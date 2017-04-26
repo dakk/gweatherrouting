@@ -1,4 +1,4 @@
-# Regatta Simulator
+# Virtual Sailing Regattas Simulator
 
 This repository is an import of http://riccardoapolloni.altervista.org/ source code from Riccardo Apolloni.
 
