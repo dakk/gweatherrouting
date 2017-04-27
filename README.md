@@ -5,9 +5,9 @@ This repository is an import of http://riccardoapolloni.altervista.org/ source c
 
 I (Davide Gessa) will try to extend this project with new features:
 - Code rewrite
-- WxWidget interface instead of Tk
+- Gtk interface instead of Tk
 - Tool for creating multi-waypoint paths
-- Save / Open for custom paths
+- Save / Open for custom paths (gpx format)
 - Realtime weather
 
 
