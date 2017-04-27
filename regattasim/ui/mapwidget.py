@@ -29,26 +29,38 @@ class PolygonalMap:
     def __init__ (self, polygons):
         self.polygons = polygons
 
+    def lonToX (self, lon, width, bbox):
+        s = abs (bbox[1][0]) + abs (bbox[1][1])
+        return width - ((lon + 180) * width / s)
+
+    def latToY (self, lat, height, bbox):
+        s = abs (bbox[0][0]) + abs (bbox[0][1])
+        return height - ((lat + 90) * height / s)
+
+
     def draw (self, widget, cr, bbox):
         print ('draw')
 
+        #print (self.lonToX (9, 600, bbox), self.latToY (39, 600, bbox))
+        cr.set_line_width (0.5)
+        cr.set_source_rgb(0,0,0)
         for polygon in self.polygons:
-            x = 0
-            y=0
-
-            print (len (polygon))
+            #print (len (polygon))
             for i in range (0, len (polygon)):
-                if i == len (polygon) - 1:
-                    cr.move_to(polygon[i][0], polygon[i][1])
-                    cr.line_to(polygon[0][0], polygon[0][1])
-                    cr.stroke_preserve()
-                    cr.set_source_rgb (0,0,1)
-                else:
-                    cr.move_to(polygon[i][0], polygon[i][1])
-                    cr.line_to(polygon[i+1][0], polygon[i+1][1])
-                    cr.set_source_rgb(0,0,0)
-                    cr.stroke_preserve()
+                x = self.lonToX (polygon[i][1], 600, bbox)
+                y = self.latToY (polygon[i][0], 600, bbox)
 
+                if x < 0 or x > 600 or y < 0 or y > 600:
+                    continue
+
+                if i == len (polygon) - 1:
+                    cr.move_to (x, y)
+                    cr.line_to (self.lonToX (polygon[0][1], 600, bbox), self.latToY (polygon[0][0], 600, bbox))
+                    cr.stroke ()
+                else:
+                    cr.move_to (x, y)
+                    cr.line_to (self.lonToX (polygon[i+1][1], 600, bbox), self.latToY (polygon[i+1][0], 600, bbox))
+                    cr.stroke ()
 
 class GSHHGLoader:
     def str32bit (flag):
@@ -92,12 +104,12 @@ class GSHHGLoader:
                         lat = pto[1]*10**-6
                         if lon > 180.0: 
                             lon = 360.0 - lon
-                        if lat < bbox[0][0] and lat > bbox[0][1] and lon < bbox[1][0] and lon > bbox[1][1]:
-                            poligono.append ((lat,lon))
-                        else:
-                            if len (poligono) > 0:
-                                polygons.append (poligono)
-                            poligono = []
+                        #if lat < bbox[0][0] and lat > bbox[0][1] and lon < bbox[1][0] and lon > bbox[1][1]:
+                        poligono.append ((lat,lon))
+                        #else:
+                        #    if len (poligono) > 0:
+                        #        polygons.append (poligono)
+                        #    poligono = []
 
                     if len (poligono) > 0:
                         polygons.append (poligono)
