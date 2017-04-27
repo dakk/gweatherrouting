@@ -1,4 +1,0 @@
-[console_scripts]
-regattasim = regattasim.main:startUI
-regattasim_cli = regattasim.main:startCli
-
