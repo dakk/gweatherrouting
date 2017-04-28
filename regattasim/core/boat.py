@@ -30,6 +30,15 @@ def reduce360 (alfa):
         return 0.0
     return alfa
 
+def reduce180 (alfa):
+    if alfa>math.pi:
+        alfa=alfa-2*math.pi
+    if alfa<-math.pi:
+        alfa=2*math.pi+alfa
+    if alfa>math.pi or alfa<-math.pi:
+        return 0.0
+    return alfa
+
 class Boat:
     def __init__ (self, model):
         self.position = (0.0, 0.0)
@@ -41,15 +50,15 @@ class Boat:
         this_dir, this_fn = os.path.split (__file__)
         self.polar = Polar (this_dir + '/../data/polars/' + model + '.pol')
 
-    def Orza(self):
-        #Orza di 1 grado
+    # Orza di 1 grado
+    def luffUp (self):
         if self.twa-math.radians(1)>0.0 and self.twa<=math.pi:#mure a dx
             self.twa=self.twa-math.radians(1)
         if self.twa+math.radians(1)<0.0 and self.twa>=-math.pi:#mure a sx
             self.twa=self.twa+math.radians(1)
 
-    def Puggia(self):
-        #Puggia di 1 grado
+    # Poggia di 1 grado
+    def bearAway (self):
         if self.twa>=0 and self.twa<math.pi:#mure a dx
             self.twa=self.twa+math.radians(1)
             if self.twa>math.pi:self.twa=math.pi
@@ -57,12 +66,13 @@ class Boat:
             self.twa=self.twa-math.radians(1)
             if self.twa<-math.pi:self.twa=-math.pi
 
-    def CambiaMura(self):
-        self.twa=-self.twa
+    # Cambio di mura
+    def changeTack (self):
+        self.twa = -self.twa
 
-    def Muovi(self,dt):
+    def Muovi (self,dt):
         v=self.getSpeed ()
-        pos=puntodistanterotta(self.position[0],self.position[1],v*dt,self.getHDG())
+        pos = puntodistanterotta(self.position[0],self.position[1],v*dt,self.getHDG())
         self.position=pos
         self.Log=self.Log+v*dt
 
@@ -83,40 +93,40 @@ class Boat:
     def getHDG(self):
         return reduce360 (self.tw[0]-self.twa)
 
-    def BRG(self,wp):
+    def BRG (self,wp):
         losso=lossodromica(self.position[0],self.position[1],wp[0],wp[1])
         return losso[1]
 
-    def BRGGPS(self,wp):
+    def BRGGPS (self,wp):
         orto=ortodromica(self.position[0],self.position[1],wp[0],wp[1])
         return orto[1]
 
-    def Dist(self,wp):
+    def Dist (self,wp):
         losso=lossodromica(self.position[0],self.position[1],wp[0],wp[1])
         return losso[0]
 
-    def CMG(self,rlv):
+    def CMG (self,rlv):
         scarto=scartorotta(self.getHDG(),rlv)
         return self.getSpeed ()*math.cos(scarto)
 
-    def VMGWP(self,wp):
+    def VMGWP (self,wp):
         losso=lossodromica(self.position[0],self.position[1],wp[0],wp[1])
         scarto=scartorotta(self.getHDG(),losso[1])
         return self.getSpeed ()*math.cos(scarto)
 
-    def TWAmaxVMGWP(self,wp):
+    def TWAmaxVMGWP (self,wp):
         rlv=self.BRG(wp)
         return self.twamaxCMG(rlv)
 
-    def TWAmaxCMG(self,rlv):
-        twabrg=riduci180(self.tw[0]-rlv)
+    def TWAmaxCMG (self,rlv):
+        twabrg=reduce180(self.tw[0]-rlv)
         maxtupla=self.polar.maxVMGtwa(self.tw[1],math.copysign(twabrg,1))
         return math.copysign(maxtupla[1],twabrg)
 
-    def VMGTWD(self):
+    def VMGTWD (self):
         return self.getSpeed ()*math.cos(self.twa)
 
-    def AW(self):
+    def AW (self):
         TWA=math.copysign(self.twa,1)
         TWS=self.tw[1]
         SPEED=self.getSpeed ()
@@ -129,25 +139,10 @@ class Boat:
             aw=(aw[0],-aw[1])
         return aw
 
-    def getLatitude (self):
-        return stampalat(self.position[0])
 
-    def getLongitude (self):
-        return stampalon(self.position[1])
+    def getPosition (self):
+        return (stampalat(self.position[0]), stampalon(self.position[1]))
 
-    def Ruota(self):
-        #iconaruotata=[]
-        #for punto in self.Icona:
-        #    iconaruotata.append(ruota(punto,self.getHDG()))
-        fiocco=self.getJib ()
-        #fioccoruotato=[]
-        #for punto in fiocco:
-        #    fioccoruotato.append(ruota(punto,self.getHDG()))
-        randa=self.getMainsail ()
-        #randaruotata=[]
-        #for punto in randa:
-        #    randaruotata.append(ruota(punto,self.getHDG()))
-        return randa, fiocco#iconaruotata,fioccoruotato,randaruotata
 
     def getPolar (self):
         polare=[]

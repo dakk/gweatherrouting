@@ -8,6 +8,7 @@ from gi.repository import Gtk, Gio, GObject, OsmGpsMap
 
 from .. import config
 from .boatwidget import BoatWidget
+from .boatselectdialog import BoatSelectDialog
 
 UI_INFO = """
 <ui>
@@ -22,10 +23,11 @@ UI_INFO = """
 		</menu>
 		<menu action='ViewMenu'>
 		</menu>
-		<menu action='WeatherMenu'>
-			<menuitem action='WeatherSet' />
+		<menu action='GribMenu'>
+			<menuitem action='GribSet' />
 		</menu>
 		<menu action='BoatMenu'>
+			<menuitem action='BoatSelect' />
 		</menu>
 		<menu action='SimulationMenu'>
 			<menuitem action='SimulationStart' />
@@ -89,15 +91,19 @@ class MainWindow(Gtk.Window):
 		action_filemenu = Gtk.Action ("ViewMenu", "View", None, None)
 		action_group.add_action(action_filemenu)
 
-		action_filemenu = Gtk.Action ("WeatherMenu", "Weather", None, None)
+		action_filemenu = Gtk.Action ("GribMenu", "Grib", None, None)
 		action_group.add_action(action_filemenu)
 
-		act = Gtk.Action ("WeatherSet", 'Set weather...', None, None)
+		act = Gtk.Action ("GribSet", 'Set grib...', None, None)
 		act.connect ("activate", self.onQuit)
 		action_group.add_action (act)
 
 		action_filemenu = Gtk.Action ("BoatMenu", "Boat", None, None)
 		action_group.add_action(action_filemenu)
+
+		act = Gtk.Action ("BoatSelect", 'Select boat', None, None)
+		act.connect ("activate", self.onBoatSelect)
+		action_group.add_action (act)
 
 		action_filemenu = Gtk.Action ("SimulationMenu", "Simulation", None, None)
 		action_group.add_action(action_filemenu)
@@ -224,6 +230,7 @@ class MainWindow(Gtk.Window):
 
 		self.add (box)
 		self.show_all ()
+
 
 		#self.onOpen (self)
 
@@ -389,3 +396,16 @@ class MainWindow(Gtk.Window):
 		sim = self.core.createSimulation ('mini')
 		sim.step ()
 		self.boat.update (sim.boat)
+
+	def onBoatSelect (self, widget):
+		dialog = BoatSelectDialog (self)
+		response = dialog.run()
+
+		if response == Gtk.ResponseType.OK:
+			print("The OK button was clicked")
+			selectedBoat = dialog.get_selected_boat ()
+			print (selectedBoat)
+		elif response == Gtk.ResponseType.CANCEL:
+			print("The Cancel button was clicked")
+
+		dialog.destroy()

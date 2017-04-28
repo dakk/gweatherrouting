@@ -15,4 +15,5 @@ class Simulation:
         self.steps += 1
 
         # Play a tick
-        print (self.boat.Ruota ())
+        print (self.boat.getJib ())
+        print (self.boat.getMainsail ())

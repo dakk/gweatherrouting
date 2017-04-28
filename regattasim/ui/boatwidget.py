@@ -42,7 +42,7 @@ class BoatWidget (Gtk.DrawingArea):
 
         if self.boat:
             cr.rotate (self.boat.getHDG ())
-            
+
         # Draw boat
         cr.set_line_width (0.5)
         cr.set_source_rgb (1,0,0)
@@ -55,8 +55,10 @@ class BoatWidget (Gtk.DrawingArea):
         cr.line_to (130.0, 150.0)
         cr.stroke ()
         
-        # Draw mainsail
+        if self.boat:
+            # Draw mainsail
+            ms = self.getMainsail ()
 
-        # Draw jig
-
+            # Draw jib
+            jib = self.getJib ()
         
