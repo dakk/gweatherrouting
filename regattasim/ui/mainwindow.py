@@ -7,6 +7,7 @@ gi.require_version('OsmGpsMap', '1.0')
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap
 
 from .. import config
+from .boatwidget import BoatWidget
 
 UI_INFO = """
 <ui>
@@ -102,7 +103,7 @@ class MainWindow(Gtk.Window):
 		action_group.add_action(action_filemenu)
 
 		act = Gtk.Action ("SimulationStart", None, None, Gtk.STOCK_MEDIA_PLAY)
-		act.connect ("activate", self.onQuit)
+		act.connect ("activate", self.onSimulationStart)
 		action_group.add_action (act)
 
 		act = Gtk.Action ("SimulationStop", None, None, Gtk.STOCK_MEDIA_STOP)
@@ -133,9 +134,30 @@ class MainWindow(Gtk.Window):
 		boxcenter = Gtk.Box (orientation=Gtk.Orientation.HORIZONTAL)
 		box.pack_start (boxcenter, True, True, 0)
 
-		## Controls
+		## Simulation Controls
 		boxcontrols = Gtk.Box (orientation=Gtk.Orientation.VERTICAL)
 		boxcenter.pack_start (boxcontrols, False, False, 0)
+
+		self.boat = BoatWidget ()
+		boxcontrols.pack_start (self.boat, False, False, 0)
+
+		self.simulationStore = Gtk.ListStore (int, str, float, float)
+		self.simulationTree = Gtk.TreeView (self.simulationStore)
+
+		renderer = Gtk.CellRendererText ()
+		self.simulationTree.append_column (Gtk.TreeViewColumn("Time", renderer, text=0))
+		self.simulationTree.append_column (Gtk.TreeViewColumn("TWD", renderer, text=1))
+		self.simulationTree.append_column (Gtk.TreeViewColumn("TWS", renderer, text=2))
+		self.simulationTree.append_column (Gtk.TreeViewColumn("TWA", renderer, text=3))
+		self.simulationTree.append_column (Gtk.TreeViewColumn("HDG", renderer, text=4))
+		self.simulationTree.append_column (Gtk.TreeViewColumn("Speed", renderer, text=5))
+
+		scbar = Gtk.ScrolledWindow ()
+		scbar.set_hexpand (False)
+		scbar.set_vexpand (True)
+		scbar.add (self.simulationTree)
+		boxcontrols.pack_start (scbar, True, True, 0)
+
 
 		## Map area
 		self.osm = OsmGpsMap.Map () #repo_uri='http://t1.openseamap.org/seamark/#Z/#X/#Y.png', image_format='png')
@@ -361,3 +383,9 @@ class MainWindow(Gtk.Window):
 
 	def dummyClick (self, w):
 		pass
+
+
+	def onSimulationStart (self, widget):
+		sim = self.core.createSimulation ('mini')
+		sim.step ()
+		self.boat.update (sim.boat)
