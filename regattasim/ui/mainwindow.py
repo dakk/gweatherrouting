@@ -32,13 +32,27 @@ class MainWindow(Gtk.Window):
         self._menubar = self.createMenuBar ()
         box.pack_start (self._menubar, False, False, 0)
 
-        ## Center
+        ### Center
         boxcenter = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         box.pack_start (boxcenter, True, True, 0)
+
+        ## Controls
+        boxcontrols = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        boxcenter.pack_start (boxcontrols, False, False, 0)
+
+        # Zoom 
+        label = Gtk.Label("This is a normal label")
+        boxcontrols.pack_start(label, False, False, 0)
+
+        adj = Gtk.Adjustment(value=1, lower=1, upper=10, step_incr=1, page_incr=1, page_size=0) 
+        adj.connect( "value_changed", self.zoomChanged) 
+        scale = Gtk.HScale (adjustment=adj) 
+        boxcontrols.pack_start(scale, False, False, 0)
 
         # Map area
         self._mapwidget = MapWidget ()
         boxcenter.pack_start (self._mapwidget, True, True, 0)
+
 
         # Status bar
         self._statusbar = Gtk.Statusbar ()
@@ -47,6 +61,9 @@ class MainWindow(Gtk.Window):
 
         self.add (box)
         self.show_all ()
+
+    def zoomChanged (self, adj):
+        self._mapwidget.setZoom (adj.get_value ())
 
 
     def createMenuBar (self):

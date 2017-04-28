@@ -26,41 +26,57 @@ from .. import config
 
 
 class PolygonalMap:
-    def __init__ (self, polygons):
+    def __init__ (self, resolution, bbox, polygons):
+        self.resolution = resolution
+        self.bbox = bbox
         self.polygons = polygons
 
-    def lonToX (self, lon, width, bbox):
-        s = abs (bbox[1][0]) + abs (bbox[1][1])
-        return width - ((lon + 180) * width / s)
+    def lonToX (self, lon, width):
+        s = float (abs (self.bbox[1][0]) + abs (self.bbox[1][1]))
+        return width - ((lon + 180.0) * width / s)
 
-    def latToY (self, lat, height, bbox):
-        s = abs (bbox[0][0]) + abs (bbox[0][1])
-        return height - ((lat + 90) * height / s)
+    def latToY (self, lat, height):
+        s = float (abs (self.bbox[0][0]) + abs (self.bbox[0][1]))
+        return height - ((lat + 90.0) * height / s)
 
+    def draw (self, widget, cr):
+        width = float (widget.get_allocated_width ())
+        height = float (widget.get_allocated_height ())
 
-    def draw (self, widget, cr, bbox):
-        print ('draw')
-
-        #print (self.lonToX (9, 600, bbox), self.latToY (39, 600, bbox))
         cr.set_line_width (0.5)
+
+        cr.set_source_rgb(1,0,0)
+        cr.move_to (self.lonToX (39., width), self.latToY (-9., height))
+        cr.line_to (self.lonToX (-9., width), self.latToY (39., height))
+        cr.stroke ()
+
         cr.set_source_rgb(0,0,0)
         for polygon in self.polygons:
             #print (len (polygon))
             for i in range (0, len (polygon)):
-                x = self.lonToX (polygon[i][1], 600, bbox)
-                y = self.latToY (polygon[i][0], 600, bbox)
+                x = self.lonToX (polygon[i][1], width)
+                y = self.latToY (polygon[i][0], height)
 
-                if x < 0 or x > 600 or y < 0 or y > 600:
+                if x < 0.0 or x > width or y < 0.0 or y > height:
                     continue
+                
+                if i == len (polygon) - 1:
+                    nextpol = polygon[0]
+                else:
+                    nextpol = polygon[i+1]
 
+                if (polygon[i][1] > 170. and nextpol[1] < -170.) or (polygon[i][1] < -170. and nextpol[1] > 170.):
+                    continue
+                    
                 if i == len (polygon) - 1:
                     cr.move_to (x, y)
-                    cr.line_to (self.lonToX (polygon[0][1], 600, bbox), self.latToY (polygon[0][0], 600, bbox))
+                    cr.line_to (self.lonToX (nextpol[1], width), self.latToY (nextpol[0], height))
                     cr.stroke ()
                 else:
                     cr.move_to (x, y)
-                    cr.line_to (self.lonToX (polygon[i+1][1], 600, bbox), self.latToY (polygon[i+1][0], 600, bbox))
+                    cr.line_to (self.lonToX (nextpol[1], width), self.latToY (nextpol[0], height))
                     cr.stroke ()
+
 
 class GSHHGLoader:
     def str32bit (flag):
@@ -69,7 +85,7 @@ class GSHHGLoader:
             flag = (32 - len (flag)) * "0" + flag
         return flag
 
-    def load (self, resolution = 'crude', bbox = [(90, -90), (180, -180)]):
+    def load (self, resolution = 'low', bbox = [(90, -90), (180, -180)]):
         this_dir, this_fn = os.path.split (__file__)
         
         if resolution == 'low':
@@ -81,7 +97,7 @@ class GSHHGLoader:
         elif resolution == 'crude':
             filename = this_dir + '/../data/gshhg/crude.bin'
         else:
-            filename = this_dir + '/../data/gshhg/crude.bin'
+            filename = this_dir + '/../data/gshhg/low.bin'
 
         polygons = []
         file = open (filename, "rb")
@@ -100,10 +116,12 @@ class GSHHGLoader:
                     for n in range (0, npti):
                         pto = file.read (8)
                         pto = struct.unpack (">2i", pto)
-                        lon = pto[0]*10**-6
-                        lat = pto[1]*10**-6
+                        lon = pto[0] * 10 ** -6
+                        lat = pto[1] * 10 ** -6
+
+                        lon = 360 - lon
                         if lon > 180.0: 
-                            lon = 360.0 - lon
+                           lon = lon - 360
                         #if lat < bbox[0][0] and lat > bbox[0][1] and lon < bbox[1][0] and lon > bbox[1][1]:
                         poligono.append ((lat,lon))
                         #else:
@@ -119,7 +137,7 @@ class GSHHGLoader:
         
         
         file.close ()
-        return PolygonalMap (polygons)
+        return PolygonalMap (resolution, bbox, polygons)
 
 
 class MapWidget (Gtk.DrawingArea):
@@ -127,19 +145,43 @@ class MapWidget (Gtk.DrawingArea):
         Gtk.DrawingArea.__init__(self)
         self.connect ('draw', self.draw)
         self.bbox = [(90, -90), (180, -180)]
-        self.zoom = 0
-        self.center = (0.0, 0.0)
+        self.zoom = 1
+        self.center = (39.221630, 9.217588)
         
         self.map = GSHHGLoader ().load ()
+        self._updateBoundingBox ()
+
+    def _updateBoundingBox (self):
+        scart = (90. / self.zoom, 180. / self.zoom)
+
+        self.bbox = [
+            (self.center[0] + scart[0], self.center[0] - scart[0]), 
+            (self.center[1] + scart[1], self.center[1] - scart[1])
+        ]
+
+        if self.zoom <= 3. and (self.map.resolution != 'crude' or self.map.bbox != self.bbox):
+            self.map = GSHHGLoader ().load (resolution='crude', bbox=self.bbox)
+        elif self.zoom <= 7. and (self.map.resolution != 'low' or self.map.bbox != self.bbox):
+            self.map = GSHHGLoader ().load (resolution='low', bbox=self.bbox)
+        elif self.zoom <= 10. and (self.map.resolution != 'intermediate' or self.map.bbox != self.bbox):
+            self.map = GSHHGLoader ().load (resolution='intermediate', bbox=self.bbox)
+        else:
+            self.map = GSHHGLoader ().load (resolution='intermediate', bbox=self.bbox)
+
+        self.queue_draw()
+        print (self.bbox)
 
     def setCenter (self, lat, lon):
-        pass
+        self.center = (lat, lon)
+        self._updateBoundingBox ()
 
     def setZoom (self, zoom):
-        pass
+        self.zoom = zoom
+        print (zoom)
+        self._updateBoundingBox ()
 
     def draw (self, widget, cr):
         cr.set_source_rgb (1, 1, 1)
         cr.paint()
         
-        self.map.draw (widget, cr, self.bbox)
+        self.map.draw (widget, cr)
