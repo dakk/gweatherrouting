@@ -7,8 +7,11 @@ class Track:
     def __len__ (self):
         return len (self.waypoints)
 
-    def __getitem__(self, key):
+    def __getitem__ (self, key):
         return self.waypoints [key]
+
+    def clear (self):
+        self.waypoints = []
 
     def load (self, path):
         try:

@@ -12,6 +12,7 @@ UI_INFO = """
 <ui>
 	<menubar name='MenuBar'>
 		<menu action='FileMenu'>
+			<menuitem action='FileNew' />
 			<menuitem action='FileOpen' />
 			<menuitem action='FileSave' />
 			<menuitem action='FileSaveAs' />
@@ -25,10 +26,22 @@ UI_INFO = """
 		<menu action='BoatMenu'>
 		</menu>
 		<menu action='SimulationMenu'>
+			<menuitem action='SimulationStart' />
+			<menuitem action='SimulationPause' />
+			<menuitem action='SimulationStop' />
 		</menu>
 		<menu action='HelpMenu'>
 		</menu>
 	</menubar>
+	<toolbar name='ToolBar'>
+		<toolitem action='FileNew' />
+		<toolitem action='FileOpen' />
+		<toolitem action='FileSave' />
+		<separator />
+		<toolitem action='SimulationStart' />
+		<toolitem action='SimulationPause' />
+		<toolitem action='SimulationStop' />
+	</toolbar>
 </ui>
 """
 
@@ -36,8 +49,10 @@ UI_INFO = """
 
 class MainWindow(Gtk.Window):
 	def __init__(self, core):
-		Gtk.Window.__init__ (self, title="Regatta Simulator")
+		Gtk.Window.__init__ (self, title="Regatta Simulator - New file")
 		self.core = core
+		self.openedFile = None
+
 		self.set_default_size (800, 600)
 		self.maximize ()
 
@@ -48,6 +63,10 @@ class MainWindow(Gtk.Window):
 
 		action_filemenu = Gtk.Action ("FileMenu", "File", None, None)
 		action_group.add_action(action_filemenu)
+
+		act = Gtk.Action ("FileNew", None, None, Gtk.STOCK_NEW)
+		act.connect ("activate", self.onNew)
+		action_group.add_action (act)
 
 		act = Gtk.Action ("FileOpen", None, None, Gtk.STOCK_OPEN)
 		act.connect ("activate", self.onOpen)
@@ -77,9 +96,20 @@ class MainWindow(Gtk.Window):
 		action_filemenu = Gtk.Action ("SimulationMenu", "Simulation", None, None)
 		action_group.add_action(action_filemenu)
 
+		act = Gtk.Action ("SimulationStart", None, None, Gtk.STOCK_MEDIA_PLAY)
+		act.connect ("activate", self.onQuit)
+		action_group.add_action (act)
+
+		act = Gtk.Action ("SimulationStop", None, None, Gtk.STOCK_MEDIA_STOP)
+		act.connect ("activate", self.onQuit)
+		action_group.add_action (act)
+
+		act = Gtk.Action ("SimulationPause", None, None, Gtk.STOCK_MEDIA_PAUSE)
+		act.connect ("activate", self.onQuit)
+		action_group.add_action (act)
+
 		action_filemenu = Gtk.Action ("HelpMenu", "Help", None, None)
 		action_group.add_action(action_filemenu)
-
 
 		uimanager = Gtk.UIManager ()
 		uimanager.add_ui_from_string (UI_INFO)
@@ -88,8 +118,11 @@ class MainWindow(Gtk.Window):
 
 		uimanager.insert_action_group (action_group)
 		self.menubar = uimanager.get_widget ("/MenuBar")
-
 		box.pack_start (self.menubar, False, False, 0)
+
+		self.toolbar = uimanager.get_widget("/ToolBar")
+		box.pack_start(self.toolbar, False, False, 0)
+
 
 		### Center
 		boxcenter = Gtk.Box (orientation=Gtk.Orientation.HORIZONTAL)
@@ -167,6 +200,11 @@ class MainWindow(Gtk.Window):
 
 		#self.onOpen (self)
 
+	def onNew (self, widget):
+		self.openedFile = None
+		self.core.getTrack ().clear ()
+		self.updateTrack ()
+		self.set_title ('Regatta Simulator - New file')
 
 
 	def onOpen (self, widget):
@@ -186,18 +224,20 @@ class MainWindow(Gtk.Window):
 			dialog.destroy()
 
 			if self.core.load (filepath):
+				self.set_title ('Regatta Simulator - %s' % filepath)
+				self.openedFile = filepath
 				self.updateTrack ()
-				edialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done")
+				edialog = Gtk.MessageDialog (self, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done")
 				edialog.format_secondary_text ("File opened, loaded %d waypoints" % len (self.core.getTrack ()))
-				edialog.run()
-				edialog.destroy()	
+				edialog.run ()
+				edialog.destroy ()	
 				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Loaded %s with %d waypoints' % (filepath, len (self.core.getTrack ())))					
 				
 			else:
-				edialog = Gtk.MessageDialog(self, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
+				edialog = Gtk.MessageDialog (self, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
 				edialog.format_secondary_text ("Cannot open file: %s" % filepath)
-				edialog.run()
-				edialog.destroy()
+				edialog.run ()
+				edialog.destroy ()
 		else:
 			dialog.destroy()
 
