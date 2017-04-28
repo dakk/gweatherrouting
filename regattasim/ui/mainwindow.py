@@ -14,8 +14,19 @@ UI_INFO = """
 		<menu action='FileMenu'>
 			<menuitem action='FileOpen' />
 			<menuitem action='FileSave' />
+			<menuitem action='FileSaveAs' />
 			<separator />
 			<menuitem action='FileQuit' />
+		</menu>
+		<menu action='ViewMenu'>
+		</menu>
+		<menu action='WeatherMenu'>
+		</menu>
+		<menu action='BoatMenu'>
+		</menu>
+		<menu action='SimulationMenu'>
+		</menu>
+		<menu action='HelpMenu'>
 		</menu>
 	</menubar>
 </ui>
@@ -46,9 +57,29 @@ class MainWindow(Gtk.Window):
 		act.connect ("activate", self.onQuit)
 		action_group.add_action (act)
 
+		act = Gtk.Action ("FileSaveAs", None, None, Gtk.STOCK_SAVE_AS)
+		act.connect ("activate", self.onQuit)
+		action_group.add_action (act)
+
 		act = Gtk.Action ("FileQuit", None, None, Gtk.STOCK_QUIT)
 		act.connect ("activate", self.onQuit)
 		action_group.add_action (act)
+
+		action_filemenu = Gtk.Action ("ViewMenu", "View", None, None)
+		action_group.add_action(action_filemenu)
+
+		action_filemenu = Gtk.Action ("WeatherMenu", "Weather", None, None)
+		action_group.add_action(action_filemenu)
+
+		action_filemenu = Gtk.Action ("BoatMenu", "Boat", None, None)
+		action_group.add_action(action_filemenu)
+
+		action_filemenu = Gtk.Action ("SimulationMenu", "Simulation", None, None)
+		action_group.add_action(action_filemenu)
+
+		action_filemenu = Gtk.Action ("HelpMenu", "Help", None, None)
+		action_group.add_action(action_filemenu)
+
 
 		uimanager = Gtk.UIManager ()
 		uimanager.add_ui_from_string (UI_INFO)
@@ -85,7 +116,12 @@ class MainWindow(Gtk.Window):
 		self.trackTree.append_column (Gtk.TreeViewColumn("Name", renderer, text=1))
 		self.trackTree.append_column (Gtk.TreeViewColumn("Latitude", renderer, text=2))
 		self.trackTree.append_column (Gtk.TreeViewColumn("Longitude", renderer, text=3))
-		boxtrack.pack_start (self.trackTree, True, True, 0)
+
+		scbar = Gtk.ScrolledWindow ()
+		scbar.set_hexpand (False)
+		scbar.set_vexpand (True)
+		scbar.add (self.trackTree)
+		boxtrack.pack_start (scbar, True, True, 0)
 
 		# Track controls
 		boxtrackcontrols = Gtk.Box (orientation=Gtk.Orientation.HORIZONTAL)
