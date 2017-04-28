@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<gpx version="1.1" creator="regattasim">
+    <wpt lat="42.9" lon="-9.25">
+        <name>Finesterre</name>
+    </wpt>
+    <wpt lat="29.000000" lon="-14.000000">
+        <name>Lanzarote</name>
+    </wpt>
+    <wpt lat="16.000000" lon="-61.000000">
+        <name>Guadalupe</name>
+    </wpt>
+</gpx>

@@ -25,7 +25,7 @@ setup(name='regattasim',
 	setup_requires='setuptools',
 	author_email=['riccardo.apolloni@gmail.com', 'gessadavide@gmail.com'],
 	packages=['regattasim', 'regattasim.ui', 'regattasim.core'],
-	package_data={'regattasim': ['data/polars/*.pol', 'data/gshhg/*.bin']},
+	package_data={'regattasim': ['data/polars/*.pol']},
 	entry_points={
 		'console_scripts': [
 			'regattasim=regattasim.main:startUI',
