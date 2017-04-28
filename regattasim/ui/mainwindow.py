@@ -22,6 +22,7 @@ UI_INFO = """
 		<menu action='ViewMenu'>
 		</menu>
 		<menu action='WeatherMenu'>
+			<menuitem action='WeatherSet' />
 		</menu>
 		<menu action='BoatMenu'>
 		</menu>
@@ -73,11 +74,11 @@ class MainWindow(Gtk.Window):
 		action_group.add_action (act)
 				
 		act = Gtk.Action ("FileSave", None, None, Gtk.STOCK_SAVE)
-		act.connect ("activate", self.onQuit)
+		act.connect ("activate", self.onSave)
 		action_group.add_action (act)
 
 		act = Gtk.Action ("FileSaveAs", None, None, Gtk.STOCK_SAVE_AS)
-		act.connect ("activate", self.onQuit)
+		act.connect ("activate", self.onSaveAs)
 		action_group.add_action (act)
 
 		act = Gtk.Action ("FileQuit", None, None, Gtk.STOCK_QUIT)
@@ -89,6 +90,10 @@ class MainWindow(Gtk.Window):
 
 		action_filemenu = Gtk.Action ("WeatherMenu", "Weather", None, None)
 		action_group.add_action(action_filemenu)
+
+		act = Gtk.Action ("WeatherSet", 'Set weather...', None, None)
+		act.connect ("activate", self.onQuit)
+		action_group.add_action (act)
 
 		action_filemenu = Gtk.Action ("BoatMenu", "Boat", None, None)
 		action_group.add_action(action_filemenu)
@@ -206,22 +211,67 @@ class MainWindow(Gtk.Window):
 		self.updateTrack ()
 		self.set_title ('Regatta Simulator - New file')
 
+	def onSave (self, widget):
+		if self.openedFile == None:
+			return self.onSaveAs (widget)
+
+		if self.core.save (self.openedFile):
+			self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Saved %d waypoints to %s' % (len (self.core.getTrack ()), self.openedFile))					
+		else:
+			edialog = Gtk.MessageDialog (self, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
+			edialog.format_secondary_text ("Cannot save file: %s" % self.openedFile)
+			edialog.run ()
+			edialog.destroy ()
+
+
+	def onSaveAs (self, widget):
+		dialog = Gtk.FileChooserDialog ("Please select a destination", self,
+					Gtk.FileChooserAction.SAVE,
+					(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+
+		filter_gpx = Gtk.FileFilter()
+		filter_gpx.set_name("GPX track")
+		filter_gpx.add_mime_type("application/gpx+xml")
+		filter_gpx.add_pattern ('*.gpx')
+		dialog.add_filter(filter_gpx)
+
+		response = dialog.run ()
+
+		if response == Gtk.ResponseType.OK:
+			filepath = dialog.get_filename ()
+			
+			if not filepath.endswith('.gpx'):
+				filepath += '.gpx'
+
+			if self.core.save (filepath):
+				self.openedFile = filepath
+				self.set_title ('Regatta Simulator - %s' % filepath)
+				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Saved %d waypoints to %s' % (len (self.core.getTrack ()), self.openedFile))
+			else:
+				edialog = Gtk.MessageDialog (self, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
+				edialog.format_secondary_text ("Cannot save file: %s" % filepath)
+				edialog.run ()
+				edialog.destroy ()
+			
+		dialog.destroy ()
+
 
 	def onOpen (self, widget):
-		dialog = Gtk.FileChooserDialog("Please choose a file", self,
+		dialog = Gtk.FileChooserDialog ("Please choose a file", self,
 					Gtk.FileChooserAction.OPEN,
 					(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
 			
-		filter_py = Gtk.FileFilter()
-		filter_py.set_name("GPX track")
-		filter_py.add_mime_type("application/gpx+xml")
-		dialog.add_filter(filter_py)
+		filter_gpx = Gtk.FileFilter ()
+		filter_gpx.set_name ("GPX track")
+		filter_gpx.add_mime_type ("application/gpx+xml")
+		filter_gpx.add_pattern ('*.gpx')
+		dialog.add_filter (filter_gpx)
 
 		response = dialog.run()
 		
 		if response == Gtk.ResponseType.OK:
-			filepath = dialog.get_filename()
-			dialog.destroy()
+			filepath = dialog.get_filename ()
+			dialog.destroy ()
 
 			if self.core.load (filepath):
 				self.set_title ('Regatta Simulator - %s' % filepath)

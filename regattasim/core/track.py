@@ -36,7 +36,14 @@ class Track:
         return True
 
     def save (self, path):
-        return False
+        try:
+            f = open (path, 'w')
+        except:
+            return False
+
+        # TODO
+        
+        return True
 
     def moveUp (self, i):
         if i > 0 and i < len (self):
@@ -51,7 +58,7 @@ class Track:
             self.waypoints [i] = sw
 
     def remove (self, i):
-        if i > 0 and i < len (self):
+        if i >= 0 and i < len (self):
             del self.waypoints [i]
 
     def add (self, lat, lon, name):
