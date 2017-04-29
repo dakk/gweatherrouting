@@ -12,16 +12,38 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         self.grib = grib
 
     def drawWindArrow (self, cr, x, y, wdir, wspeed):
-        if wspeed < 1.0:
-            cr.set_source_rgb (0.,1.,0.)
-        elif wspeed < 4.0:
-            cr.set_source_rgb (0.5,0.5,0.)
-        else:
-            cr.set_source_rgb (1.,0.,0.)
+        wdir = math.radians (wdir)
 
+        if wspeed>=0 and wspeed<3:color="0000CC"
+        elif wspeed>=3 and wspeed<6:color="0066FF"
+        elif wspeed>=6 and wspeed<9:color="00FFFF"    
+        elif wspeed>=9 and wspeed<12:color="00FF66"
+        elif wspeed>=12 and wspeed<15:color="00CC00"
+        elif wspeed>=15 and wspeed<18:color="66FF33"
+        elif wspeed>=18 and wspeed<21:color="CCFF33"
+        elif wspeed>=21 and wspeed<24:color="FFFF66"
+        elif wspeed>=24 and wspeed<27:color="FFCC00"
+        elif wspeed>=27 and wspeed<30:color="FF9900"
+        elif wspeed>=30 and wspeed<33:color="FF6600"
+        elif wspeed>=33 and wspeed<36:color="FF3300"
+        elif wspeed>=36 and wspeed<39:color="FF0000"
+        elif wspeed>=39 and wspeed<42:color="CC6600"
+        elif wspeed>=42: color="CC0000"
+
+        a = int (color [0:2], 16) / 255.
+        b = int (color [2:4], 16) / 255.
+        c = int (color [4:6], 16) / 255.
+        cr.set_source_rgb (a, b, c)
+        
+        length = 15
         cr.move_to (x, y)
-        cr.line_to (x + (wspeed / 2 * math.sin (wdir)), y + 1 * math.cos (wdir))
-        cr.line_to (x + (5 + wspeed * math.sin (wdir)), y + (5 + wspeed * math.cos (wdir)))
+        #cr.line_to (x + (wspeed / 2 * math.sin (wdir)), y + 1 * math.cos (wdir))
+        cr.line_to (x + (length * math.sin (wdir)), y + (length * math.cos (wdir)))
+
+        cr.line_to (x + (1 * math.sin (wdir - 30)), y + (1 * math.cos (wdir - 30)))
+        cr.move_to (x + (length * math.sin (wdir)), y + (length * math.cos (wdir)))
+        cr.line_to (x + (1 * math.sin (wdir + 30)), y + (1 * math.cos (wdir + 30)))
+        
         cr.stroke ()
 
     def do_draw (self, gpsmap, cr):
@@ -31,8 +53,8 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 
         for x in range (0, 100):
             for y in range (0, 100):
-                w = self.grib.getWind (0, x, y)
-                self.drawWindArrow (cr, x * 20, y * 20, w[0], w[1])
+                wdir, wspeed = self.grib.getWind (0, x, y)
+                self.drawWindArrow (cr, x * 20, y * 20, wdir, wspeed)
 
     def do_render (self, gpsmap):
         pass

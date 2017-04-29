@@ -8,6 +8,7 @@ class Core:
     def __init__ (self):
         self.track = Track ()
         self.grib = Grib ()
+        self.grib.parse (open ('/home/dakk/testgrib.grb', 'rb'))
 
     # Simulation
     def createSimulation (self, boatModel):
