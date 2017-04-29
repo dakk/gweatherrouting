@@ -57,8 +57,8 @@ class BoatWidget (Gtk.DrawingArea):
         
         if self.boat:
             # Draw mainsail
-            ms = self.getMainsail ()
+            ms = self.boat.getMainsail ()
 
             # Draw jib
-            jib = self.getJib ()
+            jib = self.boat.getJib ()
         

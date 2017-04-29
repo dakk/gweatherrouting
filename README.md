@@ -1,14 +1,16 @@
 # Virtual Sailing Regattas Simulator
 
-This repository is an import of http://riccardoapolloni.altervista.org/ source code from Riccardo Apolloni.
+This repository is a modern rewrite of http://riccardoapolloni.altervista.org/ source code from Riccardo Apolloni.
 
 
-I (Davide Gessa) will try to extend this project with new features:
+## Planned features
+
 - Code rewrite
 - Gtk interface instead of Tk
 - Tool for creating multi-waypoint paths
 - Save / Open for custom paths (gpx format)
-- Realtime weather
+- Realtime weather grib
+- Save / Open saved simulation
 
 
 ## License

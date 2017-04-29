@@ -42,6 +42,8 @@ class BoatSelectDialog (Gtk.Dialog):
 
 		self.boatName = Gtk.Label ('')
 		boxboat.add (self.boatName)
+		self.boatImage = Gtk.Image ()
+		boxboat.add (self.boatImage)
 
 		self.show_all ()
 		self.selectBoat (0)
@@ -52,6 +54,7 @@ class BoatSelectDialog (Gtk.Dialog):
 	def selectBoat (self, i):
 		self.selectedBoat = self.boats[i]
 		self.boatName.set_label (self.boats[i]['name'])
+		self.boatImage.set_from_file (os.path.split (__file__)[0] + '/../data/boats/' + self.boats[i]['image'])
 
 	def onBoatChanged (self, selection):
 		model, treeiter = selection.get_selected()

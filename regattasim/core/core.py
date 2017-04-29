@@ -2,10 +2,12 @@ from .. import config
 from .track import Track
 from .simulation import Simulation
 from .boat import Boat
+from .grib import Grib
 
 class Core:
     def __init__ (self):
         self.track = Track ()
+        self.grib = Grib ()
 
     # Simulation
     def createSimulation (self, boatModel):

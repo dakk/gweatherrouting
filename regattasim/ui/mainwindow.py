@@ -1,5 +1,6 @@
 import gi
 import math
+from threading import Thread
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('OsmGpsMap', '1.0')
@@ -9,6 +10,8 @@ from gi.repository import Gtk, Gio, GObject, OsmGpsMap
 from .. import config
 from .boatwidget import BoatWidget
 from .boatselectdialog import BoatSelectDialog
+from .gribselectdialog import GribSelectDialog
+from .gribmaplayer import GribMapLayer
 
 UI_INFO = """
 <ui>
@@ -18,6 +21,8 @@ UI_INFO = """
 			<menuitem action='FileOpen' />
 			<menuitem action='FileSave' />
 			<menuitem action='FileSaveAs' />
+			<separator />
+			<menuitem action='FileTakeScreenshoot' />
 			<separator />
 			<menuitem action='FileQuit' />
 		</menu>
@@ -33,6 +38,8 @@ UI_INFO = """
 			<menuitem action='SimulationStart' />
 			<menuitem action='SimulationPause' />
 			<menuitem action='SimulationStop' />
+			<separator />
+			<menuitem action='SimulationSavePath' />
 		</menu>
 		<menu action='HelpMenu'>
 		</menu>
@@ -45,6 +52,7 @@ UI_INFO = """
 		<toolitem action='SimulationStart' />
 		<toolitem action='SimulationPause' />
 		<toolitem action='SimulationStop' />
+		<toolitem action='SimulationSavePath' />
 	</toolbar>
 </ui>
 """
@@ -84,6 +92,10 @@ class MainWindow(Gtk.Window):
 		act.connect ("activate", self.onSaveAs)
 		action_group.add_action (act)
 
+		act = Gtk.Action ("FileTakeScreenshoot", 'Take Screenshoot', None, Gtk.STOCK_ZOOM_FIT)
+		act.connect ("activate", self.onQuit)
+		action_group.add_action (act)
+
 		act = Gtk.Action ("FileQuit", None, None, Gtk.STOCK_QUIT)
 		act.connect ("activate", self.onQuit)
 		action_group.add_action (act)
@@ -94,14 +106,14 @@ class MainWindow(Gtk.Window):
 		action_filemenu = Gtk.Action ("GribMenu", "Grib", None, None)
 		action_group.add_action(action_filemenu)
 
-		act = Gtk.Action ("GribSet", 'Set grib...', None, None)
-		act.connect ("activate", self.onQuit)
+		act = Gtk.Action ("GribSet", 'Set grib', None, Gtk.STOCK_COLOR_PICKER)
+		act.connect ("activate", self.onGribSelect)
 		action_group.add_action (act)
 
 		action_filemenu = Gtk.Action ("BoatMenu", "Boat", None, None)
 		action_group.add_action(action_filemenu)
 
-		act = Gtk.Action ("BoatSelect", 'Select boat', None, None)
+		act = Gtk.Action ("BoatSelect", 'Select boat', None, Gtk.STOCK_COLOR_PICKER)
 		act.connect ("activate", self.onBoatSelect)
 		action_group.add_action (act)
 
@@ -117,6 +129,10 @@ class MainWindow(Gtk.Window):
 		action_group.add_action (act)
 
 		act = Gtk.Action ("SimulationPause", None, None, Gtk.STOCK_MEDIA_PAUSE)
+		act.connect ("activate", self.onQuit)
+		action_group.add_action (act)
+
+		act = Gtk.Action ("SimulationSavePath", 'Save path', None, Gtk.STOCK_SAVE)
 		act.connect ("activate", self.onQuit)
 		action_group.add_action (act)
 
@@ -140,39 +156,23 @@ class MainWindow(Gtk.Window):
 		boxcenter = Gtk.Box (orientation=Gtk.Orientation.HORIZONTAL)
 		box.pack_start (boxcenter, True, True, 0)
 
-		## Simulation Controls
-		boxcontrols = Gtk.Box (orientation=Gtk.Orientation.VERTICAL)
-		boxcenter.pack_start (boxcontrols, False, False, 0)
-
-		self.boat = BoatWidget ()
-		boxcontrols.pack_start (self.boat, False, False, 0)
-
-		self.simulationStore = Gtk.ListStore (int, str, float, float)
-		self.simulationTree = Gtk.TreeView (self.simulationStore)
-
-		renderer = Gtk.CellRendererText ()
-		self.simulationTree.append_column (Gtk.TreeViewColumn("Time", renderer, text=0))
-		self.simulationTree.append_column (Gtk.TreeViewColumn("TWD", renderer, text=1))
-		self.simulationTree.append_column (Gtk.TreeViewColumn("TWS", renderer, text=2))
-		self.simulationTree.append_column (Gtk.TreeViewColumn("TWA", renderer, text=3))
-		self.simulationTree.append_column (Gtk.TreeViewColumn("HDG", renderer, text=4))
-		self.simulationTree.append_column (Gtk.TreeViewColumn("Speed", renderer, text=5))
-
-		scbar = Gtk.ScrolledWindow ()
-		scbar.set_hexpand (False)
-		scbar.set_vexpand (True)
-		scbar.add (self.simulationTree)
-		boxcontrols.pack_start (scbar, True, True, 0)
 
 
 		## Map area
-		self.osm = OsmGpsMap.Map () #repo_uri='http://t1.openseamap.org/seamark/#Z/#X/#Y.png', image_format='png')
+		self.osm = OsmGpsMap.Map () #repo_uri="http://tiles.openseamap.org/seamark/#Z/#X/#Y.png", image_format='png')
 		self.osm.connect ('button_press_event', self.onMapClick)
+
+		self.gribMapLayer = GribMapLayer (self.core.grib)
+		self.osm.layer_add (self.gribMapLayer)
+		self.osm.layer_add (OsmGpsMap.MapOsd (show_dpad=True, show_zoom=True, show_crosshair=False))
 		boxcenter.pack_start (self.osm, True, True, 0)
+
+		notebook = Gtk.Notebook ()
+		boxcenter.pack_start (notebook, False, False, 0)
 
 		## Track
 		boxtrack = Gtk.Box (orientation=Gtk.Orientation.VERTICAL)
-		boxcenter.pack_start (boxtrack, False, False, 0)
+		notebook.append_page(boxtrack, Gtk.Label ('Track'))
 
 		self.trackStore = Gtk.ListStore (int, str, float, float)
 		self.trackTree = Gtk.TreeView (self.trackStore)
@@ -223,6 +223,31 @@ class MainWindow(Gtk.Window):
 		button.connect ("clicked", self.addWaypoint)
 		boxtrack.pack_start (button, False, False, 0)
 
+		## Simulation Controls
+		boxcontrols = Gtk.Box (orientation=Gtk.Orientation.VERTICAL)
+		notebook.append_page(boxcontrols, Gtk.Label ('Simulation'))
+
+		self.boat = BoatWidget ()
+		boxcontrols.pack_start (self.boat, False, False, 0)
+
+		self.simulationStore = Gtk.ListStore (int, str, float, float)
+		self.simulationTree = Gtk.TreeView (self.simulationStore)
+
+		renderer = Gtk.CellRendererText ()
+		self.simulationTree.append_column (Gtk.TreeViewColumn("Time", renderer, text=0))
+		self.simulationTree.append_column (Gtk.TreeViewColumn("TWD", renderer, text=1))
+		self.simulationTree.append_column (Gtk.TreeViewColumn("TWS", renderer, text=2))
+		self.simulationTree.append_column (Gtk.TreeViewColumn("TWA", renderer, text=3))
+		self.simulationTree.append_column (Gtk.TreeViewColumn("HDG", renderer, text=4))
+		self.simulationTree.append_column (Gtk.TreeViewColumn("Speed", renderer, text=5))
+
+		scbar = Gtk.ScrolledWindow ()
+		scbar.set_hexpand (False)
+		scbar.set_vexpand (True)
+		scbar.add (self.simulationTree)
+		boxcontrols.pack_start (scbar, True, True, 0)
+
+		
 		# Status bar
 		self.statusbar = Gtk.Statusbar ()
 		self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Regatta Simulator started')
@@ -326,6 +351,10 @@ class MainWindow(Gtk.Window):
 		self.osm.track_remove_all ()
 		track = OsmGpsMap.MapTrack ()
 
+		#TODO: make it editable? should swap values between track and core model
+		#track.set_property ("editable", True)
+		track.set_property ("line-width", 2)
+
 		i = 0
 		for wp in self.core.getTrack ():
 			i += 1
@@ -402,10 +431,39 @@ class MainWindow(Gtk.Window):
 		response = dialog.run()
 
 		if response == Gtk.ResponseType.OK:
-			print("The OK button was clicked")
 			selectedBoat = dialog.get_selected_boat ()
 			print (selectedBoat)
 		elif response == Gtk.ResponseType.CANCEL:
-			print("The Cancel button was clicked")
+			pass
+
+		dialog.destroy()
+
+
+	def onGribDownloadPercentage (self, percentage):
+		self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Downloading grib: %d%% completed' % percentage)
+
+	def onGribDownloadCompleted (self, status):
+		if status:
+			edialog = Gtk.MessageDialog (self, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done")
+			edialog.format_secondary_text ("Grib downloaded successfully")
+			edialog.run ()
+			edialog.destroy ()	
+		else:
+			edialog = Gtk.MessageDialog (self, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
+			edialog.format_secondary_text ("Error during grib download")
+			edialog.run ()
+			edialog.destroy ()	
+
+
+	def onGribSelect (self, widget):
+		dialog = GribSelectDialog (self)
+		response = dialog.run()
+
+		if response == Gtk.ResponseType.OK:
+			selectedGrib = dialog.get_selected_grib ()
+			t = Thread(target=self.core.grib.download, args=(selectedGrib, self.onGribDownloadPercentage, self.onGribDownloadCompleted,))
+			t.start ()
+		elif response == Gtk.ResponseType.CANCEL:
+			pass
 
 		dialog.destroy()
