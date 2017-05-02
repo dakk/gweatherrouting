@@ -1,3 +1,4 @@
+import time
 import gi
 import math
 from threading import Thread
@@ -425,6 +426,15 @@ class MainWindow(Gtk.Window):
 		sim = self.core.createSimulation ('mini')
 		sim.step ()
 		self.boat.update (sim.boat)
+
+		GObject.timeout_add(1000, self.inc)
+
+	def inc (self):
+		print ('inc!')
+		self.gribMapLayer.t += 0.1
+		self.osm.queue_draw ()
+		GObject.timeout_add(1000, self.inc)
+
 
 	def onBoatSelect (self, widget):
 		dialog = BoatSelectDialog (self)

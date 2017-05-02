@@ -1,11 +1,9 @@
 import gi
 import os
-import json
-import requests
-from bs4 import BeautifulSoup
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, GObject
 
+from ..core import grib
 
 class GribSelectDialog (Gtk.Dialog):
 	def __init__(self, parent):
@@ -34,15 +32,8 @@ class GribSelectDialog (Gtk.Dialog):
 		select = gribTree.get_selection ()
 		select.connect ("changed", self.onGribChanged)
 		
-		data = requests.get ('http://grib.virtual-loup-de-mer.org/').text
-		soup = BeautifulSoup (data, 'html.parser')
-
-		for row in soup.find ('table').find_all ('tr'):
-			r = row.find_all ('td')
-
-
-			if len (r) >= 4 and r[1].text.find ('.grb') != -1:
-				gribStore.append ([r[1].text, 'NOAA', r[2].text, r[3].text, 'http://grib.virtual-loup-de-mer.org/' + r[1].find ('a', href=True)['href']])
+		for x in grib.Grib.getDownloadList ():
+			gribStore.append (x)
 
 		self.show_all ()
 

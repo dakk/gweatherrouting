@@ -10,6 +10,7 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
     def __init__ (self, grib):
         GObject.GObject.__init__ (self)
         self.grib = grib
+        self.t = 0.0
 
     def drawWindArrow (self, cr, x, y, wdir, wspeed):
         wdir = math.radians (wdir)
@@ -59,14 +60,22 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         # Draw boat
         cr.set_line_width (1)
         cr.set_source_rgb (1,0,0)
-        print (p1lat, p1lon, p2lat, p2lon)
-        for x in range (0, int (width), 20):
-            for y in range (0, int (height), 20):
-                lat = (max (p2lat, p1lat) - min (p2lat, p1lat)) / height * y + min (p2lat, p1lat)
-                lon = (max (p2lon, p1lon) - min (p2lon, p1lon)) / width * x + min (p2lon, p1lon)
-                wdir, wspeed = self.grib.getWind (0, lon, lat)
-                print (lat, lon, wdir, wspeed)
-                self.drawWindArrow (cr, x, y, wdir, wspeed)
+        #print (p1lat, p1lon, p2lat, p2lon)
+
+        bounds = ((min(p1lat,p2lat), min (p1lon, p2lon)), (max(p1lat,p2lat), max (p1lon, p2lon)))
+        data = self.grib.getContinousWind (self.t, bounds)
+        print (self.t)
+
+        x = 0
+        y = 0
+        for r in data:
+            x = 0
+            for c in r:
+                self.drawWindArrow (cr, x, y, c[0], c[1])
+                x += width / len (r)
+
+            y += height / len (data)
+        
 
     def do_render (self, gpsmap):
         pass
