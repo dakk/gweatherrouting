@@ -14,6 +14,7 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
     def drawWindArrow (self, cr, x, y, wdir, wspeed):
         wdir = math.radians (wdir)
 
+        color = "0000CC"
         if wspeed>=0 and wspeed<3:color="0000CC"
         elif wspeed>=3 and wspeed<6:color="0066FF"
         elif wspeed>=6 and wspeed<9:color="00FFFF"    
@@ -47,14 +48,25 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         cr.stroke ()
 
     def do_draw (self, gpsmap, cr):
+        p1, p2 = gpsmap.get_bbox ()
+
+        p1lat, p1lon = p1.get_degrees ()
+        p2lat, p2lon = p2.get_degrees ()
+
+        width = float (gpsmap.get_allocated_width ())
+        height = float (gpsmap.get_allocated_height ())
+
         # Draw boat
         cr.set_line_width (1)
         cr.set_source_rgb (1,0,0)
-
-        for x in range (0, 100):
-            for y in range (0, 100):
-                wdir, wspeed = self.grib.getWind (0, x, y)
-                self.drawWindArrow (cr, x * 20, y * 20, wdir, wspeed)
+        print (p1lat, p1lon, p2lat, p2lon)
+        for x in range (0, int (width), 20):
+            for y in range (0, int (height), 20):
+                lat = (max (p2lat, p1lat) - min (p2lat, p1lat)) / height * y + min (p2lat, p1lat)
+                lon = (max (p2lon, p1lon) - min (p2lon, p1lon)) / width * x + min (p2lon, p1lon)
+                wdir, wspeed = self.grib.getWind (0, lon, lat)
+                print (lat, lon, wdir, wspeed)
+                self.drawWindArrow (cr, x, y, wdir, wspeed)
 
     def do_render (self, gpsmap):
         pass

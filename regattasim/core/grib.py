@@ -240,6 +240,7 @@ class GribRecord:
 			#i=tuplaij[0]
 			#j=tuplaij[1]
 			octectreaded=11
+			self.grid = []
 			for N in range(0,NI*NJ):
 				#leggiamo nbit
 				n=int ((nbit-len(bufferstr))/8+1)
@@ -251,7 +252,7 @@ class GribRecord:
 				X=int(Xstr,2)
 				bufferstr=bufferstr[nbit:]
 
-				#print ((R+X*2**E)*10**-D)
+				self.grid.append ((R+X*2**E)*10**-D)
 				#
 				#record.grid[j][i]=(R+X*2**E)*10**-D
 				#incremento i,j in accordo a scanmode
@@ -271,7 +272,15 @@ class GribRecord:
 		print (self.date, self.bounds, self.timeunits, self.time, self.parameter)
 
 	def getValue (self, lat, lon):
-		return 0.0
+		#self.bounds = [(LA1, LO1), (LA2, LO2)]
+		minlat=min(self.bounds[0][0], self.bounds[1][0])
+		minlon=min(self.bounds[0][1], self.bounds[1][1])
+		maxlat=max(self.bounds[0][0], self.bounds[1][0])
+		maxlon=max(self.bounds[0][1], self.bounds[1][1])
+		i=(lon-minlon)/(maxlon-minlon)
+		j=(lat-minlat)/(maxlat-minlat)
+		#print (int (i) * self.size[0] + int (j), len (self.grid))
+		return self.grid [int (i) * self.size[0] + int (j)]
 
 		
 class Grib:
@@ -283,9 +292,9 @@ class Grib:
 	# Return [dir (degree), speed]
 	def getWind (self, t, lat, lon):
 		#return [random.random () * 6, random.random () * 10]
-		print (self.rindex)
-		wdir = self.rindex[33][t].getValue (lat, lon)
-		wspeed = self.rindex[34][t].getValue (lat, lon)
+		#print (self.rindex)
+		wdir = self.rindex[34][t].getValue (lat, lon)
+		wspeed = self.rindex[33][t].getValue (lat, lon)
 
 		return [wdir, wspeed]
 
