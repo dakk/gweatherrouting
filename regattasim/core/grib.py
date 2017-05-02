@@ -251,7 +251,6 @@ class GribRecord:
 				Xstr=bufferstr[0:nbit]
 				X=int(Xstr,2)
 				bufferstr=bufferstr[nbit:]
-
 				self.grid.append ((R+X*2**E)*10**-D)
 				#
 				#record.grid[j][i]=(R+X*2**E)*10**-D
