@@ -22,17 +22,17 @@ class Polar:
         self.tws = []
         self.twa = []
         self.vmgdict = {}
-        self.speedTable= []
+        self.speedTable = []
         
         f = open (polarpath, "r")
         
         tws = f.readline ().split ()
         for i in range (1,len(tws)):
-            self.tws.append (float (tws[i]))
+            self.tws.append (float (tws[i].replace ('\x02', '')))
 
         line = f.readline ()
         while line != "":
-            dato = line.split()
+            dato = line.split ()
             twa = float (dato[0])
             self.twa.append (math.radians (twa))
             speedline = []
@@ -40,7 +40,7 @@ class Polar:
                 speed = float (dato[i])
                 speedline.append (speed)
             self.speedTable.append (speedline)
-            line = f.readline()
+            line = f.readline ()
         f.close ()
 
 

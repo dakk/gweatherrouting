@@ -8,19 +8,19 @@
     {
         "name": "Mini 650 Proto",
         "image": "mini650/mini.png",
-        "polar": "mini650/mini.pol",
+        "polar": "mini650proto/mini.pol",
         "length": 6.50
     },
     {
         "name": "Class 40",
         "image": "mini650/mini.png",
-        "polar": "mini650/mini.pol",
+        "polar": "class40/class40.pol",
         "length": 20.0
     },
     {
         "name": "Cat 20",
         "image": "mini650/mini.png",
-        "polar": "mini650/mini.pol",
+        "polar": "cat20/cat20.pol",
         "length": 10.0
     }
 ]
