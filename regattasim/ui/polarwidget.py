@@ -36,10 +36,9 @@ class PolarWidget (Gtk.DrawingArea):
         cr.set_source_rgb (1, 1, 1)
         cr.paint ()
 
-        cr.set_line_width (1)
+        cr.set_line_width (0.3)
         cr.set_source_rgb (0, 0, 0)
         for x in self.polar.tws:# [::2]:
-            print (x)
             cr.arc (0.0, 100.0, x * 3, math.radians (-180), math.radians (180.0))
             cr.stroke ()
 

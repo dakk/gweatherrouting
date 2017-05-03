@@ -32,21 +32,21 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         wdir = math.radians (wdir)
 
         color = "0000CC"
-        if wspeed>=0 and wspeed<3:color="0000CC"
-        elif wspeed>=3 and wspeed<6:color="0066FF"
-        elif wspeed>=6 and wspeed<9:color="00FFFF"    
-        elif wspeed>=9 and wspeed<12:color="00FF66"
-        elif wspeed>=12 and wspeed<15:color="00CC00"
-        elif wspeed>=15 and wspeed<18:color="66FF33"
-        elif wspeed>=18 and wspeed<21:color="CCFF33"
-        elif wspeed>=21 and wspeed<24:color="FFFF66"
-        elif wspeed>=24 and wspeed<27:color="FFCC00"
-        elif wspeed>=27 and wspeed<30:color="FF9900"
-        elif wspeed>=30 and wspeed<33:color="FF6600"
-        elif wspeed>=33 and wspeed<36:color="FF3300"
-        elif wspeed>=36 and wspeed<39:color="FF0000"
-        elif wspeed>=39 and wspeed<42:color="CC6600"
-        elif wspeed>=42: color="CC0000"
+        if wspeed>=0 and wspeed<2:color="0000CC"
+        elif wspeed>=2 and wspeed<4:color="0066FF"
+        elif wspeed>=4 and wspeed<6:color="00FFFF"    
+        elif wspeed>=6 and wspeed<8:color="00FF66"
+        elif wspeed>=8 and wspeed<10:color="00CC00"
+        elif wspeed>=10 and wspeed<12:color="66FF33"
+        elif wspeed>=12 and wspeed<14:color="CCFF33"
+        elif wspeed>=14 and wspeed<16:color="FFFF66"
+        elif wspeed>=16 and wspeed<18:color="FFCC00"
+        elif wspeed>=18 and wspeed<20:color="FF9900"
+        elif wspeed>=20 and wspeed<22:color="FF6600"
+        elif wspeed>=22 and wspeed<24:color="FF3300"
+        elif wspeed>=24 and wspeed<26:color="FF0000"
+        elif wspeed>=26 and wspeed<28:color="CC6600"
+        elif wspeed>=28: color="CC0000"
 
         a = int (color [0:2], 16) / 255.
         b = int (color [2:4], 16) / 255.
@@ -58,9 +58,9 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         #cr.line_to (x + (wspeed / 2 * math.sin (wdir)), y + 1 * math.cos (wdir))
         cr.line_to (x + (length * math.sin (wdir)), y + (length * math.cos (wdir)))
 
-        cr.line_to (x + (1 * math.sin (wdir - 30)), y + (1 * math.cos (wdir - 30)))
+        cr.line_to (x + (4 * math.sin (wdir - math.radians (30))), y + (4 * math.cos (wdir - math.radians (30))))
         cr.move_to (x + (length * math.sin (wdir)), y + (length * math.cos (wdir)))
-        cr.line_to (x + (1 * math.sin (wdir + 30)), y + (1 * math.cos (wdir + 30)))
+        cr.line_to (x + (4 * math.sin (wdir + math.radians (30))), y + (4 * math.cos (wdir + math.radians (30))))
         
         cr.stroke ()
 
@@ -84,13 +84,18 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 
         x = 0
         y = 0
-        for r in data:
-            x = 0
-            for c in r:
-                self.drawWindArrow (cr, x, y, c[0], c[1])
-                x += width / len (r)
+        sep = 1
 
-            y += height / len (data)
+        sep = math.ceil (len (data[0]) / 60)
+        cr.set_line_width (1.5 / sep)
+
+        for r in data[::sep]:
+            x = 0
+            for c in r[::sep]:
+                self.drawWindArrow (cr, x, y, c[0], c[1])
+                x += (width / len (r)) * sep
+
+            y += (height / len (data)) * sep
         
 
     def do_render (self, gpsmap):
