@@ -1,3 +1,19 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) 2017 Davide Gessa
+'''
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+For detail about GNU see <http://www.gnu.org/licenses/>.
+'''
+
 import time
 import gi
 import math
@@ -433,7 +449,7 @@ class MainWindow(Gtk.Window):
 		print ('inc!')
 		self.gribMapLayer.t += 0.1
 		self.osm.queue_draw ()
-		GObject.timeout_add(1000, self.inc)
+		GObject.timeout_add (1000, self.inc)
 
 
 	def onBoatSelect (self, widget):

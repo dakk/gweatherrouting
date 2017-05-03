@@ -24,40 +24,15 @@ from gi.repository import Gtk, Gio
 from .. import config
 
 
-class BoatWidget (Gtk.DrawingArea):
-    def __init__ (self):
+class PolarWidget (Gtk.DrawingArea):
+    def __init__ (self, polar):
         Gtk.DrawingArea.__init__(self)
         self.connect ('draw', self.draw)
         self.set_size_request (200, 200)
-        self.boat = None
-
-    def update (self, boat):
-        self.queue_draw ()
-        self.boat = boat
+        self.polar = polar
 
     def draw (self, widget, cr):
         cr.set_source_rgb (1, 1, 1)
         cr.paint()
 
-        if self.boat:
-            cr.rotate (self.boat.getHDG ())
-
-        # Draw boat
-        cr.set_line_width (0.5)
-        cr.set_source_rgb (1,0,0)
-
-        cr.curve_to (100.0,20.0, 50.0,60.0, 70.0,150.0)
-        cr.stroke ()
-        cr.curve_to (100.0,20.0, 150.0,60.0, 130.0,150.0)
-        cr.stroke ()
-        cr.move_to (70.0, 150.0)
-        cr.line_to (130.0, 150.0)
-        cr.stroke ()
-        
-        if self.boat:
-            # Draw mainsail
-            ms = self.boat.getMainsail ()
-
-            # Draw jib
-            jib = self.boat.getJib ()
         

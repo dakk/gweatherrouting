@@ -1,8 +1,27 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) 2017 Davide Gessa
+'''
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+For detail about GNU see <http://www.gnu.org/licenses/>.
+'''
+
 import gi
 import os
 import json
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, GObject
+
+from .polarwidget import PolarWidget
+
 
 class BoatSelectDialog (Gtk.Dialog):
 	def __init__(self, parent):
@@ -44,6 +63,8 @@ class BoatSelectDialog (Gtk.Dialog):
 		boxboat.add (self.boatName)
 		self.boatImage = Gtk.Image ()
 		boxboat.add (self.boatImage)
+		self.boatPolarContainer = Gtk.Box ()
+		boxboat.add (self.boatPolarContainer)
 
 		self.show_all ()
 		self.selectBoat (0)
@@ -55,6 +76,8 @@ class BoatSelectDialog (Gtk.Dialog):
 		self.selectedBoat = self.boats[i]
 		self.boatName.set_label (self.boats[i]['name'])
 		self.boatImage.set_from_file (os.path.split (__file__)[0] + '/../data/boats/' + self.boats[i]['image'])
+		self.boatPolarContainer.clear ()
+		self.boatPolarContainer.add (Polar (os.path.split (__file__)[0] + '/../data/boats/' + self.boats[i]['polar']))
 
 	def onBoatChanged (self, selection):
 		model, treeiter = selection.get_selected()
