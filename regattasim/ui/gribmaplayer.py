@@ -82,7 +82,7 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         data = self.grib.getContinousWind (self.t, bounds)
         print (self.t)
 
-        x = 0
+        x = width
         y = 0
         sep = 1
 
@@ -90,10 +90,10 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         cr.set_line_width (1.5 / sep)
 
         for r in data[::sep]:
-            x = 0
+            x = width
             for c in r[::sep]:
                 self.drawWindArrow (cr, x, y, c[0], c[1])
-                x += (width / len (r)) * sep
+                x -= (width / len (r)) * sep
 
             y += (height / len (data)) * sep
         

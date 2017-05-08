@@ -106,7 +106,7 @@ class Grib:
 				tws=(uu[i][j]**2+vv[i][j]**2)/2.
 				twd=math.atan2(uu[i][j],vv[i][j])+math.pi
 				twd=riduci360(twd)
-				data2.append ((math.degrees(twd), tws))
+				data2.append ((-math.degrees(twd), tws))
 			data.append (data2)
 		return data
 
