@@ -80,7 +80,7 @@ class Polar:
         return speed
         
 
-    def Reaching(self,tws):
+    def getReaching(self,tws):
         maxspeed=0
         twamaxspeed=0
         for twa in range(0,181):
@@ -92,7 +92,7 @@ class Polar:
         return (maxspeed,twamaxspeed)
 
 
-    def maxVMGtwa(self,tws,twa):
+    def getMaxVMGTWA(self,tws,twa):
         if not self.vmgdict.has_key((tws,twa)):
             twamin=max(0,twa-math.pi/2)
             twamax=min(math.pi,twa+math.pi/2)
@@ -109,21 +109,21 @@ class Polar:
         return self.vmgdict.get((tws,twa))
 
 
-    def maxVMGup(self,tws):
-        vmguptupla=self.maxVMGtwa(tws,0)
+    def getMaxVMGUp(self,tws):
+        vmguptupla=self.getMaxVMGTWA(tws,0)
         return (vmguptupla[0],vmguptupla[1])
 
 
-    def maxVMGdown(self,tws):
-        vmgdowntupla=self.maxVMGtwa(tws,math.pi)
+    def getMaxVMGDown(self,tws):
+        vmgdowntupla=self.getMaxVMGTWA(tws,math.pi)
         return (-vmgdowntupla[0],vmgdowntupla[1])
 
 
-    def SpeedRoutage(self,tws,twa):
-        UP=self.maxVMGup(tws)
+    def getRoutageSpeed(self,tws,twa):
+        UP=self.getMaxVMGUp(tws)
         vmgup=UP[0]
         twaup=UP[1]
-        DOWN=self.maxVMGdown(tws)
+        DOWN=self.getMaxVMGDown(tws)
         vmgdown=DOWN[0]
         twadown=DOWN[1]
         v=0.0
@@ -137,11 +137,11 @@ class Polar:
         return v
 
 
-    def twaroutage(self,tws,twa):
-        UP=self.maxVMGup(tws)
+    def getTWARoutage(self,tws,twa):
+        UP=self.getMaxVMGUp(tws)
         vmgup=UP[0]
         twaup=UP[1]
-        DOWN=self.maxVMGdown(tws)
+        DOWN=self.getMaxVMGDown(tws)
         vmgdown=DOWN[0]
         twadown=DOWN[1]
         if twa>=twaup and twa<=twadown:

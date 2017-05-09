@@ -18,6 +18,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import math
 import os
 from .polar import Polar
+from .beizer import Beizer
 
 def reduce360 (alfa):
     n=int(alfa*0.5/math.pi)
@@ -77,7 +78,7 @@ class Boat:
         self.Log=self.Log+v*dt
 
     def MuoviRoutage(self,dt):
-        v=self.SpeedRoutage()
+        v=self.getRoutageSpeed()
         pos=puntodistanterotta(self.position[0],self.position[1],v*dt,self.getHDG())
         self.position=pos
         self.Log=self.Log+v*dt
@@ -86,9 +87,9 @@ class Boat:
         twa=math.copysign(self.twa,1)
         return self.polar.getSpeed (self.tw[1],twa)
 
-    def SpeedRoutage(self):
+    def getRoutageSpeed(self):
         twa=math.copysign(self.twa,1)
-        return self.polar.SpeedRoutage(self.tw[1],twa)
+        return self.polar.getRoutageSpeed(self.tw[1],twa)
 
     def getHDG(self):
         return reduce360 (self.tw[0]-self.twa)
@@ -120,7 +121,7 @@ class Boat:
 
     def TWAmaxCMG (self,rlv):
         twabrg=reduce180(self.tw[0]-rlv)
-        maxtupla=self.polar.maxVMGtwa(self.tw[1],math.copysign(twabrg,1))
+        maxtupla=self.polar.getMaxVMGTWA (self.tw[1],math.copysign(twabrg,1))
         return math.copysign(maxtupla[1],twabrg)
 
     def VMGTWD (self):
@@ -194,11 +195,11 @@ class Boat:
         return fiocco
 
     def getMainsail (self):
-        aw=self.AW()
-        awa=aw[1]
-        randa=[]
+        aw = self.AW ()
+        awa = aw[1]
+        randa = []
         #if math.copysign(awa,1)<math.radians(25):
-        if self.getSpeed ()<=0:
+        if self.getSpeed () <= 0:
             randa=[(0,35.0),(0,-75.0)]
         else:
             if awa>math.pi/2:
