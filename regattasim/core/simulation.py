@@ -13,17 +13,26 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
+import logging
 from .boat import Boat
 from .track import Track
 
+logger = logging.getLogger ('regattasim')
+
 class Simulation:
-    def __init__ (self, boat, track):
+    def __init__ (self, boat, track, initialTime = 0.0):
         self.mode = 'wind'      # 'compass' 'gps' 'vmg'
         self.boat = boat
         self.track = track
         self.steps = 0
         self.path = Track ()    # Simulated points
+        self.t = initialTime
+
+        logger.debug ('initialized (mode: %s, time: %f)' % (self.mode, self.t))
+
+
+    def getTime (self):
+        return self.t
 
     def reset (self):
         self.steps = 0
@@ -31,7 +40,11 @@ class Simulation:
 
     def step (self):
         self.steps += 1
+        self.t += 0.1
 
         # Play a tick
         print (self.boat.getJib ())
         print (self.boat.getMainsail ())
+
+        logger.debug ('step (mode: %s, time: %f)' % (self.mode, self.t))
+        

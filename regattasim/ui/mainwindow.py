@@ -439,17 +439,17 @@ class MainWindow(Gtk.Window):
 
 
 	def onSimulationStart (self, widget):
-		sim = self.core.createSimulation ('mini')
-		sim.step ()
-		self.boat.update (sim.boat)
+		self.sim = self.core.createSimulation ('mini')
+		self.boat.update (self.sim.boat)
 
-		GObject.timeout_add(1000, self.inc)
+		GObject.timeout_add(1000, self.onSimulationStep)
 
-	def inc (self):
-		print ('inc!')
-		self.gribMapLayer.t += 0.1
+	def onSimulationStep (self):
+		self.sim.step ()
+		self.boat.update (self.sim.boat)
+		self.gribMapLayer.t = self.sim.getTime ()
 		self.osm.queue_draw ()
-		GObject.timeout_add (1000, self.inc)
+		GObject.timeout_add (10, self.onSimulationStep)
 
 
 	def onBoatSelect (self, widget):
