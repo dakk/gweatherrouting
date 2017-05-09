@@ -28,6 +28,7 @@ class Simulation:
         self.path = Track ()    # Simulated points
         self.t = initialTime
 
+        self.boat.setPosition (self.track[0]['lat'], self.track[0]['lon'])
         logger.debug ('initialized (mode: %s, time: %f)' % (self.mode, self.t))
 
 
@@ -37,14 +38,24 @@ class Simulation:
     def reset (self):
         self.steps = 0
         self.path.clear ()
+        self.boat.setPosition (self.track[0]['lat'], self.track[0]['lon'])
 
     def step (self):
         self.steps += 1
         self.t += 0.1
 
         # Play a tick
-        print (self.boat.getJib ())
-        print (self.boat.getMainsail ())
+        jib = self.boat.getJib ()
+        mainsail = self.boat.getMainsail ()
+        position = self.boat.getPosition ()
 
-        logger.debug ('step (mode: %s, time: %f)' % (self.mode, self.t))
+        logger.debug ('step (mode: %s, time: %f): %f %f' % (self.mode, self.t, position[0], position[1]))
+
+        return {
+            'position': position,
+            'sails': {
+                'mainsail': mainsail,
+                'jib': jib
+            }
+        }
         

@@ -21,7 +21,7 @@ import math
 def cfbinomiale(n,i):
     return math.factorial(n)/(math.factorial(n-i)*math.factorial(i))
 
-class Bezier:
+class Beizer:
     def __init__(self, points = []):
         self.points = points
 

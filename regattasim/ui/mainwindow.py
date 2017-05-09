@@ -179,6 +179,8 @@ class MainWindow(Gtk.Window):
 		self.osm = OsmGpsMap.Map () #repo_uri="http://tiles.openseamap.org/seamark/#Z/#X/#Y.png", image_format='png')
 		self.osm.connect ('button_press_event', self.onMapClick)
 
+		self.osm.set_center_and_zoom (39., 9., 6)
+
 		self.gribMapLayer = GribMapLayer (self.core.grib)
 		self.osm.layer_add (self.gribMapLayer)
 		self.osm.layer_add (OsmGpsMap.MapOsd (show_dpad=True, show_zoom=True, show_crosshair=False))

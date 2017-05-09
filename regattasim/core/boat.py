@@ -51,6 +51,12 @@ class Boat:
         this_dir, this_fn = os.path.split (__file__)
         self.polar = Polar (this_dir + '/../data/polars/' + model + '.pol')
 
+    def setPosition (self, lat, lon):
+        self.position = (lat, lon)
+
+    def getPosition (self):
+        return self.position
+
     # Orza di 1 grado
     def luffUp (self):
         if self.twa-math.radians(1)>0.0 and self.twa<=math.pi:#mure a dx
@@ -141,10 +147,6 @@ class Boat:
         return aw
 
 
-    def getPosition (self):
-        return (stampalat(self.position[0]), stampalon(self.position[1]))
-
-
     def getPolar (self):
         polare=[]
         for twa in range(0,185,5):
@@ -207,7 +209,7 @@ class Boat:
             if awa<-math.pi/2:
                 awa=-math.pi/2
             segno=awa/math.copysign(awa,1)
-            bezier=Bezier([(0,35),
+            bezier=Beizer([(0,35),
                            (-40*math.sin(awa+segno*math.radians(30)),35-40*math.cos(awa+segno*math.radians(30))),
                            (-110*math.sin(awa-segno*math.radians(25)),35-110*math.cos(awa-segno*math.radians(25)))])
             for i in range(0,11):
