@@ -29,7 +29,7 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         self.t = 0.0
 
     def drawWindArrow (self, cr, x, y, wdir, wspeed):
-        wdir = math.radians (wdir)
+        wdir = -math.radians (wdir)
 
         color = "0000CC"
         if wspeed>=0 and wspeed<2:color="0000CC"
@@ -51,7 +51,7 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         a = int (color [0:2], 16) / 255.
         b = int (color [2:4], 16) / 255.
         c = int (color [4:6], 16) / 255.
-        cr.set_source_rgb (a, b, c)
+        cr.set_source_rgba (a, b, c, 0.8)
         
         length = 15
         cr.move_to (x, y)
@@ -78,25 +78,22 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         cr.set_source_rgb (1,0,0)
         #print (p1lat, p1lon, p2lat, p2lon)
 
-        bounds = ((min(p1lat,p2lat), min (p1lon, p2lon)), (max(p1lat,p2lat), max (p1lon, p2lon)))
-        data = self.grib.getContinousWind (self.t, bounds)
-        print (self.t)
+        bounds = ((min (p1lat,p2lat), min (p1lon, p2lon)), (max (p1lat,p2lat), max (p1lon, p2lon)))
+        data = self.grib.getWind (self.t, bounds)
 
-        x = width
+        x = 0
         y = 0
         sep = 1
 
-        sep = math.ceil (len (data[0]) / 60)
+        sep = 1 #math.ceil (len (data[0]) / 60)
         cr.set_line_width (1.5 / sep)
 
-        for r in data[::sep]:
-            x = width
-            for c in r[::sep]:
-                self.drawWindArrow (cr, x, y, c[0], c[1])
-                x -= (width / len (r)) * sep
 
-            y += (height / len (data)) * sep
-        
+        for x in data[::sep]:
+            for y in x[::sep]:
+                xx, yy = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (y[2][0], y[2][1]))
+                self.drawWindArrow (cr, xx, yy, y[0], y[1])
+
 
     def do_render (self, gpsmap):
         pass

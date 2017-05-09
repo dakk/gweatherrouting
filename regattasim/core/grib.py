@@ -59,56 +59,68 @@ class Grib:
 		return gribStore
 
 
-	def getContinousWind (self, t, bounds):
-		print (int (int (round (t)) / 3) * 3, int (int (round (t+3)) / 3) * 3)
-
+	def getWind (self, t, bounds):
 		t1 = int (int (round (t)) / 3) * 3
 		t2 = int (int (round (t+3)) / 3) * 3
-		r1 = self.getWind (t1, bounds)
-		r2 = self.getWind (t2, bounds)
 
-		newdata = []
+		self.grbs.seek(0) 
+		u1 = self.rindex [t1]['u']
+		v1 = self.rindex [t1]['v']
+		self.grbs.seek(0) 
+		u2 = self.rindex [t2]['u']
+		v2 = self.rindex [t2]['v']
 
-		for i in range (0, len (r1)):
-			d2 = []
-			for j in range (0, len (r1[i])):
-				el1 = r1[i][j]
-				el2 = r2[i][j]
+		lon1 = min (bounds[0][1], bounds[1][1])
+		lon2 = max (bounds[0][1], bounds[1][1])
 
-				v1 = el1[0]+(el2[0]-el1[0])*(t-t1)*1.0/(t2-t1)
-				v2 = el1[1]+(el2[1]-el1[1])*(t-t1)*1.0/(t2-t1)
-				d2.append ((v1, v2))
-			newdata.append (d2)
+		if lon1 < 0.0 and lon2 < 0.0:
+			lon1 = 180. + abs (lon1)
+			lon2 = 180. + abs (lon2)
+		elif lon1 < 0.0:
+			lon1 = 180. + abs (lon1)
+			lon2 = 0.0
+		elif lon2 < 0.0:
+			lon2 = 180. + abs (lon2)
+			lon1 = 0.0
 
-		return newdata
+		bounds = [(bounds[0][0], min (lon1, lon2)), (bounds[1][0], max (lon1, lon2))]
+
+		uu1, latuu, lonuu = u1.data (lat1=bounds[0][0],lat2=bounds[1][0],lon1=bounds[0][1],lon2=bounds[1][1])
+		vv1, latvv, lonvv = v1.data (lat1=bounds[0][0],lat2=bounds[1][0],lon1=bounds[0][1],lon2=bounds[1][1])
+		uu2, latuu2, lonuu2 = u2.data (lat1=bounds[0][0],lat2=bounds[1][0],lon1=bounds[0][1],lon2=bounds[1][1])
+		vv2, latvv2, lonvv2 = v2.data (lat1=bounds[0][0],lat2=bounds[1][0],lon1=bounds[0][1],lon2=bounds[1][1])
+
+		data = []		
+		for i in range (0, len (uu1)):
+			data2 = []
+			for j in range (0, len (uu1[i])):
+				lon = lonuu[i][j]
+				lat = latuu[i][j]
+
+				uu = uu1[i][j] + (uu2[i][j] - uu1[i][j]) * (t - t1) * 1.0 / (t2 - t1)
+				vv = vv1[i][j] + (vv2[i][j] - vv1[i][j]) * (t - t1) * 1.0 / (t2 - t1)
+
+				if lon > 180.0:
+					lon = 180. - lon
+
+				tws=0
+				twd=0
+				tws=(uu**2+vv**2)/2.
+				twd=math.atan2(uu,vv)+math.pi
+				twd=riduci360(twd)
+
+				data2.append ((math.degrees(twd), tws, (lat, lon)))
+			data.append (data2)
+
+		return data
 
 
 	# Get wind direction and speed in a point, used by simulator
-	def getExactWind (self, t, lat, lon):
-		return ()
+	def getWindAt (self, t, lat, lon):
+		data = getWind (t, [(lat-1.0, lon-1.0), (lat+1.0, lon+1.0)])
 
-	# Return [dir (degree), speed]
-	def getWind (self, t, bounds):
-		self.grbs.seek(0) 
-		u = self.rindex [t]['u']
-		v = self.rindex [t]['v']
-
-		uu, lat, lon = u.data (lat1=bounds[0][0],lat2=bounds[1][0],lon1=bounds[0][1],lon2=bounds[1][1])
-		vv, lat, lon = v.data (lat1=bounds[0][0],lat2=bounds[1][0],lon1=bounds[0][1],lon2=bounds[1][1])
-
-		data = []		
-		for i in range (0, len (uu)):
-			data2 = []
-			for j in range (0, len (uu[i])):
-				tws=0
-				twd=0
-				#print (u, v)
-				tws=(uu[i][j]**2+vv[i][j]**2)/2.
-				twd=math.atan2(uu[i][j],vv[i][j])+math.pi
-				twd=riduci360(twd)
-				data2.append ((-math.degrees(twd), tws))
-			data.append (data2)
 		return data
+
 
 
 	def parse (self, path):
