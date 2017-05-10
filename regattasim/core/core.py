@@ -14,17 +14,22 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
+import logging
+
 from .. import config
 from .track import Track
 from .simulation import Simulation
 from .boat import Boat
 from .grib import Grib
 
+logger = logging.getLogger ('regattasim')
+
 class Core:
     def __init__ (self):
         self.track = Track ()
         self.grib = Grib ()
         self.grib.parse ('/home/dakk/testgrib.grb')
+        logger.debug ('Initialized')
 
     # Simulation
     def createSimulation (self, boatModel):
@@ -37,7 +42,9 @@ class Core:
         return self.track
 
     def load (self, path):
+        logger.info ('Saved current state to %s' % path)
         return self.track.load (path)
 
     def save (self, path):
+        logger.info ('Loaded state from %s' % path)
         return self.track.save (path)

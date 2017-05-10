@@ -49,6 +49,5 @@ For detail about GNU see <http://www.gnu.org/licenses/>.""")
 
 		boxcontent.pack_start (textview, True, True, 10)
 
-
 		self.show_all ()
 

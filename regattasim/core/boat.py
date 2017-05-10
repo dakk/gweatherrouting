@@ -15,10 +15,14 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
+import logging
 import math
 import os
+
 from .polar import Polar
 from .beizer import Beizer
+
+logger = logging.getLogger ('regattasim')
 
 def reduce360 (alfa):
     n=int(alfa*0.5/math.pi)
@@ -49,7 +53,7 @@ class Boat:
         self.model = model
 
         this_dir, this_fn = os.path.split (__file__)
-        self.polar = Polar (this_dir + '/../data/polars/' + model + '.pol')
+        self.polar = Polar (this_dir + '/../data/boats/' + model + '/polar.pol')
 
     def setPosition (self, lat, lon):
         self.position = (lat, lon)

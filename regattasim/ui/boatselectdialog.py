@@ -76,12 +76,12 @@ class BoatSelectDialog (Gtk.Dialog):
 	def selectBoat (self, i):
 		self.selectedBoat = self.boats[i]
 		self.boatName.set_label (self.boats[i]['name'])
-		self.boatImage.set_from_file (os.path.split (__file__)[0] + '/../data/boats/' + self.boats[i]['image'])
+		self.boatImage.set_from_file (os.path.split (__file__)[0] + '/../data/boats/' + self.boats[i]['dir'] + '/image.png')
 		
 		for w in self.boatPolarContainer.get_children ():
 			self.boatPolarContainer.remove (w)
 
-		self.boatPolarContainer.add (PolarWidget (polar.Polar (os.path.split (__file__)[0] + '/../data/boats/' + self.boats[i]['polar'])))
+		self.boatPolarContainer.add (PolarWidget (polar.Polar (os.path.split (__file__)[0] + '/../data/boats/' + self.boats[i]['dir'] + '/polar.pol')))
 		self.boatPolarContainer.show_all ()
 		
 	def onBoatChanged (self, selection):
