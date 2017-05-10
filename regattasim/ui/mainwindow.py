@@ -26,6 +26,7 @@ from gi.repository import Gtk, Gio, GObject, OsmGpsMap
 
 from .. import config
 from .boatwidget import BoatWidget
+from .aboutdialog import AboutDialog
 from .boatselectdialog import BoatSelectDialog
 from .gribselectdialog import GribSelectDialog
 from .gribmaplayer import GribMapLayer
@@ -59,6 +60,7 @@ UI_INFO = """
 			<menuitem action='SimulationSavePath' />
 		</menu>
 		<menu action='HelpMenu'>
+			<menuitem action='HelpAbout' />
 		</menu>
 	</menubar>
 	<toolbar name='ToolBar'>
@@ -155,6 +157,10 @@ class MainWindow(Gtk.Window):
 
 		action_filemenu = Gtk.Action ("HelpMenu", "Help", None, None)
 		action_group.add_action(action_filemenu)
+
+		act = Gtk.Action ("HelpAbout", 'About', None, Gtk.STOCK_ABOUT)
+		act.connect ("activate", self.onAbout)
+		action_group.add_action (act)
 
 		uimanager = Gtk.UIManager ()
 		uimanager.add_ui_from_string (UI_INFO)
@@ -277,6 +283,13 @@ class MainWindow(Gtk.Window):
 
 
 		#self.onOpen (self)
+
+
+	def onAbout (self, widget):
+		dialog = AboutDialog (self)
+		response = dialog.run()
+		dialog.destroy()
+
 
 	def onNew (self, widget):
 		self.openedFile = None
@@ -441,6 +454,13 @@ class MainWindow(Gtk.Window):
 
 
 	def onSimulationStart (self, widget):
+		if len (self.core.getTrack ()) < 2:
+			edialog = Gtk.MessageDialog (self, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Track is empty")
+			edialog.format_secondary_text ("Please add at least two points in the track")
+			edialog.run ()
+			edialog.destroy ()	
+			return	
+
 		self.sim = self.core.createSimulation ('mini')
 		self.boat.update (self.sim.boat)
 
