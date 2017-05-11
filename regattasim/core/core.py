@@ -34,8 +34,9 @@ class Core:
     # Simulation
     def createSimulation (self, boatModel):
         boat = Boat (boatModel)
-        sim = Simulation (boat, self.track)
+        sim = Simulation (boat, self.track, self.grib)
         return sim
+
 
     # Track ans save/load
     def getTrack (self):

@@ -20,14 +20,15 @@ from .track import Track
 logger = logging.getLogger ('regattasim')
 
 class Simulation:
-    def __init__ (self, boat, track, initialTime = 0.0):
+    def __init__ (self, boat, track, grib, initialTime = 0.0):
         self.mode = 'wind'      # 'compass' 'gps' 'vmg'
         self.boat = boat
         self.track = track
         self.steps = 0
         self.path = Track ()    # Simulated points
         self.t = initialTime
-
+        self.grib = grib
+        self.log = []           # Log of each simulation step
         self.boat.setPosition (self.track[0]['lat'], self.track[0]['lon'])
         logger.debug ('initialized (mode: %s, time: %f)' % (self.mode, self.t))
 
@@ -39,6 +40,7 @@ class Simulation:
         self.steps = 0
         self.path.clear ()
         self.boat.setPosition (self.track[0]['lat'], self.track[0]['lon'])
+        self.log = []
 
     def step (self):
         self.steps += 1
@@ -48,6 +50,9 @@ class Simulation:
         jib = self.boat.getJib ()
         mainsail = self.boat.getMainsail ()
         position = self.boat.getPosition ()
+
+        wind = self.grib.getWindAt (self.t, position[0], position[1])
+
 
         logger.debug ('step (mode: %s, time: %f): %f %f' % (self.mode, self.t, position[0], position[1]))
 

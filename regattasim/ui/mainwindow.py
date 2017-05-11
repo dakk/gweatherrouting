@@ -461,7 +461,7 @@ class MainWindow(Gtk.Window):
 			edialog.destroy ()	
 			return	
 
-		self.sim = self.core.createSimulation ('mini')
+		self.sim = self.core.createSimulation ('mini650')
 		self.boat.update (self.sim.boat)
 
 		GObject.timeout_add(1000, self.onSimulationStep)

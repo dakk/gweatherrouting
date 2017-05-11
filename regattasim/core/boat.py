@@ -81,61 +81,61 @@ class Boat:
     def changeTack (self):
         self.twa = -self.twa
 
-    def Muovi (self,dt):
+    def move (self, dt):
         v=self.getSpeed ()
-        pos = puntodistanterotta(self.position[0],self.position[1],v*dt,self.getHDG())
-        self.position=pos
-        self.Log=self.Log+v*dt
+        pos = puntodistanterotta (self.position[0], self.position[1], v*dt, self.getHDG ())
+        self.position = pos
+        self.Log = self.Log + v * dt
 
-    def MuoviRoutage(self,dt):
-        v=self.getRoutageSpeed()
-        pos=puntodistanterotta(self.position[0],self.position[1],v*dt,self.getHDG())
-        self.position=pos
-        self.Log=self.Log+v*dt
+    def moveRoutage (self, dt):
+        v = self.getRoutageSpeed ()
+        pos = puntodistanterotta (self.position[0], self.position[1], v*dt, self.getHDG ())
+        self.position = pos
+        self.Log = self.Log + v * dt
         
     def getSpeed (self):
-        twa=math.copysign(self.twa,1)
-        return self.polar.getSpeed (self.tw[1],twa)
+        twa = math.copysign (self.twa, 1)
+        return self.polar.getSpeed (self.tw[1], twa)
 
-    def getRoutageSpeed(self):
-        twa=math.copysign(self.twa,1)
-        return self.polar.getRoutageSpeed(self.tw[1],twa)
+    def getRoutageSpeed (self):
+        twa = math.copysign(self.twa, 1)
+        return self.polar.getRoutageSpeed(self.tw[1], twa)
 
-    def getHDG(self):
-        return reduce360 (self.tw[0]-self.twa)
+    def getHDG (self):
+        return reduce360 (self.tw[0] - self.twa)
 
-    def BRG (self,wp):
-        losso=lossodromica(self.position[0],self.position[1],wp[0],wp[1])
+    def BRG (self, wp):
+        losso = lossodromica (self.position[0], self.position[1], wp[0], wp[1])
         return losso[1]
 
-    def BRGGPS (self,wp):
-        orto=ortodromica(self.position[0],self.position[1],wp[0],wp[1])
+    def BRGGPS (self, wp):
+        orto = ortodromica (self.position[0], self.position[1], wp[0], wp[1])
         return orto[1]
 
-    def Dist (self,wp):
-        losso=lossodromica(self.position[0],self.position[1],wp[0],wp[1])
+    def Dist (self, wp):
+        losso = lossodromica (self.position[0], self.position[1], wp[0], wp[1])
         return losso[0]
 
-    def CMG (self,rlv):
-        scarto=scartorotta(self.getHDG(),rlv)
+    def CMG (self, rlv):
+        scarto=scartorotta (self.getHDG (), rlv)
+        return self.getSpeed () * math.cos (scarto)
+
+    def VMGWP (self, wp):
+        losso = lossodromica (self.position[0], self.position[1], wp[0], wp[1])
+        scarto = scartorotta (self.getHDG(), losso[1])
         return self.getSpeed ()*math.cos(scarto)
 
-    def VMGWP (self,wp):
-        losso=lossodromica(self.position[0],self.position[1],wp[0],wp[1])
-        scarto=scartorotta(self.getHDG(),losso[1])
-        return self.getSpeed ()*math.cos(scarto)
+    def TWAmaxVMGWP (self, wp):
+        rlv = self.BRG (wp)
+        return self.twamaxCMG (rlv)
 
-    def TWAmaxVMGWP (self,wp):
-        rlv=self.BRG(wp)
-        return self.twamaxCMG(rlv)
-
-    def TWAmaxCMG (self,rlv):
-        twabrg=reduce180(self.tw[0]-rlv)
-        maxtupla=self.polar.getMaxVMGTWA (self.tw[1],math.copysign(twabrg,1))
-        return math.copysign(maxtupla[1],twabrg)
+    def TWAmaxCMG (self, rlv):
+        twabrg = reduce180 (self.tw[0] - rlv)
+        maxtupla = self.polar.getMaxVMGTWA (self.tw[1], math.copysign (twabrg,1))
+        return math.copysign (maxtupla[1],twabrg)
 
     def VMGTWD (self):
-        return self.getSpeed ()*math.cos(self.twa)
+        return self.getSpeed () * math.cos(self.twa)
 
     def AW (self):
         TWA=math.copysign(self.twa,1)

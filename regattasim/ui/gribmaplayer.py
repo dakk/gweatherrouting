@@ -15,6 +15,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 import gi
+import colorsys
 import math
 
 gi.require_version('Gtk', '3.0')
@@ -31,6 +32,11 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
     def drawWindArrow (self, cr, x, y, wdir, wspeed):
         wdir = -math.radians (wdir)
 
+
+        #color = colorsys.hsv_to_rgb (1. - (float (wspeed) / 50.), 1, 1)
+        #cr.set_source_rgba (color[0], color[1], color[2], 0.8)
+
+        
         color = "0000CC"
         if wspeed>=0 and wspeed<2:color="0000CC"
         elif wspeed>=2 and wspeed<4:color="0066FF"
