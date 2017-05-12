@@ -30,6 +30,7 @@ from .aboutdialog import AboutDialog
 from .boatselectdialog import BoatSelectDialog
 from .gribselectdialog import GribSelectDialog
 from .gribmaplayer import GribMapLayer
+from .isochronesmaplayer import IsochronesMapLayer
 
 UI_INFO = """
 <ui>
@@ -187,8 +188,12 @@ class MainWindow(Gtk.Window):
 
 		self.osm.set_center_and_zoom (39., 9., 6)
 
+		self.isochronesMapLayer = IsochronesMapLayer ()
+		self.osm.layer_add (self.isochronesMapLayer)
+
 		self.gribMapLayer = GribMapLayer (self.core.grib)
 		self.osm.layer_add (self.gribMapLayer)
+
 		self.osm.layer_add (OsmGpsMap.MapOsd (show_dpad=True, show_zoom=True, show_crosshair=False))
 		boxcenter.pack_start (self.osm, True, True, 0)
 
@@ -467,9 +472,10 @@ class MainWindow(Gtk.Window):
 		GObject.timeout_add(1000, self.onSimulationStep)
 
 	def onSimulationStep (self):
-		self.sim.step ()
+		res = self.sim.step ()
 		self.boat.update (self.sim.boat)
 		self.gribMapLayer.t = self.sim.getTime ()
+		self.isochronesMapLayer.setIsochrones (res['isochrones'])
 		self.osm.queue_draw ()
 		GObject.timeout_add (10, self.onSimulationStep)
 

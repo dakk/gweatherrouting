@@ -13,54 +13,113 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
+
+import math
 import logging
 from .boat import Boat
 from .track import Track
 
 logger = logging.getLogger ('regattasim')
 
+RaggioTerrestre=60.0*360/(2*math.pi)#nm
+def puntodistanterotta(latA,lonA,Distanza,Rotta):
+	#non funziona in prossimita' dei poli
+	#dove può risultare latC>90, log(tan(latC/...))=log(<0)   (*)
+	a=Distanza*1.0/RaggioTerrestre
+	latB=latA+a*math.cos(Rotta)
+	if math.copysign(latA-latB,1)<=math.radians(0.1/3600.0):
+		q=math.cos(latA)
+	else:
+		Df=math.log(math.tan(latB/2+math.pi/4)/math.tan(latA/2+math.pi/4),math.e)#(*)
+		q=(latB-latA)/Df
+	lonB=lonA-a*math.sin(Rotta)/q
+	return latB,lonB
+
+def reduce360 (alfa):
+	n=int(alfa*0.5/math.pi)
+	n=math.copysign(n,1)
+	if alfa>2.0*math.pi:
+		alfa=alfa-n*2.0*math.pi
+	if alfa<0:
+		alfa=(n+1)*2.0*math.pi+alfa
+	if alfa>2.0*math.pi or alfa<0:
+		return 0.0
+	return alfa
+
 class Simulation:
-    def __init__ (self, boat, track, grib, initialTime = 0.0):
-        self.mode = 'wind'      # 'compass' 'gps' 'vmg'
-        self.boat = boat
-        self.track = track
-        self.steps = 0
-        self.path = Track ()    # Simulated points
-        self.t = initialTime
-        self.grib = grib
-        self.log = []           # Log of each simulation step
-        self.boat.setPosition (self.track[0]['lat'], self.track[0]['lon'])
-        logger.debug ('initialized (mode: %s, time: %f)' % (self.mode, self.t))
+	def __init__ (self, boat, track, grib, initialTime = 0.0):
+		self.mode = 'wind'      # 'compass' 'gps' 'vmg'
+		self.boat = boat
+		self.track = track
+		self.steps = 0
+		self.path = Track ()    # Simulated points
+		self.t = initialTime
+		self.grib = grib
+		self.log = []           # Log of each simulation step
+		self.boat.setPosition (self.track[0]['lat'], self.track[0]['lon'])
+		logger.debug ('initialized (mode: %s, time: %f)' % (self.mode, self.t))
 
 
-    def getTime (self):
-        return self.t
+	def getTime (self):
+		return self.t
 
-    def reset (self):
-        self.steps = 0
-        self.path.clear ()
-        self.boat.setPosition (self.track[0]['lat'], self.track[0]['lon'])
-        self.log = []
-
-    def step (self):
-        self.steps += 1
-        self.t += 0.1
-
-        # Play a tick
-        jib = self.boat.getJib ()
-        mainsail = self.boat.getMainsail ()
-        position = self.boat.getPosition ()
-
-        wind = self.grib.getWindAt (self.t, position[0], position[1])
+	def reset (self):
+		self.steps = 0
+		self.path.clear ()
+		self.boat.setPosition (self.track[0]['lat'], self.track[0]['lon'])
+		self.log = []
 
 
-        logger.debug ('step (mode: %s, time: %f): %f %f' % (self.mode, self.t, position[0], position[1]))
+	def _calculateIsochrones (self, isocrone):
+		dt = 10.0
 
-        return {
-            'position': position,
-            'sails': {
-                'mainsail': mainsail,
-                'jib': jib
-            }
-        }
-        
+		print ('call')
+		for x in isocrone[-1]:
+			print (x)
+			isonew = []
+			(TWD,TWS)=self.grib.getWindAt (self.t, x[0], x[1])
+			passo=30#per valori più bassi si rischia instabilità
+			for TWA in range(-180,180,passo):
+				TWA=math.radians(TWA)
+				brg=reduce360(TWD+TWA)
+				Speed=self.boat.polar.getRoutageSpeed(TWS,math.copysign(TWA,1))
+				ptoiso=puntodistanterotta(x[0],x[1],Speed*dt,brg)
+				isonew.append(ptoiso)
+			isonew.append(isonew[0])#chiude l'isocrona
+			isocrone.append(isonew)  
+
+		return isocrone
+
+
+	def step (self):
+		self.steps += 1
+		self.t += 0.1
+
+
+		position = self.boat.getPosition ()
+		wind = self.grib.getWindAt (self.t, position[0], position[1])
+
+		print (wind)
+		isoc = self._calculateIsochrones (self._calculateIsochrones (self._calculateIsochrones ([[position]])))
+
+		# Play a tick
+		self.boat.setWind (wind[0], wind[1])
+
+		print (self.boat.getSpeed (), self.boat.getHDG ())
+		jib = self.boat.getJib ()
+		mainsail = self.boat.getMainsail ()
+
+		logger.debug ('step (mode: %s, time: %f): %f %f' % (self.mode, self.t, position[0], position[1]))
+
+		nlog = {
+			'position': position,
+			'sails': {
+				'mainsail': mainsail,
+				'jib': jib
+			},
+			'isochrones': isoc
+		}
+
+		self.log.append (nlog)
+		return nlog
+		

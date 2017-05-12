@@ -55,6 +55,10 @@ class Boat:
         this_dir, this_fn = os.path.split (__file__)
         self.polar = Polar (this_dir + '/../data/boats/' + model + '/polar.pol')
 
+    def setWind (self, direction, speed):
+        self.tw = (direction, speed)
+        self.twa = reduce180 (direction - self.getHDG ())
+
     def setPosition (self, lat, lon):
         self.position = (lat, lon)
 
@@ -135,19 +139,21 @@ class Boat:
         return math.copysign (maxtupla[1],twabrg)
 
     def VMGTWD (self):
-        return self.getSpeed () * math.cos(self.twa)
+        return self.getSpeed () * math.cos (self.twa)
 
-    def AW (self):
-        TWA=math.copysign(self.twa,1)
-        TWS=self.tw[1]
-        SPEED=self.getSpeed ()
-        AWSy=TWS*math.cos(TWA)+SPEED
-        AWSx=TWS*math.sin(TWA)
-        AWS=(AWSy**2+AWSx**2)**0.5
-        AWA=math.pi/2-math.atan2(AWSy,AWSx)
-        aw=(AWS,AWA)
+
+    # Get the apparent wind (direction, speed)
+    def getAW (self):
+        TWA = math.copysign(self.twa,1)
+        TWS = self.tw[1]
+        SPEED = self.getSpeed ()
+        AWSy = TWS*math.cos(TWA)+SPEED
+        AWSx = TWS*math.sin(TWA)
+        AWS = (AWSy**2+AWSx**2)**0.5
+        AWA = math.pi/2-math.atan2(AWSy,AWSx)
+        aw = (AWA, AWS)
         if self.twa<0:
-            aw=(aw[0],-aw[1])
+            aw = (-aw[1], aw[0])
         return aw
 
 
@@ -166,9 +172,9 @@ class Boat:
         return polare
 
     def getJib (self):
-        fiocco=[]
-        aw=self.AW()
-        awa=aw[1]
+        jib=[]
+        aw=self.getAW()
+        awa=aw[0]
         if math.copysign(awa,1)>math.radians(60):
             l=125.0
             zero=135
@@ -176,8 +182,8 @@ class Boat:
             l=90
             zero=125
         #if math.copysign(awa,1)<math.radians(25):
-        if self.getSpeed ()<=0:
-            fiocco=[(0,125.0),(0,35.0)]
+        if self.getSpeed () <= 0:
+            jib = [(0,125.0),(0,35.0)]
         else:
             if awa>0:
                 r=l/awa
@@ -187,7 +193,7 @@ class Boat:
                     angolo=math.radians(angolo)
                     x=cx-r*math.cos(angolo)
                     y=cy+r*math.sin(angolo)
-                    fiocco.append((x,y))
+                    jib.append((x,y))
             else:
                 awa=math.copysign(awa,1)
                 r=l/awa
@@ -197,26 +203,26 @@ class Boat:
                     angolo=math.radians(angolo)
                     x=cx+r*math.cos(angolo)
                     y=cy+r*math.sin(angolo)
-                    fiocco.append((x,y))
-        return fiocco
+                    jib.append((x,y))
+        return jib
 
     def getMainsail (self):
-        aw = self.AW ()
-        awa = aw[1]
-        randa = []
+        aw = self.getAW ()
+        awa = aw[0]
+        mainsail = []
         #if math.copysign(awa,1)<math.radians(25):
         if self.getSpeed () <= 0:
-            randa=[(0,35.0),(0,-75.0)]
+            mainsail=[(0,35.0),(0,-75.0)]
         else:
             if awa>math.pi/2:
                 awa=math.pi/2
             if awa<-math.pi/2:
                 awa=-math.pi/2
-            segno=awa/math.copysign(awa,1)
-            bezier=Beizer([(0,35),
-                           (-40*math.sin(awa+segno*math.radians(30)),35-40*math.cos(awa+segno*math.radians(30))),
-                           (-110*math.sin(awa-segno*math.radians(25)),35-110*math.cos(awa-segno*math.radians(25)))])
+            sign=awa/math.copysign(awa,1)
+            beizer=Beizer([(0,35),
+                           (-40*math.sin(awa+sign*math.radians(30)),35-40*math.cos(awa+sign*math.radians(30))),
+                           (-110*math.sin(awa-sign*math.radians(25)),35-110*math.cos(awa-sign*math.radians(25)))])
             for i in range(0,11):
                 i=i*0.1
-                randa.append(bezier.calcolavalore(i)) 
-        return randa
+                mainsail.append(beizer.value (i)) 
+        return mainsail

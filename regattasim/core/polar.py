@@ -93,7 +93,7 @@ class Polar:
 
 
     def getMaxVMGTWA(self,tws,twa):
-        if not self.vmgdict.has_key((tws,twa)):
+        if not ((tws,twa) in self.vmgdict):
             twamin=max(0,twa-math.pi/2)
             twamax=min(math.pi,twa+math.pi/2)
             alfa=twamin
@@ -106,7 +106,7 @@ class Polar:
                     twamaxvmg=alfa
                 alfa=alfa+math.radians(1)
             self.vmgdict[tws,twa]=(maxvmg,twamaxvmg)
-        return self.vmgdict.get((tws,twa))
+        return self.vmgdict[(tws,twa)]
 
 
     def getMaxVMGUp(self,tws):
