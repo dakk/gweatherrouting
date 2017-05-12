@@ -64,22 +64,27 @@ class Grib:
 		lon1 = min (bounds[0][1], bounds[1][1])
 		lon2 = max (bounds[0][1], bounds[1][1])
 
+		otherside = None
+
 		if lon1 < 0.0 and lon2 < 0.0:
 			lon1 = 180. + abs (lon1)
 			lon2 = 180. + abs (lon2)
 		elif lon1 < 0.0:
-			lon1 = 180. + abs (lon1)
-			lon2 = 0.0
+			otherside = (-180.0, lon1)
 		elif lon2 < 0.0:
-			lon2 = 180. + abs (lon2)
-			lon1 = 0.0
+			otherside = (-180.0, lon2)
 
 		bounds = [(bounds[0][0], min (lon1, lon2)), (bounds[1][0], max (lon1, lon2))]
-
 		uu1, latuu, lonuu = u1.data (lat1=bounds[0][0],lat2=bounds[1][0],lon1=bounds[0][1],lon2=bounds[1][1])
 		vv1, latvv, lonvv = v1.data (lat1=bounds[0][0],lat2=bounds[1][0],lon1=bounds[0][1],lon2=bounds[1][1])
 		uu2, latuu2, lonuu2 = u2.data (lat1=bounds[0][0],lat2=bounds[1][0],lon1=bounds[0][1],lon2=bounds[1][1])
 		vv2, latvv2, lonvv2 = v2.data (lat1=bounds[0][0],lat2=bounds[1][0],lon1=bounds[0][1],lon2=bounds[1][1])
+
+		if otherside:
+			bounds = [(bounds[0][0], min (otherside[0], otherside[1])), (bounds[1][0], max (otherside[0], otherside[1]))]
+			dataotherside = self.getWind (t, bounds)
+		else:
+			dataotherside = []
 
 		data = []		
 		for i in range (0, len (uu1)):
@@ -92,8 +97,9 @@ class Grib:
 				vv = vv1[i][j] + (vv2[i][j] - vv1[i][j]) * (t - t1) * 1.0 / (t2 - t1)
 
 				if lon > 180.0:
-					lon = 180. - lon
+					lon = -180. + (lon - 180.)
 
+				
 				tws=0
 				twd=0
 				tws=(uu**2+vv**2)/2.
@@ -103,19 +109,14 @@ class Grib:
 				data2.append ((math.degrees(twd), tws, (lat, lon)))
 			data.append (data2)
 
-		return data
+		return data + dataotherside
 
 
 
 	# Get wind direction and speed in a point, used by simulator
-	def getWindAt (self, t, lat, lon):
-		if (0,math.floor (lat*100),math.floor (lon*100)) in self.cache:
-			print ('cached')
-			return self.cache [(0,math.floor (lat*100),math.floor (lon*100))]
-			
+	def getWindAt (self, t, lat, lon):			
 		data = self.getWind (t, [(lat-0.5, lon-0.5), (lat+0.5, lon+0.5)])
 		wind = (data[0][0][0], data[0][0][1])
-		self.cache [(0,math.floor (lat*100),math.floor (lon*100))] = wind
 		return wind
 
 
