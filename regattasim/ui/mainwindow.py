@@ -183,8 +183,11 @@ class MainWindow(Gtk.Window):
 
 
 		## Map area
-		self.osm = OsmGpsMap.Map () #repo_uri="http://tiles.openseamap.org/seamark/#Z/#X/#Y.png", image_format='png')
+		self.osm = OsmGpsMap.Map () #repo_uri="http://korona.geog.uni-heidelberg.de/tiles/roads/x=#X&y=#Y&z=#Z.png", image_format='png')
 		self.osm.connect ('button_press_event', self.onMapClick)
+
+		#self.openseaMapLayer = #repo_uri="http://t1.openseamap.org/seamark/#Z/#X/#Y.png", image_format='png')
+		#self.osm.layer_add (self.openseaMapLayer)
 
 		self.osm.set_center_and_zoom (39., 9., 6)
 

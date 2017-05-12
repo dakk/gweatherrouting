@@ -98,7 +98,6 @@ class Grib:
 
 				if lon > 180.0:
 					lon = -180. + (lon - 180.)
-
 				
 				tws=0
 				twd=0
