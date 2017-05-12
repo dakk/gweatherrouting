@@ -16,6 +16,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import logging
 
+from . import utils
 from .. import config
 from .track import Track
 from .simulation import Simulation

@@ -26,25 +26,16 @@ import pygrib
 import requests
 from bs4 import BeautifulSoup
 
+from . import utils
 from .. import config
 
 logger = logging.getLogger ('regattasim')
 
-def riduci360(alfa):
-    n=int(alfa*0.5/math.pi)
-    n=math.copysign(n,1)
-    if alfa>2.0*math.pi:
-        alfa=alfa-n*2.0*math.pi
-    if alfa<0:
-        alfa=(n+1)*2.0*math.pi+alfa
-    if alfa>2.0*math.pi or alfa<0:
-        return 0.0
-    return alfa
 
 class Grib:
 	def __init__ (self):
 		#self.parse (open ('/home/dakk/testgrib.grb', 'rb'))
-		pass
+		self.cache = {}
 
 	def getDownloadList ():
 		data = requests.get ('http://grib.virtual-loup-de-mer.org/').text
@@ -107,7 +98,7 @@ class Grib:
 				twd=0
 				tws=(uu**2+vv**2)/2.
 				twd=math.atan2(uu,vv)+math.pi
-				twd=riduci360(twd)
+				twd=utils.reduce360(twd)
 
 				data2.append ((math.degrees(twd), tws, (lat, lon)))
 			data.append (data2)
@@ -115,10 +106,17 @@ class Grib:
 		return data
 
 
+
 	# Get wind direction and speed in a point, used by simulator
 	def getWindAt (self, t, lat, lon):
+		if (0,math.floor (lat*100),math.floor (lon*100)) in self.cache:
+			print ('cached')
+			return self.cache [(0,math.floor (lat*100),math.floor (lon*100))]
+			
 		data = self.getWind (t, [(lat-0.5, lon-0.5), (lat+0.5, lon+0.5)])
-		return (data[0][0][0], data[0][0][1])
+		wind = (data[0][0][0], data[0][0][1])
+		self.cache [(0,math.floor (lat*100),math.floor (lon*100))] = wind
+		return wind
 
 
 

@@ -16,35 +16,14 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import math
 import logging
+
+from . import utils
 from .boat import Boat
 from .track import Track
 
 logger = logging.getLogger ('regattasim')
 
-RaggioTerrestre=60.0*360/(2*math.pi)#nm
-def puntodistanterotta(latA,lonA,Distanza,Rotta):
-	#non funziona in prossimita' dei poli
-	#dove può risultare latC>90, log(tan(latC/...))=log(<0)   (*)
-	a=Distanza*1.0/RaggioTerrestre
-	latB=latA+a*math.cos(Rotta)
-	if math.copysign(latA-latB,1)<=math.radians(0.1/3600.0):
-		q=math.cos(latA)
-	else:
-		Df=math.log(math.tan(latB/2+math.pi/4)/math.tan(latA/2+math.pi/4),math.e)#(*)
-		q=(latB-latA)/Df
-	lonB=lonA-a*math.sin(Rotta)/q
-	return latB,lonB
 
-def reduce360 (alfa):
-	n=int(alfa*0.5/math.pi)
-	n=math.copysign(n,1)
-	if alfa>2.0*math.pi:
-		alfa=alfa-n*2.0*math.pi
-	if alfa<0:
-		alfa=(n+1)*2.0*math.pi+alfa
-	if alfa>2.0*math.pi or alfa<0:
-		return 0.0
-	return alfa
 
 class Simulation:
 	def __init__ (self, boat, track, grib, initialTime = 0.0):
@@ -71,7 +50,7 @@ class Simulation:
 
 
 	def _calculateIsochrones (self, isocrone):
-		dt = 10.0
+		dt = 50.0
 
 		print ('call')
 		for x in isocrone[-1]:
@@ -81,9 +60,9 @@ class Simulation:
 			passo=30#per valori più bassi si rischia instabilità
 			for TWA in range(-180,180,passo):
 				TWA=math.radians(TWA)
-				brg=reduce360(TWD+TWA)
+				brg=utils.reduce360(TWD+TWA)
 				Speed=self.boat.polar.getRoutageSpeed(TWS,math.copysign(TWA,1))
-				ptoiso=puntodistanterotta(x[0],x[1],Speed*dt,brg)
+				ptoiso=utils.routagePointDistance(isocrone[0][0][0],isocrone[0][0][1],Speed*dt,brg)
 				isonew.append(ptoiso)
 			isonew.append(isonew[0])#chiude l'isocrona
 			isocrone.append(isonew)  
@@ -100,7 +79,7 @@ class Simulation:
 		wind = self.grib.getWindAt (self.t, position[0], position[1])
 
 		print (wind)
-		isoc = self._calculateIsochrones (self._calculateIsochrones (self._calculateIsochrones ([[position]])))
+		isoc = self._calculateIsochrones (self._calculateIsochrones (self._calculateIsochrones (self._calculateIsochrones ([[position]]))))
 
 		# Play a tick
 		self.boat.setWind (wind[0], wind[1])

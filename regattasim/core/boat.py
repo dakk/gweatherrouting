@@ -19,30 +19,13 @@ import logging
 import math
 import os
 
+from . import utils
 from .polar import Polar
 from .beizer import Beizer
 
 logger = logging.getLogger ('regattasim')
 
-def reduce360 (alfa):
-    n=int(alfa*0.5/math.pi)
-    n=math.copysign(n,1)
-    if alfa>2.0*math.pi:
-        alfa=alfa-n*2.0*math.pi
-    if alfa<0:
-        alfa=(n+1)*2.0*math.pi+alfa
-    if alfa>2.0*math.pi or alfa<0:
-        return 0.0
-    return alfa
 
-def reduce180 (alfa):
-    if alfa>math.pi:
-        alfa=alfa-2*math.pi
-    if alfa<-math.pi:
-        alfa=2*math.pi+alfa
-    if alfa>math.pi or alfa<-math.pi:
-        return 0.0
-    return alfa
 
 class Boat:
     def __init__ (self, model):
@@ -57,7 +40,7 @@ class Boat:
 
     def setWind (self, direction, speed):
         self.tw = (direction, speed)
-        self.twa = reduce180 (direction - self.getHDG ())
+        self.twa = utils.reduce180 (direction - self.getHDG ())
 
     def setPosition (self, lat, lon):
         self.position = (lat, lon)
@@ -106,7 +89,7 @@ class Boat:
         return self.polar.getRoutageSpeed(self.tw[1], twa)
 
     def getHDG (self):
-        return reduce360 (self.tw[0] - self.twa)
+        return utils.reduce360 (self.tw[0] - self.twa)
 
     def BRG (self, wp):
         losso = lossodromica (self.position[0], self.position[1], wp[0], wp[1])
@@ -134,7 +117,7 @@ class Boat:
         return self.twamaxCMG (rlv)
 
     def TWAmaxCMG (self, rlv):
-        twabrg = reduce180 (self.tw[0] - rlv)
+        twabrg = utils.reduce180 (self.tw[0] - rlv)
         maxtupla = self.polar.getMaxVMGTWA (self.tw[1], math.copysign (twabrg,1))
         return math.copysign (maxtupla[1],twabrg)
 
