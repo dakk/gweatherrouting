@@ -140,6 +140,7 @@ class MainWindow(Gtk.Window):
 		action_filemenu = Gtk.Action ("SimulationMenu", "Simulation", None, None)
 		action_group.add_action(action_filemenu)
 
+
 		act = Gtk.Action ("SimulationStart", None, None, Gtk.STOCK_MEDIA_PLAY)
 		act.connect ("activate", self.onSimulationStart)
 		action_group.add_action (act)
@@ -260,6 +261,11 @@ class MainWindow(Gtk.Window):
 		boxcontrols = Gtk.Box (orientation=Gtk.Orientation.VERTICAL)
 		notebook.append_page(boxcontrols, Gtk.Label ('Simulation'))
 
+		self.timeScale = Gtk.HScale()
+		self.timeScale.set_adjustment (Gtk.Adjustment(0.0, 0.0, 120.0, 0.1, 1.0, 1.0))
+		self.timeScale.connect ("change-value", self.timeScaleChange)
+		boxcontrols.pack_start (self.timeScale, False, False, 10)
+
 		self.boat = BoatWidget ()
 		boxcontrols.pack_start (self.boat, False, False, 0)
 
@@ -292,6 +298,11 @@ class MainWindow(Gtk.Window):
 
 		#self.onOpen (self)
 
+
+	def timeScaleChange (self, range, scroll, value):
+		self.gribMapLayer.t = value
+		self.osm.queue_draw ()
+		print (value)
 
 	def onAbout (self, widget):
 		dialog = AboutDialog (self)
@@ -480,7 +491,7 @@ class MainWindow(Gtk.Window):
 		self.gribMapLayer.t = self.sim.getTime ()
 		self.isochronesMapLayer.setIsochrones (res['isochrones'])
 		self.osm.queue_draw ()
-		GObject.timeout_add (1, self.onSimulationStep)
+		#GObject.timeout_add (1, self.onSimulationStep)
 
 
 	def onBoatSelect (self, widget):

@@ -51,30 +51,35 @@ class Simulation:
 		self.log = []
 
 
-	def _calculateIsochrones (self, isocrone, level):
+	def _calculateIsochrones (self, isocrone, level, nextwp):
 		dt = level * 50.0
 
+		isocronenew = isocrone
+		
 		print ('call')
-		for x in isocrone[-1]:
+		for x in [isocrone[-1][0]]:
 			print (x)
 			isonew = []
 			(TWD,TWS)=self.grib.getWindAt (self.t, x[0], x[1])
-			passo=30#per valori più bassi si rischia instabilità
+			passo=5#per valori più bassi si rischia instabilità
 			for TWA in range(-180,180,passo):
 				TWA=math.radians(TWA)
 				brg=utils.reduce360(TWD+TWA)
 				Speed=self.boat.polar.getRoutageSpeed(TWS,math.copysign(TWA,1))
-				ptoiso=utils.routagePointDistance(isocrone[0][0][0],isocrone[0][0][1],Speed*dt,brg)
+				ptoiso=utils.routagePointDistance(x[0],x[1],Speed*dt,brg)
+
+				#print ('losso',utils.lossodromic (ptoiso[0], ptoiso[1], nextwp[0], nextwp[1])[0], utils.lossodromic (x[0], x[1], nextwp[0], nextwp[1])[0])
+				#if utils.ortodromic (ptoiso[0], ptoiso[1], nextwp[0], nextwp[1])[0] < utils.ortodromic (x[0], x[1], nextwp[0], nextwp[1])[0]:
 				isonew.append(ptoiso)
 			isonew.append(isonew[0])#chiude l'isocrona
-			isocrone.append(isonew)  
+			isocronenew.append(isonew)  
 
-		return isocrone
+		return isocronenew
 
 
 	def step (self):
 		self.steps += 1
-		self.t += 0.1
+		#self.t += 0.1
 
 		# Next waypoint
 		nextwp = (self.track[self.wp]['lat'], self.track[self.wp]['lon'])
@@ -85,7 +90,10 @@ class Simulation:
 		wind = self.grib.getWindAt (self.t, position[0], position[1])
 
 		print (wind)
-		isoc = []#self._calculateIsochrones (self._calculateIsochrones (self._calculateIsochrones (self._calculateIsochrones ([[position]], 1), 2), 3), 4)
+
+		isoc = [[position]]
+		for x in range (18):
+			isoc = self._calculateIsochrones (isoc, x+1, nextwp)
 
 		# Play a tick
 		self.boat.setWind (wind[0], wind[1])

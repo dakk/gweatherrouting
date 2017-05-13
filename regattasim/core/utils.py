@@ -26,19 +26,46 @@ COUNTRIES = json.load (open (this_dir + '/../data/countries.geojson', 'r'))
 COUNTRY_SHAPES = []
 
 for feature in COUNTRIES['features']:
-     COUNTRY_SHAPES.append (shape(feature['geometry']))
+	 COUNTRY_SHAPES.append (shape(feature['geometry']).simplify (tolerance=50))
 
 def pointInCountry (lat, lon):
-    point = Point (lat, lon)
-    for polygon in COUNTRY_SHAPES:
-        if polygon.contains (point):
-            return True
-    return False
+	point = Point (lat, lon)
+	for polygon in COUNTRY_SHAPES:
+		if polygon.contains (point):
+			return True
+	return False
 
 
 
 
 EARTH_RADIUS=60.0*360/(2*math.pi)#nm
+
+
+
+def ortodromic (latA,lonA,latB,lonB):
+    Distanza=math.cos(latA)*math.cos(latB)*math.cos(lonB-lonA)+math.sin(latA)*math.sin(latB)
+    Distanza=EARTH_RADIUS*math.acos(Distanza)
+    x=math.cos(latA)*math.sin(latB)-math.sin(latA)*math.cos(latB)*math.cos(lonB-lonA)
+    y=math.sin(lonB-lonA)*math.cos(latB)
+    Rotta=math.atan2(-y,x)
+    if Rotta<0:Rotta=Rotta+2.0*math.pi#atan2:[-pi,pi]
+    return Distanza,Rotta
+
+def lossodromic (latA,lonA,latB,lonB):
+    #non funziona in prossimita' dei poli
+    #per latB=-90: math domain error log(0)
+    #per latA=-90 [zero divison error]
+    #per A==B ritorna (0.0,0.0)
+    #if latA==latB:
+    if  math.copysign(latA-latB,1)<=math.radians(0.1/3600.0):
+        q=math.cos(latA)
+    else:
+        Df=math.log(math.tan(latB/2+math.pi/4)/math.tan(latA/2+math.pi/4),math.e)
+        q=(latB-latA)*1.0/Df
+    Distanza=EARTH_RADIUS*((latA-latB)**2+(q*(lonA-lonB))**2)**0.5
+    Rotta=math.atan2(-q*(lonB-lonA),(latB-latA))
+    if Rotta<0:Rotta=Rotta+2.0*math.pi#atan2:[-pi,pi]
+    return Distanza,Rotta
 
 def routagePointDistance (latA,lonA,Distanza,Rotta):
 	#non funziona in prossimita' dei poli
@@ -48,27 +75,30 @@ def routagePointDistance (latA,lonA,Distanza,Rotta):
 	if math.copysign(latA-latB,1)<=math.radians(0.1/3600.0):
 		q=math.cos(latA)
 	else:
-		Df=math.log(math.tan(latB/2+math.pi/4)/math.tan(latA/2+math.pi/4),math.e)#(*)
-		q=(latB-latA)/Df
+		try:
+			Df=math.log(math.tan(latB/2+math.pi/4)/math.tan(latA/2+math.pi/4),math.e)#(*)
+			q=(latB-latA)/Df
+		except:
+			return latA, lonA
 	lonB=lonA-a*math.sin(Rotta)/q
 	return latB,lonB
 
 def reduce360 (alfa):
-    n=int(alfa*0.5/math.pi)
-    n=math.copysign(n,1)
-    if alfa>2.0*math.pi:
-        alfa=alfa-n*2.0*math.pi
-    if alfa<0:
-        alfa=(n+1)*2.0*math.pi+alfa
-    if alfa>2.0*math.pi or alfa<0:
-        return 0.0
-    return alfa
+	n=int(alfa*0.5/math.pi)
+	n=math.copysign(n,1)
+	if alfa>2.0*math.pi:
+		alfa=alfa-n*2.0*math.pi
+	if alfa<0:
+		alfa=(n+1)*2.0*math.pi+alfa
+	if alfa>2.0*math.pi or alfa<0:
+		return 0.0
+	return alfa
 
 def reduce180 (alfa):
-    if alfa>math.pi:
-        alfa=alfa-2*math.pi
-    if alfa<-math.pi:
-        alfa=2*math.pi+alfa
-    if alfa>math.pi or alfa<-math.pi:
-        return 0.0
-    return alfa
+	if alfa>math.pi:
+		alfa=alfa-2*math.pi
+	if alfa<-math.pi:
+		alfa=2*math.pi+alfa
+	if alfa>math.pi or alfa<-math.pi:
+		return 0.0
+	return alfa

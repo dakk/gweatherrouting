@@ -32,11 +32,16 @@ class IsochronesMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         self.isochrones = isoc
 
     def do_draw (self, gpsmap, cr):
-        cr.set_source_rgba (0,0,0,1)
+        cr.set_source_rgba (0,0,0,0.6)
         cr.set_line_width (1)
 
+        i = 0
         print (len (self.isochrones))
         for ic in self.isochrones:
+            i += 1
+            cr.set_source_rgba (0,0,0, 1.0 - i / len (self.isochrones))
+        
+
             prev = None
             for icpoint in ic:
                 x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (icpoint[0], icpoint[1]))

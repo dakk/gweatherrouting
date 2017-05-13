@@ -105,7 +105,6 @@ class Grib:
 					lon = -180. + (lon - 180.)
 
 				#if utils.pointInCountry (lat, lon):
-				#	print ('incountry!')
 				#	continue
 
 				uu = uu1[i][j] + (uu2[i][j] - uu1[i][j]) * (t - t1) * 1.0 / (t2 - t1)
