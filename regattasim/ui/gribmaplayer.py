@@ -57,7 +57,7 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         a = int (color [0:2], 16) / 255.
         b = int (color [2:4], 16) / 255.
         c = int (color [4:6], 16) / 255.
-        cr.set_source_rgba (a, b, c, 0.8)
+        cr.set_source_rgba (a, b, c, 0.5)
         
         length = 15
         cr.move_to (x, y)
@@ -92,8 +92,7 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         sep = 1
 
         sep = 1 #math.ceil (len (data[0]) / 60)
-        cr.set_line_width (1.5 / sep)
-
+        cr.set_line_width (1.5 / (math.ceil (len (data[0]) / 60)))
 
         for x in data[::sep]:
             for y in x[::sep]:

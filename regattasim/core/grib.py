@@ -101,11 +101,15 @@ class Grib:
 				lon = lonuu[i][j]
 				lat = latuu[i][j]
 
-				uu = uu1[i][j] + (uu2[i][j] - uu1[i][j]) * (t - t1) * 1.0 / (t2 - t1)
-				vv = vv1[i][j] + (vv2[i][j] - vv1[i][j]) * (t - t1) * 1.0 / (t2 - t1)
-
 				if lon > 180.0:
 					lon = -180. + (lon - 180.)
+
+				#if utils.pointInCountry (lat, lon):
+				#	print ('incountry!')
+				#	continue
+
+				uu = uu1[i][j] + (uu2[i][j] - uu1[i][j]) * (t - t1) * 1.0 / (t2 - t1)
+				vv = vv1[i][j] + (vv2[i][j] - vv1[i][j]) * (t - t1) * 1.0 / (t2 - t1)
 				
 				tws=0
 				twd=0
@@ -121,8 +125,10 @@ class Grib:
 
 
 	# Get wind direction and speed in a point, used by simulator
-	def getWindAt (self, t, lat, lon):			
-		data = self.getWind (t, [(lat-0.5, lon-0.5), (lat+0.5, lon+0.5)])
+	def getWindAt (self, t, lat, lon):	
+		bounds = [(math.floor (lat * 2) / 2., math.floor (lon * 2) / 2.), (math.ceil (lat * 2) / 2., math.ceil (lon * 2) / 2.)]
+		print (bounds)
+		data = self.getWind (t, bounds)
 		wind = (data[0][0][0], data[0][0][1])
 		return wind
 

@@ -30,6 +30,7 @@ class Simulation:
 		self.mode = 'wind'      # 'compass' 'gps' 'vmg'
 		self.boat = boat
 		self.track = track
+		self.wp = 1
 		self.steps = 0
 		self.path = Track ()    # Simulated points
 		self.t = initialTime
@@ -46,11 +47,12 @@ class Simulation:
 		self.steps = 0
 		self.path.clear ()
 		self.boat.setPosition (self.track[0]['lat'], self.track[0]['lon'])
+		self.wp = 1
 		self.log = []
 
 
-	def _calculateIsochrones (self, isocrone):
-		dt = 50.0
+	def _calculateIsochrones (self, isocrone, level):
+		dt = level * 50.0
 
 		print ('call')
 		for x in isocrone[-1]:
@@ -74,12 +76,16 @@ class Simulation:
 		self.steps += 1
 		self.t += 0.1
 
+		# Next waypoint
+		nextwp = (self.track[self.wp]['lat'], self.track[self.wp]['lon'])
+
+		# Currentposition
 
 		position = self.boat.getPosition ()
 		wind = self.grib.getWindAt (self.t, position[0], position[1])
 
 		print (wind)
-		isoc = self._calculateIsochrones (self._calculateIsochrones (self._calculateIsochrones (self._calculateIsochrones ([[position]]))))
+		isoc = []#self._calculateIsochrones (self._calculateIsochrones (self._calculateIsochrones (self._calculateIsochrones ([[position]], 1), 2), 3), 4)
 
 		# Play a tick
 		self.boat.setWind (wind[0], wind[1])

@@ -183,7 +183,7 @@ class MainWindow(Gtk.Window):
 
 
 		## Map area
-		self.osm = OsmGpsMap.Map () #repo_uri="http://korona.geog.uni-heidelberg.de/tiles/roads/x=#X&y=#Y&z=#Z.png", image_format='png')
+		self.osm = OsmGpsMap.Map () #repo_uri="http://acetate.geoiq.com/tiles/acetate-hillshading/#Z/#X/#Y.png", image_format='png')
 		self.osm.connect ('button_press_event', self.onMapClick)
 
 		#self.openseaMapLayer = #repo_uri="http://t1.openseamap.org/seamark/#Z/#X/#Y.png", image_format='png')
@@ -472,7 +472,7 @@ class MainWindow(Gtk.Window):
 		self.sim = self.core.createSimulation ('mini650')
 		self.boat.update (self.sim.boat)
 
-		GObject.timeout_add(1000, self.onSimulationStep)
+		GObject.timeout_add(0, self.onSimulationStep)
 
 	def onSimulationStep (self):
 		res = self.sim.step ()
@@ -480,7 +480,7 @@ class MainWindow(Gtk.Window):
 		self.gribMapLayer.t = self.sim.getTime ()
 		self.isochronesMapLayer.setIsochrones (res['isochrones'])
 		self.osm.queue_draw ()
-		GObject.timeout_add (10, self.onSimulationStep)
+		GObject.timeout_add (1, self.onSimulationStep)
 
 
 	def onBoatSelect (self, widget):
