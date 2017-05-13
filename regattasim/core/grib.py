@@ -50,16 +50,26 @@ class Grib:
 		return gribStore
 
 
+	# Get Wind data from cache if available (speed up the entire simulation)
+	def _getWindDataCached (self, t, bounds):
+		h = ('%f%f%f%f%f' % (t, bounds[0][0], bounds[0][1], bounds[1][0], bounds[1][1]))
+
+		if h in self.cache:
+			return self.cache [h]
+		else:
+			self.grbs.seek(0) 
+			u = self.rindex [t]['u']
+			v = self.rindex [t]['v']
+			uu1, latuu, lonuu = u.data (lat1=bounds[0][0],lat2=bounds[1][0],lon1=bounds[0][1],lon2=bounds[1][1])
+			vv1, latvv, lonvv = v.data (lat1=bounds[0][0],lat2=bounds[1][0],lon1=bounds[0][1],lon2=bounds[1][1])
+
+			self.cache [h] = (uu1, vv1, latuu, lonuu)
+			return self.cache [h]
+
+
 	def getWind (self, t, bounds):
 		t1 = int (int (round (t)) / 3) * 3
 		t2 = int (int (round (t+3)) / 3) * 3
-
-		self.grbs.seek(0) 
-		u1 = self.rindex [t1]['u']
-		v1 = self.rindex [t1]['v']
-		self.grbs.seek(0) 
-		u2 = self.rindex [t2]['u']
-		v2 = self.rindex [t2]['v']
 
 		lon1 = min (bounds[0][1], bounds[1][1])
 		lon2 = max (bounds[0][1], bounds[1][1])
@@ -75,10 +85,8 @@ class Grib:
 			otherside = (-180.0, lon2)
 
 		bounds = [(bounds[0][0], min (lon1, lon2)), (bounds[1][0], max (lon1, lon2))]
-		uu1, latuu, lonuu = u1.data (lat1=bounds[0][0],lat2=bounds[1][0],lon1=bounds[0][1],lon2=bounds[1][1])
-		vv1, latvv, lonvv = v1.data (lat1=bounds[0][0],lat2=bounds[1][0],lon1=bounds[0][1],lon2=bounds[1][1])
-		uu2, latuu2, lonuu2 = u2.data (lat1=bounds[0][0],lat2=bounds[1][0],lon1=bounds[0][1],lon2=bounds[1][1])
-		vv2, latvv2, lonvv2 = v2.data (lat1=bounds[0][0],lat2=bounds[1][0],lon1=bounds[0][1],lon2=bounds[1][1])
+		(uu1, vv1, latuu, lonuu) = self._getWindDataCached (t1, bounds)
+		(uu2, vv2, latuu2, lonuu2) = self._getWindDataCached (t2, bounds)
 
 		if otherside:
 			bounds = [(bounds[0][0], min (otherside[0], otherside[1])), (bounds[1][0], max (otherside[0], otherside[1]))]
