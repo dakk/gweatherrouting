@@ -36,7 +36,6 @@ class IsochronesMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         cr.set_line_width (1)
 
         i = 0
-        print (len (self.isochrones))
         for ic in self.isochrones:
             i += 1
             cr.set_source_rgba (0,0,0, 1.0 - i / len (self.isochrones))

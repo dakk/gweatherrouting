@@ -84,6 +84,9 @@ def routagePointDistance (latA,lonA,Distanza,Rotta):
 	return latB,lonB
 
 def reduce360 (alfa):
+	if math.isnan (alfa):
+		return 0.0
+		
 	n=int(alfa*0.5/math.pi)
 	n=math.copysign(n,1)
 	if alfa>2.0*math.pi:

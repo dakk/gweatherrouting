@@ -25,9 +25,8 @@ gi.require_version('OsmGpsMap', '1.0')
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap
 
 from .. import config
-from .boatwidget import BoatWidget
 from .aboutdialog import AboutDialog
-from .boatselectdialog import BoatSelectDialog
+from .routingwizarddialog import RoutingWizardDialog
 from .gribselectdialog import GribSelectDialog
 from .gribmaplayer import GribMapLayer
 from .isochronesmaplayer import IsochronesMapLayer
@@ -50,15 +49,10 @@ UI_INFO = """
 		<menu action='GribMenu'>
 			<menuitem action='GribSet' />
 		</menu>
-		<menu action='BoatMenu'>
-			<menuitem action='BoatSelect' />
-		</menu>
-		<menu action='SimulationMenu'>
-			<menuitem action='SimulationStart' />
-			<menuitem action='SimulationPause' />
-			<menuitem action='SimulationStop' />
+		<menu action='RoutingMenu'>
+			<menuitem action='RoutingWizard' />
 			<separator />
-			<menuitem action='SimulationSavePath' />
+			<menuitem action='RoutingSavePath' />
 		</menu>
 		<menu action='HelpMenu'>
 			<menuitem action='HelpAbout' />
@@ -69,10 +63,8 @@ UI_INFO = """
 		<toolitem action='FileOpen' />
 		<toolitem action='FileSave' />
 		<separator />
-		<toolitem action='SimulationStart' />
-		<toolitem action='SimulationPause' />
-		<toolitem action='SimulationStop' />
-		<toolitem action='SimulationSavePath' />
+		<toolitem action='RoutingWizard' />
+		<toolitem action='RoutingSavePath' />
 	</toolbar>
 </ui>
 """
@@ -130,30 +122,16 @@ class MainWindow(Gtk.Window):
 		act.connect ("activate", self.onGribSelect)
 		action_group.add_action (act)
 
-		action_filemenu = Gtk.Action ("BoatMenu", "Boat", None, None)
-		action_group.add_action(action_filemenu)
 
-		act = Gtk.Action ("BoatSelect", 'Select boat', None, Gtk.STOCK_COLOR_PICKER)
-		act.connect ("activate", self.onBoatSelect)
-		action_group.add_action (act)
-
-		action_filemenu = Gtk.Action ("SimulationMenu", "Simulation", None, None)
+		action_filemenu = Gtk.Action ("RoutingMenu", "Routing", None, None)
 		action_group.add_action(action_filemenu)
 
 
-		act = Gtk.Action ("SimulationStart", None, None, Gtk.STOCK_MEDIA_PLAY)
-		act.connect ("activate", self.onSimulationStart)
+		act = Gtk.Action ("RoutingWizard", 'Routing...', None, Gtk.STOCK_MEDIA_PLAY)
+		act.connect ("activate", self.onRoutingWizard)
 		action_group.add_action (act)
 
-		act = Gtk.Action ("SimulationStop", None, None, Gtk.STOCK_MEDIA_STOP)
-		act.connect ("activate", self.onQuit)
-		action_group.add_action (act)
-
-		act = Gtk.Action ("SimulationPause", None, None, Gtk.STOCK_MEDIA_PAUSE)
-		act.connect ("activate", self.onQuit)
-		action_group.add_action (act)
-
-		act = Gtk.Action ("SimulationSavePath", 'Save path', None, Gtk.STOCK_SAVE)
+		act = Gtk.Action ("RoutingSavePath", 'Save path', None, Gtk.STOCK_SAVE)
 		act.connect ("activate", self.onQuit)
 		action_group.add_action (act)
 
@@ -259,16 +237,15 @@ class MainWindow(Gtk.Window):
 
 		## Simulation Controls
 		boxcontrols = Gtk.Box (orientation=Gtk.Orientation.VERTICAL)
-		notebook.append_page(boxcontrols, Gtk.Label ('Simulation'))
+		notebook.append_page(boxcontrols, Gtk.Label ('Routing'))
 
 		self.timeScale = Gtk.HScale()
 		self.timeScale.set_adjustment (Gtk.Adjustment(0.0, 0.0, 120.0, 0.1, 1.0, 1.0))
 		self.timeScale.connect ("change-value", self.timeScaleChange)
 		boxcontrols.pack_start (self.timeScale, False, False, 10)
 
-		self.boat = BoatWidget ()
-		boxcontrols.pack_start (self.boat, False, False, 0)
-
+		
+		"""
 		self.simulationStore = Gtk.ListStore (int, str, float, float)
 		self.simulationTree = Gtk.TreeView (self.simulationStore)
 
@@ -285,7 +262,7 @@ class MainWindow(Gtk.Window):
 		scbar.set_vexpand (True)
 		scbar.add (self.simulationTree)
 		boxcontrols.pack_start (scbar, True, True, 0)
-
+		"""
 		
 		# Status bar
 		self.statusbar = Gtk.Statusbar ()
@@ -299,17 +276,31 @@ class MainWindow(Gtk.Window):
 		#self.onOpen (self)
 
 
+	########### Routing
+
+	def onRoutingWizard (self, widget):
+		dialog = RoutingWizardDialog (self)
+		response = dialog.run ()
+		dialog.destroy ()
+		
+
 	def timeScaleChange (self, range, scroll, value):
 		self.gribMapLayer.t = value
 		self.osm.queue_draw ()
-		print (value)
+
+
+
+	########### Help
 
 	def onAbout (self, widget):
 		dialog = AboutDialog (self)
-		response = dialog.run()
-		dialog.destroy()
+		response = dialog.run ()
+		dialog.destroy ()
 
 
+
+	########### Track
+	
 	def onNew (self, widget):
 		self.openedFile = None
 		self.core.getTrack ().clear ()
@@ -464,6 +455,8 @@ class MainWindow(Gtk.Window):
 			self.updateTrack ()
 
 
+	########### Misc
+
 	def onQuit (self, widget):
 		Gtk.main_quit ()
 
@@ -472,40 +465,8 @@ class MainWindow(Gtk.Window):
 		pass
 
 
-	def onSimulationStart (self, widget):
-		if len (self.core.getTrack ()) < 2:
-			edialog = Gtk.MessageDialog (self, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Track is empty")
-			edialog.format_secondary_text ("Please add at least two points in the track")
-			edialog.run ()
-			edialog.destroy ()	
-			return	
 
-		self.sim = self.core.createSimulation ('mini650')
-		self.boat.update (self.sim.boat)
-
-		GObject.timeout_add(0, self.onSimulationStep)
-
-	def onSimulationStep (self):
-		res = self.sim.step ()
-		self.boat.update (self.sim.boat)
-		self.gribMapLayer.t = self.sim.getTime ()
-		self.isochronesMapLayer.setIsochrones (res['isochrones'])
-		self.osm.queue_draw ()
-		#GObject.timeout_add (1, self.onSimulationStep)
-
-
-	def onBoatSelect (self, widget):
-		dialog = BoatSelectDialog (self)
-		response = dialog.run()
-
-		if response == Gtk.ResponseType.OK:
-			selectedBoat = dialog.get_selected_boat ()
-			print (selectedBoat)
-		elif response == Gtk.ResponseType.CANCEL:
-			pass
-
-		dialog.destroy()
-
+	########### GRIB
 
 	def onGribDownloadPercentage (self, percentage):
 		self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Downloading grib: %d%% completed' % percentage)

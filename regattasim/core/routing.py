@@ -23,11 +23,14 @@ from .track import Track
 
 logger = logging.getLogger ('regattasim')
 
+ALGORITHMS = {
+	'IsoTree': None,
+	'BestIsoList': None
+}
 
-
-class Simulation:
-	def __init__ (self, boat, track, grib, initialTime = 0.0):
-		self.mode = 'wind'      # 'compass' 'gps' 'vmg'
+class Routing:
+	def __init__ (self, algorithm, boat, track, grib, initialTime = 0.0):
+		self.algorithm = algorithm
 		self.boat = boat
 		self.track = track
 		self.wp = 1
@@ -36,8 +39,8 @@ class Simulation:
 		self.t = initialTime
 		self.grib = grib
 		self.log = []           # Log of each simulation step
-		self.boat.setPosition (self.track[0]['lat'], self.track[0]['lon'])
-		logger.debug ('initialized (mode: %s, time: %f)' % (self.mode, self.t))
+		self.position = (self.track[0]['lat'], self.track[0]['lon'])
+		logger.debug ('initialized (time: %f)' % (self.t))
 
 
 	def getTime (self):
@@ -46,7 +49,7 @@ class Simulation:
 	def reset (self):
 		self.steps = 0
 		self.path.clear ()
-		self.boat.setPosition (self.track[0]['lat'], self.track[0]['lon'])
+		self.position = (self.track[0]['lat'], self.track[0]['lon'])
 		self.wp = 1
 		self.log = []
 
@@ -85,31 +88,19 @@ class Simulation:
 		nextwp = (self.track[self.wp]['lat'], self.track[self.wp]['lon'])
 
 		# Currentposition
-
-		position = self.boat.getPosition ()
-		wind = self.grib.getWindAt (self.t, position[0], position[1])
+		wind = self.grib.getWindAt (self.t, self.position[0], self.position[1])
 
 		print (wind)
 
-		isoc = [[position]]
+		isoc = [[self.position]]
 		for x in range (18):
 			isoc = self._calculateIsochrones (isoc, x+1, nextwp)
 
-		# Play a tick
-		self.boat.setWind (wind[0], wind[1])
 
-		print (self.boat.getSpeed (), self.boat.getHDG ())
-		jib = self.boat.getJib ()
-		mainsail = self.boat.getMainsail ()
-
-		logger.debug ('step (mode: %s, time: %f): %f %f' % (self.mode, self.t, position[0], position[1]))
+		logger.debug ('step (mode: %s, time: %f): %f %f' % (self.mode, self.t, self.position[0], self.position[1]))
 
 		nlog = {
 			'position': position,
-			'sails': {
-				'mainsail': mainsail,
-				'jib': jib
-			},
 			'isochrones': isoc
 		}
 

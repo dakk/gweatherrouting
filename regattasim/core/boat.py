@@ -29,40 +29,10 @@ logger = logging.getLogger ('regattasim')
 
 class Boat:
     def __init__ (self, model):
-        self.position = (0.0, 0.0)
-        self.log = 0.0
-        self.twa = 0.0
-        self.tw = (0.0,0.0)
         self.model = model
 
         this_dir, this_fn = os.path.split (__file__)
         self.polar = Polar (this_dir + '/../data/boats/' + model + '/polar.pol')
-
-    def setWind (self, direction, speed):
-        self.tw = (direction, speed)
-        self.twa = utils.reduce180 (direction - self.getHDG ())
-
-    def setPosition (self, lat, lon):
-        self.position = (lat, lon)
-
-    def getPosition (self):
-        return self.position
-
-    # Orza di 1 grado
-    def luffUp (self):
-        if self.twa-math.radians(1)>0.0 and self.twa<=math.pi:#mure a dx
-            self.twa=self.twa-math.radians(1)
-        if self.twa+math.radians(1)<0.0 and self.twa>=-math.pi:#mure a sx
-            self.twa=self.twa+math.radians(1)
-
-    # Poggia di 1 grado
-    def bearAway (self):
-        if self.twa>=0 and self.twa<math.pi:#mure a dx
-            self.twa=self.twa+math.radians(1)
-            if self.twa>math.pi:self.twa=math.pi
-        if self.twa<=0 and self.twa>-math.pi:#mure a sx
-            self.twa=self.twa-math.radians(1)
-            if self.twa<-math.pi:self.twa=-math.pi
 
     # Cambio di mura
     def changeTack (self):
@@ -153,59 +123,3 @@ class Boat:
                 y=speed*math.cos(twa)
             polare.append((x,y))
         return polare
-
-    def getJib (self):
-        jib=[]
-        aw=self.getAW()
-        awa=aw[0]
-        if math.copysign(awa,1)>math.radians(60):
-            l=125.0
-            zero=135
-        else:
-            l=90
-            zero=125
-        #if math.copysign(awa,1)<math.radians(25):
-        if self.getSpeed () <= 0:
-            jib = [(0,125.0),(0,35.0)]
-        else:
-            if awa>0:
-                r=l/awa
-                cx=+r*math.cos(awa)
-                cy=zero-r*math.sin(awa)
-                for angolo in range(0,int(math.degrees(awa))):
-                    angolo=math.radians(angolo)
-                    x=cx-r*math.cos(angolo)
-                    y=cy+r*math.sin(angolo)
-                    jib.append((x,y))
-            else:
-                awa=math.copysign(awa,1)
-                r=l/awa
-                cx=-r*math.cos(awa)
-                cy=zero-r*math.sin(awa)
-                for angolo in range(0,int(math.degrees(awa))):
-                    angolo=math.radians(angolo)
-                    x=cx+r*math.cos(angolo)
-                    y=cy+r*math.sin(angolo)
-                    jib.append((x,y))
-        return jib
-
-    def getMainsail (self):
-        aw = self.getAW ()
-        awa = aw[0]
-        mainsail = []
-        #if math.copysign(awa,1)<math.radians(25):
-        if self.getSpeed () <= 0:
-            mainsail=[(0,35.0),(0,-75.0)]
-        else:
-            if awa>math.pi/2:
-                awa=math.pi/2
-            if awa<-math.pi/2:
-                awa=-math.pi/2
-            sign=awa/math.copysign(awa,1)
-            beizer=Beizer([(0,35),
-                           (-40*math.sin(awa+sign*math.radians(30)),35-40*math.cos(awa+sign*math.radians(30))),
-                           (-110*math.sin(awa-sign*math.radians(25)),35-110*math.cos(awa-sign*math.radians(25)))])
-            for i in range(0,11):
-                i=i*0.1
-                mainsail.append(beizer.value (i)) 
-        return mainsail

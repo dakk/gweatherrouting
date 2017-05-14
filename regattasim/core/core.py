@@ -19,7 +19,7 @@ import logging
 from . import utils
 from .. import config
 from .track import Track
-from .simulation import Simulation
+from .routing import Routing
 from .boat import Boat
 from .grib import Grib
 
