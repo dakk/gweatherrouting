@@ -45,6 +45,7 @@ class RoutingWizardDialog (Gtk.Dialog):
 		self.boatSelect = Gtk.ComboBox.new_with_model_and_entry (boat_store)
 		#name_combo.connect("changed", self.on_name_combo_changed)
 		self.boatSelect.set_entry_text_column (1)
+		self.boatSelect.set_active (0)
 		boxcontent.pack_start (self.boatSelect, False, False, 0)
 
 
@@ -52,12 +53,13 @@ class RoutingWizardDialog (Gtk.Dialog):
 		boxcontent.pack_start (Gtk.Label ('Routing algorithm'), False, False, 0)
 
 		routing_store = Gtk.ListStore (str, object)
-		for ra in routing.ALGORITHMS:
-			routing_store.append ([ra, routing.ALGORITHMS[ra]])
+		for r in routing.ALGORITHMS:
+			routing_store.append ([r['name'], r['class']])
 
 		self.routingSelect = Gtk.ComboBox.new_with_model_and_entry (routing_store)
 		#name_combo.connect("changed", self.on_name_combo_changed)
 		self.routingSelect.set_entry_text_column (0)
+		self.routingSelect.set_active (0)
 		boxcontent.pack_start (self.routingSelect, False, False, 0)
 
 
@@ -65,3 +67,15 @@ class RoutingWizardDialog (Gtk.Dialog):
 
 
 		self.show_all ()
+
+
+	def getSelectedAlgorithm (self):
+		return routing.ALGORITHMS [self.routingSelect.get_active ()]['class']
+
+
+	def getSelectedBoat (self):
+		return self.boats [self.boatSelect.get_active ()]['dir']
+
+
+	def getInitialTime (self):
+		return 0.0

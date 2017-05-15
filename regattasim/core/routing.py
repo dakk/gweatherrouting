@@ -20,39 +20,37 @@ import logging
 from . import utils
 from .boat import Boat
 from .track import Track
+from .routers import linearbestisorouter
 
 logger = logging.getLogger ('regattasim')
 
-ALGORITHMS = {
-	'IsoTree': None,
-	'BestIsoList': None
-}
+ALGORITHMS = [
+	{
+		'name': 'LinearBestIsoRouter',
+		'class': linearbestisorouter.LinearBestIsoRouter
+	}
+]
 
 class Routing:
 	def __init__ (self, algorithm, boat, track, grib, initialTime = 0.0):
+		self.end = False
 		self.algorithm = algorithm
 		self.boat = boat
 		self.track = track
 		self.wp = 1
 		self.steps = 0
 		self.path = Track ()    # Simulated points
-		self.t = initialTime
+		self.time = initialTime
 		self.grib = grib
 		self.log = []           # Log of each simulation step
-		self.position = (self.track[0]['lat'], self.track[0]['lon'])
-		logger.debug ('initialized (time: %f)' % (self.t))
+		self.position = self.track[0]
+		logger.debug ('initialized (time: %f)' % (self.time))
 
+	def isEnd (self):
+		return self.ends
 
 	def getTime (self):
-		return self.t
-
-	def reset (self):
-		self.steps = 0
-		self.path.clear ()
-		self.position = (self.track[0]['lat'], self.track[0]['lon'])
-		self.wp = 1
-		self.log = []
-
+		return self.time
 
 	def _calculateIsochrones (self, isocrone, level, nextwp):
 		dt = level * 50.0
@@ -63,7 +61,7 @@ class Routing:
 		for x in [isocrone[-1][0]]:
 			print (x)
 			isonew = []
-			(TWD,TWS)=self.grib.getWindAt (self.t, x[0], x[1])
+			(TWD,TWS)=self.grib.getWindAt (self.time, x[0], x[1])
 			passo=5#per valori più bassi si rischia instabilità
 			for TWA in range(-180,180,passo):
 				TWA=math.radians(TWA)
@@ -85,22 +83,25 @@ class Routing:
 		#self.t += 0.1
 
 		# Next waypoint
-		nextwp = (self.track[self.wp]['lat'], self.track[self.wp]['lon'])
+		nextwp = self.track[self.wp]
 
 		# Currentposition
-		wind = self.grib.getWindAt (self.t, self.position[0], self.position[1])
+		wind = self.grib.getWindAt (self.time, self.position[0], self.position[1])
 
 		print (wind)
 
 		isoc = [[self.position]]
-		for x in range (18):
+		for x in range (3):
 			isoc = self._calculateIsochrones (isoc, x+1, nextwp)
 
-
-		logger.debug ('step (mode: %s, time: %f): %f %f' % (self.mode, self.t, self.position[0], self.position[1]))
+		self.time += 0.2
+		progress = 12
+		logger.debug ('step (time: %f, %f%% completed): %f %f' % (self.time, progress, self.position[0], self.position[1]))
 
 		nlog = {
-			'position': position,
+			'progress': progress,
+			'time': self.time,
+			'path': [],
 			'isochrones': isoc
 		}
 

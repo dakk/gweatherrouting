@@ -38,15 +38,7 @@ class Track:
         self.waypoints = []
         root = tree.getroot ()
         for child in root:
-            wp = {
-                'lat': float (child.attrib['lat']),
-                'lon': float (child.attrib['lon']),
-                'name': ''
-            }
-
-            if len (child.findall('name')) != 0:
-                wp['name'] = child.findall('name')[0].text
-
+            wp = (float (child.attrib['lat']), float (child.attrib['lon']))
             self.waypoints.append (wp)
 
         return True
@@ -77,9 +69,5 @@ class Track:
         if i >= 0 and i < len (self):
             del self.waypoints [i]
 
-    def add (self, lat, lon, name):
-        self.waypoints.append ({
-            'lat': lat,
-            'lon': lon,
-            'name': name
-        })
+    def add (self, lat, lon):
+        self.waypoints.append ((lat, lon))

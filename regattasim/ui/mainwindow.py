@@ -74,6 +74,10 @@ UI_INFO = """
 class MainWindow(Gtk.Window):
 	def __init__(self, core):
 		Gtk.Window.__init__ (self, title="Regatta Simulator - New file")
+
+		settings = Gtk.Settings.get_default ()
+		#settings.set_property ("gtk-application-prefer-dark-theme", False)
+
 		self.core = core
 		self.openedFile = None
 
@@ -179,21 +183,20 @@ class MainWindow(Gtk.Window):
 		self.osm.layer_add (OsmGpsMap.MapOsd (show_dpad=True, show_zoom=True, show_crosshair=False))
 		boxcenter.pack_start (self.osm, True, True, 0)
 
-		notebook = Gtk.Notebook ()
-		boxcenter.pack_start (notebook, False, False, 0)
+		self.notebook = Gtk.Notebook ()
+		boxcenter.pack_start (self.notebook, False, False, 0)
 
 		## Track
 		boxtrack = Gtk.Box (orientation=Gtk.Orientation.VERTICAL)
-		notebook.append_page(boxtrack, Gtk.Label ('Track'))
+		self.notebook.append_page(boxtrack, Gtk.Label ('Track'))
 
-		self.trackStore = Gtk.ListStore (int, str, float, float)
+		self.trackStore = Gtk.ListStore (int, float, float)
 		self.trackTree = Gtk.TreeView (self.trackStore)
 
 		renderer = Gtk.CellRendererText ()
 		self.trackTree.append_column (Gtk.TreeViewColumn(" ", renderer, text=0))
-		self.trackTree.append_column (Gtk.TreeViewColumn("Name", renderer, text=1))
-		self.trackTree.append_column (Gtk.TreeViewColumn("Latitude", renderer, text=2))
-		self.trackTree.append_column (Gtk.TreeViewColumn("Longitude", renderer, text=3))
+		self.trackTree.append_column (Gtk.TreeViewColumn("Latitude", renderer, text=1))
+		self.trackTree.append_column (Gtk.TreeViewColumn("Longitude", renderer, text=2))
 
 		scbar = Gtk.ScrolledWindow ()
 		scbar.set_hexpand (False)
@@ -227,22 +230,22 @@ class MainWindow(Gtk.Window):
 		self.waypointLon = Gtk.Entry ()
 		boxtrack.pack_start (self.waypointLon, False, False, 3)
 
-		boxtrack.pack_start (Gtk.Label ('Name:'), False, False, 0)
-		self.waypointName = Gtk.Entry ()
-		boxtrack.pack_start (self.waypointName, False, False, 3)
-
 		button = Gtk.Button.new_with_label ('Insert')
 		button.connect ("clicked", self.addWaypoint)
 		boxtrack.pack_start (button, False, False, 0)
 
 		## Simulation Controls
 		boxcontrols = Gtk.Box (orientation=Gtk.Orientation.VERTICAL)
-		notebook.append_page(boxcontrols, Gtk.Label ('Routing'))
+		self.notebook.append_page(boxcontrols, Gtk.Label ('Routing'))
 
-		self.timeScale = Gtk.HScale()
+		self.timeScale = Gtk.HScale ()
 		self.timeScale.set_adjustment (Gtk.Adjustment(0.0, 0.0, 120.0, 0.1, 1.0, 1.0))
 		self.timeScale.connect ("change-value", self.timeScaleChange)
 		boxcontrols.pack_start (self.timeScale, False, False, 10)
+
+
+		self.routingProgress = Gtk.ProgressBar ()
+		boxcontrols.pack_start (self.routingProgress, False, False, 10)
 
 		
 		"""
@@ -272,20 +275,40 @@ class MainWindow(Gtk.Window):
 		self.add (box)
 		self.show_all ()
 
-
 		#self.onOpen (self)
 
 
 	########### Routing
 
 	def onRoutingWizard (self, widget):
+		if len (self.core.getTrack ()) < 2:
+			edialog = Gtk.MessageDialog (self, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
+			edialog.format_secondary_text ("You need at least 2 track points to create a routing path")
+			edialog.run ()
+			edialog.destroy ()
+			return
+
 		dialog = RoutingWizardDialog (self)
 		response = dialog.run ()
+
+		if response == Gtk.ResponseType.OK:
+			self.currentRouting = self.core.createRouting (dialog.getSelectedAlgorithm (), dialog.getSelectedBoat (), dialog.getInitialTime ())
+			self.notebook.set_current_page (1)
+			GObject.timeout_add (10, self.onRoutingStep)
+
 		dialog.destroy ()
 		
+	def onRoutingStep (self):
+		res = self.currentRouting.step ()
+		self.isochronesMapLayer.setIsochrones (res['isochrones'])
+		self.gribMapLayer.time = res['time']
+		self.osm.queue_draw ()
+		self.timeScale.set_value (res['time'])
+		GObject.timeout_add (10, self.onRoutingStep)
+
 
 	def timeScaleChange (self, range, scroll, value):
-		self.gribMapLayer.t = value
+		self.gribMapLayer.time = value
 		self.osm.queue_draw ()
 
 
@@ -400,10 +423,10 @@ class MainWindow(Gtk.Window):
 		i = 0
 		for wp in self.core.getTrack ():
 			i += 1
-			self.trackStore.append([i, wp['name'], wp['lat'], wp['lon']])
+			self.trackStore.append([i, wp[0], wp[1]])
 
 			p = OsmGpsMap.MapPoint ()
-			p.set_degrees (wp['lat'], wp['lon'])
+			p.set_degrees (wp[0], wp[1])
 			track.add_point (p)
 		self.osm.track_add (track)
 		
@@ -419,13 +442,11 @@ class MainWindow(Gtk.Window):
 		lon = self.waypointLon.get_text ()
 
 		if len (lat) > 1 and len (lon) > 1:
-			name = self.waypointName.get_text ()
-			self.core.getTrack ().add (float (lat), float (lon), name)
+			self.core.getTrack ().add (float (lat), float (lon))
 			self.updateTrack ()
 
 			self.waypointLat.set_text ('')
 			self.waypointLon.set_text ('')
-			self.waypointName.set_text ('')
 
 
 	def onWaypointDown (self, widget):

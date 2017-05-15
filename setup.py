@@ -24,7 +24,7 @@ setup(name='regattasim',
 	author=['Riccardo Apolloni', 'Davide Gessa'],
 	setup_requires='setuptools',
 	author_email=['riccardo.apolloni@gmail.com', 'gessadavide@gmail.com'],
-	packages=['regattasim', 'regattasim.ui', 'regattasim.core'],
+	packages=['regattasim', 'regattasim.ui', 'regattasim.core', 'regattasim.core.routers'],
 	package_data={'regattasim': ['data/*', 'data/boats/*', 'data/boats/*/*']},
 	entry_points={
 		'console_scripts': [

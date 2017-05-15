@@ -33,11 +33,13 @@ class Core:
         logger.debug ('Initialized')
 
     # Simulation
-    def createSimulation (self, boatModel):
+    def createRouting (self, algorithm, boatModel, initialTime):
         boat = Boat (boatModel)
-        sim = Simulation (boat, self.track, self.grib)
-        return sim
+        routing = Routing (algorithm (), boat, self.track, self.grib, initialTime = initialTime)
+        return routing
 
+    def getGrib (self):
+        return self.grib
 
     # Track ans save/load
     def getTrack (self):

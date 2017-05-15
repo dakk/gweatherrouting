@@ -27,7 +27,7 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
     def __init__ (self, grib):
         GObject.GObject.__init__ (self)
         self.grib = grib
-        self.t = 0.0
+        self.time = 0.0
 
     def drawWindArrow (self, cr, x, y, wdir, wspeed):
         wdir = -math.radians (wdir)
@@ -85,7 +85,7 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         #print (p1lat, p1lon, p2lat, p2lon)
 
         bounds = ((min (p1lat,p2lat), min (p1lon, p2lon)), (max (p1lat,p2lat), max (p1lon, p2lon)))
-        data = self.grib.getWind (self.t, bounds)
+        data = self.grib.getWind (self.time, bounds)
 
         x = 0
         y = 0

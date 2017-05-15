@@ -71,6 +71,8 @@ class Grib:
 		t1 = int (int (round (t)) / 3) * 3
 		t2 = int (int (round (t+3)) / 3) * 3
 
+		if t2 == t1: t1 -= 3
+
 		lon1 = min (bounds[0][1], bounds[1][1])
 		lon2 = max (bounds[0][1], bounds[1][1])
 

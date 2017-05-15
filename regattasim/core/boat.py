@@ -26,9 +26,9 @@ from .beizer import Beizer
 logger = logging.getLogger ('regattasim')
 
 
-
 class Boat:
     def __init__ (self, model):
+        print (model)
         self.model = model
 
         this_dir, this_fn = os.path.split (__file__)
