@@ -35,7 +35,7 @@ class Core:
     # Simulation
     def createRouting (self, algorithm, boatModel, initialTime):
         boat = Boat (boatModel)
-        routing = Routing (algorithm (), boat, self.track, self.grib, initialTime = initialTime)
+        routing = Routing (algorithm (boat.polar, self.grib), boat, self.track, self.grib, initialTime = initialTime)
         return routing
 
     def getGrib (self):

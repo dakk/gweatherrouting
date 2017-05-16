@@ -47,35 +47,11 @@ class Routing:
 		logger.debug ('initialized (time: %f)' % (self.time))
 
 	def isEnd (self):
-		return self.ends
+		return self.end
 
 	def getTime (self):
 		return self.time
 
-	def _calculateIsochrones (self, isocrone, level, nextwp):
-		dt = level * 50.0
-
-		isocronenew = isocrone
-		
-		print ('call')
-		for x in [isocrone[-1][0]]:
-			print (x)
-			isonew = []
-			(TWD,TWS)=self.grib.getWindAt (self.time, x[0], x[1])
-			passo=5#per valori più bassi si rischia instabilità
-			for TWA in range(-180,180,passo):
-				TWA=math.radians(TWA)
-				brg=utils.reduce360(TWD+TWA)
-				Speed=self.boat.polar.getRoutageSpeed(TWS,math.copysign(TWA,1))
-				ptoiso=utils.routagePointDistance(x[0],x[1],Speed*dt,brg)
-
-				#print ('losso',utils.lossodromic (ptoiso[0], ptoiso[1], nextwp[0], nextwp[1])[0], utils.lossodromic (x[0], x[1], nextwp[0], nextwp[1])[0])
-				#if utils.ortodromic (ptoiso[0], ptoiso[1], nextwp[0], nextwp[1])[0] < utils.ortodromic (x[0], x[1], nextwp[0], nextwp[1])[0]:
-				isonew.append(ptoiso)
-			isonew.append(isonew[0])#chiude l'isocrona
-			isocronenew.append(isonew)  
-
-		return isocronenew
 
 
 	def step (self):
@@ -88,13 +64,9 @@ class Routing:
 		# Currentposition
 		wind = self.grib.getWindAt (self.time, self.position[0], self.position[1])
 
-		print (wind)
+		res = self.algorithm.route (self.time, self.position, nextwp)
 
-		isoc = [[self.position]]
-		for x in range (3):
-			isoc = self._calculateIsochrones (isoc, x+1, nextwp)
-
-		self.time += 0.2
+		#self.time += 0.2
 		progress = 12
 		logger.debug ('step (time: %f, %f%% completed): %f %f' % (self.time, progress, self.position[0], self.position[1]))
 

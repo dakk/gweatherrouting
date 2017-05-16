@@ -304,7 +304,7 @@ class MainWindow(Gtk.Window):
 		self.gribMapLayer.time = res['time']
 		self.osm.queue_draw ()
 		self.timeScale.set_value (res['time'])
-		GObject.timeout_add (10, self.onRoutingStep)
+		#GObject.timeout_add (10, self.onRoutingStep)
 
 
 	def timeScaleChange (self, range, scroll, value):
