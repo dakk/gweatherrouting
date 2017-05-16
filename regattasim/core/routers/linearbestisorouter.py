@@ -17,13 +17,14 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 from .router import *
 
 class LinearBestIsoRouter (Router):
-	def route (self, time, start, end):
-		isoc = [[start]]
-		for x in range (24):
-			isoc = self.calculateIsochrones (time, isoc, x+1, end)
+	def route (self, lastlog, time, start, end):
+		if lastlog != None:
+			isoc = self.calculateIsochrones (time, lastlog['isochrones'], end)
+		else:
+			isoc = self.calculateIsochrones (time, [[(start[0], start[1], 0)]], end)
 
 		return {
-			'time': time,
+			'time': time + 0.15,
 			'path': [],
 			'isochrones': isoc
 		}

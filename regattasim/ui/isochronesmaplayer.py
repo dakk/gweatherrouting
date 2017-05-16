@@ -37,20 +37,41 @@ class IsochronesMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 
         i = 0
         for ic in self.isochrones:
-            i += 1
-            cr.set_source_rgba (0,0,0, 1.0 - i / len (self.isochrones))
+            #cr.set_source_rgba (0,0,0, 1.0 - i / len (self.isochrones))
         
-
             prev = None
             for icpoint in ic:
+                cr.set_source_rgba (0,0,0,0.6)
+                cr.set_line_width (1)
+
                 x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (icpoint[0], icpoint[1]))
                 
                 if prev:
                     cr.move_to (prev[0], prev[1])
                     
-                cr.line_to (x, y)
-                cr.stroke ()
+                    #cr.move_to (x, y)
+                    cr.line_to (x, y)
+                    cr.stroke ()
+                
+                if i > 0:
+                    cr.set_source_rgba (1,0,0,0.6)
+                    cr.set_line_width (0.6)
+                    xa, ya = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (self.isochrones[i-1][icpoint[2]][0], self.isochrones[i-1][icpoint[2]][1]))
+                    cr.move_to (xa, ya)
+                    cr.line_to (x, y)
+                    cr.stroke ()
+
                 prev = (x, y)
+
+            # Close the path
+            cr.set_source_rgba (0,0,0,0.6)
+            cr.set_line_width (1)
+            cr.move_to (prev[0], prev[1])
+            x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (ic[0][0], ic[0][1]))
+            cr.line_to (x, y)
+            cr.stroke ()
+            
+            i += 1
 
     def do_render (self, gpsmap):
         pass

@@ -78,4 +78,4 @@ class RoutingWizardDialog (Gtk.Dialog):
 
 
 	def getInitialTime (self):
-		return 12.0
+		return 0.0

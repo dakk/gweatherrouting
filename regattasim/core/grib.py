@@ -128,8 +128,10 @@ class Grib:
 	# Get wind direction and speed in a point, used by simulator
 	def getWindAt (self, t, lat, lon):	
 		bounds = [(math.floor (lat * 2) / 2., math.floor (lon * 2) / 2.), (math.ceil (lat * 2) / 2., math.ceil (lon * 2) / 2.)]
-		print (bounds)
 		data = self.getWind (t, bounds)
+
+		if len (data[0]) == 0:
+			print (lat,lon)
 		wind = (data[0][0][0], data[0][0][1])
 		return wind
 

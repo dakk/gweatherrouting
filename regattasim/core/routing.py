@@ -64,17 +64,21 @@ class Routing:
 		# Currentposition
 		wind = self.grib.getWindAt (self.time, self.position[0], self.position[1])
 
-		res = self.algorithm.route (self.time, self.position, nextwp)
+		if len (self.log) > 0:
+			res = self.algorithm.route (self.log[-1], self.time, self.position, nextwp)
+		else:
+			res = self.algorithm.route (None, self.time, self.position, nextwp)
 
 		#self.time += 0.2
-		progress = 12
+		progress = len (self.log) * 5
 		logger.debug ('step (time: %f, %f%% completed): %f %f' % (self.time, progress, self.position[0], self.position[1]))
 
+		self.time = res['time']
 		nlog = {
 			'progress': progress,
-			'time': self.time,
+			'time': res['time'],
 			'path': [],
-			'isochrones': isoc
+			'isochrones': res['isochrones']
 		}
 
 		self.log.append (nlog)
