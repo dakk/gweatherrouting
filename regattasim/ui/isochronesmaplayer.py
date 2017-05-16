@@ -41,7 +41,7 @@ class IsochronesMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         
             prev = None
             for icpoint in ic:
-                cr.set_source_rgba (0,0,0,0.6)
+                cr.set_source_rgba (0,0,0,0.4)
                 cr.set_line_width (1)
 
                 x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (icpoint[0], icpoint[1]))
@@ -54,7 +54,7 @@ class IsochronesMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
                     cr.stroke ()
                 
                 if i > 0:
-                    cr.set_source_rgba (1,0,0,0.6)
+                    cr.set_source_rgba (1,0,0,0.2)
                     cr.set_line_width (0.6)
                     xa, ya = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (self.isochrones[i-1][icpoint[2]][0], self.isochrones[i-1][icpoint[2]][1]))
                     cr.move_to (xa, ya)

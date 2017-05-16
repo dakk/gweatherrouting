@@ -61,9 +61,6 @@ class Routing:
 		# Next waypoint
 		nextwp = self.track[self.wp]
 
-		# Currentposition
-		wind = self.grib.getWindAt (self.time, self.position[0], self.position[1])
-
 		if len (self.log) > 0:
 			res = self.algorithm.route (self.log[-1], self.time, self.position, nextwp)
 		else:

@@ -41,6 +41,15 @@ def pointInCountry (lat, lon):
 EARTH_RADIUS=60.0*360/(2*math.pi)#nm
 
 
+def ortodromic2 (lat1, lon1, lat2, lon2):
+	p1 = math.radians (lat1)
+	p2 = math.radians (lat2)
+	dp = math.radians (lat2-lat1)
+	dp2 = math.radians (lon2-lon1)
+
+	a = math.sin (dp/2) * math.sin (dp2/2) + math.cos (p1) * math.cos (p2) * math.sin (dp2/2) * math.sin (dp2/2)
+	c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+	return (EARTH_RADIUS * c, a)
 
 def ortodromic (latA,lonA,latB,lonB):
     Distanza=math.cos(latA)*math.cos(latB)*math.cos(lonB-lonA)+math.sin(latA)*math.sin(latB)
@@ -66,6 +75,16 @@ def lossodromic (latA,lonA,latB,lonB):
     Rotta=math.atan2(-q*(lonB-lonA),(latB-latA))
     if Rotta<0:Rotta=Rotta+2.0*math.pi#atan2:[-pi,pi]
     return Distanza,Rotta
+
+
+def pointDistance (latA, lonA, latB, lonB):
+	dlon = math.radians (lonB) - math.radians (lonA)
+	dlat = math.radians (latB) - math.radians (latA)
+
+	a = math.sin (dlat / 2)**2 + math.cos(math.radians (latA)) * math.cos(math.radians (latB)) * math.sin(dlon / 2)**2
+	c = 2 * math.atan2 (math.sqrt(a), math.sqrt(1 - a))
+
+	return EARTH_RADIUS * c
 
 def routagePointDistance (latA,lonA,Distanza,Rotta):
 	#non funziona in prossimita' dei poli

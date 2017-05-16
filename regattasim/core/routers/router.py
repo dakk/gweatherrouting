@@ -55,7 +55,7 @@ class Router:
 
 
 	def calculateIsochrones (self, t, isocrone, nextwp):
-		dt = (len (isocrone) + 1) * 15.0
+		dt = (len (isocrone) + 1) * 60.0
 		last = isocrone [-1]
 
 		newisopoints = []
@@ -68,25 +68,36 @@ class Router:
 
 			(TWD,TWS) = self.grib.getWindAt (t, p[0], p[1])
 			
-			for TWA in range(-180,180,5):
+			for TWA in range(-180,180,2):
 				TWA = math.radians(TWA)
 				brg = utils.reduce360(TWD+TWA)
-				Speed = self.polar.getRoutageSpeed (TWS,math.copysign(TWA,1))
-				ptoiso = utils.routagePointDistance(p[0],p[1],Speed*dt,brg)
+
+				Speed = self.polar.getRoutageSpeed (TWS, math.copysign (TWA,1))
+				ptoiso = utils.routagePointDistance (p[0],p[1],Speed*dt, brg)
+				print (Speed, brg)
+
+				if utils.pointDistance (ptoiso[0], ptoiso[1], nextwp[0], nextwp[1]) >= utils.pointDistance (p[0], p[1], nextwp[0], nextwp[1]):
+					continue
 
 				if int (ptoiso[0]) != 0 and int (ptoiso[1]) != 0:
 					newisopoints.append ((ptoiso[0], ptoiso[1], i))
 
-		# sort newisopoints based on bearing
-		for i in range(0, len (newisopoints)):
-			newisopoints[i] = (newisopoints[i][0], newisopoints[i][1], newisopoints[i][2], utils.lossodromic (isocrone[0][0][0],isocrone[0][0][1],newisopoints[i][0],newisopoints[i][1]))
 
-		newisopoints = sorted (newisopoints, key=(lambda a: a[3][1]))
+		# sort newisopoints based on bearing
+		isonew = []
+		for i in range(0, len (newisopoints)):
+			try:
+				newisopoints[i] = (newisopoints[i][0], newisopoints[i][1], newisopoints[i][2], utils.lossodromic (isocrone[0][0][0],isocrone[0][0][1],newisopoints[i][0],newisopoints[i][1]))
+				isonew.append (newisopoints[i])
+			except:
+				pass
+
+		newisopoints = sorted (isonew, key=(lambda a: a[3][1]))
 
 		# remove slow isopoints inside
 		bearing = {}
 		for x in newisopoints:
-			k = str (int (x[3][1] * 10))
+			k = str (int (x[3][1] * 50))
 			if k in bearing:
 				if x[3][0] > bearing[k][3][0]:
 					bearing[k] = x

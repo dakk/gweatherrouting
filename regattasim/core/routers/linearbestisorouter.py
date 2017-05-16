@@ -24,7 +24,7 @@ class LinearBestIsoRouter (Router):
 			isoc = self.calculateIsochrones (time, [[(start[0], start[1], 0)]], end)
 
 		return {
-			'time': time + 0.15,
+			'time': time + 1.,
 			'path': [],
 			'isochrones': isoc
 		}
