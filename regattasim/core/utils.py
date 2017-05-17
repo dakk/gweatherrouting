@@ -14,7 +14,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
+import LatLon23
 import math
 import os
 import json
@@ -52,55 +52,28 @@ def ortodromic2 (lat1, lon1, lat2, lon2):
 	return (EARTH_RADIUS * c, a)
 
 def ortodromic (latA,lonA,latB,lonB):
-    Distanza=math.cos(latA)*math.cos(latB)*math.cos(lonB-lonA)+math.sin(latA)*math.sin(latB)
-    Distanza=EARTH_RADIUS*math.acos(Distanza)
-    x=math.cos(latA)*math.sin(latB)-math.sin(latA)*math.cos(latB)*math.cos(lonB-lonA)
-    y=math.sin(lonB-lonA)*math.cos(latB)
-    Rotta=math.atan2(-y,x)
-    if Rotta<0:Rotta=Rotta+2.0*math.pi#atan2:[-pi,pi]
-    return Distanza,Rotta
+	p1 = LatLon23.LatLon(LatLon23.Latitude(latA), LatLon23.Longitude(lonA))
+	p2 = LatLon23.LatLon(LatLon23.Latitude(latB), LatLon23.Longitude(lonB))
+
+	return (p1.distance (p2), math.radians (p1.heading_initial(p2)))
 
 def lossodromic (latA,lonA,latB,lonB):
-    #non funziona in prossimita' dei poli
-    #per latB=-90: math domain error log(0)
-    #per latA=-90 [zero divison error]
-    #per A==B ritorna (0.0,0.0)
-    #if latA==latB:
-    if  math.copysign(latA-latB,1)<=math.radians(0.1/3600.0):
-        q=math.cos(latA)
-    else:
-        Df=math.log(math.tan(latB/2+math.pi/4)/math.tan(latA/2+math.pi/4),math.e)
-        q=(latB-latA)*1.0/Df
-    Distanza=EARTH_RADIUS*((latA-latB)**2+(q*(lonA-lonB))**2)**0.5
-    Rotta=math.atan2(-q*(lonB-lonA),(latB-latA))
-    if Rotta<0:Rotta=Rotta+2.0*math.pi#atan2:[-pi,pi]
-    return Distanza,Rotta
+	p1 = LatLon23.LatLon(LatLon23.Latitude(latA), LatLon23.Longitude(lonA))
+	p2 = LatLon23.LatLon(LatLon23.Latitude(latB), LatLon23.Longitude(lonB))
 
+	return (p1.distance (p2, ellipse = 'sphere'), math.radians (p1.heading_initial(p2)))
 
 def pointDistance (latA, lonA, latB, lonB):
-	dlon = math.radians (lonB) - math.radians (lonA)
-	dlat = math.radians (latB) - math.radians (latA)
-
-	a = math.sin (dlat / 2)**2 + math.cos(math.radians (latA)) * math.cos(math.radians (latB)) * math.sin(dlon / 2)**2
-	c = 2 * math.atan2 (math.sqrt(a), math.sqrt(1 - a))
-
-	return EARTH_RADIUS * c
+	p1 = LatLon23.LatLon(LatLon23.Latitude(latA), LatLon23.Longitude(lonA))
+	p2 = LatLon23.LatLon(LatLon23.Latitude(latB), LatLon23.Longitude(lonB))
+	return p1.distance (p2)
+	
 
 def routagePointDistance (latA,lonA,Distanza,Rotta):
-	#non funziona in prossimita' dei poli
-	#dove può risultare latC>90, log(tan(latC/...))=log(<0)   (*)
-	a=Distanza*1.0/EARTH_RADIUS
-	latB=latA+a*math.cos(Rotta)
-	if math.copysign(latA-latB,1)<=math.radians(0.1/3600.0):
-		q=math.cos(latA)
-	else:
-		try:
-			Df=math.log(math.tan(latB/2+math.pi/4)/math.tan(latA/2+math.pi/4),math.e)#(*)
-			q=(latB-latA)/Df
-		except:
-			return latA, lonA
-	lonB=lonA-a*math.sin(Rotta)/q
-	return latB,lonB
+	p = LatLon23.LatLon(LatLon23.Latitude(latA), LatLon23.Longitude(lonA))
+	of = p.offset (math.degrees (Rotta), Distanza).to_string('D')
+	return (float (of[0]), float (of[1]))
+
 
 def reduce360 (alfa):
 	if math.isnan (alfa):

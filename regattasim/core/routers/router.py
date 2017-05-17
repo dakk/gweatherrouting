@@ -28,25 +28,6 @@ from .. import utils
 
 # [[level1], [level2,level2], [level3,level3,level3,level3]]
 
-def interno(poligono,pto):
-    #poligono orientato in senso orario
-    somma=0
-    for i in range(0,len(poligono)-1):
-        v1=poligono[i]
-        v2=poligono[i+1]
-        rlv1=math.atan2((v1[1]-pto[1]),(v1[0]-pto[0]))
-        if rlv1<0:rlv1=2*math.pi+rlv1
-        rlv2=math.atan2((v2[1]-pto[1]),(v2[0]-pto[0]))
-        if rlv2<0:rlv2=2*math.pi+rlv2
-        angolo=math.copysign(rlv2-rlv1,1)
-        if angolo>math.pi:
-            angolo=2*math.pi-angolo
-        somma=somma+angolo
-    if somma<2*math.pi:
-        Interno=False
-    else:
-        Interno=True
-    return Interno
 
 class Router:
 	def __init__ (self, polar, grib):
@@ -55,7 +36,7 @@ class Router:
 
 
 	def calculateIsochrones (self, t, isocrone, nextwp):
-		dt = (len (isocrone) + 1) * 60.0
+		dt = (len (isocrone) + 1) * 1.0
 		last = isocrone [-1]
 
 		newisopoints = []
@@ -67,20 +48,18 @@ class Router:
 			p = last[i]
 
 			(TWD,TWS) = self.grib.getWindAt (t, p[0], p[1])
-			
-			for TWA in range(-180,180,2):
+
+			for TWA in range(-180,180,5):
 				TWA = math.radians(TWA)
 				brg = utils.reduce360(TWD+TWA)
 
 				Speed = self.polar.getRoutageSpeed (TWS, math.copysign (TWA,1))
-				ptoiso = utils.routagePointDistance (p[0],p[1],Speed*dt, brg)
-				print (Speed, brg)
+				ptoiso = utils.routagePointDistance (p[0], p[1], Speed*dt*1.85, brg)
 
 				if utils.pointDistance (ptoiso[0], ptoiso[1], nextwp[0], nextwp[1]) >= utils.pointDistance (p[0], p[1], nextwp[0], nextwp[1]):
 					continue
-
-				if int (ptoiso[0]) != 0 and int (ptoiso[1]) != 0:
-					newisopoints.append ((ptoiso[0], ptoiso[1], i))
+				
+				newisopoints.append ((ptoiso[0], ptoiso[1], i))
 
 
 		# sort newisopoints based on bearing
@@ -97,7 +76,7 @@ class Router:
 		# remove slow isopoints inside
 		bearing = {}
 		for x in newisopoints:
-			k = str (int (x[3][1] * 50))
+			k = str (int (x[3][1] * 100))
 			if k in bearing:
 				if x[3][0] > bearing[k][3][0]:
 					bearing[k] = x

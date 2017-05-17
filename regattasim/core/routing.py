@@ -58,6 +58,10 @@ class Routing:
 		self.steps += 1
 		#self.t += 0.1
 
+		if self.wp >= len (self.track):
+			self.end = True
+			return self.log[-1]
+
 		# Next waypoint
 		nextwp = self.track[self.wp]
 
@@ -70,11 +74,16 @@ class Routing:
 		progress = len (self.log) * 5
 		logger.debug ('step (time: %f, %f%% completed): %f %f' % (self.time, progress, self.position[0], self.position[1]))
 
+		if len (res['path']) != 0:
+			self.position = res['position']
+			self.wp += 1
+			res['isochrones'] = []
+
 		self.time = res['time']
 		nlog = {
 			'progress': progress,
 			'time': res['time'],
-			'path': [],
+			'path': res['path'],
 			'isochrones': res['isochrones']
 		}
 

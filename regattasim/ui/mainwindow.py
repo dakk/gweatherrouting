@@ -304,8 +304,18 @@ class MainWindow(Gtk.Window):
 		self.gribMapLayer.time = res['time']
 		self.osm.queue_draw ()
 		self.timeScale.set_value (res['time'])
-		print (len (res['isochrones']), res['time'])
-		GObject.timeout_add (1000, self.onRoutingStep)
+
+		track = OsmGpsMap.MapTrack ()
+		track.set_property ("line-width", 5)
+		for wp in res['path']:
+			p = OsmGpsMap.MapPoint ()
+			p.set_degrees (wp[0], wp[1])
+			track.add_point (p)
+		
+		self.osm.track_add (track)		
+
+		if not self.currentRouting.isEnd ():
+			GObject.timeout_add (1000, self.onRoutingStep)
 
 
 	def timeScaleChange (self, range, scroll, value):

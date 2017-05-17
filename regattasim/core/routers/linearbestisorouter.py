@@ -13,18 +13,36 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
+from .. import utils
 from .router import *
 
 class LinearBestIsoRouter (Router):
 	def route (self, lastlog, time, start, end):
-		if lastlog != None:
+		if lastlog != None and len (lastlog['isochrones']) > 0:
 			isoc = self.calculateIsochrones (time, lastlog['isochrones'], end)
 		else:
 			isoc = self.calculateIsochrones (time, [[(start[0], start[1], 0)]], end)
 
+
+		position = start
+		path = []
+		for p in isoc[-1]:
+			if utils.pointDistance (end[0],end[1], p[0], p[1]) < 15.0:
+				print ('Found!')
+				path.append (p)
+				for iso in isoc[::-1][1::]:
+					print (path[-1][2], len (iso))
+					path.append (iso[path[-1][2]])
+
+				print (path)
+				path = path[::-1]
+				position = path[-1]
+				break
+
+
 		return {
 			'time': time + 1.,
-			'path': [],
+			'path': path,
+			'position': position,
 			'isochrones': isoc
 		}
