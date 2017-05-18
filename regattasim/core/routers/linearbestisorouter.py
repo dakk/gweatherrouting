@@ -41,7 +41,7 @@ class LinearBestIsoRouter (Router):
 
 
 		return {
-			'time': time + 1.,
+			'time': time + 1. / 60. * 60.,
 			'path': path,
 			'position': position,
 			'isochrones': isoc

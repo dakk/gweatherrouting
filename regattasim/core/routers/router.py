@@ -36,7 +36,7 @@ class Router:
 
 
 	def calculateIsochrones (self, t, isocrone, nextwp):
-		dt = (len (isocrone) + 1) * 1.0
+		dt = (1. / 60. * 60.)
 		last = isocrone [-1]
 
 		newisopoints = []
@@ -55,7 +55,7 @@ class Router:
 
 				Speed = self.polar.getRoutageSpeed (TWS, math.copysign (TWA,1))
 				ptoiso = utils.routagePointDistance (p[0], p[1], Speed*dt*1.85, brg)
-
+				print (Speed*dt*1.85)
 				if utils.pointDistance (ptoiso[0], ptoiso[1], nextwp[0], nextwp[1]) >= utils.pointDistance (p[0], p[1], nextwp[0], nextwp[1]):
 					continue
 				
