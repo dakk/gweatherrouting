@@ -55,9 +55,11 @@ class Router:
 
 				Speed = self.polar.getRoutageSpeed (TWS, math.copysign (TWA,1))
 				ptoiso = utils.routagePointDistance (p[0], p[1], Speed*dt*1.85, brg)
-				print (Speed*dt*1.85)
+				
 				if utils.pointDistance (ptoiso[0], ptoiso[1], nextwp[0], nextwp[1]) >= utils.pointDistance (p[0], p[1], nextwp[0], nextwp[1]):
 					continue
+				#if utils.pointInCountry (ptoiso[0], ptoiso[1]):
+				#	continue
 				
 				newisopoints.append ((ptoiso[0], ptoiso[1], i))
 

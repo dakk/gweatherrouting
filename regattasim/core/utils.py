@@ -26,7 +26,7 @@ COUNTRIES = json.load (open (this_dir + '/../data/countries.geojson', 'r'))
 COUNTRY_SHAPES = []
 
 for feature in COUNTRIES['features']:
-	 COUNTRY_SHAPES.append (shape(feature['geometry']).simplify (tolerance=50))
+	 COUNTRY_SHAPES.append (shape(feature['geometry']))
 
 def pointInCountry (lat, lon):
 	point = Point (lat, lon)
