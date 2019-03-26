@@ -16,7 +16,6 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 from setuptools import find_packages
 from setuptools import setup
-from regattasim import config
 
 setup(name='regattasim',
 	version=0.1,
