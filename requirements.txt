@@ -1,9 +1,12 @@
 requests
 colorlog
-pyproj<=1.9.6
+#pyproj<=1.9.6
 LatLon23
 #shapely
-pygrib
+#pygrib
+eccodes
 numpy
 geojson_utils
 bs4
+vext
+vext.gi

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017 Davide Gessa
+# Copyright (C) 2017-2021 Davide Gessa
 '''
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ class AboutDialog (Gtk.Dialog):
 
 		textview = Gtk.TextView ()
 		textbuffer = textview.get_buffer ()
-		textbuffer.set_text("""Copyright (C) 2017 Davide Gessa
+		textbuffer.set_text("""Copyright (C) 2017-2021 Davide Gessa
 Copyright (C) 2012 Riccardo Apolloni
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
