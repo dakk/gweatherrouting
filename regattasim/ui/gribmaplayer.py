@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017 Davide Gessa
+# Copyright (C) 2017-2021 Davide Gessa
 '''
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -32,10 +32,8 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
     def drawWindArrow (self, cr, x, y, wdir, wspeed):
         wdir = -math.radians (wdir)
 
-
         #color = colorsys.hsv_to_rgb (1. - (float (wspeed) / 50.), 1, 1)
         #cr.set_source_rgba (color[0], color[1], color[2], 0.8)
-
         
         color = "0000CC"
         if wspeed>=0 and wspeed<2:color="0000CC"
@@ -60,7 +58,9 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         cr.set_source_rgba (a, b, c, 0.5)
         
         length = 15
+
         cr.move_to (x, y)
+
         #cr.line_to (x + (wspeed / 2 * math.sin (wdir)), y + 1 * math.cos (wdir))
         cr.line_to (x + (length * math.sin (wdir)), y + (length * math.cos (wdir)))
 
@@ -87,12 +87,18 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         bounds = ((min (p1lat,p2lat), min (p1lon, p2lon)), (max (p1lat,p2lat), max (p1lon, p2lon)))
         data = self.grib.getWind (self.time, bounds)
 
+
+        if (len(data) == 0):
+            return
+
         x = 0
         y = 0
         sep = 1
 
         sep = 1 #math.ceil (len (data[0]) / 60)
         cr.set_line_width (1.5 / (math.ceil (len (data[0]) / 60)))
+
+        cr.set_line_width (0.5)
 
         for x in data[::sep]:
             for y in x[::sep]:

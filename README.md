@@ -1,7 +1,12 @@
 # Virtual Sailing Regattas Simulator
 
-This repository is a modern rewrite of http://riccardoapolloni.altervista.org/ source code from Riccardo Apolloni.
+This repository is a modern rewrite of Riccardo Apolloni source code.
 
+
+## Dependencies
+This software requires:
+- osm-gps-map
+- eccodes
 
 ## Planned features
 

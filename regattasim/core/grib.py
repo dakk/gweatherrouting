@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017 Davide Gessa
+# Copyright (C) 2017-2021 Davide Gessa
 # Copyright (C) 2012 Riccardo Apolloni
 '''
 This program is free software: you can redistribute it and/or modify
@@ -22,7 +22,8 @@ import random
 import struct
 import math
 import json
-import pygrib
+#import pygrib
+import eccodes
 import requests
 from bs4 import BeautifulSoup
 
@@ -57,11 +58,24 @@ class Grib:
 		if h in self.cache:
 			return self.cache [h]
 		else:
-			self.grbs.seek(0) 
 			u = self.rindex [t]['u']
 			v = self.rindex [t]['v']
-			uu1, latuu, lonuu = u.data (lat1=bounds[0][0],lat2=bounds[1][0],lon1=bounds[0][1],lon2=bounds[1][1])
-			vv1, latvv, lonvv = v.data (lat1=bounds[0][0],lat2=bounds[1][0],lon1=bounds[0][1],lon2=bounds[1][1])
+
+			uu1, latuu, lonuu = [],[],[]
+			vv1, latvv, lonvv = [],[],[]
+			
+			for x in u:
+				uu1.append(x['value'])
+				latuu.append(x['lat'])
+				lonuu.append(x['lon'])
+
+			for x in v:
+				vv1.append(x['value'])
+				latvv.append(x['lat'])
+				lonvv.append(x['lon'])
+
+			# uu1, latuu, lonuu = u.data (lat1=bounds[0][0],lat2=bounds[1][0],lon1=bounds[0][1],lon2=bounds[1][1])
+			# vv1, latvv, lonvv = v.data (lat1=bounds[0][0],lat2=bounds[1][0],lon1=bounds[0][1],lon2=bounds[1][1])
 
 			self.cache [h] = (uu1, vv1, latuu, lonuu)
 			return self.cache [h]
@@ -69,7 +83,7 @@ class Grib:
 
 	def getWind (self, t, bounds):
 		t1 = int (int (round (t)) / 3) * 3
-		t2 = int (int (round (t+3)) / 3) * 3
+		t2 = int (int (round (t+6)) / 3) * 3
 
 		if t2 == t1: t1 -= 3
 
@@ -97,11 +111,11 @@ class Grib:
 			dataotherside = []
 
 		data = []		
-		for i in range (0, len (uu1)):
+		for i in range (0, len ([uu1])):
 			data2 = []
-			for j in range (0, len (uu1[i])):
-				lon = lonuu[i][j]
-				lat = latuu[i][j]
+			for j in range (0, len ([uu1][i])):
+				lon = [lonuu][i][j]
+				lat = [latuu][i][j]
 
 				if lon > 180.0:
 					lon = -180. + (lon - 180.)
@@ -109,8 +123,8 @@ class Grib:
 				#if utils.pointInCountry (lat, lon):
 				#	continue
 
-				uu = uu1[i][j] + (uu2[i][j] - uu1[i][j]) * (t - t1) * 1.0 / (t2 - t1)
-				vv = vv1[i][j] + (vv2[i][j] - vv1[i][j]) * (t - t1) * 1.0 / (t2 - t1)
+				uu = [uu1][i][j] + ([uu2][i][j] - [uu1][i][j]) * (t - t1) * 1.0 / (t2 - t1)
+				vv = [vv1][i][j] + ([vv2][i][j] - [vv1][i][j]) * (t - t1) * 1.0 / (t2 - t1)
 				
 				tws=0
 				twd=0
@@ -138,15 +152,18 @@ class Grib:
 
 
 	def parse (self, path):
-		self.grbs = pygrib.open (path) 
+		self.grbs = eccodes.GribFile (path) 
 
 		self.rindex = {}
-
-		for r in self.grbs.select (name='10 metre U wind component'):
-			self.rindex [r['P2']] = { 'u': r }
-
-		for r in self.grbs.select (name='10 metre V wind component'):
-			self.rindex [r['P2']]['v'] = r
+		timeIndex = 0
+			
+		for r in self.grbs:
+			# timeIndex = str(r['dataDate'])+str(r['dataTime'])
+			if r['name'] == '10 metre U wind component':
+				self.rindex [timeIndex] = { 'u': eccodes.codes_grib_get_data(r.gid) }
+			elif r['name'] == '10 metre V wind component':
+				self.rindex [timeIndex]['v'] = eccodes.codes_grib_get_data(r.gid)
+				timeIndex += 1
 			
 
 		
