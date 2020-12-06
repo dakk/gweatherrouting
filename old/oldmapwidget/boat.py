@@ -23,7 +23,7 @@ from . import utils
 from .polar import Polar
 from .beizer import Beizer
 
-logger = logging.getLogger ('regattasim')
+logger = logging.getLogger ('gweatherrouting')
 
 
 

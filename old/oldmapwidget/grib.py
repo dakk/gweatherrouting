@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 
 from .. import config
 
-logger = logging.getLogger ('regattasim')
+logger = logging.getLogger ('gweatherrouting')
 
 def riduci360(alfa):
     n=int(alfa*0.5/math.pi)

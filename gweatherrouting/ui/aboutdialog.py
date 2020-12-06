@@ -29,7 +29,7 @@ class AboutDialog (Gtk.Dialog):
 		boxcontent = Gtk.Box (orientation=Gtk.Orientation.VERTICAL)
 		box.pack_start (boxcontent, True, True, 10)
 
-		boxcontent.pack_start (Gtk.Label ("RegattaSim is created by Davide Gessa and Riccardo Apolloni.\nThe software is released under the GNU General Public License version 3"), True, True, 10)
+		boxcontent.pack_start (Gtk.Label ("gweatherrouting is created by Davide Gessa and Riccardo Apolloni.\nThe software is released under the GNU General Public License version 3"), True, True, 10)
 
 		textview = Gtk.TextView ()
 		textbuffer = textview.get_buffer ()

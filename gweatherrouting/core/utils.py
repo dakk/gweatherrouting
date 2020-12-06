@@ -19,7 +19,7 @@ import math
 import os
 import json
 from geojson_utils import point_in_polygon
-#from shapely.geometry import shape, Point
+# from shapely.geometry import shape, Point
 
 
 this_dir, this_fn = os.path.split (__file__)
@@ -28,14 +28,14 @@ COUNTRY_SHAPES = []
 
 for feature in COUNTRIES['features']:
 	COUNTRY_SHAPES.append(feature['geometry'])
-#for feature in COUNTRIES['features']:
-#	 COUNTRY_SHAPES.append (shape(feature['geometry']))
+# for feature in COUNTRIES['features']:
+# 	 COUNTRY_SHAPES.append (shape(feature['geometry']))
 
 def pointInCountry (lat, lon):
-	#point = Point (lat, lon)
-	#for polygon in COUNTRY_SHAPES:
-	#	if polygon.contains (point):
-	#		return True
+	# point = Point (lat, lon)
+	# for polygon in COUNTRY_SHAPES:
+	# 	if polygon.contains (point):
+	# 		return True
 
 	for polygon in COUNTRY_SHAPES:
 		if point_in_polygon({"type": "Point", "coordinates": [lon, lat]}, polygon):

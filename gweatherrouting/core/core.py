@@ -23,7 +23,7 @@ from .routing import Routing
 from .boat import Boat
 from .grib import Grib
 
-logger = logging.getLogger ('regattasim')
+logger = logging.getLogger ('gweatherrouting')
 
 class Core:
     def __init__ (self):

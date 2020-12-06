@@ -2,7 +2,7 @@ requests
 colorlog
 #pyproj<=1.9.6
 LatLon23
-#shapely
+# shapely
 #pygrib
 eccodes
 numpy

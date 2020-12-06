@@ -17,18 +17,18 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 from setuptools import find_packages
 from setuptools import setup
 
-setup(name='regattasim',
+setup(name='gweatherrouting',
 	version=0.1,
 	description='',
 	author=['Riccardo Apolloni', 'Davide Gessa'],
 	setup_requires='setuptools',
 	author_email=['riccardo.apolloni@gmail.com', 'gessadavide@gmail.com'],
-	packages=['regattasim', 'regattasim.ui', 'regattasim.core', 'regattasim.core.routers'],
-	package_data={'regattasim': ['data/*', 'data/boats/*', 'data/boats/*/*']},
+	packages=['gweatherrouting', 'gweatherrouting.ui', 'gweatherrouting.core', 'gweatherrouting.core.routers'],
+	package_data={'gweatherrouting': ['data/*', 'data/boats/*', 'data/boats/*/*']},
 	entry_points={
 		'console_scripts': [
-			'regattasim=regattasim.main:startUI',
-			'regattasim_cli=regattasim.main:startCli'
+			'gweatherrouting=gweatherrouting.main:startUI',
+			'gweatherrouting_cli=gweatherrouting.main:startCli'
 		],
 	},
 	install_requires=open ('requirements.txt', 'r').read ().split ('\n')

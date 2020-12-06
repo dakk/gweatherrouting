@@ -30,7 +30,7 @@ from bs4 import BeautifulSoup
 from . import utils
 from .. import config
 
-logger = logging.getLogger ('regattasim')
+logger = logging.getLogger ('gweatherrouting')
 
 
 class Grib:

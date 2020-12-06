@@ -18,7 +18,7 @@ import logging
 from . import config
 from .core.core import Core
 
-logger = logging.getLogger ('regattasim')
+logger = logging.getLogger ('gweatherrouting')
 
 def startUI ():
     import gi

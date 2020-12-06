@@ -22,7 +22,7 @@ from .boat import Boat
 from .track import Track
 from .routers import linearbestisorouter
 
-logger = logging.getLogger ('regattasim')
+logger = logging.getLogger ('gweatherrouting')
 
 ALGORITHMS = [
 	{
