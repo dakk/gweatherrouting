@@ -23,7 +23,7 @@ setup(name='gweatherrouting',
 	author=['Riccardo Apolloni', 'Davide Gessa'],
 	setup_requires='setuptools',
 	author_email=['riccardo.apolloni@gmail.com', 'gessadavide@gmail.com'],
-	packages=['gweatherrouting', 'gweatherrouting.ui', 'gweatherrouting.core', 'gweatherrouting.core.routers'],
+	packages=['gweatherrouting', 'gweatherrouting.ui', 'gweatherrouting.ui.gtk', 'gweatherrouting.core', 'gweatherrouting.core.routers'],
 	package_data={'gweatherrouting': ['data/*', 'data/boats/*', 'data/boats/*/*']},
 	entry_points={
 		'console_scripts': [

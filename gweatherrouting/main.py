@@ -18,6 +18,14 @@ import logging
 from . import config
 from .core.core import Core
 
+
+import gi
+
+gi.require_version('Gtk', '3.0')
+gi.require_version('OsmGpsMap', '1.0')
+
+from gi.repository import Gtk, Gio, GObject, OsmGpsMap
+
 logger = logging.getLogger ('gweatherrouting')
 
 def startUI ():
@@ -27,6 +35,13 @@ def startUI ():
     from .ui.mainwindow import MainWindow
 
     core = Core ()
+
+    # builder = Gtk.Builder()
+    # builder.add_from_file("./gweatherrouting/ui/gtk/mainwindow.glade")
+    
+    # window = builder.get_object("main-window")
+    # window.show_all()
+    
     win = MainWindow (core)
     win.connect("delete-event", Gtk.main_quit)
     win.show_all()
