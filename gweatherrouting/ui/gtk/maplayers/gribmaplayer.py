@@ -79,7 +79,6 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         width = float (gpsmap.get_allocated_width ())
         height = float (gpsmap.get_allocated_height ())
 
-        # Draw boat
         cr.set_line_width (1)
         cr.set_source_rgb (1,0,0)
         #print (p1lat, p1lon, p2lat, p2lon)
@@ -98,7 +97,7 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         sep = 1 #math.ceil (len (data[0]) / 60)
         cr.set_line_width (1.5 / (math.ceil (len (data[0]) / 60)))
 
-        cr.set_line_width (0.5)
+        cr.set_line_width (1)
 
         for x in data[::sep]:
             for y in x[::sep]:

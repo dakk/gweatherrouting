@@ -22,7 +22,6 @@ import random
 import struct
 import math
 import json
-#import pygrib
 import eccodes
 import requests
 from bs4 import BeautifulSoup
@@ -65,17 +64,17 @@ class Grib:
 			vv1, latvv, lonvv = [],[],[]
 			
 			for x in u:
-				uu1.append(x['value'])
-				latuu.append(x['lat'])
-				lonuu.append(x['lon'])
+				if x['lat'] >= bounds[0][0] and x['lat'] <= bounds[1][0] and x['lon'] >= bounds[0][1] and x['lon'] <= bounds[1][1]: 
+					uu1.append(x['value'])
+					latuu.append(x['lat'])
+					lonuu.append(x['lon'])
 
 			for x in v:
-				vv1.append(x['value'])
-				latvv.append(x['lat'])
-				lonvv.append(x['lon'])
+				if x['lat'] >= bounds[0][0] and x['lat'] <= bounds[1][0] and x['lon'] >= bounds[0][1] and x['lon'] <= bounds[1][1]: 
+					vv1.append(x['value'])
+					latvv.append(x['lat'])
+					lonvv.append(x['lon'])
 
-			# uu1, latuu, lonuu = u.data (lat1=bounds[0][0],lat2=bounds[1][0],lon1=bounds[0][1],lon2=bounds[1][1])
-			# vv1, latvv, lonvv = v.data (lat1=bounds[0][0],lat2=bounds[1][0],lon1=bounds[0][1],lon2=bounds[1][1])
 
 			self.cache [h] = (uu1, vv1, latuu, lonuu)
 			return self.cache [h]

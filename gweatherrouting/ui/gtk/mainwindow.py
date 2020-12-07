@@ -28,8 +28,8 @@ from ... import config
 from .aboutdialog import AboutDialog
 from .routingwizarddialog import RoutingWizardDialog
 from .gribselectdialog import GribSelectDialog
-from .gribmaplayer import GribMapLayer
-from .isochronesmaplayer import IsochronesMapLayer
+from .maplayers import GribMapLayer
+from .maplayers import IsochronesMapLayer
 
 
 
@@ -38,6 +38,7 @@ class MainWindow:
 		return MainWindow(core)
 
 	def __init__(self, core):
+		self.play = False
 		self.selectedTrackItem = None
 		self.core = core
 
@@ -63,6 +64,9 @@ class MainWindow:
 		self.statusbar = self.builder.get_object("status-bar")
 		self.trackStore = self.builder.get_object("track-list-store")
 
+
+	####################################
+	## Track handling
 
 	def updateTrack (self):
 		self.trackStore.clear ()
@@ -145,3 +149,29 @@ class MainWindow:
 			self.builder.get_object("track-add-point-lat").set_text ('')
 			self.builder.get_object("track-add-point-lon").set_text ('')
 			self.builder.get_object("track-add-point-popover").hide()
+
+
+
+	####################################
+	## Time controls
+
+	def onPlayClick(self, event):
+		self.play = True
+		GObject.timeout_add (10, self.onPlayStep)
+
+	def onPlayStep(self):
+		self.onFowardClick(None)
+		if self.play:
+			GObject.timeout_add (1000, self.onPlayStep)
+
+	def onStopClick(self, event):
+		self.play = False
+
+	def onFowardClick(self, event):
+		self.gribMapLayer.time += 1
+		self.map.queue_draw ()
+
+	def onBackwardClick(self, event):
+		if self.gribMapLayer.time > 0:
+			self.gribMapLayer.time -= 1
+			self.map.queue_draw ()
