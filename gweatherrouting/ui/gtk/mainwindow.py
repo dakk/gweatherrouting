@@ -22,7 +22,7 @@ from threading import Thread
 gi.require_version('Gtk', '3.0')
 gi.require_version('OsmGpsMap', '1.0')
 
-from gi.repository import Gtk, Gio, GObject, OsmGpsMap
+from gi.repository import Gtk, Gio, GObject, OsmGpsMap, Gdk
 
 from ... import config
 from .aboutdialog import AboutDialog
@@ -68,6 +68,7 @@ class MainWindow:
 		# This will cause segfault, maybe an osm-gps-map bug
 		# self.mapTrack.set_property ("editable", True)
 		self.mapTrack.set_property ("line-width", 2)
+		self.mapTrack.set_property ("color", Gdk.RGBA(1.0,1.0,1.0,1.0))
 		self.map.track_add (self.mapTrack)
 
 		self.statusbar = self.builder.get_object("status-bar")
@@ -134,6 +135,8 @@ class MainWindow:
 			self.mapTrack.add_point (p)
 
 	def onMapClickRelease(self, map, event):
+		return 
+
 		self.trackStore.clear ()
 
 		i = 0
@@ -331,3 +334,45 @@ class MainWindow:
 	def onTimeSlide (self, widget):
 		self.gribMapLayer.time = int (self.builder.get_object('time-adjustment').get_value())
 		self.map.queue_draw ()
+
+
+	####################################
+	# Misc
+	def onAbout(self, item):
+		dialog = AboutDialog (self.window)
+		response = dialog.run ()
+		dialog.destroy ()
+
+
+	# Grib
+	def onGribOpen(self, widget):
+		pass
+	
+	def onGribDownloadPercentage (self, percentage):
+		self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Downloading grib: %d%% completed' % percentage)
+
+	def onGribDownloadCompleted (self, status):
+		if status:
+			edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done")
+			edialog.format_secondary_text ("Grib downloaded successfully")
+			edialog.run ()
+			edialog.destroy ()	
+		else:
+			edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
+			edialog.format_secondary_text ("Error during grib download")
+			edialog.run ()
+			edialog.destroy ()	
+
+
+	def onGribSelect (self, widget):
+		dialog = GribSelectDialog (self.window)
+		response = dialog.run()
+
+		if response == Gtk.ResponseType.OK:
+			selectedGrib = dialog.get_selected_grib ()
+			t = Thread(target=self.core.grib.download, args=(selectedGrib, self.onGribDownloadPercentage, self.onGribDownloadCompleted,))
+			t.start ()
+		elif response == Gtk.ResponseType.CANCEL:
+			pass
+
+		dialog.destroy()

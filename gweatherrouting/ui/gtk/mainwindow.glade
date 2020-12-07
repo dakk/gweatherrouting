@@ -17,6 +17,69 @@
       </object>
     </child>
   </object>
+  <object class="GtkMenu" id="preferences-menu">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <child>
+      <object class="GtkMenuItem">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Grib</property>
+        <property name="use-underline">True</property>
+        <child type="submenu">
+          <object class="GtkMenu">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <child>
+              <object class="GtkMenuItem">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="label" translatable="yes">Download</property>
+                <property name="use-underline">True</property>
+                <signal name="activate" handler="onGribSelect" swapped="no"/>
+              </object>
+            </child>
+            <child>
+              <object class="GtkMenuItem">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="label" translatable="yes">Open</property>
+                <property name="use-underline">True</property>
+                <signal name="activate" handler="onGribOpen" swapped="no"/>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkMenu" id="settings-menu">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <child>
+      <object class="GtkMenuItem">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Preferences</property>
+        <property name="use-underline">True</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkSeparatorMenuItem">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">About</property>
+        <property name="use-underline">True</property>
+        <signal name="activate" handler="onAbout" swapped="no"/>
+      </object>
+    </child>
+  </object>
   <object class="GtkAdjustment" id="time-adjustment">
     <property name="upper">100</property>
     <property name="step-increment">1</property>
@@ -350,7 +413,8 @@
                   <object class="OsmGpsMap" id="map">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
-                    <property name="tile-cache">/home/dakk/.cache/osmgpsmap/b477b51738b9962abcc425a3dcb26b4d</property>
+                    <property name="repo-uri">https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/#Z/#Y/#X</property>
+                    <property name="tile-cache">/home/dakk/.cache/osmgpsmap/b487b51738b9962abcc425a3dcb26b4d</property>
                     <signal name="button-press-event" handler="onMapClick" swapped="no"/>
                     <signal name="button-release-event" handler="onMapClickRelease" swapped="no"/>
                   </object>
@@ -437,45 +501,6 @@
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
-            <property name="tooltip-text" translatable="yes">Edit GWeatherRouting settings</property>
-            <property name="always-show-image">True</property>
-            <child>
-              <object class="GtkImage">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="icon-name">application-menu-symbolic</property>
-              </object>
-            </child>
-          </object>
-          <packing>
-            <property name="pack-type">end</property>
-            <property name="position">2</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkButton">
-            <property name="visible">True</property>
-            <property name="can-focus">True</property>
-            <property name="receives-default">True</property>
-            <property name="tooltip-text" translatable="yes">Edit project settings</property>
-            <child>
-              <object class="GtkImage">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="icon-name">document-properties-symbolic</property>
-              </object>
-            </child>
-          </object>
-          <packing>
-            <property name="pack-type">end</property>
-            <property name="position">3</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkButton">
-            <property name="visible">True</property>
-            <property name="can-focus">True</property>
-            <property name="receives-default">True</property>
             <property name="tooltip-text" translatable="yes">Save</property>
             <signal name="clicked" handler="onSave" swapped="no"/>
             <child>
@@ -487,7 +512,7 @@
             </child>
           </object>
           <packing>
-            <property name="position">4</property>
+            <property name="position">2</property>
           </packing>
         </child>
         <child>
@@ -506,7 +531,7 @@
             </child>
           </object>
           <packing>
-            <property name="position">5</property>
+            <property name="position">3</property>
           </packing>
         </child>
         <child>
@@ -525,6 +550,46 @@
             </child>
           </object>
           <packing>
+            <property name="position">4</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkMenuButton">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="focus-on-click">False</property>
+            <property name="receives-default">True</property>
+            <property name="popup">settings-menu</property>
+            <child>
+              <object class="GtkImage">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="icon-name">open-menu-symbolic</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="pack-type">end</property>
+            <property name="position">5</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkMenuButton">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="focus-on-click">False</property>
+            <property name="receives-default">True</property>
+            <property name="popup">preferences-menu</property>
+            <child>
+              <object class="GtkImage">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="icon-name">document-properties-symbolic</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="pack-type">end</property>
             <property name="position">6</property>
           </packing>
         </child>

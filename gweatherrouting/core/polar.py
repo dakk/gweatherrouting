@@ -147,8 +147,8 @@ class Polar:
         if twa>=twaup and twa<=twadown:
             twa=twa
         else:
-            if twa<twaup:
-                twa=twaup
-            if twa>twadown:
-                twa=twadown
+            if twa < twaup:
+                twa = twaup
+            if twa > twadown:
+                twa = twadown
         return twa

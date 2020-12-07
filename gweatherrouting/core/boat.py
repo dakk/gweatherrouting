@@ -111,15 +111,15 @@ class Boat:
 
 
     def getPolar (self):
-        polare=[]
+        polar = []
         for twa in range(0,185,5):
-            twa=math.radians(twa)
-            speed=self.polar.getSpeed (self.tw[1],twa)
-            if self.twa<0:#mure a sx
-                x=speed*math.sin(twa)
-                y=speed*math.cos(twa)
-            else:#mure a dx
-                x=-speed*math.sin(twa)
-                y=speed*math.cos(twa)
-            polare.append((x,y))
-        return polare
+            twa = math.radians(twa)
+            speed = self.polar.getSpeed (self.tw[1], twa)
+            if self.twa < 0: #mure a sx
+                x = speed * math.sin(twa)
+                y = speed * math.cos(twa)
+            else: #mure a dx
+                x = -speed * math.sin(twa)
+                y = speed * math.cos(twa)
+            polar.append((x, y))
+        return polar

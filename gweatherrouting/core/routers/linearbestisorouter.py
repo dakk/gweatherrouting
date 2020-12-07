@@ -27,7 +27,7 @@ class LinearBestIsoRouter (Router):
 		position = start
 		path = []
 		for p in isoc[-1]:
-			if utils.pointDistance (end[0],end[1], p[0], p[1]) < 15.0:
+			if utils.pointDistance (end[0],end[1], p[0], p[1]) < 10.0:
 				print ('Found!')
 				path.append (p)
 				for iso in isoc[::-1][1::]:
