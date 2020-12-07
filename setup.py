@@ -20,9 +20,9 @@ from setuptools import setup
 setup(name='gweatherrouting',
 	version=0.1,
 	description='',
-	author=['Riccardo Apolloni', 'Davide Gessa'],
+	author=['Davide Gessa', 'Riccardo Apolloni'],
 	setup_requires='setuptools',
-	author_email=['riccardo.apolloni@gmail.com', 'gessadavide@gmail.com'],
+	author_email=['gessadavide@gmail.com', 'riccardo.apolloni@gmail.com'],
 	packages=['gweatherrouting', 'gweatherrouting.ui', 'gweatherrouting.ui.gtk', 'gweatherrouting.core', 'gweatherrouting.core.routers'],
 	package_data={'gweatherrouting': ['data/*', 'data/boats/*', 'data/boats/*/*']},
 	entry_points={
