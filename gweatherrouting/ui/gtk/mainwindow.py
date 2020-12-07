@@ -62,6 +62,12 @@ class MainWindow:
 		self.map.layer_add (self.gribMapLayer)
 		self.map.layer_add (OsmGpsMap.MapOsd (show_dpad=True, show_zoom=True, show_crosshair=False))
 
+		self.mapTrack = OsmGpsMap.MapTrack ()
+		# This will cause segfault, maybe an osm-gps-map bug
+		# self.mapTrack.set_property ("editable", True)
+		self.mapTrack.set_property ("line-width", 2)
+		self.map.track_add (self.mapTrack)
+
 		self.statusbar = self.builder.get_object("status-bar")
 		self.trackStore = self.builder.get_object("track-list-store")
 
@@ -71,12 +77,8 @@ class MainWindow:
 
 	def updateTrack (self):
 		self.trackStore.clear ()
-		self.map.track_remove_all ()
-		track = OsmGpsMap.MapTrack ()
-
-		#TODO: make it editable? should swap values between track and core model
-		#track.set_property ("editable", True)
-		track.set_property ("line-width", 2)
+		while self.mapTrack.n_points() > 0:
+			self.mapTrack.remove_point(0)
 
 		i = 0
 		for wp in self.core.getTrack ():
@@ -85,8 +87,17 @@ class MainWindow:
 
 			p = OsmGpsMap.MapPoint ()
 			p.set_degrees (wp[0], wp[1])
-			track.add_point (p)
-		self.map.track_add (track)
+			self.mapTrack.add_point (p)
+
+	def onMapClickRelease(self, map, event):
+		self.trackStore.clear ()
+
+		i = 0
+		while i < self.mapTrack.n_points():
+			p = self.mapTrack.get_point(i)
+			d = p.get_degrees()
+			self.trackStore.append([d.lat, d.lon])
+			i += 1
 
 
 	def onTrackItemClick(self, item, event):
@@ -160,7 +171,7 @@ class MainWindow:
 		self.openedFile = None
 		self.core.getTrack ().clear ()
 		self.updateTrack ()
-		self.builder.get_object('header-bar').set_subtitle ('newfile')
+		self.builder.get_object('header-bar').set_subtitle ('unsaved')
 
 	def onSave (self, widget):
 		if self.openedFile == None:

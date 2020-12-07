@@ -104,7 +104,7 @@
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="model">track-list-store</property>
-                            <property name="reorderable">True</property>
+                            <property name="headers-clickable">False</property>
                             <property name="enable-search">False</property>
                             <property name="show-expanders">False</property>
                             <property name="enable-grid-lines">horizontal</property>
@@ -352,6 +352,7 @@
                     <property name="can-focus">True</property>
                     <property name="tile-cache">/home/dakk/.cache/osmgpsmap/b477b51738b9962abcc425a3dcb26b4d</property>
                     <signal name="button-press-event" handler="onMapClick" swapped="no"/>
+                    <signal name="button-release-event" handler="onMapClickRelease" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -399,7 +400,7 @@
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="title" translatable="yes">GWeatherRouting</property>
-        <property name="subtitle" translatable="yes">noname.gpx</property>
+        <property name="subtitle" translatable="yes">unsaved</property>
         <property name="spacing">0</property>
         <property name="show-close-button">True</property>
         <child>
@@ -490,7 +491,23 @@
           </packing>
         </child>
         <child>
-          <placeholder/>
+          <object class="GtkButton">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">True</property>
+            <property name="tooltip-text" translatable="yes">Save</property>
+            <signal name="clicked" handler="onSaveAs" swapped="no"/>
+            <child>
+              <object class="GtkImage">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="icon-name">document-save-as-symbolic</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="position">5</property>
+          </packing>
         </child>
         <child>
           <placeholder/>
