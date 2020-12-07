@@ -26,6 +26,9 @@ class Track:
     def __getitem__ (self, key):
         return self.waypoints [key]
 
+    def size(self):
+        return len(self)
+
     def clear (self):
         self.waypoints = []
 
@@ -68,6 +71,9 @@ class Track:
     def remove (self, i):
         if i >= 0 and i < len (self):
             del self.waypoints [i]
+
+    def duplicate (self, i):
+        self.waypoints.append(self.waypoints[i])
 
     def add (self, lat, lon):
         self.waypoints.append ((lat, lon))

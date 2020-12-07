@@ -21,7 +21,7 @@ import struct
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio
 
-from .. import config
+from ... import config
 
 
 class PolarWidget (Gtk.DrawingArea):
