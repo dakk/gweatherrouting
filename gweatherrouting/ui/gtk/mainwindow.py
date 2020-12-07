@@ -39,6 +39,7 @@ class MainWindow:
 
 	def __init__(self, core):
 		self.play = False
+		self.openedFile = None
 		self.selectedTrackItem = None
 		self.core = core
 
@@ -46,12 +47,12 @@ class MainWindow:
 		self.builder.add_from_file("./gweatherrouting/ui/gtk/mainwindow.glade")
 		self.builder.connect_signals(self)
 
-		window = self.builder.get_object("main-window")
-		window.connect("delete-event", Gtk.main_quit)
-		window.show_all()
+		self.window = self.builder.get_object("main-window")
+		self.window.connect("delete-event", Gtk.main_quit)
+		self.window.show_all()
 
-		window.set_default_size (800, 600)
-		window.maximize ()
+		self.window.set_default_size (800, 600)
+		self.window.maximize ()
 
 		self.map = self.builder.get_object("map")
 		self.map.set_center_and_zoom (39., 9., 6)
@@ -153,6 +154,97 @@ class MainWindow:
 
 
 	####################################
+	## File handling
+
+	def onNew (self, widget):
+		self.openedFile = None
+		self.core.getTrack ().clear ()
+		self.updateTrack ()
+		self.builder.get_object('header-bar').set_subtitle ('newfile')
+
+	def onSave (self, widget):
+		if self.openedFile == None:
+			return self.onSaveAs (widget)
+
+		if self.core.save (self.openedFile):
+			self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Saved %d waypoints to %s' % (len (self.core.getTrack ()), self.openedFile))					
+		else:
+			edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
+			edialog.format_secondary_text ("Cannot save file: %s" % self.openedFile)
+			edialog.run ()
+			edialog.destroy ()
+
+
+	def onSaveAs (self, widget):
+		dialog = Gtk.FileChooserDialog ("Please select a destination", self.window,
+					Gtk.FileChooserAction.SAVE,
+					(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+
+		filter_gpx = Gtk.FileFilter()
+		filter_gpx.set_name("GPX track")
+		filter_gpx.add_mime_type("application/gpx+xml")
+		filter_gpx.add_pattern ('*.gpx')
+		dialog.add_filter(filter_gpx)
+
+		response = dialog.run ()
+
+		if response == Gtk.ResponseType.OK:
+			filepath = dialog.get_filename ()
+			
+			if not filepath.endswith('.gpx'):
+				filepath += '.gpx'
+
+			if self.core.save (filepath):
+				self.openedFile = filepath
+				self.builder.get_object('header-bar').set_subtitle (filepath)
+				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Saved %d waypoints to %s' % (len (self.core.getTrack ()), self.openedFile))
+			else:
+				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
+				edialog.format_secondary_text ("Cannot save file: %s" % filepath)
+				edialog.run ()
+				edialog.destroy ()
+			
+		dialog.destroy ()
+
+
+	def onOpen (self, widget):
+		dialog = Gtk.FileChooserDialog ("Please choose a file", self.window,
+					Gtk.FileChooserAction.OPEN,
+					(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+			
+		filter_gpx = Gtk.FileFilter ()
+		filter_gpx.set_name ("GPX track")
+		filter_gpx.add_mime_type ("application/gpx+xml")
+		filter_gpx.add_pattern ('*.gpx')
+		dialog.add_filter (filter_gpx)
+
+		response = dialog.run()
+		
+		if response == Gtk.ResponseType.OK:
+			filepath = dialog.get_filename ()
+			dialog.destroy ()
+
+			if self.core.load (filepath):
+				self.builder.get_object('header-bar').set_subtitle (filepath)
+				self.openedFile = filepath
+				self.updateTrack ()
+				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done")
+				edialog.format_secondary_text ("File opened, loaded %d waypoints" % len (self.core.getTrack ()))
+				edialog.run ()
+				edialog.destroy ()	
+				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Loaded %s with %d waypoints' % (filepath, len (self.core.getTrack ())))					
+				
+			else:
+				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
+				edialog.format_secondary_text ("Cannot open file: %s" % filepath)
+				edialog.run ()
+				edialog.destroy ()
+		else:
+			dialog.destroy()
+
+
+
+	####################################
 	## Time controls
 
 	def onPlayClick(self, event):
@@ -170,8 +262,17 @@ class MainWindow:
 	def onFowardClick(self, event):
 		self.gribMapLayer.time += 1
 		self.map.queue_draw ()
+		self.updateTimeSlider()
 
 	def onBackwardClick(self, event):
 		if self.gribMapLayer.time > 0:
 			self.gribMapLayer.time -= 1
 			self.map.queue_draw ()
+			self.updateTimeSlider()
+
+	def updateTimeSlider(self):
+		self.builder.get_object('time-adjustment').set_value(int(self.gribMapLayer.time))
+
+	def onTimeSlide (self, widget):
+		self.gribMapLayer.time = int (self.builder.get_object('time-adjustment').get_value())
+		self.map.queue_draw ()
