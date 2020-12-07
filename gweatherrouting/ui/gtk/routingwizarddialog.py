@@ -25,7 +25,7 @@ from ...core import grib, routing
 class RoutingWizardDialog (Gtk.Dialog):
 	def __init__(self, parent):
 		this_dir, this_fn = os.path.split (__file__)
-		self.boats = json.load (open (this_dir + '/../data/boats/list.json'))
+		self.boats = json.load (open (this_dir + '/../../data/boats/list.json'))
 
 		Gtk.Dialog.__init__(self, "Routing Wizard", parent, 0, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK))
 		self.set_default_size (550, 300)

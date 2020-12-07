@@ -62,6 +62,8 @@ class MainWindow:
 		self.map.layer_add (self.gribMapLayer)
 		self.map.layer_add (OsmGpsMap.MapOsd (show_dpad=True, show_zoom=True, show_crosshair=False))
 
+		self.map.gps_add(39,9,99)
+
 		self.mapTrack = OsmGpsMap.MapTrack ()
 		# This will cause segfault, maybe an osm-gps-map bug
 		# self.mapTrack.set_property ("editable", True)
@@ -70,6 +72,48 @@ class MainWindow:
 
 		self.statusbar = self.builder.get_object("status-bar")
 		self.trackStore = self.builder.get_object("track-list-store")
+
+
+
+	####################################
+	## Routing
+
+	def onRoutingCreate(self, event):
+		if len (self.core.getTrack ()) < 2:
+			edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
+			edialog.format_secondary_text ("You need at least 2 track points to create a routing path")
+			edialog.run ()
+			edialog.destroy ()
+			return
+
+		dialog = RoutingWizardDialog (self.window)
+		response = dialog.run ()
+
+		if response == Gtk.ResponseType.OK:
+			self.currentRouting = self.core.createRouting (dialog.getSelectedAlgorithm (), dialog.getSelectedBoat (), dialog.getInitialTime ())
+			# self.notebook.set_current_page (1)
+			GObject.timeout_add (10, self.onRoutingStep)
+
+		dialog.destroy ()
+		
+	def onRoutingStep (self):
+		res = self.currentRouting.step ()
+		self.isochronesMapLayer.setIsochrones (res['isochrones'])
+		self.gribMapLayer.time = res['time']
+		self.map.queue_draw ()
+		self.builder.get_object('time-adjustment').set_value (res['time'])
+
+		track = OsmGpsMap.MapTrack ()
+		track.set_property ("line-width", 5)
+		for wp in res['path']:
+			p = OsmGpsMap.MapPoint ()
+			p.set_degrees (wp[0], wp[1])
+			track.add_point (p)
+		
+		self.map.track_add (track)		
+
+		if not self.currentRouting.isEnd ():
+			GObject.timeout_add (1000, self.onRoutingStep)
 
 
 	####################################
