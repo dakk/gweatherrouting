@@ -19,7 +19,7 @@ import os
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, GObject
 
-from ...core import grib
+from ...core import Grib
 
 class GribSelectDialog (Gtk.Dialog):
 	def __init__(self, parent):

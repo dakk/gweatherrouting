@@ -87,7 +87,7 @@ class MainWindow:
 			edialog.destroy ()
 			return
 
-		dialog = RoutingWizardDialog (self.window)
+		dialog = RoutingWizardDialog.create ()
 		response = dialog.run ()
 
 		if response == Gtk.ResponseType.OK:
@@ -347,7 +347,7 @@ class MainWindow:
 	# Grib
 	def onGribOpen(self, widget):
 		pass
-	
+
 	def onGribDownloadPercentage (self, percentage):
 		self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Downloading grib: %d%% completed' % percentage)
 

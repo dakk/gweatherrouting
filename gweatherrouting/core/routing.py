@@ -24,12 +24,13 @@ from .routers import linearbestisorouter
 
 logger = logging.getLogger ('gweatherrouting')
 
-ALGORITHMS = [
-	{
-		'name': 'LinearBestIsoRouter',
-		'class': linearbestisorouter.LinearBestIsoRouter
-	}
-]
+def listRoutingAlgorithms():
+	return [
+		{
+			'name': 'LinearBestIsoRouter',
+			'class': linearbestisorouter.LinearBestIsoRouter
+		}
+	]
 
 class Routing:
 	def __init__ (self, algorithm, boat, track, grib, initialTime = 0.0):

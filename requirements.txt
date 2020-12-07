@@ -1,9 +1,6 @@
 requests
 colorlog
-#pyproj<=1.9.6
-# pupygrib==0.6.1
 LatLon23
-# shapely
 eccodes
 numpy
 geojson_utils
