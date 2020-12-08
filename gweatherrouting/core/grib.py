@@ -35,7 +35,7 @@ logger = logging.getLogger ('gweatherrouting')
 class Grib:
 	def __init__ (self):
 		#self.parse (open ('/home/dakk/testgrib.grb', 'rb'))
-		self.cache = {}
+		self.cache = utils.DictCache(16)
 
 	def getDownloadList ():
 		data = requests.get ('http://grib.virtual-loup-de-mer.org/').text
