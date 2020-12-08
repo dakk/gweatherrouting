@@ -81,10 +81,8 @@ class MainWindow:
 
 	def onRoutingCreate(self, event):
 		if len (self.core.getTrack ()) < 2:
-			edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
-			edialog.format_secondary_text ("You need at least 2 track points to create a routing path")
-			edialog.run ()
-			edialog.destroy ()
+			epop = self.builder.get_object('routing-2points-error-popover')
+			epop.show_all()
 			return
 
 		dialog = RoutingWizardDialog.create ()
@@ -339,9 +337,9 @@ class MainWindow:
 	####################################
 	# Misc
 	def onAbout(self, item):
-		dialog = AboutDialog (self.window)
+		dialog = self.builder.get_object('about-dialog')
 		response = dialog.run ()
-		dialog.destroy ()
+		dialog.hide ()
 
 
 	# Grib
