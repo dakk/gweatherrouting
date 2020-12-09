@@ -353,7 +353,7 @@ class MainWindow:
 		w.show ()
 
 	def onGribManager(self, event):
-		w = GribManagerWindow.create ()
+		w = GribManagerWindow.create (self.core.gribManager)
 		w.show ()
 
 	# Grib

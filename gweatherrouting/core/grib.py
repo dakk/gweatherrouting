@@ -15,16 +15,11 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
-import requests
 import logging
-import tempfile
 import random
 import struct
 import math
-import json
 import eccodes
-import requests
-from bs4 import BeautifulSoup
 
 from . import utils
 from .. import config
@@ -33,11 +28,14 @@ logger = logging.getLogger ('gweatherrouting')
 
 
 class Grib:
-	def __init__ (self, bounds, rindex, timeframe):
+	def __init__ (self, name, centre, bounds, rindex, startTime, lastForecast):
+		self.name = name
+		self.centre = centre.upper()
 		self.cache = utils.DictCache(16)
 		self.rindex = rindex
 		self.bounds = bounds
-		self.timeframe = timeframe
+		self.startTime = startTime
+		self.lastForecast = lastForecast
 
 
 
@@ -141,62 +139,29 @@ class Grib:
 	def parse (path):
 		grbs = eccodes.GribFile (path) 
 
+
 		# TODO: get bounds and timeframe
 		bounds = [0, 0, 0, 0]
-		timeframe = [0, 1]
+		forecastTime = None
+		startTime = None
 
 		rindex = {}
-		timeIndex = 0
 			
+		centre = ''
+
 		for r in grbs:
+			if 'centre' in r.keys():
+				centre = r['centre']
+
+			forecastTime = r['forecastTime']
+			startTime = "%d-%d-%d %d:%d" % (r['year'], r['month'], r['day'], r['hour'], r['minute'])
+			print (startTime, forecastTime)
+
 			# timeIndex = str(r['dataDate'])+str(r['dataTime'])
 			if r['name'] == '10 metre U wind component':
-				rindex [timeIndex] = { 'u': eccodes.codes_grib_get_data(r.gid) }
+				rindex [forecastTime] = { 'u': eccodes.codes_grib_get_data(r.gid) }
 			elif r['name'] == '10 metre V wind component':
-				rindex [timeIndex]['v'] = eccodes.codes_grib_get_data(r.gid)
-				timeIndex += 1
+				rindex [forecastTime]['v'] = eccodes.codes_grib_get_data(r.gid)
 
-		return Grib(bounds, rindex, timeframe)
+		return Grib(path.split('/')[-1], centre, bounds, rindex, startTime, forecastTime)
 			
-
-		
-	# def getDownloadList ():
-	# 	data = requests.get ('http://grib.virtual-loup-de-mer.org/').text
-	# 	soup = BeautifulSoup (data, 'html.parser')
-	# 	gribStore = []
-
-	# 	for row in soup.find ('table').find_all ('tr'):
-	# 		r = row.find_all ('td')
-
-	# 		if len (r) >= 4 and r[1].text.find ('.grb') != -1:
-	# 			gribStore.append ([r[1].text, 'NOAA', r[2].text, r[3].text, 'http://grib.virtual-loup-de-mer.org/' + r[1].find ('a', href=True)['href']])
-	# 	return gribStore
-
-
-	# def download (self, uri, percentageCallback, callback):
-	# 	logger.info ('starting download of %s' % uri)
-
-	# 	response = requests.get(uri, stream=True)
-	# 	total_length = response.headers.get('content-length')
-	# 	last_signal_percent = -1
-	# 	f = open ('/home/dakk/testgrib.grb', 'wb')
-
-	# 	if total_length is None:
-	# 		pass
-	# 	else:
-	# 		dl = 0
-	# 		total_length = int(total_length)
-	# 		for data in response.iter_content (chunk_size=4096):
-	# 			dl += len (data)
-	# 			f.write (data)
-	# 			done = int (100 * dl / total_length)
-				
-	# 			if last_signal_percent != done:
-	# 				percentageCallback (done)  
-	# 				last_signal_percent = done
-		
-	# 	f.close ()
-	# 	logger.info ('download completed %s' % uri)
-
-	# 	self.parse ('/home/dakk/testgrib.grb')
-	# 	callback (True)
