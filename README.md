@@ -11,6 +11,15 @@ This software requires:
 - eccodes
 
 
+## Planned features
+
+- Customizable routing calculator
+- Nautical charts
+- GRIB downloader
+- NMEA interface
+- Boat realtime dashboard
+
+
 ## License
 
 Read the LICENSE file.

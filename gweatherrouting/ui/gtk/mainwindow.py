@@ -27,7 +27,10 @@ from gi.repository import Gtk, Gio, GObject, OsmGpsMap, Gdk
 from ... import config
 from .aboutdialog import AboutDialog
 from .routingwizarddialog import RoutingWizardDialog
+from .settingswindow import SettingsWindow
+from .projectpropertieswindow import ProjectPropertiesWindow
 from .gribselectdialog import GribSelectDialog
+from .gribmanagerwindow import GribManagerWindow
 from .maplayers import GribMapLayer
 from .maplayers import IsochronesMapLayer
 
@@ -73,6 +76,8 @@ class MainWindow:
 
 		self.statusbar = self.builder.get_object("status-bar")
 		self.trackStore = self.builder.get_object("track-list-store")
+
+
 
 
 
@@ -341,6 +346,17 @@ class MainWindow:
 		response = dialog.run ()
 		dialog.hide ()
 
+	def onSettings(self, event):
+		w = SettingsWindow.create ()
+		w.show ()
+
+	def onProjectProperties(self, event):
+		w = ProjectPropertiesWindow.create ()
+		w.show ()
+
+	def onGribManager(self, event):
+		w = GribManagerWindow.create ()
+		w.show ()
 
 	# Grib
 	def onGribOpen(self, widget):

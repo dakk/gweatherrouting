@@ -32,16 +32,5 @@ def startUI ():
     MainWindow.create(core)
     Gtk.main()
 
-    # builder = Gtk.Builder()
-    # builder.add_from_file("./gweatherrouting/ui/gtk/mainwindow.glade")
-    
-    # window = builder.get_object("main-window")
-    # window.show_all()
-    
-    # win = MainWindow (core)
-    # win.connect("delete-event", Gtk.main_quit)
-    # win.show_all()
-    # Gtk.main()
-
 def stratCli ():
     return 0
