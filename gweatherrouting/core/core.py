@@ -28,8 +28,7 @@ logger = logging.getLogger ('gweatherrouting')
 class Core:
     def __init__ (self):
         self.track = Track ()
-        self.grib = Grib ()
-        self.grib.parse ('/home/dakk/testgrib.grb')
+        self.grib = Grib.parse('/home/dakk/testgrib.grb')
         logger.debug ('Initialized')
 
     # Simulation

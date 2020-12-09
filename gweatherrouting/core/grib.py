@@ -33,21 +33,10 @@ logger = logging.getLogger ('gweatherrouting')
 
 
 class Grib:
-	def __init__ (self):
-		#self.parse (open ('/home/dakk/testgrib.grb', 'rb'))
+	def __init__ (self, rindex):
 		self.cache = utils.DictCache(16)
+		self.rindex = rindex
 
-	def getDownloadList ():
-		data = requests.get ('http://grib.virtual-loup-de-mer.org/').text
-		soup = BeautifulSoup (data, 'html.parser')
-		gribStore = []
-
-		for row in soup.find ('table').find_all ('tr'):
-			r = row.find_all ('td')
-
-			if len (r) >= 4 and r[1].text.find ('.grb') != -1:
-				gribStore.append ([r[1].text, 'NOAA', r[2].text, r[3].text, 'http://grib.virtual-loup-de-mer.org/' + r[1].find ('a', href=True)['href']])
-		return gribStore
 
 
 	# Get Wind data from cache if available (speed up the entire simulation)
@@ -110,31 +99,30 @@ class Grib:
 			dataotherside = []
 
 		data = []		
-		for i in range (0, len ([uu1])):
-			data2 = []
-			for j in range (0, len ([uu1][i])):
-				lon = [lonuu][i][j]
-				lat = [latuu][i][j]
 
-				if lon > 180.0:
-					lon = -180. + (lon - 180.)
+		for j in range (0, len (uu1)):
+			lon = lonuu[j]
+			lat = latuu[j]
 
-				#if utils.pointInCountry (lat, lon):
-				#	continue
+			if lon > 180.0:
+				lon = -180. + (lon - 180.)
 
-				uu = [uu1][i][j] + ([uu2][i][j] - [uu1][i][j]) * (t - t1) * 1.0 / (t2 - t1)
-				vv = [vv1][i][j] + ([vv2][i][j] - [vv1][i][j]) * (t - t1) * 1.0 / (t2 - t1)
-				
-				tws=0
-				twd=0
-				tws=(uu**2+vv**2)/2.
-				twd=math.atan2(uu,vv)+math.pi
-				twd=utils.reduce360(twd)
+			#if utils.pointInCountry (lat, lon):
+			#	continue
 
-				data2.append ((math.degrees(twd), tws, (lat, lon)))
-			data.append (data2)
+			uu = uu1[j] + (uu2[j] - uu1[j]) * (t - t1) * 1.0 / (t2 - t1)
+			vv = vv1[j] + (vv2[j] - vv1[j]) * (t - t1) * 1.0 / (t2 - t1)
+			
+			tws=0
+			twd=0
+			tws=(uu**2+vv**2)/2.
+			twd=math.atan2(uu,vv)+math.pi
+			twd=utils.reduce360(twd)
 
-		return data + dataotherside
+			data.append ((math.degrees(twd), tws, (lat, lon)))
+		
+		
+		return [data] + dataotherside
 
 
 
@@ -143,54 +131,68 @@ class Grib:
 		bounds = [(math.floor (lat * 2) / 2., math.floor (lon * 2) / 2.), (math.ceil (lat * 2) / 2., math.ceil (lon * 2) / 2.)]
 		data = self.getWind (t, bounds)
 
-		if len (data[0]) == 0:
-			print (lat,lon)
+		# if len (data[0]) == 0:
+		# 	print (lat,lon)
 		wind = (data[0][0][0], data[0][0][1])
 		return wind
 
 
 
-	def parse (self, path):
-		self.grbs = eccodes.GribFile (path) 
+	def parse (path):
+		grbs = eccodes.GribFile (path) 
 
-		self.rindex = {}
+		rindex = {}
 		timeIndex = 0
 			
-		for r in self.grbs:
+		for r in grbs:
 			# timeIndex = str(r['dataDate'])+str(r['dataTime'])
 			if r['name'] == '10 metre U wind component':
-				self.rindex [timeIndex] = { 'u': eccodes.codes_grib_get_data(r.gid) }
+				rindex [timeIndex] = { 'u': eccodes.codes_grib_get_data(r.gid) }
 			elif r['name'] == '10 metre V wind component':
-				self.rindex [timeIndex]['v'] = eccodes.codes_grib_get_data(r.gid)
+				rindex [timeIndex]['v'] = eccodes.codes_grib_get_data(r.gid)
 				timeIndex += 1
+
+		return Grib(rindex)
 			
 
 		
+	# def getDownloadList ():
+	# 	data = requests.get ('http://grib.virtual-loup-de-mer.org/').text
+	# 	soup = BeautifulSoup (data, 'html.parser')
+	# 	gribStore = []
 
-	def download (self, uri, percentageCallback, callback):
-		logger.info ('starting download of %s' % uri)
+	# 	for row in soup.find ('table').find_all ('tr'):
+	# 		r = row.find_all ('td')
 
-		response = requests.get(uri, stream=True)
-		total_length = response.headers.get('content-length')
-		last_signal_percent = -1
-		f = open ('/home/dakk/testgrib.grb', 'wb')
+	# 		if len (r) >= 4 and r[1].text.find ('.grb') != -1:
+	# 			gribStore.append ([r[1].text, 'NOAA', r[2].text, r[3].text, 'http://grib.virtual-loup-de-mer.org/' + r[1].find ('a', href=True)['href']])
+	# 	return gribStore
 
-		if total_length is None:
-			pass
-		else:
-			dl = 0
-			total_length = int(total_length)
-			for data in response.iter_content (chunk_size=4096):
-				dl += len (data)
-				f.write (data)
-				done = int (100 * dl / total_length)
+
+	# def download (self, uri, percentageCallback, callback):
+	# 	logger.info ('starting download of %s' % uri)
+
+	# 	response = requests.get(uri, stream=True)
+	# 	total_length = response.headers.get('content-length')
+	# 	last_signal_percent = -1
+	# 	f = open ('/home/dakk/testgrib.grb', 'wb')
+
+	# 	if total_length is None:
+	# 		pass
+	# 	else:
+	# 		dl = 0
+	# 		total_length = int(total_length)
+	# 		for data in response.iter_content (chunk_size=4096):
+	# 			dl += len (data)
+	# 			f.write (data)
+	# 			done = int (100 * dl / total_length)
 				
-				if last_signal_percent != done:
-					percentageCallback (done)  
-					last_signal_percent = done
+	# 			if last_signal_percent != done:
+	# 				percentageCallback (done)  
+	# 				last_signal_percent = done
 		
-		f.close ()
-		logger.info ('download completed %s' % uri)
+	# 	f.close ()
+	# 	logger.info ('download completed %s' % uri)
 
-		self.parse ('/home/dakk/testgrib.grb')
-		callback (True)
+	# 	self.parse ('/home/dakk/testgrib.grb')
+	# 	callback (True)
