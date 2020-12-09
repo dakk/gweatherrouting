@@ -10,11 +10,13 @@ class GribManager:
 		self.gribFiles = None
 
 		self.gribs = []
-		self.timeframe = [0, 1]
+		self.timeframe = [0, 0]
 
 	def load(self, path):
 		self.gribs.append (Grib.parse(path))
 
+	def hasGrib(self):
+		return len(self.gribs) > 0
 
 	# Returns the cumulative timeframe of loaded grib files
 	def getTimeframe(self):
@@ -26,12 +28,15 @@ class GribManager:
 		if len(self.gribs) > 0:
 			return self.gribs[0].getWindAt(t, lat, lon)
 
+		return None
+
 
 	def getWind (self, t, bounds):
 		# TODO: get the best matching grib for lat/lon at time t
 		if len(self.gribs) > 0:
 			return self.gribs[0].getWind(t, bounds)
 
+		return None
 
 
 		

@@ -87,7 +87,7 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         data = self.gribManager.getWind (self.time, bounds)
 
 
-        if (len(data) == 0):
+        if not data:
             return
 
         x = 0

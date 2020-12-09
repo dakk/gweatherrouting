@@ -22,7 +22,7 @@ import math
 import eccodes
 
 from . import utils
-from .. import config
+from .. import log
 
 logger = logging.getLogger ('gweatherrouting')
 
@@ -139,23 +139,22 @@ class Grib:
 	def parse (path):
 		grbs = eccodes.GribFile (path) 
 
-
 		# TODO: get bounds and timeframe
 		bounds = [0, 0, 0, 0]
 		forecastTime = None
 		startTime = None
-
-		rindex = {}
-			
+		rindex = {}			
 		centre = ''
 
 		for r in grbs:
 			if 'centre' in r.keys():
 				centre = r['centre']
 
-			forecastTime = r['forecastTime']
+			ft = r['forecastTime']
 			startTime = "%d-%d-%d %d:%d" % (r['year'], r['month'], r['day'], r['hour'], r['minute'])
-			print (startTime, forecastTime)
+
+			if forecastTime == None or forecastTime < int(ft):
+				forecastTime = int(ft)
 
 			# timeIndex = str(r['dataDate'])+str(r['dataTime'])
 			if r['name'] == '10 metre U wind component':

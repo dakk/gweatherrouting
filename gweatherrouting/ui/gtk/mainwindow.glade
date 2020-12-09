@@ -48,6 +48,20 @@ Riccardo Apolloni</property>
       </object>
     </child>
   </object>
+  <object class="GtkPopover" id="routing-nogrib-error-popover">
+    <property name="can-focus">False</property>
+    <property name="relative-to">routing-button</property>
+    <child>
+      <object class="GtkLabel">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="xpad">10</property>
+        <property name="ypad">5</property>
+        <property name="label" translatable="yes">At least one grib file should be
+loaded to created a routing</property>
+      </object>
+    </child>
+  </object>
   <object class="GtkMenu" id="settings-menu">
     <property name="visible">True</property>
     <property name="can-focus">False</property>

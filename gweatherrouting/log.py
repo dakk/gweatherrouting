@@ -33,3 +33,4 @@ stream.setFormatter (formatter)
 logger = logging.getLogger ('gweatherrouting')
 logger.addHandler (stream)
 logger.setLevel (10)
+

@@ -17,7 +17,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import logging
 
 from . import utils
-from .. import config
+from .. import log
 from .track import Track
 from .routing import Routing
 from .boat import Boat
