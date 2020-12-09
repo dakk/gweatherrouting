@@ -33,9 +33,11 @@ logger = logging.getLogger ('gweatherrouting')
 
 
 class Grib:
-	def __init__ (self, rindex):
+	def __init__ (self, bounds, rindex, timeframe):
 		self.cache = utils.DictCache(16)
 		self.rindex = rindex
+		self.bounds = bounds
+		self.timeframe = timeframe
 
 
 
@@ -131,8 +133,6 @@ class Grib:
 		bounds = [(math.floor (lat * 2) / 2., math.floor (lon * 2) / 2.), (math.ceil (lat * 2) / 2., math.ceil (lon * 2) / 2.)]
 		data = self.getWind (t, bounds)
 
-		# if len (data[0]) == 0:
-		# 	print (lat,lon)
 		wind = (data[0][0][0], data[0][0][1])
 		return wind
 
@@ -140,6 +140,10 @@ class Grib:
 
 	def parse (path):
 		grbs = eccodes.GribFile (path) 
+
+		# TODO: get bounds and timeframe
+		bounds = [0, 0, 0, 0]
+		timeframe = [0, 1]
 
 		rindex = {}
 		timeIndex = 0
@@ -152,7 +156,7 @@ class Grib:
 				rindex [timeIndex]['v'] = eccodes.codes_grib_get_data(r.gid)
 				timeIndex += 1
 
-		return Grib(rindex)
+		return Grib(bounds, rindex, timeframe)
 			
 
 		

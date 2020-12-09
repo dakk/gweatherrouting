@@ -13,6 +13,9 @@ class ProjectPropertiesWindow:
 	def show(self):
 		self.window.show_all()
 	
+	def close(self):
+		self.window.hide()
+		
 	def __init__(self):
 		self.builder = Gtk.Builder()
 		self.builder.add_from_file("./gweatherrouting/ui/gtk/projectpropertieswindow.glade")

@@ -19,3 +19,4 @@ from .polar import Polar
 from .track import Track
 from .routing import listRoutingAlgorithms, Routing
 from .utils import DictCache
+from .gribmanager import GribManager

@@ -24,9 +24,9 @@ gi.require_version('OsmGpsMap', '1.0')
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap
 
 class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
-    def __init__ (self, grib):
+    def __init__ (self, gribManager):
         GObject.GObject.__init__ (self)
-        self.grib = grib
+        self.gribManager = gribManager
         self.time = 0.0
 
     def drawWindArrow (self, cr, x, y, wdir, wspeed):
@@ -84,7 +84,7 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         #print (p1lat, p1lon, p2lat, p2lon)
 
         bounds = ((min (p1lat,p2lat), min (p1lon, p2lon)), (max (p1lat,p2lat), max (p1lon, p2lon)))
-        data = self.grib.getWind (self.time, bounds)
+        data = self.gribManager.getWind (self.time, bounds)
 
 
         if (len(data) == 0):

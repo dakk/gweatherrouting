@@ -61,7 +61,7 @@ class MainWindow:
 		self.map.set_center_and_zoom (39., 9., 6)
 		self.isochronesMapLayer = IsochronesMapLayer ()
 		self.map.layer_add (self.isochronesMapLayer)
-		self.gribMapLayer = GribMapLayer (self.core.grib)
+		self.gribMapLayer = GribMapLayer (self.core.gribManager)
 		self.map.layer_add (self.gribMapLayer)
 		self.map.layer_add (OsmGpsMap.MapOsd (show_dpad=True, show_zoom=True, show_crosshair=False))
 
@@ -76,8 +76,6 @@ class MainWindow:
 
 		self.statusbar = self.builder.get_object("status-bar")
 		self.trackStore = self.builder.get_object("track-list-store")
-
-
 
 
 
@@ -359,34 +357,34 @@ class MainWindow:
 		w.show ()
 
 	# Grib
-	def onGribOpen(self, widget):
-		pass
+	# def onGribOpen(self, widget):
+	# 	pass
 
-	def onGribDownloadPercentage (self, percentage):
-		self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Downloading grib: %d%% completed' % percentage)
+	# def onGribDownloadPercentage (self, percentage):
+	# 	self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Downloading grib: %d%% completed' % percentage)
 
-	def onGribDownloadCompleted (self, status):
-		if status:
-			edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done")
-			edialog.format_secondary_text ("Grib downloaded successfully")
-			edialog.run ()
-			edialog.destroy ()	
-		else:
-			edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
-			edialog.format_secondary_text ("Error during grib download")
-			edialog.run ()
-			edialog.destroy ()	
+	# def onGribDownloadCompleted (self, status):
+	# 	if status:
+	# 		edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done")
+	# 		edialog.format_secondary_text ("Grib downloaded successfully")
+	# 		edialog.run ()
+	# 		edialog.destroy ()	
+	# 	else:
+	# 		edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
+	# 		edialog.format_secondary_text ("Error during grib download")
+	# 		edialog.run ()
+	# 		edialog.destroy ()	
 
 
-	def onGribSelect (self, widget):
-		dialog = GribSelectDialog (self.window)
-		response = dialog.run()
+	# def onGribSelect (self, widget):
+	# 	dialog = GribSelectDialog (self.window)
+	# 	response = dialog.run()
 
-		if response == Gtk.ResponseType.OK:
-			selectedGrib = dialog.get_selected_grib ()
-			t = Thread(target=self.core.grib.download, args=(selectedGrib, self.onGribDownloadPercentage, self.onGribDownloadCompleted,))
-			t.start ()
-		elif response == Gtk.ResponseType.CANCEL:
-			pass
+	# 	if response == Gtk.ResponseType.OK:
+	# 		selectedGrib = dialog.get_selected_grib ()
+	# 		t = Thread(target=self.core.grib.download, args=(selectedGrib, self.onGribDownloadPercentage, self.onGribDownloadCompleted,))
+	# 		t.start ()
+	# 	elif response == Gtk.ResponseType.CANCEL:
+	# 		pass
 
-		dialog.destroy()
+	# 	dialog.destroy()

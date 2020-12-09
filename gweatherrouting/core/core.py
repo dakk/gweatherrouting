@@ -22,23 +22,26 @@ from .track import Track
 from .routing import Routing
 from .boat import Boat
 from .grib import Grib
+from .gribmanager import GribManager
 
 logger = logging.getLogger ('gweatherrouting')
 
 class Core:
     def __init__ (self):
         self.track = Track ()
-        self.grib = Grib.parse('/home/dakk/testgrib.grb')
+        self.gribManager = GribManager()
+        self.gribManager.load('/home/dakk/testgrib.grb')
+
         logger.debug ('Initialized')
 
     # Simulation
     def createRouting (self, algorithm, boatModel, initialTime):
         boat = Boat (boatModel)
-        routing = Routing (algorithm (boat.polar, self.grib), boat, self.track, self.grib, initialTime = initialTime)
+        routing = Routing (algorithm (boat.polar, self.gribManager), boat, self.track, self.gribManager, initialTime = initialTime)
         return routing
 
-    def getGrib (self):
-        return self.grib
+    def getGribManager (self):
+        return self.gribManager
 
     # Track ans save/load
     def getTrack (self):
