@@ -30,8 +30,6 @@ class Core:
     def __init__ (self):
         self.track = Track ()
         self.gribManager = GribManager()
-        # self.gribManager.load('/home/dakk/testgrib.grb')
-
         logger.debug ('Initialized')
 
     # Simulation

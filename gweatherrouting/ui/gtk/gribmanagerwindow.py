@@ -53,14 +53,18 @@ class GribManagerWindow:
 
 	def onGribDownloadPercentage (self, percentage):
 		print ('Downloading grib: %d%% completed' % percentage)
+		self.builder.get_object('download-progress').set_fraction(percentage / 100.)
+		self.builder.get_object('download-progress').set_text("%d%%" % percentage)
 		# self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Downloading grib: %d%% completed' % percentage)
 
 	def onGribDownloadCompleted (self, status):
+		self.builder.get_object('download-progress').set_text("Download completed!")
 		self.gribManagerStore.clear()
 
 		for x in self.gribManager.gribs:
 			self.gribManagerStore.append ([x.name, x.centre])
 
+		GObject.timeout_add (3000, self.builder.get_object('download-progress').hide)
 
 	def onGribClick(self, widget, event):
 		if event.button == 3:
@@ -76,5 +80,6 @@ class GribManagerWindow:
 			print ('Selected: ', self.selectedGrib)
 
 	def onGribDownload (self, widget):
+		self.builder.get_object('download-progress').show()
 		t = Thread(target=self.gribManager.download, args=(self.selectedGrib, self.onGribDownloadPercentage, self.onGribDownloadCompleted,))
 		t.start ()

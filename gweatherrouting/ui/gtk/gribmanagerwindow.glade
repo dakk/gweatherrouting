@@ -106,12 +106,29 @@
           </packing>
         </child>
         <child>
+          <object class="GtkProgressBar" id="download-progress">
+            <property name="can-focus">False</property>
+            <property name="no-show-all">True</property>
+            <property name="show-text">True</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
           <object class="GtkTreeView">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="model">grib-manager-store</property>
-            <child internal-child="selection">
-              <object class="GtkTreeSelection"/>
+            <child>
+              <object class="GtkTreeViewColumn">
+                <property name="title" translatable="yes">Enabled</property>
+                <child>
+                  <object class="GtkCellRendererToggle"/>
+                </child>
+              </object>
             </child>
             <child>
               <object class="GtkTreeViewColumn">
@@ -139,7 +156,7 @@
           <packing>
             <property name="expand">True</property>
             <property name="fill">True</property>
-            <property name="position">1</property>
+            <property name="position">2</property>
           </packing>
         </child>
       </object>
