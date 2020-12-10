@@ -26,6 +26,14 @@ from .. import log
 
 logger = logging.getLogger ('gweatherrouting')
 
+class MetaGrib:
+	def __init__(self, name, centre, bounds, startTime, lastForecast):
+		self.name = name
+		self.centre = centre.upper()
+		self.bounds = bounds
+		self.startTime = startTime
+		self.lastForecast = lastForecast
+
 
 class Grib:
 	def __init__ (self, name, centre, bounds, rindex, startTime, lastForecast):
@@ -135,6 +143,35 @@ class Grib:
 		return wind
 
 
+	def parseMetadata(path):
+		grbs = eccodes.GribFile (path) 
+
+		# TODO: get bounds and timeframe
+		bounds = [0, 0, 0, 0]
+		forecastTime = None
+		startTime = None
+		rindex = {}			
+		centre = ''
+
+		for r in grbs:
+			if r['name'] != '10 metre U wind component' and r['name'] != '10 metre V wind component':
+				continue
+
+			if 'centre' in r.keys():
+				centre = r['centre']
+
+			if 'forecastTime' in r.keys():
+				ft = r['forecastTime']
+			else:
+				ft = r['P1']
+
+			startTime = "%d-%d-%d %d:%d" % (r['year'], r['month'], r['day'], r['hour'], r['minute'])
+
+			if forecastTime == None or forecastTime < int(ft):
+				forecastTime = int(ft)
+
+		return MetaGrib(path.split('/')[-1], centre, bounds, startTime, forecastTime)
+
 
 	def parse (path):
 		grbs = eccodes.GribFile (path) 
@@ -152,11 +189,6 @@ class Grib:
 
 			if 'centre' in r.keys():
 				centre = r['centre']
-
-
-			# print ('\n==================\n')
-			# for x in r.keys():
-			# 	print (x, r[x])
 
 			if 'forecastTime' in r.keys():
 				ft = r['forecastTime']

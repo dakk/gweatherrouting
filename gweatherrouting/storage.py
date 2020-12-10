@@ -48,6 +48,10 @@ os.makedirs(GRIB_DIR, exist_ok=True)
 os.makedirs(TEMP_DIR, exist_ok=True)
 
 
+EMPTY_CONF = {
+    'grib_loaded': []
+}
+
 class Config:
     def __init__(self, dc):
         self.dconf = dc
@@ -75,7 +79,7 @@ class Config:
                 logger.debug ('Load configuration from %s/config.json' % DATA_DIR)
                 return c
         except:
-            c = Config({})
+            c = Config(EMPTY_CONF)
             c.save()
             logger.debug ('Saved initial configuration to %s/config.json' % DATA_DIR)
             return c

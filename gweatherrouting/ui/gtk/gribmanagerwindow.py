@@ -38,18 +38,30 @@ class GribManagerWindow:
 		except:
 			print ('Failed to download grib file list')
 
-		for x in self.gribManager.gribs:
-			self.gribManagerStore.append ([x.name, x.centre])
+		self.updateLocalGribs()
 
-		# self.dialog.add_button("Cancel", Gtk.ResponseType.CANCEL)
-		# self.dialog.add_button("Save", Gtk.ResponseType.OK)
+	def updateLocalGribs(self):
+		self.gribManagerStore.clear()
 
-		# self.dialog.show_all ()
+		for x in self.gribManager.localGribs:
+			self.gribManagerStore.append ([x.name, x.centre, x.startTime, x.lastForecast, self.gribManager.isEnabled(x.name)])
 
 
 	def onOpen(self, widget):
 		pass
 
+	def onGribToggle(self, widget, i):
+		# currentState = widget.get_active()
+		# widget.set_active(not currentState)
+		# print (self.gribManager.localGribs[int(i)])
+		n = self.gribManager.localGribs[int(i)].name
+
+		if self.gribManager.isEnabled(n):
+			self.gribManager.disable(n)
+		else:
+			self.gribManager.enable(n)
+
+		self.updateLocalGribs()
 
 	def onGribDownloadPercentage (self, percentage):
 		print ('Downloading grib: %d%% completed' % percentage)
@@ -59,10 +71,7 @@ class GribManagerWindow:
 
 	def onGribDownloadCompleted (self, status):
 		self.builder.get_object('download-progress').set_text("Download completed!")
-		self.gribManagerStore.clear()
-
-		for x in self.gribManager.gribs:
-			self.gribManagerStore.append ([x.name, x.centre])
+		self.updateLocalGribs()
 
 		GObject.timeout_add (3000, self.builder.get_object('download-progress').hide)
 

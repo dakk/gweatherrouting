@@ -22,6 +22,12 @@
       <column type="gchararray"/>
       <!-- column-name centre -->
       <column type="gchararray"/>
+      <!-- column-name start_time -->
+      <column type="gchararray"/>
+      <!-- column-name hours -->
+      <column type="gint"/>
+      <!-- column-name active -->
+      <column type="gboolean"/>
     </columns>
   </object>
   <object class="GtkWindow" id="grib-manager-window">
@@ -125,8 +131,14 @@
             <child>
               <object class="GtkTreeViewColumn">
                 <property name="title" translatable="yes">Enabled</property>
+                <property name="clickable">True</property>
                 <child>
-                  <object class="GtkCellRendererToggle"/>
+                  <object class="GtkCellRendererToggle">
+                    <signal name="toggled" handler="onGribToggle" swapped="no"/>
+                  </object>
+                  <attributes>
+                    <attribute name="active">4</attribute>
+                  </attributes>
                 </child>
               </object>
             </child>
@@ -148,6 +160,28 @@
                   <object class="GtkCellRendererText"/>
                   <attributes>
                     <attribute name="markup">1</attribute>
+                  </attributes>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkTreeViewColumn">
+                <property name="title" translatable="yes">Start Time</property>
+                <child>
+                  <object class="GtkCellRendererText"/>
+                  <attributes>
+                    <attribute name="text">2</attribute>
+                  </attributes>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkTreeViewColumn">
+                <property name="title" translatable="yes">Forecasted Hours</property>
+                <child>
+                  <object class="GtkCellRendererText"/>
+                  <attributes>
+                    <attribute name="text">3</attribute>
                   </attributes>
                 </child>
               </object>
@@ -176,6 +210,18 @@
             <signal name="clicked" handler="onOpen" swapped="no"/>
           </object>
         </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkMenu" id="local-grib-menu">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <child>
+      <object class="GtkMenuItem">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Remove</property>
+        <signal name="activate" handler="onRemoveLocalGrib" swapped="no"/>
       </object>
     </child>
   </object>
