@@ -41,9 +41,11 @@ def app_data_path (appname, roaming=True):
 APP_NAME = 'gweatherrouting'
 DATA_DIR = app_data_path (appname=APP_NAME)
 GRIB_DIR = DATA_DIR + '/grib/'
+TEMP_DIR = DATA_DIR + '/temp/'
 
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(GRIB_DIR, exist_ok=True)
+os.makedirs(TEMP_DIR, exist_ok=True)
 
 
 class Config:

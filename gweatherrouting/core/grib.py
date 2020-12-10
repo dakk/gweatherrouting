@@ -147,10 +147,22 @@ class Grib:
 		centre = ''
 
 		for r in grbs:
+			if r['name'] != '10 metre U wind component' and r['name'] != '10 metre V wind component':
+				continue
+
 			if 'centre' in r.keys():
 				centre = r['centre']
 
-			ft = r['forecastTime']
+
+			# print ('\n==================\n')
+			# for x in r.keys():
+			# 	print (x, r[x])
+
+			if 'forecastTime' in r.keys():
+				ft = r['forecastTime']
+			else:
+				ft = r['P1']
+
 			startTime = "%d-%d-%d %d:%d" % (r['year'], r['month'], r['day'], r['hour'], r['minute'])
 
 			if forecastTime == None or forecastTime < int(ft):

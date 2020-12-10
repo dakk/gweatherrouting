@@ -22,10 +22,6 @@
       <column type="gchararray"/>
       <!-- column-name centre -->
       <column type="gchararray"/>
-      <!-- column-name start_date -->
-      <column type="gchararray"/>
-      <!-- column-name hours -->
-      <column type="gchararray"/>
     </columns>
   </object>
   <object class="GtkWindow" id="grib-manager-window">
@@ -50,8 +46,11 @@
                 <property name="search-column">0</property>
                 <property name="show-expanders">False</property>
                 <property name="tooltip-column">0</property>
+                <signal name="button-press-event" handler="onGribClick" swapped="no"/>
                 <child internal-child="selection">
-                  <object class="GtkTreeSelection"/>
+                  <object class="GtkTreeSelection">
+                    <signal name="changed" handler="onGribSelect" swapped="no"/>
+                  </object>
                 </child>
                 <child>
                   <object class="GtkTreeViewColumn" id="Model">
@@ -160,6 +159,18 @@
             <signal name="clicked" handler="onOpen" swapped="no"/>
           </object>
         </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkMenu" id="remote-grib-menu">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <child>
+      <object class="GtkMenuItem">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Download</property>
+        <signal name="activate" handler="onGribDownload" swapped="no"/>
       </object>
     </child>
   </object>

@@ -3,6 +3,7 @@ import gi
 import os
 import json
 import math
+from threading import Thread
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, GObject
 
@@ -19,6 +20,7 @@ class GribManagerWindow:
 
 	def __init__(self, gribManager):
 		self.gribManager = gribManager
+		self.selectedGrib = None
 
 		self.builder = Gtk.Builder()
 		self.builder.add_from_file("./gweatherrouting/ui/gtk/gribmanagerwindow.glade")
@@ -49,33 +51,30 @@ class GribManagerWindow:
 		pass
 
 
+	def onGribDownloadPercentage (self, percentage):
+		print ('Downloading grib: %d%% completed' % percentage)
+		# self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Downloading grib: %d%% completed' % percentage)
 
-	# Grib
-	# def onGribDownloadPercentage (self, percentage):
-	# 	self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Downloading grib: %d%% completed' % percentage)
+	def onGribDownloadCompleted (self, status):
+		self.gribManagerStore.clear()
 
-	# def onGribDownloadCompleted (self, status):
-	# 	if status:
-	# 		edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done")
-	# 		edialog.format_secondary_text ("Grib downloaded successfully")
-	# 		edialog.run ()
-	# 		edialog.destroy ()	
-	# 	else:
-	# 		edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
-	# 		edialog.format_secondary_text ("Error during grib download")
-	# 		edialog.run ()
-	# 		edialog.destroy ()	
+		for x in self.gribManager.gribs:
+			self.gribManagerStore.append ([x.name, x.centre])
 
 
-	# def onGribSelect (self, widget):
-	# 	dialog = GribSelectDialog (self.window)
-	# 	response = dialog.run()
+	def onGribClick(self, widget, event):
+		if event.button == 3:
+			menu = self.builder.get_object("remote-grib-menu")
+			menu.popup (None, None, None, None, event.button, event.time)
 
-	# 	if response == Gtk.ResponseType.OK:
-	# 		selectedGrib = dialog.get_selected_grib ()
-	# 		t = Thread(target=self.core.grib.download, args=(selectedGrib, self.onGribDownloadPercentage, self.onGribDownloadCompleted,))
-	# 		t.start ()
-	# 	elif response == Gtk.ResponseType.CANCEL:
-	# 		pass
 
-	# 	dialog.destroy()
+	def onGribSelect (self, selection):
+		store, pathlist = selection.get_selected_rows()
+		for path in pathlist:
+			tree_iter = store.get_iter(path)
+			self.selectedGrib = store.get_value(tree_iter, 4)
+			print ('Selected: ', self.selectedGrib)
+
+	def onGribDownload (self, widget):
+		t = Thread(target=self.gribManager.download, args=(self.selectedGrib, self.onGribDownloadPercentage, self.onGribDownloadCompleted,))
+		t.start ()
