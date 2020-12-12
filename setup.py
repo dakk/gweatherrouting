@@ -17,6 +17,24 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 from setuptools import find_packages
 from setuptools import setup
 
+buildOptions = {}
+executables = {}
+W32 = False
+
+if W32:
+	from cx_Freeze import setup, Executable
+
+	buildOptions = {
+		"build_exe": {
+			"packages": ["gi"], 
+			"include_files":[]
+		}
+	}
+	executables = [
+		Executable("main.py") #  icon="evm_bg_KYa_icon.ico")
+	]
+
+
 setup(name='gweatherrouting',
 	version=0.1,
 	description='',
@@ -31,5 +49,7 @@ setup(name='gweatherrouting',
 			'gweatherrouting_cli=gweatherrouting.main:startCli'
 		],
 	},
+	options=buildOptions,
+	executables=executables,
 	install_requires=open ('requirements.txt', 'r').read ().split ('\n')
 )
