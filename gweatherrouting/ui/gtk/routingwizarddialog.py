@@ -23,9 +23,9 @@ from gi.repository import Gtk, Gio, GObject
 
 from ...core import Boat, listRoutingAlgorithms
 
-class RoutingWizardDialog ():
-	def create():
-		return RoutingWizardDialog()
+class RoutingWizardDialog:
+	def create(core):
+		return RoutingWizardDialog(core)
 
 	def run(self):
 		return self.dialog.run()
@@ -74,7 +74,8 @@ class RoutingWizardDialog ():
 		self.builder.get_object('boat-polar-area').queue_draw()
 		
 
-	def __init__(self):
+	def __init__(self, core):
+		self.core = core
 		self.polar = None
 
 		this_dir, this_fn = os.path.split (__file__)
@@ -102,10 +103,20 @@ class RoutingWizardDialog ():
 			routing_store.append ([r['name']])
 		self.builder.get_object('routing-select').set_active (0)
 
+		track_store = self.builder.get_object('track-store')
+		for r in self.core.trackManager.tracks:
+			track_store.append ([r.name])
+		self.builder.get_object('track-select').set_active (0)
+
 
 		self.dialog.show_all ()
 		self.dialog.run()
 
+
+
+	def getSelectedTrack (self):
+		print (self.builder.get_object('track-select').get_active ())
+		return self.core.trackManager.tracks[self.builder.get_object('track-select').get_active ()]
 
 	def getSelectedAlgorithm (self):
 		return listRoutingAlgorithms()[self.builder.get_object('routing-select').get_active ()]['class']

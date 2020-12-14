@@ -87,11 +87,11 @@ class MainWindow:
 			epop.show_all()
 			return
 
-		dialog = RoutingWizardDialog.create ()
+		dialog = RoutingWizardDialog.create (self.core)
 		response = dialog.run ()
 
 		if response == Gtk.ResponseType.OK:
-			self.currentRouting = self.core.createRouting (dialog.getSelectedAlgorithm (), dialog.getSelectedBoat (), dialog.getInitialTime ())
+			self.currentRouting = self.core.createRouting (dialog.getSelectedAlgorithm (), dialog.getSelectedBoat (), dialog.getInitialTime (), dialog.getSelectedTrack())
 			GObject.timeout_add (10, self.onRoutingStep)
 
 		dialog.destroy ()
@@ -123,7 +123,6 @@ class MainWindow:
 		if not onlyActive:
 			self.trackListStore.clear()
 			for x in self.core.trackManager.tracks:
-				# print (x, [x.name, x.size(), x.length(), x.visible])
 				self.trackListStore.append([x.name, x.size(), x.length(), x.visible])
 
 		self.trackStore.clear ()
