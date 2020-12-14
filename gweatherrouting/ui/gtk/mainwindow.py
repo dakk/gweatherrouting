@@ -16,6 +16,8 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import time
 import gi
+import gc
+import copy
 import math
 from threading import Thread
 
@@ -29,8 +31,7 @@ from .routingwizarddialog import RoutingWizardDialog
 from .settingswindow import SettingsWindow
 from .projectpropertieswindow import ProjectPropertiesWindow
 from .gribmanagerwindow import GribManagerWindow
-from .maplayers import GribMapLayer
-from .maplayers import IsochronesMapLayer
+from .maplayers import GribMapLayer, IsochronesMapLayer
 
 
 
@@ -69,6 +70,8 @@ class MainWindow:
 		# self.mapTrack.set_property ("editable", True)
 		self.mapTrack.set_property ("line-width", 2)
 		self.mapTrack.set_property ("color", Gdk.RGBA(1.0,1.0,1.0,1.0))
+		# self.mapTrack.connect('point-changed', self.onMapClickRelease)
+		# self.mapTrack.connect('point-added', self.onMapClickRelease)
 		self.map.track_add (self.mapTrack)
 
 		self.statusbar = self.builder.get_object("status-bar")
@@ -126,7 +129,8 @@ class MainWindow:
 	def updateTrack (self):
 		self.trackListStore.clear()
 		for x in self.core.trackManager.tracks:
-			self.trackListStore.append([x.name, x.size(), x.distance, x.visible])
+			# print (x, [x.name, x.size(), x.length(), x.visible])
+			self.trackListStore.append([x.name, x.size(), x.length(), x.visible])
 
 		self.trackStore.clear ()
 		while self.mapTrack.n_points() > 0:
@@ -142,17 +146,23 @@ class MainWindow:
 			self.mapTrack.add_point (p)
 
 	def onMapClickRelease(self, map, event):
-		return 
-
 		self.trackStore.clear ()
-
 		i = 0
-		while i < self.mapTrack.n_points():
-			p = self.mapTrack.get_point(i)
+		
+		elements = []
+		gc.disable()
+
+		for p in self.mapTrack.get_points():
 			d = p.get_degrees()
-			self.trackStore.append([d.lat, d.lon])
+			elements.append([i, d.lat, d.lon])
 			i += 1
 
+		gc.enable()
+		for el in elements:
+			self.trackStore.append(el)
+		
+
+		
 
 	def onTrackItemClick(self, item, event):
 		if event.button == 3 and self.core.getActiveTrack().size() > 0:

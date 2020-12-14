@@ -6,7 +6,8 @@ class TrackManager:
         self.active = None
 
     def create(self):
-        self.tracks.append (Track(name=('noname-%d' % (len(self.tracks) + 1))))
+        nt = Track(name=('noname-%d' % (len(self.tracks) + 1)))
+        self.tracks.append (nt)
         self.active = len(self.tracks) - 1
 
     def activeTrack(self):

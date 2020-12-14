@@ -491,7 +491,6 @@ Riccardo Apolloni</property>
                     <property name="repo-uri">https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/#Z/#Y/#X</property>
                     <property name="tile-cache">/home/dakk/.cache/osmgpsmap/b487b51738b9962abcc425a3dcb26b4d</property>
                     <signal name="button-press-event" handler="onMapClick" swapped="no"/>
-                    <signal name="button-release-event" handler="onMapClickRelease" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
