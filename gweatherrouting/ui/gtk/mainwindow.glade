@@ -122,6 +122,18 @@ Riccardo Apolloni</property>
       </object>
     </child>
   </object>
+  <object class="GtkMenu" id="track-list-item-menu">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <child>
+      <object class="GtkMenuItem">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Remove</property>
+        <property name="use-underline">True</property>
+      </object>
+    </child>
+  </object>
   <object class="GtkListStore" id="track-list-store">
     <columns>
       <!-- column-name name -->
@@ -160,6 +172,7 @@ Riccardo Apolloni</property>
                 <property name="width-request">281</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
+                <property name="scrollable">True</property>
                 <child>
                   <object class="GtkBox">
                     <property name="visible">True</property>
@@ -255,55 +268,60 @@ Riccardo Apolloni</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkTreeView">
+                  <object class="GtkScrolledWindow">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
-                    <property name="model">track-list-store</property>
-                    <child internal-child="selection">
-                      <object class="GtkTreeSelection"/>
-                    </child>
+                    <property name="vscrollbar-policy">always</property>
+                    <property name="shadow-type">in</property>
                     <child>
-                      <object class="GtkTreeViewColumn">
-                        <property name="title" translatable="yes">Name</property>
+                      <object class="GtkTreeView">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="model">track-list-store</property>
                         <child>
-                          <object class="GtkCellRendererText"/>
-                          <attributes>
-                            <attribute name="text">0</attribute>
-                          </attributes>
+                          <object class="GtkTreeViewColumn">
+                            <property name="title" translatable="yes">Name</property>
+                            <child>
+                              <object class="GtkCellRendererText"/>
+                              <attributes>
+                                <attribute name="text">0</attribute>
+                              </attributes>
+                            </child>
+                          </object>
                         </child>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkTreeViewColumn">
-                        <property name="title" translatable="yes">POI</property>
                         <child>
-                          <object class="GtkCellRendererText"/>
-                          <attributes>
-                            <attribute name="text">1</attribute>
-                          </attributes>
+                          <object class="GtkTreeViewColumn">
+                            <property name="title" translatable="yes">POI</property>
+                            <child>
+                              <object class="GtkCellRendererText"/>
+                              <attributes>
+                                <attribute name="text">1</attribute>
+                              </attributes>
+                            </child>
+                          </object>
                         </child>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkTreeViewColumn">
-                        <property name="title" translatable="yes">Distance</property>
                         <child>
-                          <object class="GtkCellRendererText"/>
-                          <attributes>
-                            <attribute name="text">2</attribute>
-                          </attributes>
+                          <object class="GtkTreeViewColumn">
+                            <property name="title" translatable="yes">Distance</property>
+                            <child>
+                              <object class="GtkCellRendererText"/>
+                              <attributes>
+                                <attribute name="text">2</attribute>
+                              </attributes>
+                            </child>
+                          </object>
                         </child>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkTreeViewColumn">
-                        <property name="title" translatable="yes">Visible</property>
                         <child>
-                          <object class="GtkCellRendererToggle"/>
-                          <attributes>
-                            <attribute name="activatable">3</attribute>
-                            <attribute name="active">3</attribute>
-                          </attributes>
+                          <object class="GtkTreeViewColumn">
+                            <property name="title" translatable="yes">Visible</property>
+                            <child>
+                              <object class="GtkCellRendererToggle"/>
+                              <attributes>
+                                <attribute name="activatable">3</attribute>
+                                <attribute name="active">3</attribute>
+                              </attributes>
+                            </child>
+                          </object>
                         </child>
                       </object>
                     </child>
@@ -521,7 +539,7 @@ Riccardo Apolloni</property>
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="title" translatable="yes">GWeatherRouting</property>
-        <property name="subtitle" translatable="yes">unsaved</property>
+        <property name="has-subtitle">False</property>
         <property name="spacing">0</property>
         <property name="show-close-button">True</property>
         <child>
@@ -530,7 +548,7 @@ Riccardo Apolloni</property>
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
-            <property name="tooltip-text" translatable="yes">Open a file</property>
+            <property name="tooltip-text" translatable="yes">Import a track or a Grib</property>
             <signal name="clicked" handler="onImport" swapped="no"/>
           </object>
         </child>
@@ -558,7 +576,7 @@ Riccardo Apolloni</property>
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
-            <property name="tooltip-text" translatable="yes">Save</property>
+            <property name="tooltip-text" translatable="yes">Export current track</property>
             <signal name="clicked" handler="onExport" swapped="no"/>
             <child>
               <object class="GtkImage">
@@ -577,7 +595,7 @@ Riccardo Apolloni</property>
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
-            <property name="tooltip-text" translatable="yes">Save</property>
+            <property name="tooltip-text" translatable="yes">Calculate best routing</property>
             <signal name="clicked" handler="onRoutingCreate" swapped="no"/>
             <child>
               <object class="GtkImage">

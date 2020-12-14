@@ -31,3 +31,4 @@ class TrackManager:
             waypoints.append (wp)
 
         self.tracks.append(Track(path.split('/')[-1].split('.')[0], waypoints))
+        return True

@@ -16,7 +16,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import logging
 from . import log
-from .storage import Config
+from .session import Config
 from .core.core import Core
 
 

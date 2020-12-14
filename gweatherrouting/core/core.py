@@ -36,10 +36,11 @@ class Core:
 
         logger.debug ('Initialized')
 
+
     # Simulation
     def createRouting (self, algorithm, boatModel, initialTime):
         boat = Boat (boatModel)
-        routing = Routing (algorithm (boat.polar, self.gribManager), boat, self.track, self.gribManager, initialTime = initialTime)
+        routing = Routing (algorithm (boat.polar, self.gribManager), boat, self.trackManager.activeTrack(), self.gribManager, initialTime = initialTime)
         return routing
 
     def getGribManager (self):
@@ -48,11 +49,3 @@ class Core:
     # Track ans save/load
     def getActiveTrack (self):
         return self.trackManager.activeTrack()
-
-    def load (self, path):
-        logger.info ('Saved current state to %s' % path)
-        return self.track.load (path)
-
-    def save (self, path):
-        logger.info ('Loaded state from %s' % path)
-        return self.track.save (path)

@@ -28,7 +28,6 @@ from ... import log
 from .routingwizarddialog import RoutingWizardDialog
 from .settingswindow import SettingsWindow
 from .projectpropertieswindow import ProjectPropertiesWindow
-from .gribselectdialog import GribSelectDialog
 from .gribmanagerwindow import GribManagerWindow
 from .maplayers import GribMapLayer
 from .maplayers import IsochronesMapLayer
@@ -225,7 +224,7 @@ class MainWindow:
 	def onNew (self, widget):
 		self.core.trackManager.create()
 		self.updateTrack ()
-		self.builder.get_object('header-bar').set_subtitle ('unsaved')
+		# self.builder.get_object('header-bar').set_subtitle ('unsaved')
 
 
 	def onExport (self, widget):
@@ -248,7 +247,7 @@ class MainWindow:
 				filepath += '.gpx'
 
 			if self.core.save (filepath):
-				self.builder.get_object('header-bar').set_subtitle (filepath)
+				# self.builder.get_object('header-bar').set_subtitle (filepath)
 				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Saved %d waypoints' % (len (self.core.getActiveTrack ())))
 			else:
 				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
@@ -276,8 +275,8 @@ class MainWindow:
 			filepath = dialog.get_filename ()
 			dialog.destroy ()
 
-			if self.core.load (filepath):
-				self.builder.get_object('header-bar').set_subtitle (filepath)
+			if self.core.trackManager.importTrack (filepath):
+				# self.builder.get_object('header-bar').set_subtitle (filepath)
 				self.updateTrack ()
 				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done")
 				edialog.format_secondary_text ("File opened, loaded %d waypoints" % len (self.core.getActiveTrack ()))

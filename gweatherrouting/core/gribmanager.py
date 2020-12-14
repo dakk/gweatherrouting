@@ -3,7 +3,7 @@ import json
 import bz2
 import os
 import requests
-from ..storage import *
+from ..session import *
 from bs4 import BeautifulSoup
 
 from .grib import Grib
