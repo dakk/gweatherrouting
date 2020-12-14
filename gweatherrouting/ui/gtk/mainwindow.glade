@@ -278,6 +278,15 @@ Riccardo Apolloni</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="model">track-list-store</property>
+                        <property name="headers-clickable">False</property>
+                        <property name="enable-search">False</property>
+                        <property name="show-expanders">False</property>
+                        <property name="enable-grid-lines">horizontal</property>
+                        <child internal-child="selection">
+                          <object class="GtkTreeSelection">
+                            <signal name="changed" handler="onSelectTrack" swapped="no"/>
+                          </object>
+                        </child>
                         <child>
                           <object class="GtkTreeViewColumn">
                             <property name="title" translatable="yes">Name</property>

@@ -5,8 +5,17 @@ class TrackManager:
         self.tracks = []
         self.active = None
 
+    def activate(self, name):
+        i = 0
+        for x in self.tracks:
+            if x.name == name:
+                self.active = i
+                return 
+            i += 1
+
     def create(self):
         nt = Track(name=('noname-%d' % (len(self.tracks) + 1)))
+        nt.clear()
         self.tracks.append (nt)
         self.active = len(self.tracks) - 1
 

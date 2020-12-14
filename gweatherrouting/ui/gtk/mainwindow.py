@@ -119,11 +119,12 @@ class MainWindow:
 	####################################
 	## Track handling
 
-	def updateTrack (self):
-		self.trackListStore.clear()
-		for x in self.core.trackManager.tracks:
-			# print (x, [x.name, x.size(), x.length(), x.visible])
-			self.trackListStore.append([x.name, x.size(), x.length(), x.visible])
+	def updateTrack (self, onlyActive = False):
+		if not onlyActive:
+			self.trackListStore.clear()
+			for x in self.core.trackManager.tracks:
+				# print (x, [x.name, x.size(), x.length(), x.visible])
+				self.trackListStore.append([x.name, x.size(), x.length(), x.visible])
 
 		self.trackStore.clear ()
 
@@ -138,6 +139,15 @@ class MainWindow:
 		if event.button == 3 and self.core.getActiveTrack().size() > 0:
 			menu = self.builder.get_object("track-item-menu")
 			menu.popup (None, None, None, None, event.button, event.time)
+
+	def onSelectTrack(self, selection):
+		store, pathlist = selection.get_selected_rows()
+		for path in pathlist:
+			tree_iter = store.get_iter(path)
+			value = store.get_value(tree_iter, 0)
+			self.core.trackManager.activate(value)
+			self.updateTrack(onlyActive=True)
+			self.map.queue_draw()
 
 	def onSelectTrackItem (self, selection):
 		store, pathlist = selection.get_selected_rows()
@@ -209,6 +219,7 @@ class MainWindow:
 	def onNew (self, widget):
 		self.core.trackManager.create()
 		self.updateTrack ()
+		self.map.queue_draw ()
 		# self.builder.get_object('header-bar').set_subtitle ('unsaved')
 
 

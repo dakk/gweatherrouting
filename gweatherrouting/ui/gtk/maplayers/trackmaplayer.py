@@ -30,8 +30,6 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 
 
     def do_draw (self, gpsmap, cr):
-
-
         for tr in self.trackManager.tracks:
             if not tr.visible:
                 continue 
@@ -42,72 +40,57 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 
             prevx = None
             prevy = None 
+            i = 0
 
             for p in tr.waypoints:
+                i += 1
                 x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (p[0], p[1]))
 
                 if prevx == None:
-                    cr.set_source_rgba (1, 1, 1, 0.4)
+                    if active:
+                        cr.set_source_rgba (1, 1, 1, 0.8)
+                    else:
+                        cr.set_source_rgba (1, 1, 1, 0.4)
                     cr.set_font_size(13)
                     cr.move_to(x-10, y-10)
                     cr.show_text(tr.name)
                     cr.stroke()
 
+                
+                if active:
+                    cr.set_source_rgba (1, 1, 1, 0.8)
+                else:
+                    cr.set_source_rgba (1, 1, 1, 0.4)
+                cr.set_font_size(13)
+                cr.move_to(x-4, y+18)
+                cr.show_text(str(i))
+                cr.stroke()
+
+
 
                 if prevx != None and prevy != None:
                     if active:
-                        cr.set_line_width (3)
+                        cr.set_line_width (2)
+                        cr.set_source_rgba (1, 1, 1, 0.8)
                     else:
                         cr.set_line_width (2)
+                        cr.set_source_rgba (1, 1, 1, 0.4)
 
-                    cr.set_source_rgba (1, 1, 1, 0.4)
                     cr.move_to (prevx, prevy)
                     cr.line_to (x, y)
                     cr.stroke()
 
-                cr.set_line_width (2)
-                cr.set_source_rgba (1, 1, 1, 0.4)
+                if active:
+                    cr.set_line_width (2)
+                    cr.set_source_rgba (1, 1, 1, 0.8)
+                else:
+                    cr.set_line_width (2)
+                    cr.set_source_rgba (1, 1, 1, 0.4)
                 cr.arc(x, y, 5, 0, 2 * math.pi)
                 cr.stroke()
 
                 prevx = x
                 prevy = y
-
-
-            
-        # p1, p2 = gpsmap.get_bbox ()
-
-        # p1lat, p1lon = p1.get_degrees ()
-        # p2lat, p2lon = p2.get_degrees ()
-
-        # width = float (gpsmap.get_allocated_width ())
-        # height = float (gpsmap.get_allocated_height ())
-
-        # cr.set_line_width (1)
-        # cr.set_source_rgb (1,0,0)
-        # #print (p1lat, p1lon, p2lat, p2lon)
-
-        # bounds = ((min (p1lat,p2lat), min (p1lon, p2lon)), (max (p1lat,p2lat), max (p1lon, p2lon)))
-        # data = self.gribManager.getWind (self.time, bounds)
-
-
-        # if not data or len(data) == 0 or len(data[0]) == 0:
-        #     return
-
-        # x = 0
-        # y = 0
-        # sep = 1
-
-        # sep = 1 #math.ceil (len (data[0]) / 60)
-        # cr.set_line_width (1.5 / (math.ceil (len (data[0]) / 60)))
-
-        # cr.set_line_width (1)
-
-        # for x in data[::sep]:
-        #     for y in x[::sep]:
-        #         xx, yy = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (y[2][0], y[2][1]))
-        #         self.drawWindArrow (cr, xx, yy, y[0], y[1])
-
 
     def do_render (self, gpsmap):
         pass
