@@ -31,7 +31,7 @@ from .routingwizarddialog import RoutingWizardDialog
 from .settingswindow import SettingsWindow
 from .projectpropertieswindow import ProjectPropertiesWindow
 from .gribmanagerwindow import GribManagerWindow
-from .maplayers import GribMapLayer, IsochronesMapLayer
+from .maplayers import GribMapLayer, IsochronesMapLayer, TrackMapLayer
 
 
 
@@ -50,10 +50,9 @@ class MainWindow:
 
 		self.window = self.builder.get_object("main-window")
 		self.window.connect("delete-event", Gtk.main_quit)
+		self.window.set_default_size (1024, 600)
 		self.window.show_all()
-
-		self.window.set_default_size (800, 600)
-		self.window.maximize ()
+		# self.window.maximize ()
 
 		self.map = self.builder.get_object("map")
 		self.map.set_center_and_zoom (39., 9., 6)
@@ -63,16 +62,10 @@ class MainWindow:
 		self.map.layer_add (self.gribMapLayer)
 		self.map.layer_add (OsmGpsMap.MapOsd (show_dpad=True, show_zoom=True, show_crosshair=False))
 
-		self.map.gps_add(39,9,99)
+		self.trackMapLayer = TrackMapLayer(self.core.trackManager)
+		self.map.layer_add (self.trackMapLayer)
 
-		self.mapTrack = OsmGpsMap.MapTrack ()
-		# This will cause segfault, maybe an osm-gps-map bug
-		# self.mapTrack.set_property ("editable", True)
-		self.mapTrack.set_property ("line-width", 2)
-		self.mapTrack.set_property ("color", Gdk.RGBA(1.0,1.0,1.0,1.0))
-		# self.mapTrack.connect('point-changed', self.onMapClickRelease)
-		# self.mapTrack.connect('point-added', self.onMapClickRelease)
-		self.map.track_add (self.mapTrack)
+		# self.map.gps_add(39,9,99)
 
 		self.statusbar = self.builder.get_object("status-bar")
 		self.trackStore = self.builder.get_object("track-store")
@@ -133,34 +126,11 @@ class MainWindow:
 			self.trackListStore.append([x.name, x.size(), x.length(), x.visible])
 
 		self.trackStore.clear ()
-		while self.mapTrack.n_points() > 0:
-			self.mapTrack.remove_point(0)
 
 		i = 0
 		for wp in self.core.getActiveTrack ():
 			i += 1
 			self.trackStore.append([i, wp[0], wp[1]])
-
-			p = OsmGpsMap.MapPoint ()
-			p.set_degrees (wp[0], wp[1])
-			self.mapTrack.add_point (p)
-
-	def onMapClickRelease(self, map, event):
-		self.trackStore.clear ()
-		i = 0
-		
-		elements = []
-		gc.disable()
-
-		for p in self.mapTrack.get_points():
-			d = p.get_degrees()
-			elements.append([i, d.lat, d.lon])
-			i += 1
-
-		gc.enable()
-		for el in elements:
-			self.trackStore.append(el)
-		
 
 		
 
@@ -175,27 +145,30 @@ class MainWindow:
 			tree_iter = store.get_iter(path)
 			value = store.get_value(tree_iter, 0)
 			self.selectedTrackItem = int(value) - 1
-			print ('Selected: ', self.selectedTrackItem)
 
 	def onTrackItemMoveUp(self, widget):
 		if self.selectedTrackItem != None:
 			self.core.getActiveTrack().moveUp(self.selectedTrackItem)
 			self.updateTrack()
+			self.map.queue_draw ()
 
 	def onTrackItemMoveDown(self, widget):
 		if self.selectedTrackItem != None:
 			self.core.getActiveTrack().moveDown(self.selectedTrackItem)
 			self.updateTrack()
+			self.map.queue_draw ()
 
 	def onTrackItemRemove(self, widget):
 		if self.selectedTrackItem != None:
 			self.core.getActiveTrack().remove(self.selectedTrackItem)
 			self.updateTrack()
+			self.map.queue_draw ()
 
 	def onTrackItemDuplicate(self, widget):
 		if self.selectedTrackItem != None:
 			self.core.getActiveTrack().duplicate(self.selectedTrackItem)
 			self.updateTrack()
+			self.map.queue_draw ()	
 
 
 	def onMapClick(self, map, event):
@@ -207,6 +180,7 @@ class MainWindow:
 		if event.button == 3:
 			menu = self.builder.get_object("map-context-menu")
 			menu.popup (None, None, None, None, event.button, event.time)
+		self.map.queue_draw ()
 
 
 	def showTrackPointPopover(self, event):
@@ -225,6 +199,7 @@ class MainWindow:
 			self.builder.get_object("track-add-point-lat").set_text ('')
 			self.builder.get_object("track-add-point-lon").set_text ('')
 			self.builder.get_object("track-add-point-popover").hide()
+		self.map.queue_draw ()
 
 
 
