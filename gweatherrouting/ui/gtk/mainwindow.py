@@ -41,7 +41,6 @@ class MainWindow:
 
 	def __init__(self, core):
 		self.play = False
-		self.openedFile = None
 		self.selectedTrackItem = None
 		self.core = core
 
@@ -74,9 +73,10 @@ class MainWindow:
 		self.map.track_add (self.mapTrack)
 
 		self.statusbar = self.builder.get_object("status-bar")
-		self.trackStore = self.builder.get_object("track-list-store")
+		self.trackStore = self.builder.get_object("track-store")
+		self.trackListStore = self.builder.get_object("track-list-store")
 
-
+		self.updateTrack()
 
 	####################################
 	## Routing
@@ -87,7 +87,7 @@ class MainWindow:
 			epop.show_all()
 			return
 
-		if len (self.core.getTrack ()) < 2:
+		if len (self.core.getActiveTrack ()) < 2:
 			epop = self.builder.get_object('routing-2points-error-popover')
 			epop.show_all()
 			return
@@ -125,12 +125,16 @@ class MainWindow:
 	## Track handling
 
 	def updateTrack (self):
+		self.trackListStore.clear()
+		for x in self.core.trackManager.tracks:
+			self.trackListStore.append([x.name, x.size(), x.distance, x.visible])
+
 		self.trackStore.clear ()
 		while self.mapTrack.n_points() > 0:
 			self.mapTrack.remove_point(0)
 
 		i = 0
-		for wp in self.core.getTrack ():
+		for wp in self.core.getActiveTrack ():
 			i += 1
 			self.trackStore.append([i, wp[0], wp[1]])
 
@@ -152,7 +156,7 @@ class MainWindow:
 
 
 	def onTrackItemClick(self, item, event):
-		if event.button == 3 and self.core.getTrack().size() > 0:
+		if event.button == 3 and self.core.getActiveTrack().size() > 0:
 			menu = self.builder.get_object("track-item-menu")
 			menu.popup (None, None, None, None, event.button, event.time)
 
@@ -166,22 +170,22 @@ class MainWindow:
 
 	def onTrackItemMoveUp(self, widget):
 		if self.selectedTrackItem != None:
-			self.core.getTrack().moveUp(self.selectedTrackItem)
+			self.core.getActiveTrack().moveUp(self.selectedTrackItem)
 			self.updateTrack()
 
 	def onTrackItemMoveDown(self, widget):
 		if self.selectedTrackItem != None:
-			self.core.getTrack().moveDown(self.selectedTrackItem)
+			self.core.getActiveTrack().moveDown(self.selectedTrackItem)
 			self.updateTrack()
 
 	def onTrackItemRemove(self, widget):
 		if self.selectedTrackItem != None:
-			self.core.getTrack().remove(self.selectedTrackItem)
+			self.core.getActiveTrack().remove(self.selectedTrackItem)
 			self.updateTrack()
 
 	def onTrackItemDuplicate(self, widget):
 		if self.selectedTrackItem != None:
-			self.core.getTrack().duplicate(self.selectedTrackItem)
+			self.core.getActiveTrack().duplicate(self.selectedTrackItem)
 			self.updateTrack()
 
 
@@ -206,7 +210,7 @@ class MainWindow:
 		lon = self.builder.get_object("track-add-point-lon").get_text ()
 
 		if len (lat) > 1 and len (lon) > 1:
-			self.core.getTrack ().add (float (lat), float (lon))
+			self.core.getActiveTrack ().add (float (lat), float (lon))
 			self.updateTrack ()
 
 			self.builder.get_object("track-add-point-lat").set_text ('')
@@ -219,25 +223,12 @@ class MainWindow:
 	## File handling
 
 	def onNew (self, widget):
-		self.openedFile = None
-		self.core.getTrack ().clear ()
+		self.core.trackManager.create()
 		self.updateTrack ()
 		self.builder.get_object('header-bar').set_subtitle ('unsaved')
 
-	def onSave (self, widget):
-		if self.openedFile == None:
-			return self.onSaveAs (widget)
 
-		if self.core.save (self.openedFile):
-			self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Saved %d waypoints to %s' % (len (self.core.getTrack ()), self.openedFile))					
-		else:
-			edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
-			edialog.format_secondary_text ("Cannot save file: %s" % self.openedFile)
-			edialog.run ()
-			edialog.destroy ()
-
-
-	def onSaveAs (self, widget):
+	def onExport (self, widget):
 		dialog = Gtk.FileChooserDialog ("Please select a destination", self.window,
 					Gtk.FileChooserAction.SAVE,
 					(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
@@ -257,9 +248,8 @@ class MainWindow:
 				filepath += '.gpx'
 
 			if self.core.save (filepath):
-				self.openedFile = filepath
 				self.builder.get_object('header-bar').set_subtitle (filepath)
-				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Saved %d waypoints to %s' % (len (self.core.getTrack ()), self.openedFile))
+				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Saved %d waypoints' % (len (self.core.getActiveTrack ())))
 			else:
 				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
 				edialog.format_secondary_text ("Cannot save file: %s" % filepath)
@@ -269,7 +259,7 @@ class MainWindow:
 		dialog.destroy ()
 
 
-	def onOpen (self, widget):
+	def onImport (self, widget):
 		dialog = Gtk.FileChooserDialog ("Please choose a file", self.window,
 					Gtk.FileChooserAction.OPEN,
 					(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
@@ -288,13 +278,12 @@ class MainWindow:
 
 			if self.core.load (filepath):
 				self.builder.get_object('header-bar').set_subtitle (filepath)
-				self.openedFile = filepath
 				self.updateTrack ()
 				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done")
-				edialog.format_secondary_text ("File opened, loaded %d waypoints" % len (self.core.getTrack ()))
+				edialog.format_secondary_text ("File opened, loaded %d waypoints" % len (self.core.getActiveTrack ()))
 				edialog.run ()
 				edialog.destroy ()	
-				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Loaded %s with %d waypoints' % (filepath, len (self.core.getTrack ())))					
+				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Loaded %s with %d waypoints' % (filepath, len (self.core.getActiveTrack ())))					
 				
 			else:
 				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")

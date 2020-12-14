@@ -48,20 +48,6 @@ Riccardo Apolloni</property>
       </object>
     </child>
   </object>
-  <object class="GtkPopover" id="routing-nogrib-error-popover">
-    <property name="can-focus">False</property>
-    <property name="relative-to">routing-button</property>
-    <child>
-      <object class="GtkLabel">
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
-        <property name="xpad">10</property>
-        <property name="ypad">5</property>
-        <property name="label" translatable="yes">At least one grib file should be
-loaded to created a routing</property>
-      </object>
-    </child>
-  </object>
   <object class="GtkMenu" id="settings-menu">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
@@ -138,6 +124,18 @@ loaded to created a routing</property>
   </object>
   <object class="GtkListStore" id="track-list-store">
     <columns>
+      <!-- column-name name -->
+      <column type="gchararray"/>
+      <!-- column-name len -->
+      <column type="guint"/>
+      <!-- column-name distance -->
+      <column type="gfloat"/>
+      <!-- column-name visible -->
+      <column type="gboolean"/>
+    </columns>
+  </object>
+  <object class="GtkListStore" id="track-store">
+    <columns>
       <!-- column-name # -->
       <column type="gint"/>
       <!-- column-name Latitude -->
@@ -159,6 +157,7 @@ loaded to created a routing</property>
             <property name="can-focus">False</property>
             <child>
               <object class="GtkNotebook">
+                <property name="width-request">281</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <child>
@@ -176,7 +175,7 @@ loaded to created a routing</property>
                           <object class="GtkTreeView" id="track-list">
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
-                            <property name="model">track-list-store</property>
+                            <property name="model">track-store</property>
                             <property name="headers-clickable">False</property>
                             <property name="enable-search">False</property>
                             <property name="show-expanders">False</property>
@@ -249,17 +248,65 @@ loaded to created a routing</property>
                   <object class="GtkLabel">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">Track</property>
+                    <property name="label" translatable="yes">Active Track</property>
                   </object>
                   <packing>
                     <property name="tab-fill">False</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkLabel">
+                  <object class="GtkTreeView">
                     <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">labelasd</property>
+                    <property name="can-focus">True</property>
+                    <property name="model">track-list-store</property>
+                    <child internal-child="selection">
+                      <object class="GtkTreeSelection"/>
+                    </child>
+                    <child>
+                      <object class="GtkTreeViewColumn">
+                        <property name="title" translatable="yes">Name</property>
+                        <child>
+                          <object class="GtkCellRendererText"/>
+                          <attributes>
+                            <attribute name="text">0</attribute>
+                          </attributes>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkTreeViewColumn">
+                        <property name="title" translatable="yes">POI</property>
+                        <child>
+                          <object class="GtkCellRendererText"/>
+                          <attributes>
+                            <attribute name="text">1</attribute>
+                          </attributes>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkTreeViewColumn">
+                        <property name="title" translatable="yes">Distance</property>
+                        <child>
+                          <object class="GtkCellRendererText"/>
+                          <attributes>
+                            <attribute name="text">2</attribute>
+                          </attributes>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkTreeViewColumn">
+                        <property name="title" translatable="yes">Visible</property>
+                        <child>
+                          <object class="GtkCellRendererToggle"/>
+                          <attributes>
+                            <attribute name="activatable">3</attribute>
+                            <attribute name="active">3</attribute>
+                          </attributes>
+                        </child>
+                      </object>
+                    </child>
                   </object>
                   <packing>
                     <property name="position">1</property>
@@ -269,7 +316,7 @@ loaded to created a routing</property>
                   <object class="GtkLabel">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">Routing</property>
+                    <property name="label" translatable="yes">Track List</property>
                   </object>
                   <packing>
                     <property name="position">1</property>
@@ -290,7 +337,7 @@ loaded to created a routing</property>
                   <object class="GtkLabel">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">Missing</property>
+                    <property name="label" translatable="yes">Routings</property>
                   </object>
                   <packing>
                     <property name="position">2</property>
@@ -479,12 +526,12 @@ loaded to created a routing</property>
         <property name="show-close-button">True</property>
         <child>
           <object class="GtkButton">
-            <property name="label" translatable="yes">Open</property>
+            <property name="label" translatable="yes">Import</property>
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
             <property name="tooltip-text" translatable="yes">Open a file</property>
-            <signal name="clicked" handler="onOpen" swapped="no"/>
+            <signal name="clicked" handler="onImport" swapped="no"/>
           </object>
         </child>
         <child>
@@ -492,7 +539,7 @@ loaded to created a routing</property>
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
-            <property name="tooltip-text" translatable="yes">New</property>
+            <property name="tooltip-text" translatable="yes">New track</property>
             <signal name="clicked" handler="onNew" swapped="no"/>
             <child>
               <object class="GtkImage">
@@ -512,36 +559,17 @@ loaded to created a routing</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
             <property name="tooltip-text" translatable="yes">Save</property>
-            <signal name="clicked" handler="onSave" swapped="no"/>
+            <signal name="clicked" handler="onExport" swapped="no"/>
             <child>
               <object class="GtkImage">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="icon-name">document-save-symbolic</property>
+                <property name="icon-name">document-export-symbolic</property>
               </object>
             </child>
           </object>
           <packing>
             <property name="position">2</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkButton">
-            <property name="visible">True</property>
-            <property name="can-focus">True</property>
-            <property name="receives-default">True</property>
-            <property name="tooltip-text" translatable="yes">Save</property>
-            <signal name="clicked" handler="onSaveAs" swapped="no"/>
-            <child>
-              <object class="GtkImage">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="icon-name">document-save-as-symbolic</property>
-              </object>
-            </child>
-          </object>
-          <packing>
-            <property name="position">3</property>
           </packing>
         </child>
         <child>
@@ -560,7 +588,7 @@ loaded to created a routing</property>
             </child>
           </object>
           <packing>
-            <property name="position">4</property>
+            <property name="position">3</property>
           </packing>
         </child>
         <child>
@@ -636,6 +664,20 @@ loaded to created a routing</property>
         <property name="ypad">5</property>
         <property name="label" translatable="yes">You need at least 2 track points 
 to create a routing path</property>
+      </object>
+    </child>
+  </object>
+  <object class="GtkPopover" id="routing-nogrib-error-popover">
+    <property name="can-focus">False</property>
+    <property name="relative-to">routing-button</property>
+    <child>
+      <object class="GtkLabel">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="xpad">10</property>
+        <property name="ypad">5</property>
+        <property name="label" translatable="yes">At least one grib file should be
+loaded to created a routing</property>
       </object>
     </child>
   </object>

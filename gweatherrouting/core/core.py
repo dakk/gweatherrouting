@@ -23,13 +23,17 @@ from .routing import Routing
 from .boat import Boat
 from .grib import Grib
 from .gribmanager import GribManager
+from .trackmanager import TrackManager
 
 logger = logging.getLogger ('gweatherrouting')
 
 class Core:
     def __init__ (self):
-        self.track = Track ()
+        self.trackManager = TrackManager()
         self.gribManager = GribManager()
+
+        self.trackManager.create()
+
         logger.debug ('Initialized')
 
     # Simulation
@@ -42,8 +46,8 @@ class Core:
         return self.gribManager
 
     # Track ans save/load
-    def getTrack (self):
-        return self.track
+    def getActiveTrack (self):
+        return self.trackManager.activeTrack()
 
     def load (self, path):
         logger.info ('Saved current state to %s' % path)

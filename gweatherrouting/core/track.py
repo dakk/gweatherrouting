@@ -17,8 +17,11 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 from xml.etree import ElementTree
 
 class Track:
-    def __init__ (self):
-        self.waypoints = []
+    def __init__ (self, name = 'noname', waypoints = []):
+        self.name = name
+        self.waypoints = waypoints
+        self.distance = 0.0
+        self.visible = True
 
     def __len__ (self):
         return len (self.waypoints)
@@ -32,21 +35,8 @@ class Track:
     def clear (self):
         self.waypoints = []
 
-    def load (self, path):
-        try:
-            tree = ElementTree.parse (path)
-        except:
-            return False
 
-        self.waypoints = []
-        root = tree.getroot ()
-        for child in root:
-            wp = (float (child.attrib['lat']), float (child.attrib['lon']))
-            self.waypoints.append (wp)
-
-        return True
-
-    def save (self, path):
+    def export (self, path):
         try:
             f = open (path, 'w')
         except:
