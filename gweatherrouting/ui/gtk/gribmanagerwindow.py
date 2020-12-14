@@ -51,9 +51,6 @@ class GribManagerWindow:
 		pass
 
 	def onGribToggle(self, widget, i):
-		# currentState = widget.get_active()
-		# widget.set_active(not currentState)
-		# print (self.gribManager.localGribs[int(i)])
 		n = self.gribManager.localGribs[int(i)].name
 
 		if self.gribManager.isEnabled(n):

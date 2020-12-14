@@ -60,10 +60,9 @@ class MainWindow:
 		self.map.layer_add (self.isochronesMapLayer)
 		self.gribMapLayer = GribMapLayer (self.core.gribManager)
 		self.map.layer_add (self.gribMapLayer)
-		self.map.layer_add (OsmGpsMap.MapOsd (show_dpad=True, show_zoom=True, show_crosshair=False))
-
 		self.trackMapLayer = TrackMapLayer(self.core.trackManager)
 		self.map.layer_add (self.trackMapLayer)
+		self.map.layer_add (OsmGpsMap.MapOsd (show_dpad=True, show_zoom=True, show_crosshair=False))
 
 		# self.map.gps_add(39,9,99)
 
@@ -133,6 +132,35 @@ class MainWindow:
 				i += 1
 				self.trackStore.append([i, wp[0], wp[1]])
 
+	def onTrackExport(self, widget):
+		dialog = Gtk.FileChooserDialog ("Please select a destination", self.window,
+					Gtk.FileChooserAction.SAVE,
+					(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+
+		filter_gpx = Gtk.FileFilter()
+		filter_gpx.set_name("GPX track")
+		filter_gpx.add_mime_type("application/gpx+xml")
+		filter_gpx.add_pattern ('*.gpx')
+		dialog.add_filter(filter_gpx)
+
+		response = dialog.run ()
+
+		if response == Gtk.ResponseType.OK:
+			filepath = dialog.get_filename ()
+			
+			if not filepath.endswith('.gpx'):
+				filepath += '.gpx'
+
+			if self.core.trackManager.activeTrack.export (filepath):
+				# self.builder.get_object('header-bar').set_subtitle (filepath)
+				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Saved %d waypoints' % (len (self.core.trackManager.activeTrack)))
+			else:
+				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
+				edialog.format_secondary_text ("Cannot save file: %s" % filepath)
+				edialog.run ()
+				edialog.destroy ()
+			
+		dialog.destroy ()
 		
 	def onTrackToggle(self, widget, i):
 		self.core.trackManager.tracks[int(i)].visible = not self.core.trackManager.tracks[int(i)].visible
@@ -238,36 +266,6 @@ class MainWindow:
 		self.map.queue_draw ()
 		# self.builder.get_object('header-bar').set_subtitle ('unsaved')
 
-
-	def onExport (self, widget):
-		dialog = Gtk.FileChooserDialog ("Please select a destination", self.window,
-					Gtk.FileChooserAction.SAVE,
-					(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
-
-		filter_gpx = Gtk.FileFilter()
-		filter_gpx.set_name("GPX track")
-		filter_gpx.add_mime_type("application/gpx+xml")
-		filter_gpx.add_pattern ('*.gpx')
-		dialog.add_filter(filter_gpx)
-
-		response = dialog.run ()
-
-		if response == Gtk.ResponseType.OK:
-			filepath = dialog.get_filename ()
-			
-			if not filepath.endswith('.gpx'):
-				filepath += '.gpx'
-
-			if self.core.save (filepath):
-				# self.builder.get_object('header-bar').set_subtitle (filepath)
-				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Saved %d waypoints' % (len (self.core.trackManager.activeTrack)))
-			else:
-				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
-				edialog.format_secondary_text ("Cannot save file: %s" % filepath)
-				edialog.run ()
-				edialog.destroy ()
-			
-		dialog.destroy ()
 
 
 	def onImport (self, widget):

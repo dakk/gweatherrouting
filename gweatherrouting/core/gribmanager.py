@@ -46,20 +46,20 @@ class GribManager:
 
 	def getWindAt(self, t, lat, lon):
 		# TODO: get the best matching grib for lat/lon at time t
-		g = []
 		for x in self.gribs:
-			g = g + x.getWindAt(t, lat, lon)
-
-		return g
+			try:
+				return x.getWindAt(t, lat, lon)
+			except:
+				pass
 
 
 	def getWind (self, t, bounds):
 		# TODO: get the best matching grib for lat/lon at time t
-		g = []
 		for x in self.gribs:
-			g = g + x.getWind(t, bounds)
-
-		return g
+			try:
+				return x.getWind(t, bounds)
+			except:
+				pass
 		
 	def getDownloadList (self, force=False):
 		# https://openskiron.org/en/openskiron

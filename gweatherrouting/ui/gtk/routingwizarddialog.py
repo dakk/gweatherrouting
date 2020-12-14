@@ -115,7 +115,6 @@ class RoutingWizardDialog:
 
 
 	def getSelectedTrack (self):
-		print ('selected track', self.builder.get_object('track-select').get_active ())
 		return self.core.trackManager.tracks[self.builder.get_object('track-select').get_active ()]
 
 	def getSelectedAlgorithm (self):

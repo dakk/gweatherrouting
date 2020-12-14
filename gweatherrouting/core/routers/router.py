@@ -30,9 +30,9 @@ from .. import utils
 
 
 class Router:
-	def __init__ (self, polar, grib):
+	def __init__ (self, polar, gribManager):
 		self.polar = polar
-		self.grib = grib
+		self.gribManager = gribManager
 
 
 	def calculateIsochrones (self, t, isocrone, nextwp):
@@ -47,7 +47,7 @@ class Router:
 		for i in range (0, len (last)):
 			p = last[i]
 
-			(TWD,TWS) = self.grib.getWindAt (t, p[0], p[1])
+			(TWD,TWS) = self.gribManager.getWindAt (t, p[0], p[1])
 
 			for TWA in range(-180,180,5):
 				TWA = math.radians(TWA)

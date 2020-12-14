@@ -134,6 +134,15 @@ Riccardo Apolloni</property>
         <signal name="activate" handler="onTrackRemove" swapped="no"/>
       </object>
     </child>
+    <child>
+      <object class="GtkMenuItem">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Export</property>
+        <property name="use-underline">True</property>
+        <signal name="activate" handler="onTrackExport" swapped="no"/>
+      </object>
+    </child>
   </object>
   <object class="GtkListStore" id="track-list-store">
     <columns>
@@ -580,25 +589,6 @@ Riccardo Apolloni</property>
           </object>
           <packing>
             <property name="position">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkButton">
-            <property name="visible">True</property>
-            <property name="can-focus">True</property>
-            <property name="receives-default">True</property>
-            <property name="tooltip-text" translatable="yes">Export current track</property>
-            <signal name="clicked" handler="onExport" swapped="no"/>
-            <child>
-              <object class="GtkImage">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="icon-name">document-export-symbolic</property>
-              </object>
-            </child>
-          </object>
-          <packing>
-            <property name="position">2</property>
           </packing>
         </child>
         <child>
