@@ -127,16 +127,26 @@ class MainWindow:
 
 		self.trackStore.clear ()
 
-		i = 0
-		for wp in self.core.trackManager.activeTrack:
-			i += 1
-			self.trackStore.append([i, wp[0], wp[1]])
+		if self.core.trackManager.activeTrack:
+			i = 0
+			for wp in self.core.trackManager.activeTrack:
+				i += 1
+				self.trackStore.append([i, wp[0], wp[1]])
 
 		
 	def onTrackToggle(self, widget, i):
 		self.core.trackManager.tracks[int(i)].visible = not self.core.trackManager.tracks[int(i)].visible
-		print (self.core.trackManager.tracks[int(i)].visible)
 		self.updateTrack()
+
+	def onTrackRemove(self, widget):
+		self.core.trackManager.remove(self.core.trackManager.activeTrack)
+		self.updateTrack()
+		self.map.queue_draw()
+
+	def onTrackClick(self, item, event):
+		if event.button == 3 and len(self.core.trackManager.tracks) > 0:
+			menu = self.builder.get_object("track-list-item-menu")
+			menu.popup (None, None, None, None, event.button, event.time)
 
 	def onTrackItemClick(self, item, event):
 		if event.button == 3 and self.core.trackManager.activeTrack.size() > 0:
@@ -147,8 +157,8 @@ class MainWindow:
 		store, pathlist = selection.get_selected_rows()
 		for path in pathlist:
 			tree_iter = store.get_iter(path)
-			value = store.get_value(tree_iter, 0)
-			self.core.trackManager.activate(value)
+			name = store.get_value(tree_iter, 0)
+			self.core.trackManager.activate(name)
 			self.updateTrack(onlyActive=True)
 			self.map.queue_draw()
 
@@ -206,6 +216,9 @@ class MainWindow:
 		lon = self.builder.get_object("track-add-point-lon").get_text ()
 
 		if len (lat) > 1 and len (lon) > 1:
+			if len(self.core.trackManager.tracks) == 0:
+				self.core.trackManager.create()
+
 			self.core.trackManager.activeTrack.add (float (lat), float (lon))
 			self.updateTrack ()
 

@@ -131,6 +131,7 @@ Riccardo Apolloni</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Remove</property>
         <property name="use-underline">True</property>
+        <signal name="activate" handler="onTrackRemove" swapped="no"/>
       </object>
     </child>
   </object>
@@ -282,6 +283,7 @@ Riccardo Apolloni</property>
                         <property name="enable-search">False</property>
                         <property name="show-expanders">False</property>
                         <property name="enable-grid-lines">horizontal</property>
+                        <signal name="button-press-event" handler="onTrackClick" swapped="no"/>
                         <child internal-child="selection">
                           <object class="GtkTreeSelection">
                             <signal name="changed" handler="onSelectTrack" swapped="no"/>

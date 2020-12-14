@@ -17,8 +17,16 @@ class TrackManager:
         self.tracks.append (nt)
         self.activeTrack = nt
 
-    def remove(self, i):
-        pass 
+    def remove(self, track):
+        actTremove = False 
+
+        if track == self.activeTrack:
+            self.activeTrack = None
+            actRemove = True
+
+        self.tracks.remove(track)
+        if actRemove and len(self.tracks) > 0:
+            self.activeTrack = self.tracks[0]
 
 
     def importTrack (self, path):
