@@ -43,9 +43,3 @@ class Core:
         routing = Routing (algorithm (boat.polar, self.gribManager), boat, track, self.gribManager, initialTime = initialTime)
         return routing
 
-    def getGribManager (self):
-        return self.gribManager
-
-    # Track ans save/load
-    def getActiveTrack (self):
-        return self.trackManager.activeTrack()

@@ -43,10 +43,6 @@ class GribManager:
 	def hasGrib(self):
 		return len(self.gribs) > 0
 
-	# Returns the cumulative timeframe of loaded grib files
-	def getTimeframe(self):
-		return self.timeframe
-
 
 	def getWindAt(self, t, lat, lon):
 		# TODO: get the best matching grib for lat/lon at time t

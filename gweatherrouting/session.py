@@ -56,12 +56,11 @@ class Config:
     def __init__(self, dc):
         self.dconf = dc
 
-    def getv(self, key, failsafe=True):
-        if key in self.dconf:
-            return self.dconf[key]
-        return None 
 
-    def setv(self, key, value):
+    def __getitem__ (self, key):
+        return self.dconf [key]
+
+    def __setitem__ (self, key, value):
         self.dconf[key] = value
         self.save()
 

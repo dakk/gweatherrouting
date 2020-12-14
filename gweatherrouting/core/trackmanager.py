@@ -3,26 +3,19 @@ from .track import Track
 class TrackManager:
     def __init__(self):
         self.tracks = []
-        self.active = None
+        self.activeTrack = None
 
     def activate(self, name):
-        i = 0
         for x in self.tracks:
             if x.name == name:
-                self.active = i
+                self.activeTrack = x
                 return 
-            i += 1
 
     def create(self):
         nt = Track(name=('noname-%d' % (len(self.tracks) + 1)))
         nt.clear()
         self.tracks.append (nt)
-        self.active = len(self.tracks) - 1
-
-    def activeTrack(self):
-        if self.active != None:
-            return self.tracks[self.active]
-        return None 
+        self.activeTrack = nt
 
     def remove(self, i):
         pass 

@@ -82,7 +82,7 @@ class MainWindow:
 			epop.show_all()
 			return
 
-		if len (self.core.getActiveTrack ()) < 2:
+		if len (self.core.trackManager.activeTrack) < 2:
 			epop = self.builder.get_object('routing-2points-error-popover')
 			epop.show_all()
 			return
@@ -112,7 +112,7 @@ class MainWindow:
 		
 		self.map.track_add (track)		
 
-		if not self.currentRouting.isEnd ():
+		if not self.currentRouting.end:
 			GObject.timeout_add (1000, self.onRoutingStep)
 
 
@@ -128,14 +128,18 @@ class MainWindow:
 		self.trackStore.clear ()
 
 		i = 0
-		for wp in self.core.getActiveTrack ():
+		for wp in self.core.trackManager.activeTrack:
 			i += 1
 			self.trackStore.append([i, wp[0], wp[1]])
 
 		
+	def onTrackToggle(self, widget, i):
+		self.core.trackManager.tracks[int(i)].visible = not self.core.trackManager.tracks[int(i)].visible
+		print (self.core.trackManager.tracks[int(i)].visible)
+		self.updateTrack()
 
 	def onTrackItemClick(self, item, event):
-		if event.button == 3 and self.core.getActiveTrack().size() > 0:
+		if event.button == 3 and self.core.trackManager.activeTrack.size() > 0:
 			menu = self.builder.get_object("track-item-menu")
 			menu.popup (None, None, None, None, event.button, event.time)
 
@@ -157,25 +161,25 @@ class MainWindow:
 
 	def onTrackItemMoveUp(self, widget):
 		if self.selectedTrackItem != None:
-			self.core.getActiveTrack().moveUp(self.selectedTrackItem)
+			self.core.trackManager.activeTrack.moveUp(self.selectedTrackItem)
 			self.updateTrack()
 			self.map.queue_draw ()
 
 	def onTrackItemMoveDown(self, widget):
 		if self.selectedTrackItem != None:
-			self.core.getActiveTrack().moveDown(self.selectedTrackItem)
+			self.core.trackManager.activeTrack.moveDown(self.selectedTrackItem)
 			self.updateTrack()
 			self.map.queue_draw ()
 
 	def onTrackItemRemove(self, widget):
 		if self.selectedTrackItem != None:
-			self.core.getActiveTrack().remove(self.selectedTrackItem)
+			self.core.trackManager.activeTrack.remove(self.selectedTrackItem)
 			self.updateTrack()
 			self.map.queue_draw ()
 
 	def onTrackItemDuplicate(self, widget):
 		if self.selectedTrackItem != None:
-			self.core.getActiveTrack().duplicate(self.selectedTrackItem)
+			self.core.trackManager.activeTrack.duplicate(self.selectedTrackItem)
 			self.updateTrack()
 			self.map.queue_draw ()	
 
@@ -202,7 +206,7 @@ class MainWindow:
 		lon = self.builder.get_object("track-add-point-lon").get_text ()
 
 		if len (lat) > 1 and len (lon) > 1:
-			self.core.getActiveTrack ().add (float (lat), float (lon))
+			self.core.trackManager.activeTrack.add (float (lat), float (lon))
 			self.updateTrack ()
 
 			self.builder.get_object("track-add-point-lat").set_text ('')
@@ -243,7 +247,7 @@ class MainWindow:
 
 			if self.core.save (filepath):
 				# self.builder.get_object('header-bar').set_subtitle (filepath)
-				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Saved %d waypoints' % (len (self.core.getActiveTrack ())))
+				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Saved %d waypoints' % (len (self.core.trackManager.activeTrack)))
 			else:
 				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
 				edialog.format_secondary_text ("Cannot save file: %s" % filepath)
@@ -274,10 +278,10 @@ class MainWindow:
 				# self.builder.get_object('header-bar').set_subtitle (filepath)
 				self.updateTrack ()
 				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done")
-				edialog.format_secondary_text ("File opened, loaded %d waypoints" % len (self.core.getActiveTrack ()))
+				edialog.format_secondary_text ("File opened, loaded %d waypoints" % len (self.core.trackManager.activeTrack))
 				edialog.run ()
 				edialog.destroy ()	
-				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Loaded %s with %d waypoints' % (filepath, len (self.core.getActiveTrack ())))					
+				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Loaded %s with %d waypoints' % (filepath, len (self.core.trackManager.activeTrack)))					
 				
 			else:
 				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")

@@ -47,12 +47,6 @@ class Routing:
 		self.position = self.track[0]
 		logger.debug ('initialized (time: %f)' % (self.time))
 
-	def isEnd (self):
-		return self.end
-
-	def getTime (self):
-		return self.time
-
 
 
 	def step (self):

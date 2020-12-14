@@ -35,7 +35,7 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
                 continue 
 
             active = False
-            if self.trackManager.activeTrack().name == tr.name:
+            if self.trackManager.activeTrack.name == tr.name:
                 active = True
 
             prevx = None
