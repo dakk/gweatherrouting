@@ -64,7 +64,6 @@ class GribManagerWindow:
 		else:
 			self.gribManager.enable(n)
 
-		self.gribManager.storeOpenedGribs()
 		self.updateLocalGribs()
 
 	def onGribDownloadPercentage (self, percentage):

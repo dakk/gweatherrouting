@@ -49,10 +49,12 @@ class GribManager(Sessionable):
 
 	def enable(self, name):
 		self.load(GRIB_DIR + '/' + name)
+		self.storeOpenedGribs()
 
 	def disable(self, name):
 		for x in self.gribs:
 			if x.name == name:
+				self.storeOpenedGribs()
 				return self.gribs.remove(x)
 
 	def isEnabled(self, name):
