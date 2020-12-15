@@ -28,7 +28,7 @@ def startUI ():
     from gi.repository import Gtk
     from .ui.gtk.mainwindow import MainWindow
 
-    conf = Config.load()
+    conf = Config.load('config')
     core = Core()
 
     MainWindow.create(core)

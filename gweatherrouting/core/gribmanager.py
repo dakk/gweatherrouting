@@ -8,19 +8,40 @@ from bs4 import BeautifulSoup
 
 from .grib import Grib
 
-class GribManager:
+defaultSession = {
+	'opened': []
+}
+
+class GribManager(Sessionable):
 	def __init__(self):
+		Sessionable.__init__(self, 'grib-manager', defaultSession)
+
 		self.gribFiles = None
 
 		self.gribs = []
 		self.timeframe = [0, 0]
 
 		self.localGribs = []
+		self.refreshLocalGribs()
 
+		for x in self.getSessionVariable('opened'):
+			self.enable(x)
+
+	def refreshLocalGribs(self):
+		self.localGribs = []
 		for x in os.listdir(GRIB_DIR):
 			m = Grib.parseMetadata(GRIB_DIR + '/' + x)
 			self.localGribs.append(m)
 
+
+	def storeOpenedGribs(self):
+		ss = []
+		for x in self.gribs:
+			try:
+				ss.index(x.name)
+			except:
+				ss.append(x.name)
+		self.storeSessionVariable('opened', ss)
 
 	def load(self, path):
 		logger.info ('Loading grib %s' % path)
@@ -55,11 +76,14 @@ class GribManager:
 
 	def getWind (self, t, bounds):
 		# TODO: get the best matching grib for lat/lon at time t
+		g = []
+
 		for x in self.gribs:
 			try:
-				return x.getWind(t, bounds)
+				g = g + x.getWind(t, bounds)
 			except:
 				pass
+		return g
 		
 	def getDownloadList (self, force=False):
 		# https://openskiron.org/en/openskiron

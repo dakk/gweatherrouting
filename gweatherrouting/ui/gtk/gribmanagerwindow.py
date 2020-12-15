@@ -7,6 +7,7 @@ from threading import Thread
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, GObject
 
+from ... import session
 
 class GribManagerWindow:
 	def create(gribManager):
@@ -41,10 +42,15 @@ class GribManagerWindow:
 		self.updateLocalGribs()
 
 	def updateLocalGribs(self):
+		self.gribManager.refreshLocalGribs()
 		self.gribManagerStore.clear()
 
 		for x in self.gribManager.localGribs:
 			self.gribManagerStore.append ([x.name, x.centre, x.startTime, x.lastForecast, self.gribManager.isEnabled(x.name)])
+
+
+	def onRemoveLocalGrib(self, widget):
+		pass
 
 
 	def onOpen(self, widget):
@@ -58,6 +64,7 @@ class GribManagerWindow:
 		else:
 			self.gribManager.enable(n)
 
+		self.gribManager.storeOpenedGribs()
 		self.updateLocalGribs()
 
 	def onGribDownloadPercentage (self, percentage):
@@ -83,7 +90,6 @@ class GribManagerWindow:
 		for path in pathlist:
 			tree_iter = store.get_iter(path)
 			self.selectedGrib = store.get_value(tree_iter, 4)
-			print ('Selected: ', self.selectedGrib)
 
 	def onGribDownload (self, widget):
 		self.builder.get_object('download-progress').show()

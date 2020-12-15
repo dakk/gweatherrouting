@@ -48,14 +48,14 @@ os.makedirs(GRIB_DIR, exist_ok=True)
 os.makedirs(TEMP_DIR, exist_ok=True)
 
 
-EMPTY_CONF = {
-    'grib_loaded': []
-}
 
 class Config:
-    def __init__(self, dc):
+    def __init__(self, fn, dc):
+        self.fileName = fn
         self.dconf = dc
 
+    def __contains__ (self, key):
+        return key in self.dconf 
 
     def __getitem__ (self, key):
         return self.dconf [key]
@@ -65,22 +65,55 @@ class Config:
         self.save()
 
     def save(self):
-        with open(DATA_DIR + '/config.json', 'w') as f:
+        with open(DATA_DIR + '/' + self.fileName + '.json', 'w') as f:
             f.write(json.dumps(self.dconf))
-            logger.debug ('Configuration saved to %s/config.json' % DATA_DIR)
+            logger.debug ('Configuration saved to %s/%s.json' % (DATA_DIR, self.fileName))
             f.close()
             
-    def load():
+    def load(fn):
         try:
-            with open(DATA_DIR + '/config.json', 'r') as f:
-                c = Config(json.loads(f.read()))
+            with open(DATA_DIR + '/' + fn + '.json', 'r') as f:
+                c = Config(fn, json.loads(f.read()))
                 f.close()
-                logger.debug ('Load configuration from %s/config.json' % DATA_DIR)
+                logger.debug ('Load configuration from %s/%s.json' % (DATA_DIR, c.fileName))
                 return c
         except:
-            c = Config(EMPTY_CONF)
+            c = Config(fn, {})
             c.save()
-            logger.debug ('Saved initial configuration to %s/config.json' % DATA_DIR)
             return c
 
         
+# A class for objects that contains session data
+class Sessionable:
+    def __init__(self, filename, default):
+        self.fileName = filename 
+        self.defaultSession = default
+        self.session = {}
+        self.loadSession()
+
+    def storeSessionVariable(self, k, v):
+        self.session[k] = v
+        self.saveSession()
+        logger.debug ('Stored session variable \'%s\' to %s/%s.json' % (k, DATA_DIR, self.fileName))
+
+    def getSessionVariable(self, k):
+        if k in self.session:
+            return self.session[k]
+        return None
+
+    def saveSession(self):
+        with open(DATA_DIR + '/' + self.fileName + '.json', 'w') as f:
+            f.write(json.dumps(self.session))
+            # logger.debug ('Configuration saved to %s/%s.json' % (DATA_DIR, self.fileName))
+            f.close()
+
+    def loadSession(self):
+        try:
+            with open(DATA_DIR + '/' + self.fileName + '.json', 'r') as f:
+                self.session = json.loads(f.read())
+                f.close()
+                logger.debug ('Load session file %s/%s.json' % (DATA_DIR, self.fileName))
+        except:
+            logger.debug ('Creating session file %s/%s.json' % (DATA_DIR, self.fileName))
+            self.session = self.defaultSession
+            self.saveSession()

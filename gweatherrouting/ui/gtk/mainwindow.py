@@ -26,7 +26,7 @@ gi.require_version('OsmGpsMap', '1.0')
 
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap, Gdk
 
-from ... import log
+from ... import log, session
 from .routingwizarddialog import RoutingWizardDialog
 from .settingswindow import SettingsWindow
 from .projectpropertieswindow import ProjectPropertiesWindow
