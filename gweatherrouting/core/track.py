@@ -18,10 +18,11 @@ from xml.etree import ElementTree
 from . import utils
 
 class Track:
-    def __init__ (self, name = 'noname', waypoints = []):
+    def __init__ (self, name = 'noname', waypoints = [], visible=True, trackManager=None):
         self.name = name
         self.waypoints = waypoints
-        self.visible = True
+        self.visible = visible
+        self.trackManager = trackManager
 
     def __len__ (self):
         return len (self.waypoints)
@@ -46,6 +47,7 @@ class Track:
 
     def clear (self):
         self.waypoints = []
+        self.trackManager.saveTracks()
 
 
     def export (self, path):
@@ -63,19 +65,24 @@ class Track:
             sw = self.waypoints [i-1]
             self.waypoints [i-1] = self.waypoints [i]
             self.waypoints [i] = sw
+            self.trackManager.saveTracks()
 
     def moveDown (self, i):
         if i < len (self) - 1 and i >= 0:
             sw = self.waypoints [i+1]
             self.waypoints [i+1] = self.waypoints [i]
             self.waypoints [i] = sw
+            self.trackManager.saveTracks()
 
     def remove (self, i):
         if i >= 0 and i < len (self):
             del self.waypoints [i]
+            self.trackManager.saveTracks()
 
     def duplicate (self, i):
         self.waypoints.append(self.waypoints[i])
+        self.trackManager.saveTracks()
 
     def add (self, lat, lon):
         self.waypoints.append ((lat, lon))
+        self.trackManager.saveTracks()

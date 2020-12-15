@@ -89,17 +89,15 @@ class GribMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         if not data or len(data) == 0 or len(data[0]) == 0:
             return
 
-        x = 0
-        y = 0
-        sep = 1
+        scale = int(gpsmap.get_scale() / 200.)
+        if scale < 1:
+            scale = 1
 
-        sep = 1 #math.ceil (len (data[0]) / 60)
         cr.set_line_width (1.5 / (math.ceil (len (data[0]) / 60)))
-
         cr.set_line_width (1)
 
-        for x in data[::sep]:
-            for y in x[::sep]:
+        for x in data[::scale]:
+            for y in x[::scale]:
                 xx, yy = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (y[2][0], y[2][1]))
                 self.drawWindArrow (cr, xx, yy, y[0], y[1])
 
