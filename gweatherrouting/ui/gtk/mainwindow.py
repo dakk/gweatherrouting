@@ -97,28 +97,27 @@ class MainWindow:
 
 		if response == Gtk.ResponseType.OK:
 			self.currentRouting = self.core.createRouting (dialog.getSelectedAlgorithm (), dialog.getSelectedBoat (), dialog.getInitialTime (), dialog.getSelectedTrack())
-			GObject.timeout_add (10, self.onRoutingStep)
+			
+			Thread(target=self.onRoutingStep, args=()).start()
 
 		dialog.destroy ()
 		
 	def onRoutingStep (self):
-		res = self.currentRouting.step ()
-		self.isochronesMapLayer.setIsochrones (res['isochrones'])
-		self.gribMapLayer.time = res['time']
-		self.map.queue_draw ()
-		self.builder.get_object('time-adjustment').set_value (res['time'])
+		while not self.currentRouting.end:
+			res = self.currentRouting.step ()
+			self.isochronesMapLayer.setIsochrones (res['isochrones'])
+			self.gribMapLayer.time = res['time']
+			self.map.queue_draw ()
+			self.builder.get_object('time-adjustment').set_value (res['time'])
 
-		track = OsmGpsMap.MapTrack ()
-		track.set_property ("line-width", 5)
-		for wp in res['path']:
-			p = OsmGpsMap.MapPoint ()
-			p.set_degrees (wp[0], wp[1])
-			track.add_point (p)
-		
-		self.map.track_add (track)		
-
-		if not self.currentRouting.end:
-			GObject.timeout_add (1000, self.onRoutingStep)
+			track = OsmGpsMap.MapTrack ()
+			track.set_property ("line-width", 5)
+			for wp in res['path']:
+				p = OsmGpsMap.MapPoint ()
+				p.set_degrees (wp[0], wp[1])
+				track.add_point (p)
+			
+			self.map.track_add (track)		
 
 
 	####################################
