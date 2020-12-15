@@ -33,13 +33,24 @@ class GribManagerWindow:
 		self.gribFilesStore = self.builder.get_object("grib-files-store")
 		self.gribManagerStore = self.builder.get_object("grib-manager-store")
 
+		self.updateLocalGribs()
+
+		Thread(target=self.downloadList, args=()).start()
+
+
+	def downloadList(self):
+		self.builder.get_object('download-progress').show()
+		self.builder.get_object('download-progress').set_fraction(50 / 100.)
+
 		try:
 			for x in self.gribManager.getDownloadList():
 				self.gribFilesStore.append(x)			
 		except:
 			print ('Failed to download grib file list')
+			self.builder.get_object('download-progress').set_text("Failed to download grib list")
 
-		self.updateLocalGribs()
+
+		self.builder.get_object('download-progress').hide()
 
 	def updateLocalGribs(self):
 		self.gribManager.refreshLocalGribs()
