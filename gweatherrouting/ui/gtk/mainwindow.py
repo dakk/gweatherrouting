@@ -26,12 +26,13 @@ gi.require_version('OsmGpsMap', '1.0')
 
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap, Gdk
 
+from ...core import utils
 from ... import log, session
 from .routingwizarddialog import RoutingWizardDialog
 from .settingswindow import SettingsWindow
 from .projectpropertieswindow import ProjectPropertiesWindow
 from .gribmanagerwindow import GribManagerWindow
-from .maplayers import GribMapLayer, IsochronesMapLayer, TrackMapLayer, POIMapLayer
+from .maplayers import GribMapLayer, IsochronesMapLayer, TrackMapLayer, POIMapLayer, AISMapLayer
 
 
 
@@ -171,7 +172,7 @@ class MainWindow:
 
 
 	def onTrackNameEdit(self, widget, i, name):
-		self.core.trackManager.tracks[int(i)].name = name
+		self.core.trackManager.tracks[int(i)].name = utils.uniqueName(name, self.core.trackManager.tracks)
 		self.updateTrack()
 		
 	def onTrackToggle(self, widget, i):
@@ -251,7 +252,7 @@ class MainWindow:
 		popover.show_all()
 
 	def onPOINameEdit(self, widget, i, name):
-		self.core.poiManager.pois[int(i)].name = name
+		self.core.poiManager.pois[int(i)].name = utils.uniqueName(name, self.core.poiManager.pois)
 		self.updatePOI()
 
 	def onSelectPOI (self, selection):

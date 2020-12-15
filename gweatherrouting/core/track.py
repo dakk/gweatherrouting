@@ -19,10 +19,13 @@ from . import utils
 
 class Track:
     def __init__ (self, name = 'track', waypoints = [], visible=True, trackManager=None):
-        self.name = name
         self.waypoints = waypoints
         self.visible = visible
         self.trackManager = trackManager
+        self.name = name
+        
+        if trackManager:
+            self.name = utils.uniqueName(name, trackManager.tracks)
 
     def __len__ (self):
         return len (self.waypoints)

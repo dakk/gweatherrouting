@@ -1,4 +1,5 @@
 from .track import Track 
+from .utils import uniqueName
 from ..session import *
 
 
@@ -38,7 +39,7 @@ class TrackManager(Sessionable):
 				return 
 
 	def create(self):
-		nt = Track(name=('track-%d' % (len(self.tracks) + 1)), trackManager=self)
+		nt = Track(name=uniqueName('track', self.tracks), trackManager=self)
 		nt.clear()
 		self.tracks.append (nt)
 		self.activeTrack = nt

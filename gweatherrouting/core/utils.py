@@ -35,7 +35,16 @@ def pointInCountry (lat, lon):
 	return False
 
 
-
+def uniqueName(name, collection):
+	names = []
+	for x in collection:
+		names.append(x.name)
+	if name in names:
+		for i in range(1,1000):
+			nname = name + '-' + str(i)
+			if not (nname in names):
+				return nname
+	return name
 
 EARTH_RADIUS=60.0*360/(2*math.pi)#nm
 

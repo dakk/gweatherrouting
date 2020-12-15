@@ -15,6 +15,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 from ..session import *
+from .utils import uniqueName
 
 defaultSession = {
 	'pois': []
@@ -53,6 +54,6 @@ class POIManager(Sessionable):
 
 
 	def create(self, position):
-		nt = POI(name=('poi-%d' % (len(self.pois) + 1)), position=position, poitype=POI_TYPE_DEFAULT)
+		nt = POI(name=uniqueName('poi', self.pois), position=position, poitype=POI_TYPE_DEFAULT)
 		self.pois.append (nt)
 		self.savePOI()

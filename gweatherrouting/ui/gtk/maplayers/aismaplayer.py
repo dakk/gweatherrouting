@@ -14,8 +14,29 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
-from .gribmaplayer import GribMapLayer
-from .isochronesmaplayer import IsochronesMapLayer
-from .trackmaplayer import TrackMapLayer
-from .poimaplayer import POIMapLayer
-from .aismaplayer import AISMapLayer
+import gi
+import colorsys
+import math
+
+gi.require_version('Gtk', '3.0')
+gi.require_version('OsmGpsMap', '1.0')
+
+from gi.repository import Gtk, Gio, GObject, OsmGpsMap
+
+class AISMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
+    def __init__ (self):
+        GObject.GObject.__init__ (self)
+
+    def do_draw (self, gpsmap, cr):
+        pass
+
+    def do_render (self, gpsmap):
+        pass
+
+    def do_busy (self):
+        return False
+
+    def do_button_press (self, gpsmap, gdkeventbutton):
+        return False
+
+GObject.type_register (AISMapLayer)
