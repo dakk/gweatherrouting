@@ -21,9 +21,7 @@ from .. import log
 from .track import Track
 from .routing import Routing
 from .boat import Boat
-from .grib import Grib
-from .gribmanager import GribManager
-from .trackmanager import TrackManager
+from . import GribManager, TrackManager, POIManager
 
 logger = logging.getLogger ('gweatherrouting')
 
@@ -31,7 +29,7 @@ class Core:
     def __init__ (self):
         self.trackManager = TrackManager()
         self.gribManager = GribManager()
-
+        self.poiManager = POIManager()
         self.trackManager.create()
 
         logger.debug ('Initialized')

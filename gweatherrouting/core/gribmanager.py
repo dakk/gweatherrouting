@@ -54,8 +54,8 @@ class GribManager(Sessionable):
 	def disable(self, name):
 		for x in self.gribs:
 			if x.name == name:
+				self.gribs.remove(x)
 				self.storeOpenedGribs()
-				return self.gribs.remove(x)
 
 	def isEnabled(self, name):
 		for x in self.gribs:

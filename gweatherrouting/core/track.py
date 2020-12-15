@@ -18,7 +18,7 @@ from xml.etree import ElementTree
 from . import utils
 
 class Track:
-    def __init__ (self, name = 'noname', waypoints = [], visible=True, trackManager=None):
+    def __init__ (self, name = 'track', waypoints = [], visible=True, trackManager=None):
         self.name = name
         self.waypoints = waypoints
         self.visible = visible

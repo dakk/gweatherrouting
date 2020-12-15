@@ -47,6 +47,27 @@ Riccardo Apolloni</property>
         <signal name="activate" handler="addTrackPoint" swapped="no"/>
       </object>
     </child>
+    <child>
+      <object class="GtkMenuItem">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Add POI</property>
+        <property name="use-underline">True</property>
+        <signal name="activate" handler="addPOI" swapped="no"/>
+      </object>
+    </child>
+  </object>
+  <object class="GtkListStore" id="poi-store">
+    <columns>
+      <!-- column-name name -->
+      <column type="gchararray"/>
+      <!-- column-name latitude -->
+      <column type="gfloat"/>
+      <!-- column-name longitude -->
+      <column type="gfloat"/>
+      <!-- column-name visible -->
+      <column type="gboolean"/>
+    </columns>
   </object>
   <object class="GtkMenu" id="settings-menu">
     <property name="visible">True</property>
@@ -380,6 +401,45 @@ Riccardo Apolloni</property>
                   </object>
                   <packing>
                     <property name="position">2</property>
+                    <property name="tab-fill">False</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkScrolledWindow">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="shadow-type">in</property>
+                    <child>
+                      <object class="GtkTreeView">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="model">poi-store</property>
+                        <child>
+                          <object class="GtkTreeViewColumn">
+                            <property name="title" translatable="yes">Name</property>
+                            <child>
+                              <object class="GtkCellRendererText"/>
+                              <attributes>
+                                <attribute name="text">0</attribute>
+                              </attributes>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="position">3</property>
+                  </packing>
+                </child>
+                <child type="tab">
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">POI</property>
+                  </object>
+                  <packing>
+                    <property name="position">3</property>
                     <property name="tab-fill">False</property>
                   </packing>
                 </child>

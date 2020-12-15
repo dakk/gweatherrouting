@@ -31,7 +31,7 @@ from .routingwizarddialog import RoutingWizardDialog
 from .settingswindow import SettingsWindow
 from .projectpropertieswindow import ProjectPropertiesWindow
 from .gribmanagerwindow import GribManagerWindow
-from .maplayers import GribMapLayer, IsochronesMapLayer, TrackMapLayer
+from .maplayers import GribMapLayer, IsochronesMapLayer, TrackMapLayer, POIMapLayer
 
 
 
@@ -62,6 +62,8 @@ class MainWindow:
 		self.map.layer_add (self.gribMapLayer)
 		self.trackMapLayer = TrackMapLayer(self.core.trackManager)
 		self.map.layer_add (self.trackMapLayer)
+		self.poiMapLayer = POIMapLayer(self.core.poiManager)
+		self.map.layer_add (self.poiMapLayer)
 		self.map.layer_add (OsmGpsMap.MapOsd (show_dpad=True, show_zoom=True, show_crosshair=False))
 
 		# self.map.gps_add(39,9,99)
@@ -238,6 +240,14 @@ class MainWindow:
 		popover = self.builder.get_object("track-add-point-popover")
 		popover.show_all()
 
+
+	def addPOI (self, widget):
+		lat = self.builder.get_object("track-add-point-lat").get_text ()
+		lon = self.builder.get_object("track-add-point-lon").get_text ()
+
+		if len (lat) > 1 and len (lon) > 1:
+			self.core.poiManager.create([float (lat), float (lon)])
+			self.map.queue_draw ()
 
 	def addTrackPoint (self, widget):
 		lat = self.builder.get_object("track-add-point-lat").get_text ()

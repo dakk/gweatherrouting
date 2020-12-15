@@ -38,7 +38,7 @@ class TrackManager(Sessionable):
 				return 
 
 	def create(self):
-		nt = Track(name=('noname-%d' % (len(self.tracks) + 1)), trackManager=self)
+		nt = Track(name=('track-%d' % (len(self.tracks) + 1)), trackManager=self)
 		nt.clear()
 		self.tracks.append (nt)
 		self.activeTrack = nt

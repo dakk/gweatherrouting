@@ -17,6 +17,8 @@ from .boat import Boat
 from .grib import Grib 
 from .polar import Polar
 from .track import Track
+from .trackmanager import TrackManager
 from .routing import listRoutingAlgorithms, Routing
 from .utils import DictCache
 from .gribmanager import GribManager
+from .poimanager import POI, POIManager
