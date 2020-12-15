@@ -30,7 +30,6 @@ class Core:
         self.trackManager = TrackManager()
         self.gribManager = GribManager()
         self.poiManager = POIManager()
-        self.trackManager.create()
 
         logger.debug ('Initialized')
 
