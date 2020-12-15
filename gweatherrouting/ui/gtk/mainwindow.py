@@ -42,6 +42,7 @@ class MainWindow:
 	def __init__(self, core):
 		self.play = False
 		self.selectedTrackItem = None
+		self.selectedPOI = None
 		self.core = core
 
 		self.builder = Gtk.Builder()
@@ -70,9 +71,11 @@ class MainWindow:
 
 		self.statusbar = self.builder.get_object("status-bar")
 		self.trackStore = self.builder.get_object("track-store")
+		self.poiStore = self.builder.get_object("poi-store")
 		self.trackListStore = self.builder.get_object("track-list-store")
 
 		self.updateTrack()
+		self.updatePOI()
 
 	####################################
 	## Routing
@@ -134,6 +137,8 @@ class MainWindow:
 				i += 1
 				self.trackStore.append([i, wp[0], wp[1]])
 
+		self.map.queue_draw()
+
 	def onTrackExport(self, widget):
 		dialog = Gtk.FileChooserDialog ("Please select a destination", self.window,
 					Gtk.FileChooserAction.SAVE,
@@ -163,6 +168,11 @@ class MainWindow:
 				edialog.destroy ()
 			
 		dialog.destroy ()
+
+
+	def onTrackNameEdit(self, widget, i, name):
+		self.core.trackManager.tracks[int(i)].name = name
+		self.updateTrack()
 		
 	def onTrackToggle(self, widget, i):
 		self.core.trackManager.tracks[int(i)].visible = not self.core.trackManager.tracks[int(i)].visible
@@ -240,6 +250,38 @@ class MainWindow:
 		popover = self.builder.get_object("track-add-point-popover")
 		popover.show_all()
 
+	def onPOINameEdit(self, widget, i, name):
+		self.core.poiManager.pois[int(i)].name = name
+		self.updatePOI()
+
+	def onSelectPOI (self, selection):
+		store, pathlist = selection.get_selected_rows()
+		for path in pathlist:
+			tree_iter = store.get_iter(path)
+			self.selectedPOI = store.get_value(tree_iter, 0)
+
+	def onPOIRemove(self, widget):
+		if self.selectedPOI != None:
+			self.core.poiManager.remove(self.core.poiManager.remove(self.selectedPOI))
+			self.updatePOI()
+
+	def onPOIToggle(self, widget, i):
+		self.core.poiManager.pois[int(i)].visible = not self.core.poiManager.pois[int(i)].visible
+		self.updatePOI()
+
+	def onPOIClick(self, item, event):
+		if event.button == 3 and len(self.core.poiManager.pois) > 0:
+			menu = self.builder.get_object("poi-menu")
+			menu.popup (None, None, None, None, event.button, event.time)
+
+
+	def updatePOI (self):
+		self.poiStore.clear()
+		for x in self.core.poiManager.pois:
+			self.poiStore.append([x.name, x.position[0], x.position[1], x.visible, x.type])
+		self.core.poiManager.savePOI()
+		self.map.queue_draw ()
+
 
 	def addPOI (self, widget):
 		lat = self.builder.get_object("track-add-point-lat").get_text ()
@@ -248,6 +290,7 @@ class MainWindow:
 		if len (lat) > 1 and len (lon) > 1:
 			self.core.poiManager.create([float (lat), float (lon)])
 			self.map.queue_draw ()
+			self.updatePOI()
 
 	def addTrackPoint (self, widget):
 		lat = self.builder.get_object("track-add-point-lat").get_text ()

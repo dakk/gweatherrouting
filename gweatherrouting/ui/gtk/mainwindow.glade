@@ -57,6 +57,19 @@ Riccardo Apolloni</property>
       </object>
     </child>
   </object>
+  <object class="GtkMenu" id="poi-menu">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <child>
+      <object class="GtkMenuItem">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Remove</property>
+        <property name="use-underline">True</property>
+        <signal name="activate" handler="onPOIRemove" swapped="no"/>
+      </object>
+    </child>
+  </object>
   <object class="GtkListStore" id="poi-store">
     <columns>
       <!-- column-name name -->
@@ -67,6 +80,8 @@ Riccardo Apolloni</property>
       <column type="gfloat"/>
       <!-- column-name visible -->
       <column type="gboolean"/>
+      <!-- column-name type -->
+      <column type="gint"/>
     </columns>
   </object>
   <object class="GtkMenu" id="settings-menu">
@@ -200,7 +215,7 @@ Riccardo Apolloni</property>
             <property name="can-focus">False</property>
             <child>
               <object class="GtkNotebook">
-                <property name="width-request">281</property>
+                <property name="width-request">373</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="scrollable">True</property>
@@ -323,7 +338,10 @@ Riccardo Apolloni</property>
                           <object class="GtkTreeViewColumn">
                             <property name="title" translatable="yes">Name</property>
                             <child>
-                              <object class="GtkCellRendererText"/>
+                              <object class="GtkCellRendererText">
+                                <property name="editable">True</property>
+                                <signal name="edited" handler="onTrackNameEdit" swapped="no"/>
+                              </object>
                               <attributes>
                                 <attribute name="text">0</attribute>
                               </attributes>
@@ -414,13 +432,68 @@ Riccardo Apolloni</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="model">poi-store</property>
+                        <signal name="button-press-event" handler="onPOIClick" swapped="no"/>
+                        <child internal-child="selection">
+                          <object class="GtkTreeSelection">
+                            <signal name="changed" handler="onSelectPOI" swapped="no"/>
+                          </object>
+                        </child>
                         <child>
                           <object class="GtkTreeViewColumn">
                             <property name="title" translatable="yes">Name</property>
                             <child>
-                              <object class="GtkCellRendererText"/>
+                              <object class="GtkCellRendererText">
+                                <property name="editable">True</property>
+                                <signal name="edited" handler="onPOINameEdit" swapped="no"/>
+                              </object>
                               <attributes>
                                 <attribute name="text">0</attribute>
+                              </attributes>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkTreeViewColumn">
+                            <property name="title" translatable="yes">Latitude</property>
+                            <child>
+                              <object class="GtkCellRendererText"/>
+                              <attributes>
+                                <attribute name="text">1</attribute>
+                              </attributes>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkTreeViewColumn">
+                            <property name="title" translatable="yes">Longitude</property>
+                            <child>
+                              <object class="GtkCellRendererText"/>
+                              <attributes>
+                                <attribute name="text">2</attribute>
+                              </attributes>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkTreeViewColumn">
+                            <property name="title" translatable="yes">Visible</property>
+                            <child>
+                              <object class="GtkCellRendererToggle">
+                                <signal name="toggled" handler="onPOIToggle" swapped="no"/>
+                              </object>
+                              <attributes>
+                                <attribute name="active">3</attribute>
+                              </attributes>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkTreeViewColumn">
+                            <property name="title" translatable="yes">Type</property>
+                            <child>
+                              <object class="GtkCellRendererText"/>
+                              <attributes>
+                                <attribute name="text">4</attribute>
                               </attributes>
                             </child>
                           </object>

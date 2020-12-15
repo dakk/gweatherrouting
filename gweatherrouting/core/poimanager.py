@@ -39,6 +39,11 @@ class POIManager(Sessionable):
 			self.pois.append(tr)
 
 
+	def remove(self, name):
+		for x in self.pois:
+			if x.name == name:
+				return self.pois.remove(x)
+
 	def savePOI(self):
 		ts = []
 		for x in self.pois:
