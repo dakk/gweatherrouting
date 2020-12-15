@@ -41,6 +41,7 @@ class MainWindow:
 		return MainWindow(core)
 
 	def __init__(self, core):
+		self.routingThread = None
 		self.play = False
 		self.selectedTrackItem = None
 		self.selectedPOI = None
@@ -51,7 +52,7 @@ class MainWindow:
 		self.builder.connect_signals(self)
 
 		self.window = self.builder.get_object("main-window")
-		self.window.connect("delete-event", Gtk.main_quit)
+		self.window.connect("delete-event", self.quit)
 		self.window.set_default_size (1024, 600)
 		self.window.show_all()
 		# self.window.maximize ()
@@ -78,6 +79,14 @@ class MainWindow:
 		self.updateTrack()
 		self.updatePOI()
 
+		Gdk.threads_init()
+
+
+	def quit(self, a, b):
+		if self.routingThread:
+			self.currentRouting.end = True
+		Gtk.main_quit()
+
 	####################################
 	## Routing
 
@@ -98,13 +107,16 @@ class MainWindow:
 		if response == Gtk.ResponseType.OK:
 			self.currentRouting = self.core.createRouting (dialog.getSelectedAlgorithm (), dialog.getSelectedBoat (), dialog.getInitialTime (), dialog.getSelectedTrack())
 			
-			Thread(target=self.onRoutingStep, args=()).start()
+			self.routingThread = Thread(target=self.onRoutingStep, args=())
+			self.routingThread.start()
 
 		dialog.destroy ()
 		
 	def onRoutingStep (self):
 		while not self.currentRouting.end:
 			res = self.currentRouting.step ()
+
+			Gdk.threads_enter()
 			self.isochronesMapLayer.setIsochrones (res['isochrones'])
 			self.gribMapLayer.time = res['time']
 			self.map.queue_draw ()
@@ -117,7 +129,8 @@ class MainWindow:
 				p.set_degrees (wp[0], wp[1])
 				track.add_point (p)
 			
-			self.map.track_add (track)		
+			self.map.track_add (track)	
+			Gdk.threads_leave()	
 
 
 	####################################

@@ -5,7 +5,7 @@ import json
 import math
 from threading import Thread
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gio, GObject
+from gi.repository import Gtk, Gio, GObject, Gdk
 
 from ... import session
 
@@ -39,18 +39,28 @@ class GribManagerWindow:
 
 
 	def downloadList(self):
+		Gdk.threads_enter()
+
 		self.builder.get_object('download-progress').show()
 		self.builder.get_object('download-progress').set_fraction(50 / 100.)
 
+		Gdk.threads_leave()
+
 		try:
 			for x in self.gribManager.getDownloadList():
-				self.gribFilesStore.append(x)			
+				Gdk.threads_enter()
+				self.gribFilesStore.append(x)	
+				Gdk.threads_leave()
+			Gdk.threads_enter()
 		except:
+			Gdk.threads_enter()
 			print ('Failed to download grib file list')
 			self.builder.get_object('download-progress').set_text("Failed to download grib list")
 
 
 		self.builder.get_object('download-progress').hide()
+		Gdk.threads_leave()
+
 
 	def updateLocalGribs(self):
 		self.gribManager.refreshLocalGribs()
