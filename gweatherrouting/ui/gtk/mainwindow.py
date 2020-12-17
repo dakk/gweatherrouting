@@ -26,7 +26,7 @@ gi.require_version('OsmGpsMap', '1.0')
 
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap, Gdk
 
-from ...core import utils
+from ...core import utils, RoutingTrack
 from ... import log, session
 from .routingwizarddialog import RoutingWizardDialog
 from .settingswindow import SettingsWindow
@@ -101,7 +101,7 @@ class MainWindow:
 			epop.show_all()
 			return
 
-		dialog = RoutingWizardDialog.create (self.core)
+		dialog = RoutingWizardDialog.create (self.core, self.window)
 		response = dialog.run ()
 
 		if response == Gtk.ResponseType.OK:
@@ -113,6 +113,8 @@ class MainWindow:
 		dialog.destroy ()
 		
 	def onRoutingStep (self):
+		res = None 
+
 		while not self.currentRouting.end:
 			res = self.currentRouting.step ()
 
@@ -121,17 +123,14 @@ class MainWindow:
 			self.gribMapLayer.time = res['time']
 			self.map.queue_draw ()
 			self.builder.get_object('time-adjustment').set_value (res['time'])
-
-			track = OsmGpsMap.MapTrack ()
-			track.set_property ("line-width", 5)
-			for wp in res['path']:
-				p = OsmGpsMap.MapPoint ()
-				p.set_degrees (wp[0], wp[1])
-				track.add_point (p)
-			
-			self.map.track_add (track)	
 			Gdk.threads_leave()	
 
+		tr = []
+		for wp in res['path']:
+			tr.append((wp[0], wp[1], wp[-1]))
+
+		self.core.trackManager.routings.append(RoutingTrack(waypoints=tr, trackManager=self.core.trackManager))
+		self.core.trackManager.saveTracks()
 
 	####################################
 	## Track handling

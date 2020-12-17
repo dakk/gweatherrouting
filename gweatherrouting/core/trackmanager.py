@@ -1,11 +1,12 @@
-from .track import Track 
+from .track import RoutingTrack, Track 
 from .utils import uniqueName
 from ..session import *
 
 
 defaultSession = {
 	'tracks': [],
-	'activeTrack': ''
+	'activeTrack': '',
+	'routings': []
 }
 
 class TrackManager(Sessionable):
@@ -13,11 +14,17 @@ class TrackManager(Sessionable):
 		Sessionable.__init__(self, 'track-manager', defaultSession)
 
 		self.tracks = []
+		self.routings = []
 		self.activeTrack = None
 
 		for x in self.getSessionVariable('tracks'):
 			tr = Track(name=x['name'], waypoints=x['waypoints'], visible=x['visible'], trackManager=self)
 			self.tracks.append(tr)
+
+		for x in self.getSessionVariable('routings'):
+			tr = RoutingTrack(name=x['name'], waypoints=x['waypoints'], visible=x['visible'], trackManager=self)
+			self.routings.append(tr)
+
 		self.activate(self.getSessionVariable('activeTrack'))
 
 	def saveTracks(self):
@@ -30,6 +37,13 @@ class TrackManager(Sessionable):
 			self.storeSessionVariable('activeTrack', self.activeTrack.name)
 		else:
 			self.storeSessionVariable('activeTrack', '')
+
+		ts = []
+		for x in self.routings:
+			ts.append({'name': x.name, 'waypoints': x.waypoints, 'visible': x.visible })
+
+		self.storeSessionVariable('routings', ts)
+
 
 	def activate(self, name):
 		for x in self.tracks:

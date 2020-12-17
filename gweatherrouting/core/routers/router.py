@@ -92,7 +92,7 @@ class Router:
 
 		isonew = sorted (isonew, key=(lambda a: a[3][1]))
 
-		print (len (isonew), len(newisopoints), time.time () - bt0)
+		# print (len (isonew), len(newisopoints), time.time () - bt0)
 
 		isocrone.append (isonew)
 
@@ -106,7 +106,6 @@ class Router:
 
 
 	def route (self, lastlog, t, start, end):
-
 		return {
 			'time': 0,
 			'path': [],

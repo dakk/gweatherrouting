@@ -33,6 +33,3 @@ def startUI ():
 
     MainWindow.create(core)
     Gtk.main()
-
-def stratCli ():
-    return 0

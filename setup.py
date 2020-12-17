@@ -46,7 +46,7 @@ setup(name='gweatherrouting',
 	entry_points={
 		'console_scripts': [
 			'gweatherrouting=gweatherrouting.main:startUI',
-			'gweatherrouting_cli=gweatherrouting.main:startCli'
+			# 'gweatherrouting_cli=gweatherrouting.main:startCli'
 		],
 	},
 	options=buildOptions,

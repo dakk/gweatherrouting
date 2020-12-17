@@ -48,6 +48,8 @@ class Routing:
 		logger.debug ('initialized (time: %f)' % (self.time))
 
 
+	def toTrack(self):
+		pass
 
 	def step (self):
 		self.steps += 1
@@ -81,6 +83,7 @@ class Routing:
 			'path': res['path'],
 			'isochrones': res['isochrones']
 		}
+
 
 		self.log.append (nlog)
 		return nlog
