@@ -24,8 +24,8 @@ from gi.repository import Gtk, Gio, GObject
 from ...core import Boat, listRoutingAlgorithms
 
 class RoutingWizardDialog:
-	def create(core):
-		return RoutingWizardDialog(core)
+	def create(core, parent):
+		return RoutingWizardDialog(core, parent)
 
 	def run(self):
 		return self.dialog.run()
@@ -74,7 +74,7 @@ class RoutingWizardDialog:
 		self.builder.get_object('boat-polar-area').queue_draw()
 		
 
-	def __init__(self, core):
+	def __init__(self, core, parent):
 		self.core = core
 		self.polar = None
 
@@ -86,6 +86,7 @@ class RoutingWizardDialog:
 		self.builder.connect_signals(self)
 
 		self.dialog = self.builder.get_object('routing-wizard-dialog')
+		self.dialog.set_transient_for(parent)
 		self.dialog.set_default_size (550, 300)
 
 		self.dialog.add_button("Cancel", Gtk.ResponseType.CANCEL)
@@ -110,7 +111,6 @@ class RoutingWizardDialog:
 
 
 		self.dialog.show_all ()
-		self.dialog.run()
 
 
 
