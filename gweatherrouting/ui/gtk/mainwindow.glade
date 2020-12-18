@@ -84,6 +84,24 @@ Riccardo Apolloni</property>
       <column type="gint"/>
     </columns>
   </object>
+  <object class="GtkTreeStore" id="routing-store">
+    <columns>
+      <!-- column-name name -->
+      <column type="gchararray"/>
+      <!-- column-name time -->
+      <column type="gfloat"/>
+      <!-- column-name latitude -->
+      <column type="gfloat"/>
+      <!-- column-name longitude -->
+      <column type="gfloat"/>
+      <!-- column-name twa -->
+      <column type="gfloat"/>
+      <!-- column-name tws -->
+      <column type="gfloat"/>
+      <!-- column-name vmg -->
+      <column type="gfloat"/>
+    </columns>
+  </object>
   <object class="GtkMenu" id="settings-menu">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
@@ -231,25 +249,28 @@ Riccardo Apolloni</property>
                         <property name="vscrollbar-policy">always</property>
                         <property name="shadow-type">in</property>
                         <child>
-                          <object class="GtkTreeView" id="track-list">
+                          <object class="GtkTreeView">
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
-                            <property name="model">track-store</property>
+                            <property name="model">track-list-store</property>
                             <property name="headers-clickable">False</property>
                             <property name="enable-search">False</property>
                             <property name="show-expanders">False</property>
                             <property name="enable-grid-lines">horizontal</property>
-                            <signal name="button-press-event" handler="onTrackItemClick" swapped="no"/>
+                            <signal name="button-press-event" handler="onTrackClick" swapped="no"/>
                             <child internal-child="selection">
                               <object class="GtkTreeSelection">
-                                <signal name="changed" handler="onSelectTrackItem" swapped="no"/>
+                                <signal name="changed" handler="onSelectTrack" swapped="no"/>
                               </object>
                             </child>
                             <child>
-                              <object class="GtkTreeViewColumn" id="#">
-                                <property name="title" translatable="yes"> #</property>
+                              <object class="GtkTreeViewColumn">
+                                <property name="title" translatable="yes">Name</property>
                                 <child>
-                                  <object class="GtkCellRendererText"/>
+                                  <object class="GtkCellRendererText">
+                                    <property name="editable">True</property>
+                                    <signal name="edited" handler="onTrackNameEdit" swapped="no"/>
+                                  </object>
                                   <attributes>
                                     <attribute name="text">0</attribute>
                                   </attributes>
@@ -257,8 +278,8 @@ Riccardo Apolloni</property>
                               </object>
                             </child>
                             <child>
-                              <object class="GtkTreeViewColumn" id="Latitude">
-                                <property name="title" translatable="yes">Latitude</property>
+                              <object class="GtkTreeViewColumn">
+                                <property name="title" translatable="yes">POI</property>
                                 <child>
                                   <object class="GtkCellRendererText"/>
                                   <attributes>
@@ -268,12 +289,25 @@ Riccardo Apolloni</property>
                               </object>
                             </child>
                             <child>
-                              <object class="GtkTreeViewColumn" id="Longitude">
-                                <property name="title" translatable="yes">Longitude</property>
+                              <object class="GtkTreeViewColumn">
+                                <property name="title" translatable="yes">Distance</property>
                                 <child>
                                   <object class="GtkCellRendererText"/>
                                   <attributes>
                                     <attribute name="text">2</attribute>
+                                  </attributes>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkTreeViewColumn">
+                                <property name="title" translatable="yes">Visible</property>
+                                <child>
+                                  <object class="GtkCellRendererToggle">
+                                    <signal name="toggled" handler="onTrackToggle" swapped="no"/>
+                                  </object>
+                                  <attributes>
+                                    <attribute name="active">3</attribute>
                                   </attributes>
                                 </child>
                               </object>
@@ -288,15 +322,90 @@ Riccardo Apolloni</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkButton" id="track-add-button">
-                        <property name="label" translatable="yes">Add Point</property>
+                      <object class="GtkBox">
                         <property name="visible">True</property>
-                        <property name="can-focus">True</property>
-                        <property name="receives-default">True</property>
-                        <signal name="clicked" handler="showTrackPointPopover" swapped="no"/>
+                        <property name="can-focus">False</property>
+                        <property name="orientation">vertical</property>
+                        <child>
+                          <object class="GtkScrolledWindow">
+                            <property name="visible">True</property>
+                            <property name="can-focus">True</property>
+                            <property name="vscrollbar-policy">always</property>
+                            <property name="shadow-type">in</property>
+                            <child>
+                              <object class="GtkTreeView" id="track-list">
+                                <property name="visible">True</property>
+                                <property name="can-focus">True</property>
+                                <property name="model">track-store</property>
+                                <property name="headers-clickable">False</property>
+                                <property name="enable-search">False</property>
+                                <property name="search-column">0</property>
+                                <property name="show-expanders">False</property>
+                                <property name="enable-grid-lines">horizontal</property>
+                                <signal name="button-press-event" handler="onTrackItemClick" swapped="no"/>
+                                <child internal-child="selection">
+                                  <object class="GtkTreeSelection">
+                                    <signal name="changed" handler="onSelectTrackItem" swapped="no"/>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkTreeViewColumn" id="#">
+                                    <property name="title" translatable="yes"> #</property>
+                                    <child>
+                                      <object class="GtkCellRendererText"/>
+                                      <attributes>
+                                        <attribute name="text">0</attribute>
+                                      </attributes>
+                                    </child>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkTreeViewColumn" id="Latitude">
+                                    <property name="title" translatable="yes">Latitude</property>
+                                    <child>
+                                      <object class="GtkCellRendererText"/>
+                                      <attributes>
+                                        <attribute name="text">1</attribute>
+                                      </attributes>
+                                    </child>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkTreeViewColumn" id="Longitude">
+                                    <property name="title" translatable="yes">Longitude</property>
+                                    <child>
+                                      <object class="GtkCellRendererText"/>
+                                      <attributes>
+                                        <attribute name="text">2</attribute>
+                                      </attributes>
+                                    </child>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="track-add-button">
+                            <property name="label" translatable="yes">Add Point</property>
+                            <property name="visible">True</property>
+                            <property name="can-focus">True</property>
+                            <property name="receives-default">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
                       </object>
                       <packing>
-                        <property name="expand">False</property>
+                        <property name="expand">True</property>
                         <property name="fill">True</property>
                         <property name="position">1</property>
                       </packing>
@@ -307,83 +416,96 @@ Riccardo Apolloni</property>
                   <object class="GtkLabel">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">Active Track</property>
+                    <property name="label" translatable="yes">Tracks</property>
                   </object>
                   <packing>
                     <property name="tab-fill">False</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkScrolledWindow">
+                  <object class="GtkBox">
                     <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="vscrollbar-policy">always</property>
-                    <property name="shadow-type">in</property>
+                    <property name="can-focus">False</property>
+                    <property name="orientation">vertical</property>
                     <child>
-                      <object class="GtkTreeView">
+                      <object class="GtkScrolledWindow">
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
-                        <property name="model">track-list-store</property>
-                        <property name="headers-clickable">False</property>
-                        <property name="enable-search">False</property>
-                        <property name="show-expanders">False</property>
-                        <property name="enable-grid-lines">horizontal</property>
-                        <signal name="button-press-event" handler="onTrackClick" swapped="no"/>
-                        <child internal-child="selection">
-                          <object class="GtkTreeSelection">
-                            <signal name="changed" handler="onSelectTrack" swapped="no"/>
-                          </object>
-                        </child>
+                        <property name="shadow-type">in</property>
                         <child>
-                          <object class="GtkTreeViewColumn">
-                            <property name="title" translatable="yes">Name</property>
+                          <object class="GtkTreeView">
+                            <property name="visible">True</property>
+                            <property name="can-focus">True</property>
+                            <property name="model">routing-store</property>
+                            <child internal-child="selection">
+                              <object class="GtkTreeSelection"/>
+                            </child>
                             <child>
-                              <object class="GtkCellRendererText">
-                                <property name="editable">True</property>
-                                <signal name="edited" handler="onTrackNameEdit" swapped="no"/>
+                              <object class="GtkTreeViewColumn">
+                                <property name="title" translatable="yes">Routing</property>
+                                <child>
+                                  <object class="GtkCellRendererText">
+                                    <property name="editable">True</property>
+                                    <signal name="edited" handler="onRoutingNameEdit" swapped="no"/>
+                                  </object>
+                                  <attributes>
+                                    <attribute name="text">0</attribute>
+                                  </attributes>
+                                </child>
                               </object>
-                              <attributes>
-                                <attribute name="text">0</attribute>
-                              </attributes>
                             </child>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkTreeViewColumn">
-                            <property name="title" translatable="yes">POI</property>
                             <child>
-                              <object class="GtkCellRendererText"/>
-                              <attributes>
-                                <attribute name="text">1</attribute>
-                              </attributes>
-                            </child>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkTreeViewColumn">
-                            <property name="title" translatable="yes">Distance</property>
-                            <child>
-                              <object class="GtkCellRendererText"/>
-                              <attributes>
-                                <attribute name="text">2</attribute>
-                              </attributes>
-                            </child>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkTreeViewColumn">
-                            <property name="title" translatable="yes">Visible</property>
-                            <child>
-                              <object class="GtkCellRendererToggle">
-                                <signal name="toggled" handler="onTrackToggle" swapped="no"/>
+                              <object class="GtkTreeViewColumn">
+                                <property name="title" translatable="yes">Time</property>
+                                <child>
+                                  <object class="GtkCellRendererText"/>
+                                  <attributes>
+                                    <attribute name="text">1</attribute>
+                                  </attributes>
+                                </child>
                               </object>
-                              <attributes>
-                                <attribute name="active">3</attribute>
-                              </attributes>
+                            </child>
+                            <child>
+                              <object class="GtkTreeViewColumn">
+                                <property name="title" translatable="yes">TWA</property>
+                                <child>
+                                  <object class="GtkCellRendererText"/>
+                                  <attributes>
+                                    <attribute name="text">4</attribute>
+                                  </attributes>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkTreeViewColumn">
+                                <property name="title" translatable="yes">TWS</property>
+                                <child>
+                                  <object class="GtkCellRendererText"/>
+                                  <attributes>
+                                    <attribute name="text">5</attribute>
+                                  </attributes>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkTreeViewColumn">
+                                <property name="title" translatable="yes">VMG</property>
+                                <child>
+                                  <object class="GtkCellRendererText"/>
+                                  <attributes>
+                                    <attribute name="text">6</attribute>
+                                  </attributes>
+                                </child>
+                              </object>
                             </child>
                           </object>
                         </child>
                       </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
                     </child>
                   </object>
                   <packing>
@@ -394,31 +516,10 @@ Riccardo Apolloni</property>
                   <object class="GtkLabel">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">Track List</property>
-                  </object>
-                  <packing>
-                    <property name="position">1</property>
-                    <property name="tab-fill">False</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">label</property>
-                  </object>
-                  <packing>
-                    <property name="position">2</property>
-                  </packing>
-                </child>
-                <child type="tab">
-                  <object class="GtkLabel">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
                     <property name="label" translatable="yes">Routings</property>
                   </object>
                   <packing>
-                    <property name="position">2</property>
+                    <property name="position">1</property>
                     <property name="tab-fill">False</property>
                   </packing>
                 </child>
@@ -502,17 +603,17 @@ Riccardo Apolloni</property>
                     </child>
                   </object>
                   <packing>
-                    <property name="position">3</property>
+                    <property name="position">2</property>
                   </packing>
                 </child>
                 <child type="tab">
                   <object class="GtkLabel">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">POI</property>
+                    <property name="label" translatable="yes">POIs</property>
                   </object>
                   <packing>
-                    <property name="position">3</property>
+                    <property name="position">2</property>
                     <property name="tab-fill">False</property>
                   </packing>
                 </child>

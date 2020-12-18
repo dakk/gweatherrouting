@@ -8,14 +8,18 @@ from gi.repository import Gtk, Gio, GObject, OsmGpsMap, Gdk
 
 from .routingwizarddialog import RoutingWizardDialog
 from .maplayers import IsochronesMapLayer
-from ...core import RoutingTrack
+from ...core import RoutingTrack, utils
 
 class MainWindowRouting:
 	routingThread = None
 
 	def __init__(self):
+		self.routingStore = self.builder.get_object("routing-store")
+
 		self.isochronesMapLayer = IsochronesMapLayer ()
 		self.map.layer_add (self.isochronesMapLayer)
+
+		self.updateRoutings()
 
 	def __del__(self): 
 		if self.routingThread:
@@ -62,4 +66,23 @@ class MainWindowRouting:
 
 		self.core.trackManager.routings.append(RoutingTrack(waypoints=tr, trackManager=self.core.trackManager))
 		self.core.trackManager.saveTracks()
+		self.updateRoutings()
 
+
+	def updateRoutings(self):
+		self.routingStore.clear()
+
+		for r in self.core.trackManager.routings:
+			riter = self.routingStore.append(None, [r.name, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+
+			for x in r.waypoints:
+				self.routingStore.append(riter, ['', 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+
+		self.map.queue_draw()
+
+
+
+	def onRoutingNameEdit(self, widget, i, name):
+		self.core.trackManager.routings[int(i)].name = utils.uniqueName(name, self.core.trackManager.routings)
+		self.updateRoutings()
+		

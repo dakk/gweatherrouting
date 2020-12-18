@@ -34,14 +34,13 @@ from .maplayers import GribMapLayer, AISMapLayer
 from .mainwindow_poi import MainWindowPOI
 from .mainwindow_track import MainWindowTrack
 from .mainwindow_routing import MainWindowRouting
+from .mainwindow_time import MainWindowTime
 
-
-class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting):
+class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTime):
 	def create (core):
 		return MainWindow(core)
 
 	def __init__(self, core):
-		self.play = False
 		self.core = core
 
 		self.builder = Gtk.Builder()
@@ -64,6 +63,7 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting):
 
 		self.statusbar = self.builder.get_object("status-bar")
 
+		MainWindowTime.__init__(self)
 		MainWindowRouting.__init__(self)
 		MainWindowTrack.__init__(self)
 		MainWindowPOI.__init__(self)
@@ -73,7 +73,6 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting):
 
 	def quit(self, a, b):
 		MainWindowRouting.__del__(self)
-
 		Gtk.main_quit()
 
 
@@ -89,17 +88,14 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting):
 		self.map.queue_draw ()
 
 
-	####################################
-	## File handling
-
 	def onNew (self, widget):
 		self.core.trackManager.create()
 		self.updateTrack ()
 		self.map.queue_draw ()
-		# self.builder.get_object('header-bar').set_subtitle ('unsaved')
 
 
 
+	# TODO: handle also grib import
 	def onImport (self, widget):
 		dialog = Gtk.FileChooserDialog ("Please choose a file", self.window,
 					Gtk.FileChooserAction.OPEN,
@@ -135,43 +131,6 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting):
 			dialog.destroy()
 
 
-
-	####################################
-	## Time controls
-
-	def onPlayClick(self, event):
-		self.play = True
-		GObject.timeout_add (10, self.onPlayStep)
-
-	def onPlayStep(self):
-		self.onFowardClick(None)
-		if self.play:
-			GObject.timeout_add (1000, self.onPlayStep)
-
-	def onStopClick(self, event):
-		self.play = False
-
-	def onFowardClick(self, event):
-		self.gribMapLayer.time += 1
-		self.map.queue_draw ()
-		self.updateTimeSlider()
-
-	def onBackwardClick(self, event):
-		if self.gribMapLayer.time > 0:
-			self.gribMapLayer.time -= 1
-			self.map.queue_draw ()
-			self.updateTimeSlider()
-
-	def updateTimeSlider(self):
-		self.builder.get_object('time-adjustment').set_value(int(self.gribMapLayer.time))
-
-	def onTimeSlide (self, widget):
-		self.gribMapLayer.time = int (self.builder.get_object('time-adjustment').get_value())
-		self.map.queue_draw ()
-
-
-	####################################
-	# Misc
 	def onAbout(self, item):
 		dialog = self.builder.get_object('about-dialog')
 		response = dialog.run ()
