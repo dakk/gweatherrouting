@@ -14,37 +14,34 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
+# TODO:
+# https://eeperry.wordpress.com/2013/01/05/pygtk-new-style-python-class-using-builder/
+
 import time
 import gi
-import gc
-import copy
-import math
-from threading import Thread
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('OsmGpsMap', '1.0')
 
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap, Gdk
 
-from ...core import utils, RoutingTrack
-from ... import log, session
-from .routingwizarddialog import RoutingWizardDialog
+from ... import log
 from .settingswindow import SettingsWindow
 from .projectpropertieswindow import ProjectPropertiesWindow
 from .gribmanagerwindow import GribManagerWindow
-from .maplayers import GribMapLayer, IsochronesMapLayer, TrackMapLayer, POIMapLayer, AISMapLayer
+from .maplayers import GribMapLayer, AISMapLayer
+
+from .mainwindow_poi import MainWindowPOI
+from .mainwindow_track import MainWindowTrack
+from .mainwindow_routing import MainWindowRouting
 
 
-
-class MainWindow:
+class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting):
 	def create (core):
 		return MainWindow(core)
 
 	def __init__(self, core):
-		self.routingThread = None
 		self.play = False
-		self.selectedTrackItem = None
-		self.selectedPOI = None
 		self.core = core
 
 		self.builder = Gtk.Builder()
@@ -59,191 +56,25 @@ class MainWindow:
 
 		self.map = self.builder.get_object("map")
 		self.map.set_center_and_zoom (39., 9., 6)
-		self.isochronesMapLayer = IsochronesMapLayer ()
-		self.map.layer_add (self.isochronesMapLayer)
 		self.gribMapLayer = GribMapLayer (self.core.gribManager)
 		self.map.layer_add (self.gribMapLayer)
-		self.trackMapLayer = TrackMapLayer(self.core.trackManager)
-		self.map.layer_add (self.trackMapLayer)
-		self.poiMapLayer = POIMapLayer(self.core.poiManager)
-		self.map.layer_add (self.poiMapLayer)
 		self.map.layer_add (OsmGpsMap.MapOsd (show_dpad=True, show_zoom=True, show_crosshair=False))
 
 		# self.map.gps_add(39,9,99)
 
 		self.statusbar = self.builder.get_object("status-bar")
-		self.trackStore = self.builder.get_object("track-store")
-		self.poiStore = self.builder.get_object("poi-store")
-		self.trackListStore = self.builder.get_object("track-list-store")
 
-		self.updateTrack()
-		self.updatePOI()
+		MainWindowRouting.__init__(self)
+		MainWindowTrack.__init__(self)
+		MainWindowPOI.__init__(self)
 
 		Gdk.threads_init()
 
 
 	def quit(self, a, b):
-		if self.routingThread:
-			self.currentRouting.end = True
+		MainWindowRouting.__del__(self)
+
 		Gtk.main_quit()
-
-	####################################
-	## Routing
-
-	def onRoutingCreate(self, event):
-		if not self.core.gribManager.hasGrib():
-			epop = self.builder.get_object('routing-nogrib-error-popover')
-			epop.show_all()
-			return
-
-		if len (self.core.trackManager.activeTrack) < 2:
-			epop = self.builder.get_object('routing-2points-error-popover')
-			epop.show_all()
-			return
-
-		dialog = RoutingWizardDialog.create (self.core, self.window)
-		response = dialog.run ()
-
-		if response == Gtk.ResponseType.OK:
-			self.currentRouting = self.core.createRouting (dialog.getSelectedAlgorithm (), dialog.getSelectedBoat (), dialog.getInitialTime (), dialog.getSelectedTrack())
-			
-			self.routingThread = Thread(target=self.onRoutingStep, args=())
-			self.routingThread.start()
-
-		dialog.destroy ()
-		
-	def onRoutingStep (self):
-		res = None 
-
-		while not self.currentRouting.end:
-			res = self.currentRouting.step ()
-
-			Gdk.threads_enter()
-			self.isochronesMapLayer.setIsochrones (res['isochrones'])
-			self.gribMapLayer.time = res['time']
-			self.map.queue_draw ()
-			self.builder.get_object('time-adjustment').set_value (res['time'])
-			Gdk.threads_leave()	
-
-		tr = []
-		for wp in res['path']:
-			tr.append((wp[0], wp[1], wp[-1]))
-
-		self.core.trackManager.routings.append(RoutingTrack(waypoints=tr, trackManager=self.core.trackManager))
-		self.core.trackManager.saveTracks()
-
-	####################################
-	## Track handling
-
-	def updateTrack (self, onlyActive = False):
-		if not onlyActive:
-			self.trackListStore.clear()
-			for x in self.core.trackManager.tracks:
-				self.trackListStore.append([x.name, x.size(), x.length(), x.visible])
-
-		self.trackStore.clear ()
-
-		if self.core.trackManager.activeTrack:
-			i = 0
-			for wp in self.core.trackManager.activeTrack:
-				i += 1
-				self.trackStore.append([i, wp[0], wp[1]])
-
-		self.map.queue_draw()
-
-	def onTrackExport(self, widget):
-		dialog = Gtk.FileChooserDialog ("Please select a destination", self.window,
-					Gtk.FileChooserAction.SAVE,
-					(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
-
-		filter_gpx = Gtk.FileFilter()
-		filter_gpx.set_name("GPX track")
-		filter_gpx.add_mime_type("application/gpx+xml")
-		filter_gpx.add_pattern ('*.gpx')
-		dialog.add_filter(filter_gpx)
-
-		response = dialog.run ()
-
-		if response == Gtk.ResponseType.OK:
-			filepath = dialog.get_filename ()
-			
-			if not filepath.endswith('.gpx'):
-				filepath += '.gpx'
-
-			if self.core.trackManager.activeTrack.export (filepath):
-				# self.builder.get_object('header-bar').set_subtitle (filepath)
-				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Saved %d waypoints' % (len (self.core.trackManager.activeTrack)))
-			else:
-				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
-				edialog.format_secondary_text ("Cannot save file: %s" % filepath)
-				edialog.run ()
-				edialog.destroy ()
-			
-		dialog.destroy ()
-
-
-	def onTrackNameEdit(self, widget, i, name):
-		self.core.trackManager.tracks[int(i)].name = utils.uniqueName(name, self.core.trackManager.tracks)
-		self.updateTrack()
-		
-	def onTrackToggle(self, widget, i):
-		self.core.trackManager.tracks[int(i)].visible = not self.core.trackManager.tracks[int(i)].visible
-		self.updateTrack()
-
-	def onTrackRemove(self, widget):
-		self.core.trackManager.remove(self.core.trackManager.activeTrack)
-		self.updateTrack()
-		self.map.queue_draw()
-
-	def onTrackClick(self, item, event):
-		if event.button == 3 and len(self.core.trackManager.tracks) > 0:
-			menu = self.builder.get_object("track-list-item-menu")
-			menu.popup (None, None, None, None, event.button, event.time)
-
-	def onTrackItemClick(self, item, event):
-		if event.button == 3 and self.core.trackManager.activeTrack.size() > 0:
-			menu = self.builder.get_object("track-item-menu")
-			menu.popup (None, None, None, None, event.button, event.time)
-
-	def onSelectTrack(self, selection):
-		store, pathlist = selection.get_selected_rows()
-		for path in pathlist:
-			tree_iter = store.get_iter(path)
-			name = store.get_value(tree_iter, 0)
-			self.core.trackManager.activate(name)
-			self.updateTrack(onlyActive=True)
-			self.map.queue_draw()
-
-	def onSelectTrackItem (self, selection):
-		store, pathlist = selection.get_selected_rows()
-		for path in pathlist:
-			tree_iter = store.get_iter(path)
-			value = store.get_value(tree_iter, 0)
-			self.selectedTrackItem = int(value) - 1
-
-	def onTrackItemMoveUp(self, widget):
-		if self.selectedTrackItem != None:
-			self.core.trackManager.activeTrack.moveUp(self.selectedTrackItem)
-			self.updateTrack()
-			self.map.queue_draw ()
-
-	def onTrackItemMoveDown(self, widget):
-		if self.selectedTrackItem != None:
-			self.core.trackManager.activeTrack.moveDown(self.selectedTrackItem)
-			self.updateTrack()
-			self.map.queue_draw ()
-
-	def onTrackItemRemove(self, widget):
-		if self.selectedTrackItem != None:
-			self.core.trackManager.activeTrack.remove(self.selectedTrackItem)
-			self.updateTrack()
-			self.map.queue_draw ()
-
-	def onTrackItemDuplicate(self, widget):
-		if self.selectedTrackItem != None:
-			self.core.trackManager.activeTrack.duplicate(self.selectedTrackItem)
-			self.updateTrack()
-			self.map.queue_draw ()	
 
 
 	def onMapClick(self, map, event):
@@ -256,70 +87,6 @@ class MainWindow:
 			menu = self.builder.get_object("map-context-menu")
 			menu.popup (None, None, None, None, event.button, event.time)
 		self.map.queue_draw ()
-
-
-	def showTrackPointPopover(self, event):
-		popover = self.builder.get_object("track-add-point-popover")
-		popover.show_all()
-
-	def onPOINameEdit(self, widget, i, name):
-		self.core.poiManager.pois[int(i)].name = utils.uniqueName(name, self.core.poiManager.pois)
-		self.updatePOI()
-
-	def onSelectPOI (self, selection):
-		store, pathlist = selection.get_selected_rows()
-		for path in pathlist:
-			tree_iter = store.get_iter(path)
-			self.selectedPOI = store.get_value(tree_iter, 0)
-
-	def onPOIRemove(self, widget):
-		if self.selectedPOI != None:
-			self.core.poiManager.remove(self.core.poiManager.remove(self.selectedPOI))
-			self.updatePOI()
-
-	def onPOIToggle(self, widget, i):
-		self.core.poiManager.pois[int(i)].visible = not self.core.poiManager.pois[int(i)].visible
-		self.updatePOI()
-
-	def onPOIClick(self, item, event):
-		if event.button == 3 and len(self.core.poiManager.pois) > 0:
-			menu = self.builder.get_object("poi-menu")
-			menu.popup (None, None, None, None, event.button, event.time)
-
-
-	def updatePOI (self):
-		self.poiStore.clear()
-		for x in self.core.poiManager.pois:
-			self.poiStore.append([x.name, x.position[0], x.position[1], x.visible, x.type])
-		self.core.poiManager.savePOI()
-		self.map.queue_draw ()
-
-
-	def addPOI (self, widget):
-		lat = self.builder.get_object("track-add-point-lat").get_text ()
-		lon = self.builder.get_object("track-add-point-lon").get_text ()
-
-		if len (lat) > 1 and len (lon) > 1:
-			self.core.poiManager.create([float (lat), float (lon)])
-			self.map.queue_draw ()
-			self.updatePOI()
-
-	def addTrackPoint (self, widget):
-		lat = self.builder.get_object("track-add-point-lat").get_text ()
-		lon = self.builder.get_object("track-add-point-lon").get_text ()
-
-		if len (lat) > 1 and len (lon) > 1:
-			if len(self.core.trackManager.tracks) == 0:
-				self.core.trackManager.create()
-
-			self.core.trackManager.activeTrack.add (float (lat), float (lon))
-			self.updateTrack ()
-
-			self.builder.get_object("track-add-point-lat").set_text ('')
-			self.builder.get_object("track-add-point-lon").set_text ('')
-			self.builder.get_object("track-add-point-popover").hide()
-		self.map.queue_draw ()
-
 
 
 	####################################
