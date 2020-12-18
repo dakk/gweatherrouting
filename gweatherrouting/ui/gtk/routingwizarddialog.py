@@ -109,7 +109,6 @@ class RoutingWizardDialog:
 			track_store.append ([r.name])
 		self.builder.get_object('track-select').set_active (0)
 
-
 		self.dialog.show_all ()
 
 
