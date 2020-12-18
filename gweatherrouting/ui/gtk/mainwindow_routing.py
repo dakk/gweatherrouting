@@ -65,7 +65,6 @@ class MainWindowRouting:
 			tr.append((wp[0], wp[1], wp[-1]))
 
 		self.core.trackManager.routings.append(RoutingTrack(waypoints=tr, trackManager=self.core.trackManager))
-		self.core.trackManager.saveTracks()
 		self.updateRoutings()
 
 
@@ -73,14 +72,18 @@ class MainWindowRouting:
 		self.routingStore.clear()
 
 		for r in self.core.trackManager.routings:
-			riter = self.routingStore.append(None, [r.name, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+			riter = self.routingStore.append(None, [r.name, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, r.visible, False, True])
 
 			for x in r.waypoints:
-				self.routingStore.append(riter, ['', 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+				self.routingStore.append(riter, ['', 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, False, True, False])
 
 		self.map.queue_draw()
+		self.core.trackManager.saveTracks()
 
-
+	def onRoutingToggle(self, widget, i):
+		self.core.trackManager.routings[int(i)].visible = not self.core.trackManager.routings[int(i)].visible
+		self.updateRoutings()
+		self.updateTrack()
 
 	def onRoutingNameEdit(self, widget, i, name):
 		self.core.trackManager.routings[int(i)].name = utils.uniqueName(name, self.core.trackManager.routings)

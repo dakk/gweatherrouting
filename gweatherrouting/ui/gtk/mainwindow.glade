@@ -100,6 +100,12 @@ Riccardo Apolloni</property>
       <column type="gfloat"/>
       <!-- column-name vmg -->
       <column type="gfloat"/>
+      <!-- column-name visible -->
+      <column type="gboolean"/>
+      <!-- column-name ischild -->
+      <column type="gboolean"/>
+      <!-- column-name isparent -->
+      <column type="gboolean"/>
     </columns>
   </object>
   <object class="GtkMenu" id="settings-menu">
@@ -460,6 +466,7 @@ Riccardo Apolloni</property>
                                 <child>
                                   <object class="GtkCellRendererText"/>
                                   <attributes>
+                                    <attribute name="visible">8</attribute>
                                     <attribute name="text">1</attribute>
                                   </attributes>
                                 </child>
@@ -471,6 +478,7 @@ Riccardo Apolloni</property>
                                 <child>
                                   <object class="GtkCellRendererText"/>
                                   <attributes>
+                                    <attribute name="visible">8</attribute>
                                     <attribute name="text">4</attribute>
                                   </attributes>
                                 </child>
@@ -482,6 +490,7 @@ Riccardo Apolloni</property>
                                 <child>
                                   <object class="GtkCellRendererText"/>
                                   <attributes>
+                                    <attribute name="visible">8</attribute>
                                     <attribute name="text">5</attribute>
                                   </attributes>
                                 </child>
@@ -493,7 +502,21 @@ Riccardo Apolloni</property>
                                 <child>
                                   <object class="GtkCellRendererText"/>
                                   <attributes>
+                                    <attribute name="visible">8</attribute>
                                     <attribute name="text">6</attribute>
+                                  </attributes>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkTreeViewColumn">
+                                <child>
+                                  <object class="GtkCellRendererToggle">
+                                    <signal name="toggled" handler="onRoutingToggle" swapped="no"/>
+                                  </object>
+                                  <attributes>
+                                    <attribute name="visible">9</attribute>
+                                    <attribute name="active">7</attribute>
                                   </attributes>
                                 </child>
                               </object>
