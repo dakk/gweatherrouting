@@ -30,14 +30,11 @@ class LinearBestIsoRouter (Router):
 			if utils.pointDistance (end[0],end[1], p[0], p[1]) < 10.0:
 				path.append (p)
 				for iso in isoc[::-1][1::]:
-					# print (path[-1][2], len (iso))
 					path.append (iso[path[-1][2]])
 
-				print (path)
 				path = path[::-1]
 				position = path[-1]
 				break
-
 
 		return {
 			'time': time + 1. / 60. * 60.,

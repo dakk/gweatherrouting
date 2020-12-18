@@ -25,51 +25,66 @@ this_dir, this_fn = os.path.split (__file__)
 COUNTRIES = json.load (open (this_dir + '/../data/countries.geojson', 'r'))
 COUNTRY_SHAPES = []
 
+def extractCoordinates(coord):
+	c = []
+	for x in coord:
+		if type(x[0]) == float:
+			return coord 
+		else:
+			for xx in extractCoordinates(x):
+				c.append(xx)
+	return c
+
 for feature in COUNTRIES['features']:
 	# Calculate bbox for every feature
-	c = feature["geometry"]["coordinates"][0]
-	c1 = [x[0] for x in c] 
-	c2 = [x[1] for x in c]
-	bbox = [[min(c1),min(c2)],[min(c1),max(c2)],[max(c1),max(c2)],[max(c1),min(c2)],[min(c1),min(c2)]]
-	feature['properties']['bbox'] = {'type': 'Polygon', 'coordinates': [bbox] }
+	c = extractCoordinates(feature["geometry"]["coordinates"])
+	c2 = [x[0] for x in c] 
+	c1 = [x[1] for x in c]
+
+	bbox = [[min(c1),min(c2)],[max(c1),max(c2)]]
+
+	feature['properties']['bbox'] = bbox
 
 	COUNTRY_SHAPES.append(feature)
 
 
-
-def bbox_inside(bbox1, bbox2):
-	if point_in_polygon({"type": "Point", "coordinates": [bbox1[0][0], bbox1[0][1]]}, {"type": "Polygon", "coordinates": [bbox2]}):
+def point_in_bbox(bbox, lat, lon):
+	if lat >= bbox[0][0] and lat <= bbox[1][0] and lon >= bbox[0][1] and lon <= bbox[1][1]:
 		return True
-	if point_in_polygon({"type": "Point", "coordinates": [bbox1[1][0], bbox1[1][1]]}, {"type": "Polygon", "coordinates": [bbox2]}):
-		return True
-	if point_in_polygon({"type": "Point", "coordinates": [bbox1[2][0], bbox1[2][1]]}, {"type": "Polygon", "coordinates": [bbox2]}):
-		return True
-	if point_in_polygon({"type": "Point", "coordinates": [bbox1[3][0], bbox1[3][1]]}, {"type": "Polygon", "coordinates": [bbox2]}):
-		return True
-
 	return False
 
-# Return a list of country geometry that intersecate a bbox
-def countriesInBBox(bbox):
-	ilist = []
 
-	for feature in COUNTRY_SHAPES:
-		if bbox_inside(bbox, feature['properties']['bbox'][0]):
-			ilist.append(feature)
-		elif bbox_inside(feature['properties']['bbox'][0], bbox):
-			ilist.append(feature)
+# def bbox_inside(bbox1, bbox2):
+# 	if point_in_polygon({"type": "Point", "coordinates": [bbox1[0][0], bbox1[0][1]]}, {"type": "Polygon", "coordinates": [bbox2]}):
+# 		return True
+# 	if point_in_polygon({"type": "Point", "coordinates": [bbox1[1][0], bbox1[1][1]]}, {"type": "Polygon", "coordinates": [bbox2]}):
+# 		return True
+# 	if point_in_polygon({"type": "Point", "coordinates": [bbox1[2][0], bbox1[2][1]]}, {"type": "Polygon", "coordinates": [bbox2]}):
+# 		return True
+# 	if point_in_polygon({"type": "Point", "coordinates": [bbox1[3][0], bbox1[3][1]]}, {"type": "Polygon", "coordinates": [bbox2]}):
+# 		return True
 
-	return ilist
+# 	return False
+
+# # Return a list of country geometry that intersecate a bbox
+# def countriesInBBox(bbox):
+# 	ilist = []
+
+# 	for feature in COUNTRY_SHAPES:
+# 		if bbox_inside(bbox, feature['properties']['bbox'][0]):
+# 			ilist.append(feature)
+# 		elif bbox_inside(feature['properties']['bbox'][0], bbox):
+# 			ilist.append(feature)
+
+# 	return ilist
 
 
 # Return true if the given point is inside a country
 def pointInCountry (lat, lon):
 	for feature in COUNTRY_SHAPES:
-		if not point_in_polygon({"type": "Point", "coordinates": [lon, lat]}, feature['properties']['bbox']):
-			return False 
-
-		if point_in_polygon({"type": "Point", "coordinates": [lon, lat]}, feature['geometry']):
-			return True
+		if point_in_bbox(feature['properties']['bbox'], lat, lon):
+			if point_in_polygon({"type": "Point", "coordinates": [lon, lat]}, feature['geometry']):
+				return True
 
 	return False
 

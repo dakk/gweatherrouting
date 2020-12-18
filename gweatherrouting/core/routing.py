@@ -67,6 +67,7 @@ class Routing:
 		else:
 			res = self.algorithm.route (None, self.time, self.position, nextwp)
 
+
 		#self.time += 0.2
 		progress = len (self.log) * 5
 		logger.debug ('step (time: %f, %f%% completed): %f %f' % (self.time, progress, self.position[0], self.position[1]))
@@ -83,7 +84,6 @@ class Routing:
 			'path': res['path'],
 			'isochrones': res['isochrones']
 		}
-
 
 		self.log.append (nlog)
 		return nlog

@@ -28,6 +28,8 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         GObject.GObject.__init__ (self)
         self.trackManager = trackManager
 
+    def draw_boat(self, pos, course, speed):
+        pass
 
     def do_draw (self, gpsmap, cr):
         for tr in self.trackManager.routings:

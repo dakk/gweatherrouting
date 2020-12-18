@@ -59,6 +59,14 @@ class TrackManager(Sessionable):
 		self.activeTrack = nt
 		self.saveTracks()
 
+
+	def removeRouting(self, routingName):
+		for x in self.routings:
+			if x.name == routingName:
+				self.routings.remove(x)
+				self.saveTracks()
+				return
+
 	def remove(self, track):
 		actTremove = False 
 

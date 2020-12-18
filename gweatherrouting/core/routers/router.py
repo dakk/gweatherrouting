@@ -47,28 +47,28 @@ class Router:
 		for i in range (0, len (last)):
 			p = last[i]
 
-			(TWD,TWS) = self.gribManager.getWindAt (t, p[0], p[1])
+			(twd,tws) = self.gribManager.getWindAt (t, p[0], p[1])
 
-			for TWA in range(-180,180,5):
-				TWA = math.radians(TWA)
-				brg = utils.reduce360(TWD+TWA)
+			for twa in range(-180,180,5):
+				twa = math.radians(twa)
+				brg = utils.reduce360(twd+twa)
 
-				Speed = self.polar.getRoutageSpeed (TWS, math.copysign (TWA,1))
-				ptoiso = utils.routagePointDistance (p[0], p[1], Speed*dt*1.85, brg)
+				speed = self.polar.getRoutageSpeed (tws, math.copysign (twa,1))
+				ptoiso = utils.routagePointDistance (p[0], p[1], speed*dt*1.85, brg)
 				
-				if utils.pointDistance (ptoiso[0], ptoiso[1], nextwp[0], nextwp[1]) >= utils.pointDistance (p[0], p[1], nextwp[0], nextwp[1]) - 10:
-					continue
+				if utils.pointDistance (ptoiso[0], ptoiso[1], nextwp[0], nextwp[1]) >= utils.pointDistance (p[0], p[1], nextwp[0], nextwp[1]):
+				 	continue
 				if utils.pointInCountry (ptoiso[0], ptoiso[1]):
 					continue
 				
-				newisopoints.append ((ptoiso[0], ptoiso[1], i))
+				newisopoints.append ((ptoiso[0], ptoiso[1], i, t, twd, tws, speed, math.degrees(brg)))
 
 
 		# sort newisopoints based on bearing
 		isonew = []
 		for i in range(0, len (newisopoints)):
 			try:
-				newisopoints[i] = (newisopoints[i][0], newisopoints[i][1], newisopoints[i][2], utils.lossodromic (isocrone[0][0][0],isocrone[0][0][1],newisopoints[i][0],newisopoints[i][1]))
+				newisopoints[i] = (newisopoints[i][0], newisopoints[i][1], newisopoints[i][2], utils.lossodromic (isocrone[0][0][0],isocrone[0][0][1],newisopoints[i][0],newisopoints[i][1]), newisopoints[i][3], newisopoints[i][4], newisopoints[i][5], newisopoints[i][6], newisopoints[i][7])
 				isonew.append (newisopoints[i])
 			except:
 				pass

@@ -84,6 +84,28 @@ Riccardo Apolloni</property>
       <column type="gint"/>
     </columns>
   </object>
+  <object class="GtkMenu" id="routing-item-menu">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <child>
+      <object class="GtkMenuItem">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Remove</property>
+        <property name="use-underline">True</property>
+        <signal name="activate" handler="onRoutingRemove" swapped="no"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Export GPX</property>
+        <property name="use-underline">True</property>
+        <signal name="activate" handler="onRoutingExport" swapped="no"/>
+      </object>
+    </child>
+  </object>
   <object class="GtkTreeStore" id="routing-store">
     <columns>
       <!-- column-name name -->
@@ -98,7 +120,9 @@ Riccardo Apolloni</property>
       <column type="gfloat"/>
       <!-- column-name tws -->
       <column type="gfloat"/>
-      <!-- column-name vmg -->
+      <!-- column-name speed -->
+      <column type="gfloat"/>
+      <!-- column-name bearing -->
       <column type="gfloat"/>
       <!-- column-name visible -->
       <column type="gboolean"/>
@@ -443,8 +467,12 @@ Riccardo Apolloni</property>
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="model">routing-store</property>
+                            <property name="level-indentation">1</property>
+                            <signal name="button-press-event" handler="onRoutingClick" swapped="no"/>
                             <child internal-child="selection">
-                              <object class="GtkTreeSelection"/>
+                              <object class="GtkTreeSelection">
+                                <signal name="changed" handler="onSelectRouting" swapped="no"/>
+                              </object>
                             </child>
                             <child>
                               <object class="GtkTreeViewColumn">
@@ -466,7 +494,7 @@ Riccardo Apolloni</property>
                                 <child>
                                   <object class="GtkCellRendererText"/>
                                   <attributes>
-                                    <attribute name="visible">8</attribute>
+                                    <attribute name="visible">9</attribute>
                                     <attribute name="text">1</attribute>
                                   </attributes>
                                 </child>
@@ -478,7 +506,7 @@ Riccardo Apolloni</property>
                                 <child>
                                   <object class="GtkCellRendererText"/>
                                   <attributes>
-                                    <attribute name="visible">8</attribute>
+                                    <attribute name="visible">9</attribute>
                                     <attribute name="text">4</attribute>
                                   </attributes>
                                 </child>
@@ -490,7 +518,7 @@ Riccardo Apolloni</property>
                                 <child>
                                   <object class="GtkCellRendererText"/>
                                   <attributes>
-                                    <attribute name="visible">8</attribute>
+                                    <attribute name="visible">9</attribute>
                                     <attribute name="text">5</attribute>
                                   </attributes>
                                 </child>
@@ -498,12 +526,24 @@ Riccardo Apolloni</property>
                             </child>
                             <child>
                               <object class="GtkTreeViewColumn">
-                                <property name="title" translatable="yes">VMG</property>
+                                <property name="title" translatable="yes">Speed</property>
                                 <child>
                                   <object class="GtkCellRendererText"/>
                                   <attributes>
-                                    <attribute name="visible">8</attribute>
+                                    <attribute name="visible">9</attribute>
                                     <attribute name="text">6</attribute>
+                                  </attributes>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkTreeViewColumn">
+                                <property name="title" translatable="yes">Bearing</property>
+                                <child>
+                                  <object class="GtkCellRendererText"/>
+                                  <attributes>
+                                    <attribute name="visible">9</attribute>
+                                    <attribute name="text">7</attribute>
                                   </attributes>
                                 </child>
                               </object>
@@ -515,8 +555,8 @@ Riccardo Apolloni</property>
                                     <signal name="toggled" handler="onRoutingToggle" swapped="no"/>
                                   </object>
                                   <attributes>
-                                    <attribute name="visible">9</attribute>
-                                    <attribute name="active">7</attribute>
+                                    <attribute name="visible">10</attribute>
+                                    <attribute name="active">8</attribute>
                                   </attributes>
                                 </child>
                               </object>

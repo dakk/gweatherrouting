@@ -12,6 +12,7 @@ from ...core import RoutingTrack, utils
 
 class MainWindowRouting:
 	routingThread = None
+	selectedRouting = None
 
 	def __init__(self):
 		self.routingStore = self.builder.get_object("routing-store")
@@ -62,9 +63,12 @@ class MainWindowRouting:
 
 		tr = []
 		for wp in res['path']:
-			tr.append((wp[0], wp[1], wp[-1]))
+			if len(wp) == 3:
+				tr.append((wp[0], wp[1], wp[2], 0, 0, 0, 0))
+			else:
+				tr.append((wp[0], wp[1], wp[4], wp[5], wp[6], wp[7], wp[8]))
 
-		self.core.trackManager.routings.append(RoutingTrack(waypoints=tr, trackManager=self.core.trackManager))
+		self.core.trackManager.routings.append(RoutingTrack(name=utils.uniqueName('routing', self.core.trackManager.routings), waypoints=tr, trackManager=self.core.trackManager))
 		self.updateRoutings()
 
 
@@ -72,10 +76,10 @@ class MainWindowRouting:
 		self.routingStore.clear()
 
 		for r in self.core.trackManager.routings:
-			riter = self.routingStore.append(None, [r.name, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, r.visible, False, True])
+			riter = self.routingStore.append(None, [r.name, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, r.visible, False, True])
 
 			for x in r.waypoints:
-				self.routingStore.append(riter, ['', 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, False, True, False])
+				self.routingStore.append(riter, ['', x[2], x[0], x[1], x[3], x[4], x[5], x[6], False, True, False])
 
 		self.map.queue_draw()
 		self.core.trackManager.saveTracks()
@@ -89,3 +93,26 @@ class MainWindowRouting:
 		self.core.trackManager.routings[int(i)].name = utils.uniqueName(name, self.core.trackManager.routings)
 		self.updateRoutings()
 		
+
+	def onRoutingRemove(self, widget):
+		self.core.trackManager.removeRouting(self.selectedRouting)
+		self.updateRoutings()
+		self.map.queue_draw()
+
+	def onRoutingExport(self, widget):
+		pass
+
+	def onSelectRouting (self, selection):
+		store, pathlist = selection.get_selected_rows()
+		for path in pathlist:
+			tree_iter = store.get_iter(path)
+			value = store.get_value(tree_iter, 0)
+			if path.get_depth() == 1:
+				self.selectedRouting = value
+			else:
+				self.selectedRouting = None
+
+	def onRoutingClick(self, item, event):		
+		if self.selectedRouting != None and event.button == 3 and len(self.core.trackManager.routings) > 0:
+			menu = self.builder.get_object("routing-item-menu")
+			menu.popup (None, None, None, None, event.button, event.time)
