@@ -4,20 +4,17 @@ import time
 from threading import Thread
 import serial.tools.list_ports
 from . import SerialDataSource
+from ..core import EventDispatcher
 
 logger = logging.getLogger ('gweatherrouting')
 
-class ConnManager:
+class ConnManager(EventDispatcher):
     def __init__(self):
         self.running = True
         self.sources = {}
-        self.messageHandlers = []
 
     def __del__(self):
         self.running = False
-
-    def registerHandler(self, handler):
-        self.messageHandlers.append(handler)
 
     def plugAll(self):
         for x in serial.tools.list_ports.comports():
@@ -42,8 +39,7 @@ class ConnManager:
                 todel.append(x)
 
         if len(dd) > 0:
-            for x in self.messageHandlers:
-                x(dd)
+            self.dispatch('data', dd)
 
         if len(todel) > 0:
             for x in todel:

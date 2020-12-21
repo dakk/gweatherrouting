@@ -181,3 +181,23 @@ class DictCache(dict):
 		self.entries.remove(key)
 
 	
+
+class EventDispatcher:
+	handlers = {}
+
+	def connect(self, evt, f):
+		if not (evt in self.handlers):
+			self.handlers[evt] = []
+		self.handlers[evt].append(f)
+
+	def disconnect(self, evt, f):
+		self.handlers[evt].remove(f)
+
+	def dispatch(self, evt, e):
+		if not (evt in self.handlers):
+			return 
+			
+		for x in self.handlers[evt]:
+			x(e)
+
+	

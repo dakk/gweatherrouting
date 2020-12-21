@@ -21,7 +21,7 @@ from .. import log
 from .track import Track
 from .routing import Routing
 from .boat import Boat
-from . import GribManager, TrackManager, POIManager
+from . import GribManager, TrackManager, POIManager, EventDispatcher
 
 logger = logging.getLogger ('gweatherrouting')
 
@@ -31,7 +31,7 @@ class BoatInfo:
     sog = 0.0
     cog = 0.0
 
-class Core:
+class Core(EventDispatcher):
     def __init__ (self, conn):
         self.conn = conn
         self.trackManager = TrackManager()
@@ -39,8 +39,7 @@ class Core:
         self.poiManager = POIManager()
         self.boatInfo = BoatInfo()
 
-        self.conn.registerHandler(self.dataHandler)
-        self.boatInfoHandler = None
+        self.conn.connect('data', self.dataHandler)
 
         logger.info ('Initialized')
 
@@ -50,8 +49,7 @@ class Core:
                 self.boatInfo.latitude = x.latitude
                 self.boatInfo.longitude = x.longitude
 
-                if self.boatInfoHandler:
-                    self.boatInfoHandler(self.boatInfo)
+                self.dispatch('boatPosition', self.boatInfo)
             except:
                 pass
 

@@ -73,7 +73,7 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 
 		Gdk.threads_init()
 
-		self.core.boatInfoHandler = self.boatInfoHandler
+		self.core.connect('boatPosition', self.boatInfoHandler)
 
 
 	def boatInfoHandler(self, bi):

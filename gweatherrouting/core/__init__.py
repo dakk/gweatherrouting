@@ -20,7 +20,7 @@ from .polar import Polar
 from .track import Track, RoutingTrack
 from .trackmanager import TrackManager
 from .routing import listRoutingAlgorithms, Routing
-from .utils import DictCache
+from .utils import DictCache, EventDispatcher
 from .gribmanager import GribManager
 from .poimanager import POI, POIManager
 from .core import Core

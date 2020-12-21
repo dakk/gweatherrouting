@@ -27,11 +27,11 @@ class Beizer:
 
     def value (self, t):
         #rende il punto della curva di bezier di parametro t
-        n=len(self.points)-1
-        x=0
-        y=0
-        for k in range(0,n+1):
-            weight = ((1-t)**(n-k))*(t**k)*cfbinomiale(n,k)
+        n = len(self.points) - 1
+        x = 0
+        y = 0
+        for k in range(0, n+1):
+            weight = ((1 - t) ** (n - k)) * (t ** k) * cfbinomiale(n, k)
             x += self.points[k][0] * weight
             y += self.points[k][1] * weight
-        return (x,y)
+        return (x, y)
