@@ -64,8 +64,6 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 		self.map.layer_add (self.gribMapLayer)
 		self.map.layer_add (OsmGpsMap.MapOsd (show_dpad=True, show_zoom=True, show_crosshair=False))
 
-		# self.map.gps_add(39,9,99)
-
 		self.statusbar = self.builder.get_object("status-bar")
 
 		MainWindowTime.__init__(self)
@@ -75,6 +73,12 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 
 		Gdk.threads_init()
 
+		self.core.boatInfoHandler = self.boatInfoHandler
+
+
+	def boatInfoHandler(self, bi):
+		self.map_gps_add(bi.latitude, bi.longitude, 0.0)
+		self.map.queue_draw ()
 
 	def quit(self, a, b):
 		logger.info("Quitting...")

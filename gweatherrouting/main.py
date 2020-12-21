@@ -34,7 +34,7 @@ def startUI ():
     conn = ConnManager()
     conn.startPolling()
 
-    core = Core()
+    core = Core(conn)
 
     MainWindow.create(core, conn)
     Gtk.main()

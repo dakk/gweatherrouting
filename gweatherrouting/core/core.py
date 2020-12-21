@@ -25,14 +25,35 @@ from . import GribManager, TrackManager, POIManager
 
 logger = logging.getLogger ('gweatherrouting')
 
+class BoatInfo:
+    latitude = 0.0
+    longitude = 0.0
+    sog = 0.0
+    cog = 0.0
+
 class Core:
-    def __init__ (self):
+    def __init__ (self, conn):
+        self.conn = conn
         self.trackManager = TrackManager()
         self.gribManager = GribManager()
         self.poiManager = POIManager()
+        self.boatInfo = BoatInfo()
+
+        self.conn.registerHandler(self.dataHandler)
+        self.boatInfoHandler = None
 
         logger.info ('Initialized')
 
+    def dataHandler(self, dps):
+        for x in dps:
+            try:
+                self.boatInfo.latitude = x.latitude
+                self.boatInfo.longitude = x.longitude
+
+                if self.boatInfoHandler:
+                    self.boatInfoHandler(self.boatInfo)
+            except:
+                pass
 
     # Simulation
     def createRouting (self, algorithm, boatModel, initialTime, track):

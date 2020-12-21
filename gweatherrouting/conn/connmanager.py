@@ -16,6 +16,9 @@ class ConnManager:
     def __del__(self):
         self.running = False
 
+    def registerHandler(self, handler):
+        self.messageHandlers.append(handler)
+
     def plugAll(self):
         for x in serial.tools.list_ports.comports():
             try:
