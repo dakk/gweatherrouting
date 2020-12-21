@@ -7,3 +7,5 @@ geojson_utils
 bs4
 vext
 vext.gi
+pyserial
+pynmea2

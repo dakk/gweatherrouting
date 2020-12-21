@@ -26,6 +26,8 @@ gi.require_version('OsmGpsMap', '1.0')
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap, Gdk
 
 from ... import log
+import logging
+
 from .settingswindow import SettingsWindow
 from .projectpropertieswindow import ProjectPropertiesWindow
 from .gribmanagerwindow import GribManagerWindow
@@ -36,12 +38,15 @@ from .mainwindow_track import MainWindowTrack
 from .mainwindow_routing import MainWindowRouting
 from .mainwindow_time import MainWindowTime
 
-class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTime):
-	def create (core):
-		return MainWindow(core)
+logger = logging.getLogger ('gweatherrouting')
 
-	def __init__(self, core):
+class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTime):
+	def create (core, conn):
+		return MainWindow(core, conn)
+
+	def __init__(self, core, conn):
 		self.core = core
+		self.conn = conn
 
 		self.builder = Gtk.Builder()
 		self.builder.add_from_file("./gweatherrouting/ui/gtk/mainwindow.glade")
@@ -72,6 +77,8 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 
 
 	def quit(self, a, b):
+		logger.info("Quitting...")
+		self.conn.__del__()
 		MainWindowRouting.__del__(self)
 		Gtk.main_quit()
 

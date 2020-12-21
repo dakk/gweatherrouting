@@ -31,7 +31,7 @@ class Core:
         self.gribManager = GribManager()
         self.poiManager = POIManager()
 
-        logger.debug ('Initialized')
+        logger.info ('Initialized')
 
 
     # Simulation

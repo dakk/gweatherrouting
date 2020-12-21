@@ -13,6 +13,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
+
 from .boat import Boat
 from .grib import Grib 
 from .polar import Polar
@@ -22,3 +23,4 @@ from .routing import listRoutingAlgorithms, Routing
 from .utils import DictCache
 from .gribmanager import GribManager
 from .poimanager import POI, POIManager
+from .core import Core

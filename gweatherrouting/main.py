@@ -17,7 +17,8 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import logging
 from . import log
 from .session import Config
-from .core.core import Core
+from .core import Core
+from .conn import ConnManager
 
 
 logger = logging.getLogger ('gweatherrouting')
@@ -29,7 +30,11 @@ def startUI ():
     from .ui.gtk.mainwindow import MainWindow
 
     conf = Config.load('config')
+
+    conn = ConnManager()
+    conn.startPolling()
+
     core = Core()
 
-    MainWindow.create(core)
+    MainWindow.create(core, conn)
     Gtk.main()
