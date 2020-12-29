@@ -75,6 +75,18 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 
 		self.core.connect('boatPosition', self.boatInfoHandler)
 
+		# https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/#Z/#Y/#X
+		# https://a.basemaps.cartocdn.com/dark_all/#Z/#X/#Y.png
+
+		# var CartoDB_DarkMatter = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+		# 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+		# 	subdomains: 'abcd',
+		# 	maxZoom: 19
+		# });
+		# var OpenSeaMap = L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
+		# 	attribution: 'Map data: &copy; <a href="http://www.openseamap.org">OpenSeaMap</a> contributors'
+		# });
+
 
 	def boatInfoHandler(self, bi):
 		self.map_gps_add(bi.latitude, bi.longitude, 0.0)

@@ -28,8 +28,8 @@ logger = logging.getLogger ('gweatherrouting')
 class BoatInfo:
     latitude = 0.0
     longitude = 0.0
-    sog = 0.0
-    cog = 0.0
+    speed = 0.0
+    heading = 0.0
 
 class Core(EventDispatcher):
     def __init__ (self, conn):
