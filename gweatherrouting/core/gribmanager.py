@@ -3,6 +3,7 @@ import json
 import bz2
 import os
 import requests
+from shutil import copyfile
 from ..session import *
 from bs4 import BeautifulSoup
 
@@ -115,6 +116,16 @@ class GribManager(Sessionable):
 
 		return self.gribFiles
 
+	def importGrib(self, path):
+		try:
+			name = path.split('/')[-1]
+			logger.info ('Importing grib %s' % path)
+			copyfile(path, GRIB_DIR + '/' + name)
+			self.load (GRIB_DIR + '/' + name)
+			self.enable (name)
+			return True
+		except:
+			return False
 
 	def download (self, uri, percentageCallback, callback):
 		name = uri.split('/')[-1]

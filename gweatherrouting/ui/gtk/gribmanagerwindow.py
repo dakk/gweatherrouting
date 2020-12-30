@@ -9,6 +9,15 @@ from gi.repository import Gtk, Gio, GObject, Gdk
 
 from ... import session
 
+GribFileFilter = Gtk.FileFilter ()
+GribFileFilter.set_name ("Grib file")
+GribFileFilter.add_mime_type ("application/grib")
+GribFileFilter.add_mime_type ("application/x-grib2")
+GribFileFilter.add_pattern ('*.grib')
+GribFileFilter.add_pattern ('*.grib2')
+GribFileFilter.add_pattern ('*.grb')
+GribFileFilter.add_pattern ('*.grb2')
+
 class GribManagerWindow:
 	def create(gribManager):
 		return GribManagerWindow(gribManager)
@@ -75,7 +84,32 @@ class GribManagerWindow:
 
 
 	def onOpen(self, widget):
-		pass
+		dialog = Gtk.FileChooserDialog ("Please choose a file", self.window,
+					Gtk.FileChooserAction.OPEN,
+					(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+
+		dialog.add_filter (GribFileFilter)
+
+		response = dialog.run()
+		
+		if response == Gtk.ResponseType.OK:
+			filepath = dialog.get_filename ()
+			dialog.destroy ()
+
+			if self.gribManager.importGrib(filepath):
+				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done")
+				edialog.format_secondary_text ("File opened, loaded grib")
+				edialog.run ()
+				edialog.destroy ()	
+				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Loaded grib %s' % (filepath))					
+
+			else:
+				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
+				edialog.format_secondary_text ("Cannot open grib file: %s" % filepath)
+				edialog.run ()
+				edialog.destroy ()
+		else:
+			dialog.destroy()
 
 	def onGribToggle(self, widget, i):
 		n = self.gribManager.localGribs[int(i)].name

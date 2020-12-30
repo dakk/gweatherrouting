@@ -30,7 +30,7 @@ import logging
 
 from .settingswindow import SettingsWindow
 from .projectpropertieswindow import ProjectPropertiesWindow
-from .gribmanagerwindow import GribManagerWindow
+from .gribmanagerwindow import GribManagerWindow, GribFileFilter
 from .maplayers import GribMapLayer, AISMapLayer
 
 from .mainwindow_poi import MainWindowPOI
@@ -124,11 +124,13 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 					Gtk.FileChooserAction.OPEN,
 					(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
 			
-		filter_gpx = Gtk.FileFilter ()
+		filter_gpx = Gtk.FileFilter ()		
 		filter_gpx.set_name ("GPX track")
 		filter_gpx.add_mime_type ("application/gpx+xml")
 		filter_gpx.add_pattern ('*.gpx')
 		dialog.add_filter (filter_gpx)
+
+		dialog.add_filter (GribFileFilter)
 
 		response = dialog.run()
 		
@@ -136,20 +138,44 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 			filepath = dialog.get_filename ()
 			dialog.destroy ()
 
-			if self.core.trackManager.importTrack (filepath):
-				# self.builder.get_object('header-bar').set_subtitle (filepath)
-				self.updateTrack ()
-				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done")
-				edialog.format_secondary_text ("File opened, loaded %d waypoints" % len (self.core.trackManager.activeTrack))
-				edialog.run ()
-				edialog.destroy ()	
-				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Loaded %s with %d waypoints' % (filepath, len (self.core.trackManager.activeTrack)))					
-				
+			extension = filepath.split('.')[-1]
+
+			if extension in ['gpx']:
+				if self.core.trackManager.importTrack (filepath):
+					# self.builder.get_object('header-bar').set_subtitle (filepath)
+					self.updateTrack ()
+					edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done")
+					edialog.format_secondary_text ("File opened, loaded %d waypoints" % len (self.core.trackManager.activeTrack))
+					edialog.run ()
+					edialog.destroy ()	
+					self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Loaded %s with %d waypoints' % (filepath, len (self.core.trackManager.activeTrack)))					
+					
+				else:
+					edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
+					edialog.format_secondary_text ("Cannot open file: %s" % filepath)
+					edialog.run ()
+					edialog.destroy ()
+
+			elif extension in ['grb', 'grb2', 'grib']:
+				if self.core.gribManager.importGrib(filepath):
+					edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done")
+					edialog.format_secondary_text ("File opened, loaded grib")
+					edialog.run ()
+					edialog.destroy ()	
+					self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Loaded grib %s' % (filepath))					
+
+				else:
+					edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
+					edialog.format_secondary_text ("Cannot open grib file: %s" % filepath)
+					edialog.run ()
+					edialog.destroy ()
+
 			else:
 				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
-				edialog.format_secondary_text ("Cannot open file: %s" % filepath)
+				edialog.format_secondary_text ("Unrecognize file format: %s" % filepath)
 				edialog.run ()
 				edialog.destroy ()
+
 		else:
 			dialog.destroy()
 

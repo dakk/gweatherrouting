@@ -866,6 +866,7 @@ Riccardo Apolloni</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
             <property name="tooltip-text" translatable="yes">Import a track or a Grib</property>
+            <property name="margin-end">3</property>
             <signal name="clicked" handler="onImport" swapped="no"/>
           </object>
         </child>
@@ -875,6 +876,7 @@ Riccardo Apolloni</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
             <property name="tooltip-text" translatable="yes">New track</property>
+            <property name="margin-end">3</property>
             <signal name="clicked" handler="onNew" swapped="no"/>
             <child>
               <object class="GtkImage">
@@ -932,6 +934,7 @@ Riccardo Apolloni</property>
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
+            <property name="margin-end">3</property>
             <signal name="clicked" handler="onProjectProperties" swapped="no"/>
             <child>
               <object class="GtkImage">
@@ -952,6 +955,7 @@ Riccardo Apolloni</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
             <property name="tooltip-text" translatable="yes">Grib Manager</property>
+            <property name="margin-end">3</property>
             <signal name="clicked" handler="onGribManager" swapped="no"/>
             <child>
               <object class="GtkImage">
