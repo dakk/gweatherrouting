@@ -58,8 +58,12 @@ class MainWindowTrack:
 			if self.core.trackManager.activeTrack.export (filepath):
 				# self.builder.get_object('header-bar').set_subtitle (filepath)
 				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Saved %d waypoints' % (len (self.core.trackManager.activeTrack)))
+				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Saved")
+				edialog.format_secondary_text ('Saved %d waypoints' % (len (self.core.trackManager.activeTrack)))
+				edialog.run ()
+				edialog.destroy ()
 			else:
-				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
+				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
 				edialog.format_secondary_text ("Cannot save file: %s" % filepath)
 				edialog.run ()
 				edialog.destroy ()

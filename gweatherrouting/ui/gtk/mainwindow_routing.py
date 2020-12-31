@@ -100,7 +100,39 @@ class MainWindowRouting:
 		self.map.queue_draw()
 
 	def onRoutingExport(self, widget):
-		pass
+		routing = self.core.trackManager.getRouting(self.selectedRouting)
+
+		dialog = Gtk.FileChooserDialog ("Please select a destination", self.window,
+			Gtk.FileChooserAction.SAVE,
+			(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+
+		filter_gpx = Gtk.FileFilter()
+		filter_gpx.set_name("GPX track")
+		filter_gpx.add_mime_type("application/gpx+xml")
+		filter_gpx.add_pattern ('*.gpx')
+		dialog.add_filter(filter_gpx)
+
+		response = dialog.run ()
+
+		if response == Gtk.ResponseType.OK:
+			filepath = dialog.get_filename ()
+			
+			if not filepath.endswith('.gpx'):
+				filepath += '.gpx'
+
+			if routing.export (filepath):
+				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Saved %d waypoints' % (len (routing)))
+				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Saved")
+				edialog.format_secondary_text ('Saved %d waypoints' % (len (routing)))
+				edialog.run ()
+				edialog.destroy ()
+			else:
+				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
+				edialog.format_secondary_text ("Cannot save file: %s" % filepath)
+				edialog.run ()
+				edialog.destroy ()
+			
+		dialog.destroy ()
 
 	def onSelectRouting (self, selection):
 		store, pathlist = selection.get_selected_rows()

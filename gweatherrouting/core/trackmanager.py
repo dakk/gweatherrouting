@@ -14,10 +14,10 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
-from xml.etree import ElementTree
 from .track import RoutingTrack, Track 
 from .utils import uniqueName
 from ..session import *
+import gpxpy
 
 
 defaultSession = {
@@ -76,6 +76,11 @@ class TrackManager(Sessionable):
 		self.activeTrack = nt
 		self.saveTracks()
 
+	def getRouting(self, routingName):
+		for x in self.routings:
+			if x.name == routingName:
+				return x
+
 
 	def removeRouting(self, routingName):
 		for x in self.routings:
@@ -99,16 +104,18 @@ class TrackManager(Sessionable):
 
 	def importTrack (self, path):
 		try:
-			tree = ElementTree.parse (path)
+			waypoints = []
+			f = open(path, 'r')
+			gpxpy.parse(f)
+
+			for track in gpx.tracks:
+				for segment in track.segments:
+					for point in segment.points:
+						waypoints.append([point.latitude, point.longitude])
+
+			self.tracks.append(Track(path.split('/')[-1].split('.')[0], waypoints, trackManager=self))
+			self.saveTracks()
+			return True
+
 		except:
 			return False
-
-		waypoints = []
-		root = tree.getroot ()
-		for child in root:
-			wp = (float (child.attrib['lat']), float (child.attrib['lon']))
-			waypoints.append (wp)
-
-		self.tracks.append(Track(path.split('/')[-1].split('.')[0], waypoints, trackManager=self))
-		self.saveTracks()
-		return True

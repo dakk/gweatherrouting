@@ -14,7 +14,7 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
-from xml.etree import ElementTree
+import gpxpy
 from . import utils
 
 
@@ -54,12 +54,21 @@ class Track:
 		self.trackManager.saveTracks()
 
 	def export(self, path):
+		gpx = gpxpy.gpx.GPX()
+		gpx_track = gpxpy.gpx.GPXTrack()
+		gpx.tracks.append(gpx_track)
+
+		gpx_segment = gpxpy.gpx.GPXTrackSegment()
+		gpx_track.segments.append(gpx_segment)
+
+		for x in self.waypoints:
+			gpx_segment.points.append(gpxpy.gpx.GPXTrackPoint(x[0], x[1]))
+
 		try:
 			f = open(path, "w")
+			f.write(gpx.to_xml())
 		except:
 			return False
-
-		# TODO
 
 		return True
 
