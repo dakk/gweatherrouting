@@ -142,7 +142,7 @@
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
-                <property name="padding">2</property>
+                <property name="padding">3</property>
                 <property name="position">0</property>
               </packing>
             </child>
@@ -161,6 +161,10 @@
                       <object class="GtkComboBox" id="routing-select">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
+                        <property name="margin-start">2</property>
+                        <property name="margin-end">2</property>
+                        <property name="margin-top">2</property>
+                        <property name="margin-bottom">2</property>
                         <property name="model">routing-store</property>
                         <property name="active">0</property>
                         <property name="id-column">0</property>
@@ -185,7 +189,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="padding">2</property>
+                <property name="padding">3</property>
                 <property name="position">1</property>
               </packing>
             </child>
@@ -201,9 +205,47 @@
                     <property name="can-focus">False</property>
                     <property name="left-padding">12</property>
                     <child>
-                      <object class="GtkEntry">
+                      <object class="GtkBox">
                         <property name="visible">True</property>
-                        <property name="can-focus">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="margin-start">2</property>
+                        <property name="margin-end">2</property>
+                        <property name="margin-top">2</property>
+                        <property name="margin-bottom">2</property>
+                        <child>
+                          <object class="GtkEntry" id="time-entry">
+                            <property name="visible">True</property>
+                            <property name="can-focus">True</property>
+                            <property name="editable">False</property>
+                            <signal name="activate" handler="onTimeSelect" swapped="no"/>
+                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="time-select-button">
+                            <property name="visible">True</property>
+                            <property name="can-focus">True</property>
+                            <property name="receives-default">True</property>
+                            <signal name="clicked" handler="onTimeSelect" swapped="no"/>
+                            <child>
+                              <object class="GtkImage">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="icon-name">preferences-system-time-symbolic</property>
+                              </object>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="padding">2</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
                       </object>
                     </child>
                   </object>
@@ -219,6 +261,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
+                <property name="padding">3</property>
                 <property name="position">2</property>
               </packing>
             </child>
@@ -237,6 +280,10 @@
                       <object class="GtkComboBoxText" id="start-select">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
+                        <property name="margin-start">2</property>
+                        <property name="margin-end">2</property>
+                        <property name="margin-top">2</property>
+                        <property name="margin-bottom">2</property>
                         <property name="active">0</property>
                         <property name="active-id">first-track-point</property>
                         <items>
@@ -258,7 +305,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="padding">2</property>
+                <property name="padding">3</property>
                 <property name="position">3</property>
               </packing>
             </child>
@@ -277,6 +324,10 @@
                       <object class="GtkComboBox" id="track-select">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
+                        <property name="margin-start">2</property>
+                        <property name="margin-end">2</property>
+                        <property name="margin-top">2</property>
+                        <property name="margin-bottom">2</property>
                         <property name="model">track-store</property>
                         <property name="active">0</property>
                         <property name="id-column">0</property>
@@ -301,6 +352,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
+                <property name="padding">3</property>
                 <property name="position">4</property>
               </packing>
             </child>

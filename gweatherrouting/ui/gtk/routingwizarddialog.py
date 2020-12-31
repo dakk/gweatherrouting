@@ -17,11 +17,13 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import gi
 import os
 import json
+import datetime
 import math
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, GObject
 
 from ...core import Boat, listRoutingAlgorithms
+from .timepickerdialog import TimePickerDialog
 
 class RoutingWizardDialog:
 	def create(core, parent):
@@ -109,9 +111,20 @@ class RoutingWizardDialog:
 			track_store.append ([r.name])
 		self.builder.get_object('track-select').set_active (0)
 
+		self.builder.get_object('time-entry').set_text(datetime.datetime.today().strftime(TimePickerDialog.PICKER_FORMAT))
+
 		self.dialog.show_all ()
 
 
+	def onTimeSelect(self, widget):
+		tp = TimePickerDialog.create(self.dialog)
+		tp.setDateTime(self.builder.get_object('time-entry').get_text())
+		response = tp.run()
+
+		if response == Gtk.ResponseType.OK:
+			self.builder.get_object('time-entry').set_text(tp.getDateTime().strftime(TimePickerDialog.PICKER_FORMAT))
+		
+		tp.destroy()
 
 	def getSelectedTrack (self):
 		return self.core.trackManager.tracks[self.builder.get_object('track-select').get_active ()]
