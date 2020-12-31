@@ -126,16 +126,15 @@ class RoutingWizardDialog:
 		
 		tp.destroy()
 
+
+	def getStartDateTime(self):
+		return datetime.datetime.strptime(self.builder.get_object('time-entry').get_text(), TimePickerDialog.PICKER_FORMAT)
+
 	def getSelectedTrack (self):
 		return self.core.trackManager.tracks[self.builder.get_object('track-select').get_active ()]
 
 	def getSelectedAlgorithm (self):
 		return listRoutingAlgorithms()[self.builder.get_object('routing-select').get_active ()]['class']
 
-
 	def getSelectedBoat (self):
 		return self.boats [self.builder.get_object('boat-select').get_active ()]['dir']
-
-
-	def getInitialTime (self):
-		return 0.0

@@ -33,7 +33,7 @@ def listRoutingAlgorithms():
 	]
 
 class Routing:
-	def __init__ (self, algorithm, boat, track, grib, initialTime = 0.0):
+	def __init__ (self, algorithm, boat, track, grib, startDatetime):
 		self.end = False
 		self.algorithm = algorithm
 		self.boat = boat
@@ -41,7 +41,7 @@ class Routing:
 		self.wp = 1
 		self.steps = 0
 		self.path = Track ()    # Simulated points
-		self.time = initialTime
+		self.time = 0 # startDatetime
 		self.grib = grib
 		self.log = []           # Log of each simulation step
 		self.position = self.track[0]

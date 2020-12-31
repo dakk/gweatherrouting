@@ -54,8 +54,8 @@ class Core(EventDispatcher):
                 pass
 
     # Simulation
-    def createRouting (self, algorithm, boatModel, initialTime, track):
+    def createRouting (self, algorithm, boatModel, track, startDatetime):
         boat = Boat (boatModel)
-        routing = Routing (algorithm (boat.polar, self.gribManager), boat, track, self.gribManager, initialTime = initialTime)
+        routing = Routing (algorithm (boat.polar, self.gribManager), boat, track, self.gribManager, startDatetime = startDatetime)
         return routing
 
