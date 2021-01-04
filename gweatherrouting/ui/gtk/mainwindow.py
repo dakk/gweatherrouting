@@ -141,7 +141,7 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 			extension = filepath.split('.')[-1]
 
 			if extension in ['gpx']:
-				if self.core.trackManager.importTrack (filepath):
+				if self.core.importGPX (filepath):
 					# self.builder.get_object('header-bar').set_subtitle (filepath)
 					self.updateTrack ()
 					edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done")

@@ -101,21 +101,3 @@ class TrackManager(Sessionable):
 			self.activeTrack = self.tracks[0]
 
 		self.saveTracks()
-
-	def importTrack (self, path):
-		try:
-			waypoints = []
-			f = open(path, 'r')
-			gpxpy.parse(f)
-
-			for track in gpx.tracks:
-				for segment in track.segments:
-					for point in segment.points:
-						waypoints.append([point.latitude, point.longitude])
-
-			self.tracks.append(Track(path.split('/')[-1].split('.')[0], waypoints, trackManager=self))
-			self.saveTracks()
-			return True
-
-		except:
-			return False

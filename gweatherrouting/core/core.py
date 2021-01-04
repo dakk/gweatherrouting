@@ -18,6 +18,7 @@ import logging
 
 from . import utils
 from .. import log
+from .poimanager import POI
 from .track import Track
 from .routing import Routing
 from .boat import Boat
@@ -59,3 +60,33 @@ class Core(EventDispatcher):
         routing = Routing (algorithm (boat.polar, self.gribManager), boat, track, self.gribManager, startDatetime = startDatetime)
         return routing
 
+
+    # Import a GPX file (tracks, pois and routings)
+    def importGPX(self, path):
+        try:
+            f = open(path, 'r')
+            gpxpy.parse(f)
+
+            # Tracks
+            for track in gpx.tracks:
+                waypoints = []
+
+                for segment in track.segments:
+                    for point in segment.points:
+                        waypoints.append([point.latitude, point.longitude])
+
+                self.trackManager.tracks.append(Track(path.split('/')[-1].split('.')[0], waypoints, trackManager=self.trackManager))
+
+            self.trackManager.saveTracks()
+
+            # Routes
+            
+            # POI
+            for waypoint in gpx.waypoints:
+                self.poiManager.pois.append(POI(waypoint.name, [waypoint.latitude, waypoint.longitude]))
+
+            self.poiManager.savePOI()
+
+            return True
+        except:
+            return False
