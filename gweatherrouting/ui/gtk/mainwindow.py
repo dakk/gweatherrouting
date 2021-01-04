@@ -145,8 +145,10 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 				if self.core.importGPX (filepath):
 					# self.builder.get_object('header-bar').set_subtitle (filepath)
 					self.updateTrack ()
+					self.updatePOI()
+
 					edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done")
-					edialog.format_secondary_text ("File opened, loaded %d waypoints" % len (self.core.trackManager.activeTrack))
+					edialog.format_secondary_text ("File opened and loaded")
 					edialog.run ()
 					edialog.destroy ()	
 					self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Loaded %s with %d waypoints' % (filepath, len (self.core.trackManager.activeTrack)))					
