@@ -84,7 +84,7 @@ class RoutingWizardDialog:
 		self.boats = json.load (open (this_dir + '/../../data/boats/list.json'))
 
 		self.builder = Gtk.Builder()
-		self.builder.add_from_file("./gweatherrouting/ui/gtk/routingwizarddialog.glade")
+		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/routingwizarddialog.glade")
 		self.builder.connect_signals(self)
 
 		self.dialog = self.builder.get_object('routing-wizard-dialog')

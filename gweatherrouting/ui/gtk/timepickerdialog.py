@@ -32,7 +32,7 @@ class TimePickerDialog:
 
 	def __init__(self, parent):
 		self.builder = Gtk.Builder()
-		self.builder.add_from_file("./gweatherrouting/ui/gtk/timepickerdialog.glade")
+		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/timepickerdialog.glade")
 		self.builder.connect_signals(self)
 
 		self.dialog = self.builder.get_object("time-picker-dialog")

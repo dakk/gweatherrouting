@@ -29,9 +29,7 @@ logger = logging.getLogger ('gweatherrouting')
 class Boat:
     def __init__ (self, model):
         self.model = model
-
-        this_dir, this_fn = os.path.split (__file__)
-        self.polar = Polar (this_dir + '/../data/boats/' + model + '/polar.pol')
+        self.polar = Polar (os.path.split (__file__) + '/../data/boats/' + model + '/polar.pol')
 
     # Cambio di mura
     def changeTack (self):

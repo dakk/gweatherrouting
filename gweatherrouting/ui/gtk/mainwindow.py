@@ -19,6 +19,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import time
 import gi
+import os
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('OsmGpsMap', '1.0')
@@ -49,7 +50,7 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 		self.conn = conn
 
 		self.builder = Gtk.Builder()
-		self.builder.add_from_file("./gweatherrouting/ui/gtk/mainwindow.glade")
+		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/mainwindow.glade")
 		self.builder.connect_signals(self)
 
 		self.window = self.builder.get_object("main-window")

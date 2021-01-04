@@ -20,7 +20,7 @@ class SettingsWindow:
 
 	def __init__(self):
 		self.builder = Gtk.Builder()
-		self.builder.add_from_file("./gweatherrouting/ui/gtk/settingswindow.glade")
+		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/settingswindow.glade")
 		self.builder.connect_signals(self)
 
 		self.window = self.builder.get_object('settings-window')
