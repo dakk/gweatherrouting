@@ -32,7 +32,7 @@ import logging
 from .settingswindow import SettingsWindow
 from .projectpropertieswindow import ProjectPropertiesWindow
 from .gribmanagerwindow import GribManagerWindow, GribFileFilter
-from .maplayers import GribMapLayer, AISMapLayer
+from .maplayers import GribMapLayer, AISMapLayer, GDALVectorMapLayer, EmptyMapLayer
 
 from .mainwindow_poi import MainWindowPOI
 from .mainwindow_track import MainWindowTrack
@@ -61,8 +61,15 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 
 		self.map = self.builder.get_object("map")
 		self.map.set_center_and_zoom (39., 9., 6)
+
+		self.map.layer_add (EmptyMapLayer())
+
+		self.gdalvml = GDALVectorMapLayer (os.path.abspath(os.path.dirname(__file__)) + '/../../data/countries.geojson')
+		self.map.layer_add (self.gdalvml)
+
 		self.gribMapLayer = GribMapLayer (self.core.gribManager)
 		self.map.layer_add (self.gribMapLayer)
+		
 		self.map.layer_add (OsmGpsMap.MapOsd (show_dpad=True, show_zoom=True, show_crosshair=False))
 
 		self.statusbar = self.builder.get_object("status-bar")
@@ -76,6 +83,7 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 
 		self.core.connect('boatPosition', self.boatInfoHandler)
 
+		# https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/#Z/#Y/#X
 		# https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/#Z/#Y/#X
 		# https://a.basemaps.cartocdn.com/dark_all/#Z/#X/#Y.png
 
@@ -119,7 +127,6 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 
 
 
-	# TODO: handle also grib import
 	def onImport (self, widget):
 		dialog = Gtk.FileChooserDialog ("Please choose a file", self.window,
 					Gtk.FileChooserAction.OPEN,
@@ -148,7 +155,7 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 					self.updatePOI()
 
 					edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done")
-					edialog.format_secondary_text ("File opened and loaded")
+					edialog.format_secondary_text ("GPX file opened and loaded")
 					edialog.run ()
 					edialog.destroy ()	
 					self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Loaded %s with %d waypoints' % (filepath, len (self.core.trackManager.activeTrack)))					
