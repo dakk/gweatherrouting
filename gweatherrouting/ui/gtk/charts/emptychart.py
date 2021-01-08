@@ -14,16 +14,6 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
-import gi
-import colorsys
-import math
-
-gi.require_version("Gtk", "3.0")
-gi.require_version("OsmGpsMap", "1.0")
-
-from gi.repository import Gtk, Gio, GObject, OsmGpsMap
-
-
 class EmptyChart:
 	def __init__(self):
 		pass

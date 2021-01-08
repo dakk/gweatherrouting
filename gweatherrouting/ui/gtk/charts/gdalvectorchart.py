@@ -15,7 +15,6 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
 import gi
-import colorsys
 import math
 import json
 from osgeo import ogr, osr, gdal
@@ -26,16 +25,20 @@ gi.require_version("OsmGpsMap", "1.0")
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap
 
 class GDALVectorChart:
-	def __init__(self, path):
-		drv = None
-		if path.find("geojson") != -1:
-			drv = ogr.GetDriverByName("GeoJSON")
-		elif path.find("shp") != -1:
-			drv = ogr.GetDriverByName("ESRI Shapefile")
+	def __init__(self, path, drvName = None):
+		if drvName == None:
+			if path.find("geojson") != -1:
+				drvName = "GeoJSON"
+			elif path.find("shp") != -1:
+				drvName = "ESRI Shapefile"
+			elif path.find (".000") != -1:
+				drvName = "S57"
 
-		if drv == None:
+		if drvName == None:
 			raise ("Invalid format")
 
+		drv = ogr.GetDriverByName(drvName)
+		
 		self.vectorFile = drv.Open(path)
 
 		if self.vectorFile == None:
@@ -45,6 +48,8 @@ class GDALVectorChart:
 		# Get bounding box
 		p1, p2 = gpsmap.get_bbox()
 
+
+		## TODO: this is wrong since some countries are not renderized correctly
 		p1lat, p1lon = p1.get_degrees()
 		p2lat, p2lon = p2.get_degrees()
 		wktbb = "POLYGON((%f %f,%f %f,%f %f,%f %f,%f %f))" % (
@@ -57,7 +62,7 @@ class GDALVectorChart:
 			p2lon,
 			p1lat,
 			p1lon,
-			p1lat,
+			p1lat
 		)
 
 		# Iterate over layers

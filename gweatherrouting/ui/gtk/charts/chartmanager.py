@@ -23,6 +23,10 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
             os.path.abspath(os.path.dirname(__file__)) + "/../../../data/countries.geojson"
         )
 
+        # self.charts["s57"] = GDALVectorChart(
+        #     '/home/dakk/ENC_ROOT/US2EC03M/US2EC03M.000', 'S57'
+        # )
+
     def loadVectorLayer(self, path):
         pass
 
