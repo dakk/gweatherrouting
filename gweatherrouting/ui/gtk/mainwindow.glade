@@ -696,11 +696,14 @@ Riccardo Apolloni</property>
                   <object class="GtkBox">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
+                    <property name="margin-top">3</property>
+                    <property name="margin-bottom">3</property>
                     <child>
                       <object class="GtkButton">
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
+                        <property name="margin-start">3</property>
                         <property name="always-show-image">True</property>
                         <signal name="clicked" handler="onBackwardClick" swapped="no"/>
                         <child>
@@ -722,6 +725,7 @@ Riccardo Apolloni</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
+                        <property name="margin-start">3</property>
                         <property name="always-show-image">True</property>
                         <signal name="clicked" handler="onStopClick" swapped="no"/>
                         <child>
@@ -743,6 +747,7 @@ Riccardo Apolloni</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
+                        <property name="margin-start">3</property>
                         <property name="always-show-image">True</property>
                         <signal name="clicked" handler="onPlayClick" swapped="no"/>
                         <child>
@@ -764,6 +769,8 @@ Riccardo Apolloni</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
+                        <property name="margin-start">3</property>
+                        <property name="margin-end">3</property>
                         <property name="always-show-image">True</property>
                         <signal name="clicked" handler="onFowardClick" swapped="no"/>
                         <child>
@@ -806,7 +813,7 @@ Riccardo Apolloni</property>
                   <object class="OsmGpsMap" id="map">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
-                    <property name="repo-uri">https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/#Z/#Y/#X</property>
+                    <property name="repo-uri">none://</property>
                     <property name="tile-cache">/home/dakk/.cache/osmgpsmap/b487b51738b9962abcc425a3dcb26b4d</property>
                     <signal name="button-press-event" handler="onMapClick" swapped="no"/>
                   </object>
