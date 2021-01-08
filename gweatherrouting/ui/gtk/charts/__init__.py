@@ -14,8 +14,4 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
-from .gribmaplayer import GribMapLayer
-from .isochronesmaplayer import IsochronesMapLayer
-from .trackmaplayer import TrackMapLayer
-from .poimaplayer import POIMapLayer
-from .aismaplayer import AISMapLayer
+from .chartmanager import ChartManager

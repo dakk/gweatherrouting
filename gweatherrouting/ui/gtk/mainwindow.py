@@ -32,7 +32,8 @@ import logging
 from .settingswindow import SettingsWindow
 from .projectpropertieswindow import ProjectPropertiesWindow
 from .gribmanagerwindow import GribManagerWindow, GribFileFilter
-from .maplayers import GribMapLayer, AISMapLayer, GDALVectorMapLayer, EmptyMapLayer
+from .maplayers import GribMapLayer, AISMapLayer
+from .charts import ChartManager
 
 from .mainwindow_poi import MainWindowPOI
 from .mainwindow_track import MainWindowTrack
@@ -62,10 +63,9 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 		self.map = self.builder.get_object("map")
 		self.map.set_center_and_zoom (39., 9., 6)
 
-		self.map.layer_add (EmptyMapLayer())
-
-		self.gdalvml = GDALVectorMapLayer (os.path.abspath(os.path.dirname(__file__)) + '/../../data/countries.geojson')
-		self.map.layer_add (self.gdalvml)
+		self.chartManager = ChartManager(self.map)
+		self.chartManager.loadBaseChart()
+		self.map.layer_add (self.chartManager)
 
 		self.gribMapLayer = GribMapLayer (self.core.gribManager)
 		self.map.layer_add (self.gribMapLayer)

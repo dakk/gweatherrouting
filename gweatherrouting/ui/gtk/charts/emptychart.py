@@ -24,9 +24,9 @@ gi.require_version("OsmGpsMap", "1.0")
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap
 
 
-class EmptyMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
+class EmptyChart:
 	def __init__(self):
-		GObject.GObject.__init__(self)
+		pass
 
 	def do_draw(self, gpsmap, cr):
 		width = float (gpsmap.get_allocated_width ())
@@ -44,6 +44,3 @@ class EmptyMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 
 	def do_button_press(self, gpsmap, gdkeventbutton):
 		return False
-
-
-GObject.type_register(EmptyMapLayer)

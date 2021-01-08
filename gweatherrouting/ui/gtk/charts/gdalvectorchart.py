@@ -25,14 +25,13 @@ gi.require_version("OsmGpsMap", "1.0")
 
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap
 
-
-class GDALVectorMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
+class GDALVectorChart:
 	def __init__(self, path):
-		GObject.GObject.__init__(self)
-
 		drv = None
 		if path.find("geojson") != -1:
 			drv = ogr.GetDriverByName("GeoJSON")
+		elif path.find("shp") != -1:
+			drv = ogr.GetDriverByName("ESRI Shapefile")
 
 		if drv == None:
 			raise ("Invalid format")
@@ -130,5 +129,3 @@ class GDALVectorMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 	def do_button_press(self, gpsmap, gdkeventbutton):
 		return False
 
-
-GObject.type_register(GDALVectorMapLayer)
