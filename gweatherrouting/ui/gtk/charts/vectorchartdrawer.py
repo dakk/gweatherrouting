@@ -1,0 +1,2 @@
+class VectorChartDrawer:
+    pass

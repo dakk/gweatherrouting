@@ -2,7 +2,6 @@ import gi
 import os
 
 from .gdalvectorchart import GDALVectorChart
-from .emptychart import EmptyChart
 
 gi.require_version("Gtk", "3.0")
 gi.require_version("OsmGpsMap", "1.0")
@@ -18,7 +17,6 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
         self.charts = {}
 
     def loadBaseChart(self):
-        self.charts["empty"] = EmptyChart()
         self.charts["countries.geojson"] = GDALVectorChart(
             os.path.abspath(os.path.dirname(__file__)) + "/../../../data/countries.geojson"
         )

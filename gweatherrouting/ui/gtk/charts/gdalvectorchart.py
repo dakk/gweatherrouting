@@ -17,6 +17,8 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import gi
 import math
 import json
+from .geojsonchartdrawer import GeoJSONChartDrawer
+from .s57chartdrawer import S57ChartDrawer
 from osgeo import ogr, osr, gdal
 
 gi.require_version("Gtk", "3.0")
@@ -26,13 +28,17 @@ from gi.repository import Gtk, Gio, GObject, OsmGpsMap
 
 class GDALVectorChart:
 	def __init__(self, path, drvName = None):
+		self.drawer = None 
+
 		if drvName == None:
 			if path.find("geojson") != -1:
 				drvName = "GeoJSON"
+				self.drawer = GeoJSONChartDrawer()
 			elif path.find("shp") != -1:
 				drvName = "ESRI Shapefile"
 			elif path.find (".000") != -1:
 				drvName = "S57"
+				self.drawer = S57ChartDrawer()
 
 		if drvName == None:
 			raise ("Invalid format")
@@ -43,6 +49,8 @@ class GDALVectorChart:
 
 		if self.vectorFile == None:
 			raise ("Unable to open vector map %s" % path)
+
+
 
 	def do_draw(self, gpsmap, cr):
 		# Get bounding box
@@ -66,6 +74,9 @@ class GDALVectorChart:
 		)
 
 		# Iterate over layers
+		if self.drawer: 
+			self.drawer.backgroundRender(gpsmap, cr)
+
 		for i in range(self.vectorFile.GetLayerCount()):
 			layer = self.vectorFile.GetLayerByIndex(i)
 			layer.SetSpatialFilter(ogr.CreateGeometryFromWkt(wktbb))
@@ -78,52 +89,19 @@ class GDALVectorChart:
 				if not feat:
 					continue 
 
-				geom = feat.GetGeometryRef()
-				gj = json.loads(geom.ExportToJson())
+				# print (feat.GetFieldCount())
+				for x in range(feat.GetFieldCount()):
+					fd = feat.GetFieldDefnRef(x)
 
-				cr.set_source_rgba(245/255., 203/255., 66/255., 1.0)
-				cr.set_line_width(1)
+					# print(fd)
+					# print(fd.GetFieldName())
 
+					# if fd.GetFieldType() == ogr.OFTString:
+					# 	c = feat.GetFieldAsString(x)
+					# 	print(fd.GetFieldName(), c)
 
-				if gj['type'] == 'Polygon':
-					for l in gj["coordinates"]:
-						for x in l:
-							xx, yy = gpsmap.convert_geographic_to_screen(
-								OsmGpsMap.MapPoint.new_degrees(x[1], x[0])
-							)
-							cr.line_to(xx, yy)
-
-						cr.close_path()
-						cr.stroke_preserve()
-						cr.fill()
-
-				elif gj['type'] == 'MultiPolygon':
-					for l in gj["coordinates"]:
-						for y in l:
-							for x in y:
-								xx, yy = gpsmap.convert_geographic_to_screen(
-									OsmGpsMap.MapPoint.new_degrees(x[1], x[0])
-								)
-								cr.line_to(xx, yy)
-
-							cr.close_path()
-							cr.stroke_preserve()
-							cr.fill()
-
-
-				elif gj['type'] == 'LineString':
-					for x in gj["coordinates"]:
-						xx, yy = gpsmap.convert_geographic_to_screen(
-							OsmGpsMap.MapPoint.new_degrees(x[1], x[0])
-						)
-						cr.line_to(xx, yy)
-
-						cr.close_path()
-						cr.stroke_preserve()
-						cr.fill()
-				
-				else:
-					print (gj['type'])
+				if self.drawer:
+					self.drawer.featureRender(gpsmap, cr, feat, layer)
 
 	def do_render(self, gpsmap):
 		pass
