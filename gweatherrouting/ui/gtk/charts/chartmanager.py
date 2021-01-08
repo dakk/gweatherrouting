@@ -33,6 +33,7 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 		#     '/home/dakk/ENC_ROOT/US2EC03M/US2EC03M.000', 'S57'
 		# )
 
+
 	def loadVectorLayer(self, path):
 		pass
 
