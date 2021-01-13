@@ -19,6 +19,7 @@ import logging
 import random
 import struct
 import math
+import datetime
 import eccodes
 
 from . import utils
@@ -148,7 +149,7 @@ class Grib:
 
 		# TODO: get bounds and timeframe
 		bounds = [0, 0, 0, 0]
-		forecastTime = None
+		hoursForecasted = None
 		startTime = None
 		rindex = {}			
 		centre = ''
@@ -165,12 +166,12 @@ class Grib:
 			else:
 				ft = r['P1']
 
-			startTime = "%d-%d-%d %d:%d" % (r['year'], r['month'], r['day'], r['hour'], r['minute'])
+			startTime = datetime.datetime(int(r['year']), int(r['month']), int(r['day']), int(r['hour']), int(r['minute']))
 
-			if forecastTime == None or forecastTime < int(ft):
-				forecastTime = int(ft)
+			if hoursForecasted == None or hoursForecasted < int(ft):
+				hoursForecasted = int(ft)
 
-		return MetaGrib(path.split('/')[-1], centre, bounds, startTime, forecastTime)
+		return MetaGrib(path.split('/')[-1], centre, bounds, startTime, hoursForecasted)
 
 
 	def parse (path):
@@ -178,7 +179,7 @@ class Grib:
 
 		# TODO: get bounds and timeframe
 		bounds = [0, 0, 0, 0]
-		forecastTime = None
+		hoursForecasted = None
 		startTime = None
 		rindex = {}			
 		centre = ''
@@ -195,16 +196,17 @@ class Grib:
 			else:
 				ft = r['P1']
 
-			startTime = "%d-%d-%d %d:%d" % (r['year'], r['month'], r['day'], r['hour'], r['minute'])
+			startTime = datetime.datetime(int(r['year']), int(r['month']), int(r['day']), int(r['hour']), int(r['minute']))
 
-			if forecastTime == None or forecastTime < int(ft):
-				forecastTime = int(ft)
+			if hoursForecasted == None or hoursForecasted < int(ft):
+				hoursForecasted = int(ft)
 
 			# timeIndex = str(r['dataDate'])+str(r['dataTime'])
 			if r['name'] == '10 metre U wind component':
-				rindex [forecastTime] = { 'u': eccodes.codes_grib_get_data(r.gid) }
+				rindex [hoursForecasted] = { 'u': eccodes.codes_grib_get_data(r.gid) }
 			elif r['name'] == '10 metre V wind component':
-				rindex [forecastTime]['v'] = eccodes.codes_grib_get_data(r.gid)
+				rindex [hoursForecasted]['v'] = eccodes.codes_grib_get_data(r.gid)
 
-		return Grib(path.split('/')[-1], centre, bounds, rindex, startTime, forecastTime)
+		print(startTime, hoursForecasted)
+		return Grib(path.split('/')[-1], centre, bounds, rindex, startTime, hoursForecasted)
 			
