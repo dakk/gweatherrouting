@@ -35,6 +35,7 @@ from .gribmanagerwindow import GribManagerWindow, GribFileFilter
 from .maplayers import GribMapLayer, AISMapLayer
 from .charts import ChartManager
 
+from .timecontrol import TimeControl
 from .mainwindow_poi import MainWindowPOI
 from .mainwindow_track import MainWindowTrack
 from .mainwindow_routing import MainWindowRouting
@@ -49,6 +50,8 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 	def __init__(self, core, conn):
 		self.core = core
 		self.conn = conn
+
+		self.timeControl = TimeControl()
 
 		self.builder = Gtk.Builder()
 		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/mainwindow.glade")
@@ -67,7 +70,7 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 		self.chartManager.loadBaseChart()
 		self.map.layer_add (self.chartManager)
 
-		self.gribMapLayer = GribMapLayer (self.core.gribManager)
+		self.gribMapLayer = GribMapLayer (self.core.gribManager, self.timeControl)
 		self.map.layer_add (self.gribMapLayer)
 		
 		self.map.layer_add (OsmGpsMap.MapOsd (show_dpad=True, show_zoom=True, show_crosshair=False))
@@ -107,6 +110,16 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 		MainWindowRouting.__del__(self)
 		Gtk.main_quit()
 
+	def onMapMouseMove(self, map, event):
+		lat, lon = map.convert_screen_to_geographic(event.x, event.y).get_degrees ()
+		w = self.core.gribManager.getWindAt(self.timeControl.time, lat, lon)
+		
+		sstr = ""
+		if w:
+			sstr += "Wind %.1f°, %.1f kts - " % (w[0], w[1])
+		sstr += "Latitude: %f, Longitude: %f" % (lat, lon)
+
+		self.statusbar.push(self.statusbar.get_context_id ('Info'), sstr)
 
 	def onMapClick(self, map, event):
 		lat, lon = map.get_event_location (event).get_degrees ()

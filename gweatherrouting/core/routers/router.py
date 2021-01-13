@@ -41,8 +41,6 @@ class Router:
 
 		newisopoints = []
 
-		bt0 = time.time ()
-
 		# foreach point of the iso
 		for i in range (0, len (last)):
 			p = last[i]
@@ -91,9 +89,6 @@ class Router:
 
 
 		isonew = sorted (isonew, key=(lambda a: a[3][1]))
-
-		# print (len (isonew), len(newisopoints), time.time () - bt0)
-
 		isocrone.append (isonew)
 
 		return isocrone

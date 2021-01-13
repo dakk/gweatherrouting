@@ -111,7 +111,7 @@ Riccardo Apolloni</property>
       <!-- column-name name -->
       <column type="gchararray"/>
       <!-- column-name time -->
-      <column type="gfloat"/>
+      <column type="gchararray"/>
       <!-- column-name latitude -->
       <column type="gfloat"/>
       <!-- column-name longitude -->
@@ -770,7 +770,6 @@ Riccardo Apolloni</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
                         <property name="margin-start">3</property>
-                        <property name="margin-end">3</property>
                         <property name="always-show-image">True</property>
                         <signal name="clicked" handler="onFowardClick" swapped="no"/>
                         <child>
@@ -788,18 +787,39 @@ Riccardo Apolloni</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkScale">
+                      <object class="GtkLabel" id="time-label">
                         <property name="visible">True</property>
-                        <property name="can-focus">True</property>
-                        <property name="adjustment">time-adjustment</property>
-                        <property name="round-digits">1</property>
-                        <property name="draw-value">False</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">Time</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
                         <property name="fill">True</property>
-                        <property name="padding">3</property>
+                        <property name="pack-type">end</property>
                         <property name="position">4</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="receives-default">True</property>
+                        <property name="tooltip-text" translatable="yes">Now</property>
+                        <property name="margin-start">3</property>
+                        <property name="margin-end">3</property>
+                        <signal name="clicked" handler="onTimeNow" swapped="no"/>
+                        <child>
+                          <object class="GtkImage">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="icon-name">go-bottom-symbolic</property>
+                          </object>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">5</property>
                       </packing>
                     </child>
                   </object>
@@ -816,6 +836,7 @@ Riccardo Apolloni</property>
                     <property name="repo-uri">none://</property>
                     <property name="tile-cache">/home/dakk/.cache/osmgpsmap/b487b51738b9962abcc425a3dcb26b4d</property>
                     <signal name="button-press-event" handler="onMapClick" swapped="no"/>
+                    <signal name="motion-notify-event" handler="onMapMouseMove" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>

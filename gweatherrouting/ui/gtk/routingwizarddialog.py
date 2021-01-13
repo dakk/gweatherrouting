@@ -69,9 +69,8 @@ class RoutingWizardDialog:
 
 
 	def onBoatSelect(self, widget):
-		this_dir, this_fn = os.path.split (__file__)
 		bdir = self.boats [self.builder.get_object('boat-select').get_active ()]['dir']
-		self.builder.get_object('boat-image').set_from_file(this_dir + '/../../data/boats/' + bdir + '/image.png')
+		self.builder.get_object('boat-image').set_from_file(os.path.abspath(os.path.dirname(__file__)) + '/../../data/boats/' + bdir + '/image.png')
 		self.polar = Boat(bdir).polar
 		self.builder.get_object('boat-polar-area').queue_draw()
 		
@@ -80,8 +79,7 @@ class RoutingWizardDialog:
 		self.core = core
 		self.polar = None
 
-		this_dir, this_fn = os.path.split (__file__)
-		self.boats = json.load (open (this_dir + '/../../data/boats/list.json'))
+		self.boats = json.load (open (os.path.abspath(os.path.dirname(__file__)) + '/../../data/boats/list.json'))
 
 		self.builder = Gtk.Builder()
 		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/routingwizarddialog.glade")

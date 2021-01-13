@@ -19,6 +19,7 @@ import logging
 import random
 import struct
 import math
+import datetime
 import eccodes
 
 from . import utils
@@ -77,7 +78,12 @@ class Grib:
 			return self.cache [h]
 
 
-	def getWind (self, t, bounds):
+	def getWind (self, tt, bounds):
+		t = self._transformTime(tt)
+
+		if t == None:
+			return
+
 		t1 = int (int (round (t)) / 3) * 3
 		t2 = int (int (round (t+6)) / 3) * 3
 
@@ -132,12 +138,19 @@ class Grib:
 		
 		return [data] + dataotherside
 
+	def _transformTime(self, t):
+		if (self.startTime + datetime.timedelta(hours=self.lastForecast)) < t:
+			return None 
 
+		if t > self.startTime + datetime.timedelta(hours=self.lastForecast):
+			return None
+
+		return math.floor((t - self.startTime).total_seconds() / 60 / 60)
 
 	# Get wind direction and speed in a point, used by simulator
-	def getWindAt (self, t, lat, lon):	
+	def getWindAt (self, tt, lat, lon):	
 		bounds = [(math.floor (lat * 2) / 2., math.floor (lon * 2) / 2.), (math.ceil (lat * 2) / 2., math.ceil (lon * 2) / 2.)]
-		data = self.getWind (t, bounds)
+		data = self.getWind (tt, bounds)
 
 		wind = (data[0][0][0], data[0][0][1])
 		return wind
@@ -148,7 +161,7 @@ class Grib:
 
 		# TODO: get bounds and timeframe
 		bounds = [0, 0, 0, 0]
-		forecastTime = None
+		hoursForecasted = None
 		startTime = None
 		rindex = {}			
 		centre = ''
@@ -165,12 +178,12 @@ class Grib:
 			else:
 				ft = r['P1']
 
-			startTime = "%d-%d-%d %d:%d" % (r['year'], r['month'], r['day'], r['hour'], r['minute'])
+			startTime = datetime.datetime(int(r['year']), int(r['month']), int(r['day']), int(r['hour']), int(r['minute']))
 
-			if forecastTime == None or forecastTime < int(ft):
-				forecastTime = int(ft)
+			if hoursForecasted == None or hoursForecasted < int(ft):
+				hoursForecasted = int(ft)
 
-		return MetaGrib(path.split('/')[-1], centre, bounds, startTime, forecastTime)
+		return MetaGrib(path.split('/')[-1], centre, bounds, startTime, hoursForecasted)
 
 
 	def parse (path):
@@ -178,7 +191,7 @@ class Grib:
 
 		# TODO: get bounds and timeframe
 		bounds = [0, 0, 0, 0]
-		forecastTime = None
+		hoursForecasted = None
 		startTime = None
 		rindex = {}			
 		centre = ''
@@ -195,16 +208,16 @@ class Grib:
 			else:
 				ft = r['P1']
 
-			startTime = "%d-%d-%d %d:%d" % (r['year'], r['month'], r['day'], r['hour'], r['minute'])
+			startTime = datetime.datetime(int(r['year']), int(r['month']), int(r['day']), int(r['hour']), int(r['minute']))
 
-			if forecastTime == None or forecastTime < int(ft):
-				forecastTime = int(ft)
+			if hoursForecasted == None or hoursForecasted < int(ft):
+				hoursForecasted = int(ft)
 
 			# timeIndex = str(r['dataDate'])+str(r['dataTime'])
 			if r['name'] == '10 metre U wind component':
-				rindex [forecastTime] = { 'u': eccodes.codes_grib_get_data(r.gid) }
+				rindex [hoursForecasted] = { 'u': eccodes.codes_grib_get_data(r.gid) }
 			elif r['name'] == '10 metre V wind component':
-				rindex [forecastTime]['v'] = eccodes.codes_grib_get_data(r.gid)
+				rindex [hoursForecasted]['v'] = eccodes.codes_grib_get_data(r.gid)
 
-		return Grib(path.split('/')[-1], centre, bounds, rindex, startTime, forecastTime)
+		return Grib(path.split('/')[-1], centre, bounds, rindex, startTime, hoursForecasted)
 			
