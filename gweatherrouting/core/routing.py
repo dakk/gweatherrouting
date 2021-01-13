@@ -41,11 +41,11 @@ class Routing:
 		self.wp = 1
 		self.steps = 0
 		self.path = Track ()    # Simulated points
-		self.time = 0 # startDatetime
+		self.time = startDatetime
 		self.grib = grib
 		self.log = []           # Log of each simulation step
 		self.position = self.track[0]
-		logger.debug ('initialized (time: %f)' % (self.time))
+		logger.debug ('initialized (time: %s)' % (self.time))
 
 
 	def toTrack(self):
@@ -70,7 +70,7 @@ class Routing:
 
 		#self.time += 0.2
 		progress = len (self.log) * 5
-		logger.debug ('step (time: %f, %f%% completed): %f %f' % (self.time, progress, self.position[0], self.position[1]))
+		logger.debug ('step (time: %s, %f%% completed): %f %f' % (self.time, progress, self.position[0], self.position[1]))
 
 		if len (res['path']) != 0:
 			self.position = res['position']

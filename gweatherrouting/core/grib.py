@@ -78,7 +78,12 @@ class Grib:
 			return self.cache [h]
 
 
-	def getWind (self, t, bounds):
+	def getWind (self, tt, bounds):
+		t = self._transformTime(tt)
+
+		if t == None:
+			return
+
 		t1 = int (int (round (t)) / 3) * 3
 		t2 = int (int (round (t+6)) / 3) * 3
 
@@ -133,12 +138,19 @@ class Grib:
 		
 		return [data] + dataotherside
 
+	def _transformTime(self, t):
+		if (self.startTime + datetime.timedelta(hours=self.lastForecast)) < t:
+			return None 
 
+		if t > self.startTime + datetime.timedelta(hours=self.lastForecast):
+			return None
+
+		return math.floor((t - self.startTime).total_seconds() / 60 / 60)
 
 	# Get wind direction and speed in a point, used by simulator
-	def getWindAt (self, t, lat, lon):	
+	def getWindAt (self, tt, lat, lon):	
 		bounds = [(math.floor (lat * 2) / 2., math.floor (lon * 2) / 2.), (math.ceil (lat * 2) / 2., math.ceil (lon * 2) / 2.)]
-		data = self.getWind (t, bounds)
+		data = self.getWind (tt, bounds)
 
 		wind = (data[0][0][0], data[0][0][1])
 		return wind

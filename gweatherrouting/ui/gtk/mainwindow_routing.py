@@ -56,17 +56,17 @@ class MainWindowRouting:
 
 			Gdk.threads_enter()
 			self.isochronesMapLayer.setIsochrones (res['isochrones'])
-			self.gribMapLayer.time = res['time']
-			self.map.queue_draw ()
-			self.builder.get_object('time-adjustment').set_value (res['time'])
+			self.timeControl.setTime(res['time'])
+			# self.map.queue_draw ()
+			# self.builder.get_object('time-adjustment').set_value (res['time'])
 			Gdk.threads_leave()	
 
 		tr = []
 		for wp in res['path']:
 			if len(wp) == 3:
-				tr.append((wp[0], wp[1], wp[2], 0, 0, 0, 0))
+				tr.append((wp[0], wp[1], str(wp[2]), 0, 0, 0, 0))
 			else:
-				tr.append((wp[0], wp[1], wp[4], wp[5], wp[6], wp[7], wp[8]))
+				tr.append((wp[0], wp[1], str(wp[4]), wp[5], wp[6], wp[7], wp[8]))
 
 		self.core.trackManager.routings.append(RoutingTrack(name=utils.uniqueName('routing', self.core.trackManager.routings), waypoints=tr, trackManager=self.core.trackManager))
 		self.updateRoutings()
@@ -76,7 +76,7 @@ class MainWindowRouting:
 		self.routingStore.clear()
 
 		for r in self.core.trackManager.routings:
-			riter = self.routingStore.append(None, [r.name, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, r.visible, False, True])
+			riter = self.routingStore.append(None, [r.name, '', 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, r.visible, False, True])
 
 			for x in r.waypoints:
 				self.routingStore.append(riter, ['', x[2], x[0], x[1], x[3], x[4], x[5], x[6], False, True, False])

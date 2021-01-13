@@ -14,15 +14,16 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
+import datetime
 from .. import utils
 from .router import *
 
 class LinearBestIsoRouter (Router):
 	def route (self, lastlog, time, start, end):
 		if lastlog != None and len (lastlog['isochrones']) > 0:
-			isoc = self.calculateIsochrones (time, lastlog['isochrones'], end)
+			isoc = self.calculateIsochrones (time + datetime.timedelta(hours=1), lastlog['isochrones'], end)
 		else:
-			isoc = self.calculateIsochrones (time, [[(start[0], start[1], 0)]], end)
+			isoc = self.calculateIsochrones (time + datetime.timedelta(hours=1), [[(start[0], start[1], time)]], end)
 
 
 		position = start
@@ -38,7 +39,7 @@ class LinearBestIsoRouter (Router):
 				break
 
 		return {
-			'time': time + 1. / 60. * 60.,
+			'time': time + datetime.timedelta(hours=1),
 			'path': path,
 			'position': position,
 			'isochrones': isoc

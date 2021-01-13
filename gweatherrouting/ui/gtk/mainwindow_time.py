@@ -16,9 +16,11 @@ class MainWindowTime:
 		self.onTimeChange(self.timeControl.time)
 
 	def onTimeChange(self, t):
-		self.timeLabel.set_text("%f" % t)
+		self.timeLabel.set_text("%s" % str(t))
 		self.map.queue_draw ()
 
+	def onTimeNow(self, event):
+		self.timeControl.now()
 
 	def onPlayClick(self, event):
 		self.play = True
@@ -37,8 +39,8 @@ class MainWindowTime:
 		self.map.queue_draw ()
 
 	def onBackwardClick(self, event):
-		if self.timeControl.time > 0:
-			self.timeControl.decrease()
+		# if self.timeControl.time > 0:
+		self.timeControl.decrease()
 
 
 	# def updateTimeSlider(self):
