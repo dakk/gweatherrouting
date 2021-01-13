@@ -24,3 +24,4 @@ from .utils import DictCache, EventDispatcher
 from .gribmanager import GribManager
 from .poimanager import POI, POIManager
 from .core import Core
+from .routers import RoutingNoWindException

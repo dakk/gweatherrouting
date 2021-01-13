@@ -29,6 +29,9 @@ from .. import utils
 # [[level1], [level2,level2], [level3,level3,level3,level3]]
 
 
+class RoutingNoWindException(Exception):
+	pass
+
 class Router:
 	def __init__ (self, polar, gribManager):
 		self.polar = polar
@@ -45,7 +48,10 @@ class Router:
 		for i in range (0, len (last)):
 			p = last[i]
 
-			(twd,tws) = self.gribManager.getWindAt (t, p[0], p[1])
+			try:
+				(twd,tws) = self.gribManager.getWindAt (t, p[0], p[1])
+			except:
+				raise(RoutingNoWindException())
 
 			for twa in range(-180,180,5):
 				twa = math.radians(twa)

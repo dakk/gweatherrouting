@@ -8,7 +8,7 @@ from gi.repository import Gtk, Gio, GObject, OsmGpsMap, Gdk
 
 from .routingwizarddialog import RoutingWizardDialog
 from .maplayers import IsochronesMapLayer
-from ...core import RoutingTrack, utils
+from ...core import RoutingTrack, utils, RoutingNoWindException
 
 class MainWindowRouting:
 	routingThread = None
@@ -52,7 +52,17 @@ class MainWindowRouting:
 		res = None 
 
 		while not self.currentRouting.end:
-			res = self.currentRouting.step ()
+			try:
+				res = self.currentRouting.step ()
+			except RoutingNoWindException as e:
+				Gdk.threads_enter()
+				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
+				edialog.format_secondary_text ('Trying to create a route without wind information')
+				edialog.run ()
+				edialog.destroy ()
+				Gdk.threads_leave()	
+				self.isochronesMapLayer.setIsochrones ([], [])
+				return None
 
 			Gdk.threads_enter()
 			self.isochronesMapLayer.setIsochrones (res['isochrones'], res['path'])

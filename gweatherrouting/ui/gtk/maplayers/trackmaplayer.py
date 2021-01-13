@@ -54,7 +54,7 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
                 
                 cr.set_source_rgba (1, 1, 1, 0.8)
                 cr.set_font_size(13)
-                cr.move_to(x-4, y+18)
+                # cr.move_to(x-4, y+18)
                 # cr.show_text(str(p[2]))
                 # cr.stroke()
 
