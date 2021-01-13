@@ -27,13 +27,55 @@ class IsochronesMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
     def __init__ (self):
         GObject.GObject.__init__ (self)
         self.isochrones = []
+        self.path = []
 
-    def setIsochrones (self, isoc):
+    def setIsochrones (self, isoc, path):
         self.isochrones = isoc
+        self.path = path
 
     def do_draw (self, gpsmap, cr):
         cr.set_source_rgba (0,0,0,0.6)
         cr.set_line_width (1)
+
+
+        prevx = None
+        prevy = None 
+        i = 0
+
+        for p in self.path:
+            i += 1
+            x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (p[0], p[1]))
+
+            if prevx == None:
+                cr.set_source_rgba (1, 1, 1, 0.8)
+                cr.set_font_size(13)
+                cr.move_to(x+10, y)
+                cr.stroke()
+
+            
+            cr.set_source_rgba (1, 1, 1, 0.8)
+            cr.set_font_size(13)
+            cr.move_to(x-4, y+18)
+            # cr.show_text(str(p[2]))
+            # cr.stroke()
+
+
+            if prevx != None and prevy != None:
+                cr.set_line_width (3)
+                cr.set_source_rgba (1, 0, 0, 0.8)
+
+                cr.move_to (prevx, prevy)
+                cr.line_to (x, y)
+                cr.stroke()
+
+            cr.set_line_width (2)
+            cr.set_source_rgba (1, 1, 1, 0.8)
+            cr.arc(x, y, 5, 0, 2 * math.pi)
+            cr.stroke()
+
+            prevx = x
+            prevy = y
+
 
         i = 0
         for ic in self.isochrones:

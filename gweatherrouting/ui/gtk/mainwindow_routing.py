@@ -55,7 +55,7 @@ class MainWindowRouting:
 			res = self.currentRouting.step ()
 
 			Gdk.threads_enter()
-			self.isochronesMapLayer.setIsochrones (res['isochrones'])
+			self.isochronesMapLayer.setIsochrones (res['isochrones'], res['path'])
 			self.timeControl.setTime(res['time'])
 			# self.map.queue_draw ()
 			# self.builder.get_object('time-adjustment').set_value (res['time'])
