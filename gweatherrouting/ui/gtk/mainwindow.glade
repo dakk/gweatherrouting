@@ -816,6 +816,7 @@ Riccardo Apolloni</property>
                     <property name="repo-uri">none://</property>
                     <property name="tile-cache">/home/dakk/.cache/osmgpsmap/b487b51738b9962abcc425a3dcb26b4d</property>
                     <signal name="button-press-event" handler="onMapClick" swapped="no"/>
+                    <signal name="motion-notify-event" handler="onMapMouseMove" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>

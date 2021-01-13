@@ -107,6 +107,16 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 		MainWindowRouting.__del__(self)
 		Gtk.main_quit()
 
+	def onMapMouseMove(self, map, event):
+		lat, lon = map.convert_screen_to_geographic(event.x, event.y).get_degrees ()
+		w = self.core.gribManager.getWindAt(self.gribMapLayer.time, lat, lon)
+		
+		sstr = ""
+		if w:
+			sstr += "Wind %.1f°, %.1f kts - " % (w[0], w[1])
+		sstr += "Latitude: %f, Longitude: %f" % (lat, lon)
+
+		self.statusbar.push(self.statusbar.get_context_id ('Info'), sstr)
 
 	def onMapClick(self, map, event):
 		lat, lon = map.get_event_location (event).get_degrees ()
