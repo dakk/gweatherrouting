@@ -3,6 +3,7 @@ import gi
 import os
 import json
 import math
+import datetime
 from threading import Thread
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, GObject, Gdk
@@ -76,7 +77,7 @@ class GribManagerWindow:
 		self.gribManagerStore.clear()
 
 		for x in self.gribManager.localGribs:
-			self.gribManagerStore.append ([x.name, x.centre, x.startTime, x.lastForecast, self.gribManager.isEnabled(x.name)])
+			self.gribManagerStore.append ([x.name, x.centre, str(x.startTime), x.lastForecast, self.gribManager.isEnabled(x.name)])
 
 
 	def onRemoveLocalGrib(self, widget):

@@ -207,6 +207,5 @@ class Grib:
 			elif r['name'] == '10 metre V wind component':
 				rindex [hoursForecasted]['v'] = eccodes.codes_grib_get_data(r.gid)
 
-		print(startTime, hoursForecasted)
 		return Grib(path.split('/')[-1], centre, bounds, rindex, startTime, hoursForecasted)
 			
