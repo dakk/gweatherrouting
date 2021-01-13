@@ -40,7 +40,8 @@ class Routing:
 		self.track = track
 		self.wp = 1
 		self.steps = 0
-		self.path = Track ()    # Simulated points
+		self.path = []
+		# self.path = Track ()    # Simulated points
 		self.time = startDatetime
 		self.grib = grib
 		self.log = []           # Log of each simulation step
@@ -74,6 +75,7 @@ class Routing:
 
 		if len (res['path']) != 0:
 			self.position = res['position']
+			self.path = self.path + res['path']
 			self.wp += 1
 			res['isochrones'] = []
 
@@ -81,7 +83,7 @@ class Routing:
 		nlog = {
 			'progress': progress,
 			'time': res['time'],
-			'path': res['path'],
+			'path': self.path + res['path'],
 			'isochrones': res['isochrones']
 		}
 

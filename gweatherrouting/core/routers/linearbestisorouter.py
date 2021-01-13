@@ -25,7 +25,6 @@ class LinearBestIsoRouter (Router):
 		else:
 			isoc = self.calculateIsochrones (time + datetime.timedelta(hours=1), [[(start[0], start[1], time)]], end)
 
-
 		position = start
 		path = []
 		for p in isoc[-1]:
