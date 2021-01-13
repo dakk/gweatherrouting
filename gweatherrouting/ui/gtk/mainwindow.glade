@@ -788,17 +788,14 @@ Riccardo Apolloni</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkScale">
+                      <object class="GtkLabel" id="time-label">
                         <property name="visible">True</property>
-                        <property name="can-focus">True</property>
-                        <property name="adjustment">time-adjustment</property>
-                        <property name="round-digits">1</property>
-                        <property name="draw-value">False</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">Time</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
                         <property name="fill">True</property>
-                        <property name="padding">3</property>
                         <property name="position">4</property>
                       </packing>
                     </child>
@@ -807,18 +804,6 @@ Riccardo Apolloni</property>
                     <property name="expand">False</property>
                     <property name="fill">True</property>
                     <property name="position">0</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="time-label">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">Time</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">1</property>
                   </packing>
                 </child>
                 <child>

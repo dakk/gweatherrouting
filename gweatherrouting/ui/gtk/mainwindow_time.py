@@ -10,10 +10,13 @@ class MainWindowTime:
 	play = False
 
 	def __init__(self):
-		self.timeAdjust = self.builder.get_object('time-adjustment')
+		# self.timeAdjust = self.builder.get_object('time-adjustment')
+		self.timeLabel = self.builder.get_object('time-label')
 		self.timeControl.connect('time-change', self.onTimeChange)
+		self.onTimeChange(self.timeControl.time)
 
 	def onTimeChange(self, t):
+		self.timeLabel.set_text("%f" % t)
 		self.map.queue_draw ()
 
 
@@ -32,15 +35,14 @@ class MainWindowTime:
 	def onFowardClick(self, event):
 		self.timeControl.increase()
 		self.map.queue_draw ()
-		self.updateTimeSlider()
 
 	def onBackwardClick(self, event):
 		if self.timeControl.time > 0:
 			self.timeControl.decrease()
-			self.updateTimeSlider()
 
-	def updateTimeSlider(self):
-		self.timeAdjust.set_value(int(self.timeControl.time))
+
+	# def updateTimeSlider(self):
+	# 	self.timeAdjust.set_value(int(self.timeControl.time))
 
 	def onTimeSlide (self, widget):
 		self.timeControl.setTime(int (self.timeAdjust.get_value()))
