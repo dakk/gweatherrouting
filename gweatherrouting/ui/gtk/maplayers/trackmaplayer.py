@@ -17,6 +17,9 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import gi
 import colorsys
 import math
+import dateutil.parser
+import datetime
+from ....core import utils
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('OsmGpsMap', '1.0')
@@ -24,12 +27,12 @@ gi.require_version('OsmGpsMap', '1.0')
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap
 
 class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
-    def __init__ (self, trackManager):
+    def __init__ (self, trackManager, timeControl):
         GObject.GObject.__init__ (self)
         self.trackManager = trackManager
+        self.timeControl = timeControl
 
-    def draw_boat(self, pos, course, speed):
-        pass
+     
 
     def do_draw (self, gpsmap, cr):
         for tr in self.trackManager.routings:
@@ -38,18 +41,36 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 
             prevx = None
             prevy = None 
+            prevp = None 
             i = 0
 
             for p in tr.waypoints:
                 i += 1
                 x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (p[0], p[1]))
 
-                if prevx == None:
+                if prevp == None:
                     cr.set_source_rgba (1, 1, 1, 0.8)
                     cr.set_font_size(13)
                     cr.move_to(x+10, y)
                     cr.show_text(tr.name)
                     cr.stroke()
+
+                # Draw boat
+                if prevp != None:    
+                    tprev = dateutil.parser.parse(prevp[2])
+                    tcurr = dateutil.parser.parse(p[2])
+
+                    if tcurr >= self.timeControl.time and tprev < self.timeControl.time:
+                        dt = (tcurr-tprev).total_seconds()
+                        dl = utils.pointDistance(prevp[0], prevp[1], p[0], p[1]) / dt * (self.timeControl.time - tprev).total_seconds()
+                        
+                        rp = utils.routagePointDistance (prevp[0], prevp[1], dl, math.radians(p[6]))
+
+                        cr.set_source_rgba (0, 0.4, 0, 1.0)
+                        cr.set_line_width (5)
+                        xx, yy = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (rp[0], rp[1]))
+                        cr.arc(xx, yy, 7, 0, 2 * math.pi)
+                        cr.fill()  
 
                 
                 cr.set_source_rgba (1, 1, 1, 0.8)
@@ -74,6 +95,7 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 
                 prevx = x
                 prevy = y
+                prevp = p
 
         for tr in self.trackManager.tracks:
             if not tr.visible:

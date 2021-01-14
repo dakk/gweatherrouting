@@ -35,12 +35,12 @@ class MainWindowTime:
 		self.play = False
 
 	def onFowardClick(self, event):
-		self.timeControl.increase()
+		self.timeControl.increase(minutes=30)
 		self.map.queue_draw ()
 
 	def onBackwardClick(self, event):
 		# if self.timeControl.time > 0:
-		self.timeControl.decrease()
+		self.timeControl.decrease(minutes=30)
 
 
 	# def updateTimeSlider(self):

@@ -13,4 +13,4 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-from .router import RoutingNoWindException
+from .router import RoutingNoWindException, RoutingResult

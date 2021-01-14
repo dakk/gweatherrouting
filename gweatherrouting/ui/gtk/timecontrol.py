@@ -13,10 +13,10 @@ class TimeControl(EventDispatcher):
         self.time = v
         self.dispatch('time-change', self.time)
 
-    def decrease(self, u = 1):
-        self.time -= datetime.timedelta(hours=u)
+    def decrease(self, hours = 0, minutes=0):
+        self.time -= datetime.timedelta(hours=hours, minutes=minutes)
         self.dispatch('time-change', self.time)
 
-    def increase(self, u = 1):
-        self.time += datetime.timedelta(hours=u)
+    def increase(self, hours = 0, minutes=0):
+        self.time += datetime.timedelta(hours=hours, minutes=minutes)
         self.dispatch('time-change', self.time)

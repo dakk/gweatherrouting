@@ -32,6 +32,14 @@ from .. import utils
 class RoutingNoWindException(Exception):
 	pass
 
+class RoutingResult:
+	def __init__(self, time=0, path=[], isochrones=[], position=None, progress=0):
+		self.time = time
+		self.path = path
+		self.isochrones = isochrones
+		self.position = position
+		self.progress = progress
+
 class Router:
 	def __init__ (self, polar, gribManager):
 		self.polar = polar
@@ -107,8 +115,4 @@ class Router:
 
 
 	def route (self, lastlog, t, start, end):
-		return {
-			'time': 0,
-			'path': [],
-			'isochrones': []
-		}
+		return RoutingResult()

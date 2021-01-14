@@ -12,7 +12,7 @@ class MainWindowTrack:
 	selectedTrackItem = None
 
 	def __init__(self):
-		self.trackMapLayer = TrackMapLayer(self.core.trackManager)
+		self.trackMapLayer = TrackMapLayer(self.core.trackManager, self.timeControl)
 		self.map.layer_add (self.trackMapLayer)
 
 		self.trackStore = self.builder.get_object("track-store")

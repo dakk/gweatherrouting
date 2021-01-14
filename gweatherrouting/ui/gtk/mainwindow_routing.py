@@ -65,14 +65,14 @@ class MainWindowRouting:
 				return None
 
 			Gdk.threads_enter()
-			self.isochronesMapLayer.setIsochrones (res['isochrones'], res['path'])
-			self.timeControl.setTime(res['time'])
+			self.isochronesMapLayer.setIsochrones (res.isochrones, res.path)
+			self.timeControl.setTime(res.time)
 			# self.map.queue_draw ()
-			# self.builder.get_object('time-adjustment').set_value (res['time'])
+			# self.builder.get_object('time-adjustment').set_value (res.time)
 			Gdk.threads_leave()	
 
 		tr = []
-		for wp in res['path']:
+		for wp in res.path:
 			if len(wp) == 3:
 				tr.append((wp[0], wp[1], str(wp[2]), 0, 0, 0, 0))
 			else:

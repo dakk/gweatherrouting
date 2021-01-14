@@ -20,8 +20,8 @@ from .router import *
 
 class LinearBestIsoRouter (Router):
 	def route (self, lastlog, time, start, end):
-		if lastlog != None and len (lastlog['isochrones']) > 0:
-			isoc = self.calculateIsochrones (time + datetime.timedelta(hours=1), lastlog['isochrones'], end)
+		if lastlog != None and len (lastlog.isochrones) > 0:
+			isoc = self.calculateIsochrones (time + datetime.timedelta(hours=1), lastlog.isochrones, end)
 		else:
 			isoc = self.calculateIsochrones (time + datetime.timedelta(hours=1), [[(start[0], start[1], time)]], end)
 
@@ -37,9 +37,4 @@ class LinearBestIsoRouter (Router):
 				position = path[-1]
 				break
 
-		return {
-			'time': time + datetime.timedelta(hours=1),
-			'path': path,
-			'position': position,
-			'isochrones': isoc
-		}
+		return RoutingResult(time=time + datetime.timedelta(hours=1), path=path, position=position, isochrones=isoc)

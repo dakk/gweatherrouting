@@ -20,7 +20,7 @@ import logging
 from . import utils
 from .boat import Boat
 from .track import Track
-from .routers import linearbestisorouter
+from .routers import linearbestisorouter, RoutingResult
 
 logger = logging.getLogger ('gweatherrouting')
 
@@ -41,7 +41,6 @@ class Routing:
 		self.wp = 1
 		self.steps = 0
 		self.path = []
-		# self.path = Track ()    # Simulated points
 		self.time = startDatetime
 		self.grib = grib
 		self.log = []           # Log of each simulation step
@@ -73,19 +72,29 @@ class Routing:
 		progress = len (self.log) * 5
 		logger.debug ('step (time: %s, %f%% completed): %f %f' % (self.time, progress, self.position[0], self.position[1]))
 
-		if len (res['path']) != 0:
-			self.position = res['position']
-			self.path = self.path + res['path']
+		if len (res.path) != 0:
+			self.position = res.position
+			self.path = self.path + res.path
 			self.wp += 1
-			res['isochrones'] = []
+			res.isochrones = []
 
-		self.time = res['time']
-		nlog = {
-			'progress': progress,
-			'time': res['time'],
-			'path': self.path + res['path'],
-			'isochrones': res['isochrones']
-		}
+		np = []
+		ptime = None 
+		for x in self.path:
+			if len(x) > 3: nt = x[4]
+			else: nt = x[2]
+
+			if ptime:
+				if ptime < nt:
+					np.append(x)
+					ptime = nt
+			else:
+				np.append(x)
+				ptime = nt
+
+		self.path = np
+		self.time = res.time
+		nlog = RoutingResult(progress=progress, time=res.time, path=self.path, isochrones=res.isochrones)
 
 		self.log.append (nlog)
 		return nlog
