@@ -37,13 +37,13 @@ class Boat:
 
     def move (self, dt):
         v=self.getSpeed ()
-        pos = puntodistanterotta (self.position[0], self.position[1], v*dt, self.getHDG ())
+        pos = routagePointDistance (self.position[0], self.position[1], v*dt, self.getHDG ())
         self.position = pos
         self.Log = self.Log + v * dt
 
     def moveRoutage (self, dt):
         v = self.getRoutageSpeed ()
-        pos = puntodistanterotta (self.position[0], self.position[1], v*dt, self.getHDG ())
+        pos = routagePointDistance (self.position[0], self.position[1], v*dt, self.getHDG ())
         self.position = pos
         self.Log = self.Log + v * dt
         

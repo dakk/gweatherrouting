@@ -2,6 +2,7 @@ import gi
 import os
 
 from .gdalvectorchart import GDALVectorChart
+from .gdalrasterchart import GDALRasterChart
 
 gi.require_version("Gtk", "3.0")
 gi.require_version("OsmGpsMap", "1.0")
@@ -28,6 +29,11 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 			GDALVectorChart(os.path.abspath(os.path.dirname(__file__)) + "/../../../data/countries.geojson"),
 			os.path.abspath(os.path.dirname(__file__)) + "/../../../data/countries.geojson"
 		)
+
+		# self.charts["test"] = ChartLayer(
+		# 	GDALRasterChart("/run/media/dakk/e6a53908-e899-475e-8a2c-134c0e394aeb/Maps/kap/L10-368-520-8-24_10.kap"),
+		# 	"/run/media/dakk/e6a53908-e899-475e-8a2c-134c0e394aeb/Maps/kap/L10-368-520-8-24_10.kap"
+		# )
 
 		# self.charts["s57"] = GDALVectorChart(
 		#     '/home/dakk/ENC_ROOT/US2EC03M/US2EC03M.000', 'S57'

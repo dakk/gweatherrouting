@@ -14,11 +14,11 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
-# TODO: One option coould be to transform vector to raster using api, and only renderize using this class
-
 import gi
 import math
 import json
+import rasterio
+import numpy
 from osgeo import ogr, osr, gdal
 
 gi.require_version("Gtk", "3.0")
@@ -29,10 +29,12 @@ from gi.repository import Gtk, Gio, GObject, OsmGpsMap
 
 class GDALRasterChart:
     def __init__(self, path, drvName=None):
-        self.rasterFile = gdal.Open(path, gdal.GA_ReadOnly)
+        self.rasterFile = rasterio.open(path)
 
     def do_draw(self, gpsmap, cr):
-        pass
+        a = self.rasterFile.read(1) # window=Window(50, 30, 250, 150), 
+        from rasterio.plot import show
+        show(a)
 
     def do_render(self, gpsmap):
         pass
