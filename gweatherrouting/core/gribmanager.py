@@ -33,6 +33,9 @@ class GribManager(Sessionable):
     def refreshLocalGribs(self):
         self.localGribs = []
         for x in os.listdir(GRIB_DIR):
+            if x[-4:] == '.idx':
+                continue 
+            
             m = Grib.parseMetadata(GRIB_DIR + "/" + x)
             self.localGribs.append(m)
 
