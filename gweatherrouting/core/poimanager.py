@@ -40,6 +40,12 @@ class POIManager(Sessionable):
 			self.pois.append(tr)
 
 
+	def getByName(self, name):
+		for x in self.pois:
+			if x.name == name:
+				return x
+		return None
+
 	def remove(self, name):
 		for x in self.pois:
 			if x.name == name:

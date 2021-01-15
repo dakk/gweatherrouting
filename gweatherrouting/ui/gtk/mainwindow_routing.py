@@ -41,7 +41,7 @@ class MainWindowRouting:
 		response = dialog.run ()
 
 		if response == Gtk.ResponseType.OK:
-			self.currentRouting = self.core.createRouting (dialog.getSelectedAlgorithm (), dialog.getSelectedBoat (), dialog.getSelectedTrack(), dialog.getStartDateTime())
+			self.currentRouting = self.core.createRouting (dialog.getSelectedAlgorithm (), dialog.getSelectedBoat (), dialog.getSelectedTrack(), dialog.getStartDateTime(), dialog.getSelectedStartPoint())
 			
 			self.routingThread = Thread(target=self.onRoutingStep, args=())
 			self.routingThread.start()

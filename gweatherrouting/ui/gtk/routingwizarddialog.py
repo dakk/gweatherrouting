@@ -93,6 +93,15 @@ class RoutingWizardDialog:
 		self.dialog.add_button("Run", Gtk.ResponseType.OK)
 
 
+		start_store = self.builder.get_object('start-store')
+		start_store.append (['First track point', 'first-track-point'])
+		start_store.append (['Boat position', 'boat-position'])
+
+		for p in self.core.poiManager.pois:
+			start_store.append (['POI: ' + p.name, 'poi-' + p.name])
+		self.builder.get_object('start-select').set_active (0)
+
+
 		boat_store = self.builder.get_object('boat-store')
 		for boat in self.boats:
 			boat_store.append ([boat['name']])
@@ -136,3 +145,15 @@ class RoutingWizardDialog:
 
 	def getSelectedBoat (self):
 		return self.boats [self.builder.get_object('boat-select').get_active ()]['dir']
+
+
+	def getSelectedStartPoint (self):
+		s = self.builder.get_object('start-select').get_active ()
+		if s == 0:
+			return None 
+		elif s == 1:
+			# TODO: return boat position
+			return None 
+		else:
+			s -= 2
+			return self.core.poiManager.pois[s].position

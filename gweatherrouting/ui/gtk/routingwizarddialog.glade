@@ -14,6 +14,14 @@
       <column type="gchararray"/>
     </columns>
   </object>
+  <object class="GtkListStore" id="start-store">
+    <columns>
+      <!-- column-name text -->
+      <column type="gchararray"/>
+      <!-- column-name code -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
   <object class="GtkListStore" id="track-store">
     <columns>
       <!-- column-name name -->
@@ -277,19 +285,16 @@
                     <property name="can-focus">False</property>
                     <property name="left-padding">12</property>
                     <child>
-                      <object class="GtkComboBoxText" id="start-select">
+                      <object class="GtkComboBox" id="start-select">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="margin-start">2</property>
-                        <property name="margin-end">2</property>
-                        <property name="margin-top">2</property>
-                        <property name="margin-bottom">2</property>
-                        <property name="active">0</property>
-                        <property name="active-id">first-track-point</property>
-                        <items>
-                          <item id="first-track-point" translatable="yes">First track point</item>
-                          <item id="current-position" translatable="yes">Current position</item>
-                        </items>
+                        <property name="model">start-store</property>
+                        <child>
+                          <object class="GtkCellRendererText" id="Name3"/>
+                          <attributes>
+                            <attribute name="text">0</attribute>
+                          </attributes>
+                        </child>
                       </object>
                     </child>
                   </object>
