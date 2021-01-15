@@ -32,6 +32,7 @@ class GribManagerWindow:
 	def __init__(self, gribManager):
 		self.gribManager = gribManager
 		self.selectedGrib = None
+		self.selectedLocalGrib = None
 
 		self.builder = Gtk.Builder()
 		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/gribmanagerwindow.glade")
@@ -81,7 +82,8 @@ class GribManagerWindow:
 
 
 	def onRemoveLocalGrib(self, widget):
-		pass
+		self.gribManager.remove(self.selectedLocalGrib)
+		self.updateLocalGribs()
 
 
 	def onOpen(self, widget):
@@ -145,6 +147,18 @@ class GribManagerWindow:
 		for path in pathlist:
 			tree_iter = store.get_iter(path)
 			self.selectedGrib = store.get_value(tree_iter, 4)
+
+
+	def onLocalGribSelect (self, selection):
+		store, pathlist = selection.get_selected_rows()
+		for path in pathlist:
+			tree_iter = store.get_iter(path)
+			self.selectedLocalGrib = store.get_value(tree_iter, 0)
+
+	def onLocalGribClick(self, widget, event):
+		if event.button == 3:
+			menu = self.builder.get_object("local-grib-menu")
+			menu.popup (None, None, None, None, event.button, event.time)
 
 	def onGribDownload (self, widget):
 		self.builder.get_object('download-progress').show()

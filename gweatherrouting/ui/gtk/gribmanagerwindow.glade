@@ -128,8 +128,11 @@
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="model">grib-manager-store</property>
+            <signal name="button-press-event" handler="onLocalGribClick" swapped="no"/>
             <child internal-child="selection">
-              <object class="GtkTreeSelection"/>
+              <object class="GtkTreeSelection">
+                <signal name="changed" handler="onLocalGribSelect" swapped="no"/>
+              </object>
             </child>
             <child>
               <object class="GtkTreeViewColumn">

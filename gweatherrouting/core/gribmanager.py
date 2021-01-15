@@ -133,12 +133,17 @@ class GribManager(Sessionable):
 
         return self.gribFiles
 
+    def remove(self, name):
+        if self.isEnabled(name):
+            self.disable(name)
+        os.remove(GRIB_DIR + "/" + name)
+        os.remove(GRIB_DIR + "/" + name + '.idx')
+
     def importGrib(self, path):
         try:
             name = path.split("/")[-1]
             logger.info("Importing grib %s" % path)
             copyfile(path, GRIB_DIR + "/" + name)
-            self.load(GRIB_DIR + "/" + name)
             self.enable(name)
             return True
         except Exception as e:
