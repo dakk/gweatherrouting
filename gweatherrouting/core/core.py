@@ -34,6 +34,9 @@ class BoatInfo:
     speed = 0.0
     heading = 0.0
 
+    def isValid(self):
+        return latitude != 0.0 and longitude != 0.0
+
 
 class Core(EventDispatcher):
     def __init__(self, conn):

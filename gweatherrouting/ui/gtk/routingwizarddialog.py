@@ -152,8 +152,10 @@ class RoutingWizardDialog:
 		if s == 0:
 			return None 
 		elif s == 1:
-			# TODO: return boat position
-			return None 
+			if self.core.boatInfo.isValid():
+				return [self.core.boatInfo.latitude, self.core.boatInfo.longitude]
+			else:
+				return None
 		else:
 			s -= 2
 			return self.core.poiManager.pois[s].position
