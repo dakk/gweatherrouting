@@ -28,24 +28,45 @@ from .. import log
 logger = logging.getLogger ('gweatherrouting')
 
 class MetaGrib:
-	def __init__(self, name, centre, bounds, startTime, lastForecast):
+	def __init__(self, path, name, centre, bounds, startTime, lastForecast):
 		self.name = name
 		self.centre = centre.upper()
 		self.bounds = bounds
 		self.startTime = startTime
 		self.lastForecast = lastForecast
+		self.path = path
 
 
 class Grib:
-	def __init__ (self, name, centre, bounds, rindex, startTime, lastForecast):
+	def __init__ (self, path, name, centre, bounds, rindex, startTime, lastForecast):
 		self.name = name
 		self.centre = centre.upper()
 		self.cache = utils.DictCache(16)
+		self.rindex_data = utils.DictCache(16)
 		self.rindex = rindex
 		self.bounds = bounds
 		self.startTime = startTime
 		self.lastForecast = lastForecast
+		self.path = path
 
+
+	def getRIndexData(self, t):
+		if t in self.rindex_data:
+			return self.rindex_data[t]
+
+		with eccodes.GribIndex(file_index=self.path + '.idx') as idx: 
+			msgu = idx.select({'P1': t, 'name': '10 metre U wind component' })   
+			msgv = idx.select({'P1': t, 'name': '10 metre V wind component' })   
+
+			u = eccodes.codes_grib_get_data(msgu.gid)
+			v = eccodes.codes_grib_get_data(msgv.gid)
+
+			# eccodes.codes_release(msgu.gid)
+			# eccodes.codes_release(msgv.gid)
+
+		self.rindex_data[t] = (u,v)
+
+		return u,v
 
 
 	# Get Wind data from cache if available (speed up the entire simulation)
@@ -55,8 +76,10 @@ class Grib:
 		if h in self.cache:
 			return self.cache [h]
 		else:
-			u = self.rindex [t]['u']
-			v = self.rindex [t]['v']
+			try:
+				u, v = self.getRIndexData (t)
+			except Exception as e:
+				print(e)
 
 			uu1, latuu, lonuu = [],[],[]
 			vv1, latvv, lonvv = [],[],[]
@@ -183,7 +206,8 @@ class Grib:
 			if hoursForecasted == None or hoursForecasted < int(ft):
 				hoursForecasted = int(ft)
 
-		return MetaGrib(path.split('/')[-1], centre, bounds, startTime, hoursForecasted)
+		grbs.close()
+		return MetaGrib(path, path.split('/')[-1], centre, bounds, startTime, hoursForecasted)
 
 
 	def parse (path):
@@ -215,9 +239,14 @@ class Grib:
 
 			# timeIndex = str(r['dataDate'])+str(r['dataTime'])
 			if r['name'] == '10 metre U wind component':
-				rindex [hoursForecasted] = { 'u': eccodes.codes_grib_get_data(r.gid) }
+				rindex [hoursForecasted] = { 'u': r.gid } 
 			elif r['name'] == '10 metre V wind component':
-				rindex [hoursForecasted]['v'] = eccodes.codes_grib_get_data(r.gid)
+				rindex [hoursForecasted]['v'] = r.gid 
 
-		return Grib(path.split('/')[-1], centre, bounds, rindex, startTime, hoursForecasted)
+		with eccodes.GribIndex(path, ['name', 'P1']) as idx:                     
+			idx.write(path + '.idx')   
+
+		grbs.close()
+
+		return Grib(path, path.split('/')[-1], centre, bounds, rindex, startTime, hoursForecasted)
 			
