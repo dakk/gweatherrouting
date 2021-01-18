@@ -19,6 +19,7 @@ import os
 import json
 import math
 import datetime
+import dateutil.parser
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gio, GObject
@@ -52,7 +53,10 @@ class TimePickerDialog:
 		self.dialog.show_all()
 
 	def setDateTime(self, date):
-		d = datetime.datetime.strptime(date, TimePickerDialog.PICKER_FORMAT)
+		d = dateutil.parser.parse(date)
+		self.setFromDateTime(d)
+
+	def setFromDateTime(self, d):
 		self.year.set_text(str(d.year))
 		self.month.set_text(str(d.month))
 		self.day.set_text(str(d.day))

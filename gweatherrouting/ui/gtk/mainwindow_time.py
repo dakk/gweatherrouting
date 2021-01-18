@@ -4,6 +4,7 @@ gi.require_version('Gtk', '3.0')
 gi.require_version('OsmGpsMap', '1.0')
 
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap, Gdk
+from .timepickerdialog import TimePickerDialog
 
 
 class MainWindowTime:
@@ -41,6 +42,17 @@ class MainWindowTime:
 	def onBackwardClick(self, event):
 		# if self.timeControl.time > 0:
 		self.timeControl.decrease(minutes=30)
+
+	def onTimeSelect(self, event):
+		tp = TimePickerDialog.create(self.window)
+		tp.setFromDateTime(self.timeControl.time)
+		response = tp.run()
+
+		if response == Gtk.ResponseType.OK:
+			self.timeControl.setTime(tp.getDateTime())
+		
+		tp.destroy()
+
 
 
 	# def updateTimeSlider(self):
