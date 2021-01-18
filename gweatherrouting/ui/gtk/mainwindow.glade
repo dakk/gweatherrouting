@@ -791,7 +791,7 @@ Riccardo Apolloni</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
-                        <property name="tooltip-text" translatable="yes">Now</property>
+                        <property name="tooltip-text" translatable="yes">Select now</property>
                         <property name="margin-start">3</property>
                         <signal name="clicked" handler="onTimeNow" swapped="no"/>
                         <child>
@@ -813,6 +813,7 @@ Riccardo Apolloni</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
+                        <property name="tooltip-text" translatable="yes">Manual set date and time</property>
                         <property name="margin-start">3</property>
                         <property name="margin-end">3</property>
                         <signal name="clicked" handler="onTimeSelect" swapped="no"/>
