@@ -104,6 +104,8 @@ class RoutingWizardDialog:
 		box = Gtk.VBox()
 		cont.add(box)
 
+		self.paramWidgets = {}
+
 		for x in ralgo.PARAMS:
 			p = ralgo.PARAMS[x]
 			cb = Gtk.HBox()
@@ -113,15 +115,21 @@ class RoutingWizardDialog:
 			if p.ttype == 'float':
 				adj = Gtk.Adjustment(value=p.value, step_incr=p.step, page_incr=p.step*10.0, lower=p.lower, upper=p.upper)
 				e = Gtk.SpinButton(adjustment=adj, digits=p.digits)
-				cb.add(e)
 			elif p.ttype == 'int':
 				adj = Gtk.Adjustment(value=p.value, step_incr=p.step, page_incr=p.step*10.0, lower=p.lower, upper=p.upper)
 				e = Gtk.SpinButton(adjustment=adj, digits=0)
-				cb.add(e)
+				
+			e.connect('changed', self.onParamChange)
+			self.paramWidgets[e] = p
+			cb.add(e)
 
 			box.add(cb)
 
 		self.builder.get_object('router-params').show_all()
+
+	def onParamChange(self, widget):
+		p = self.paramWidgets[widget]
+		p.value = float(widget.get_text())
 
 	def onBoatSelect(self, widget):
 		bdir = self.boats [self.builder.get_object('boat-select').get_active ()]['dir']
