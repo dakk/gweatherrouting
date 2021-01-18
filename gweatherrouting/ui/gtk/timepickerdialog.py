@@ -26,8 +26,6 @@ from gi.repository import Gtk, Gio, GObject
 
 
 class TimePickerDialog:
-	PICKER_FORMAT = "%Y/%m/%d, %H:%M"
-
 	def create(parent):
 		return TimePickerDialog(parent)
 

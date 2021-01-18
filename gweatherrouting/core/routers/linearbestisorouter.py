@@ -19,6 +19,10 @@ from .. import utils
 from .router import *
 
 class LinearBestIsoRouter (Router):
+	PARAMS = {
+		'minIncrease': RouterParam('minIncrease', 'Minimum increase', 'float', '', default=10.0, lower=1.0, upper=100.0, step=0.1, digits=1)
+	}
+
 	def route (self, lastlog, time, start, end):
 		if lastlog != None and len (lastlog.isochrones) > 0:
 			isoc = self.calculateIsochrones (time + datetime.timedelta(hours=1), lastlog.isochrones, end)
@@ -28,7 +32,7 @@ class LinearBestIsoRouter (Router):
 		position = start
 		path = []
 		for p in isoc[-1]:
-			if utils.pointDistance (end[0],end[1], p[0], p[1]) < 10.0:
+			if utils.pointDistance (end[0],end[1], p[0], p[1]) < self.getParamValue('minIncrease'):
 				path.append (p)
 				for iso in isoc[::-1][1::]:
 					path.append (iso[path[-1][2]])
