@@ -20,7 +20,7 @@ from .router import *
 
 class LinearBestIsoRouter (Router):
 	PARAMS = {
-		'minIncrease': RouterParam('minIncrease', 'Minimum increase', 'float', '', default=10.0, lower=1.0, upper=100.0, step=0.1, digits=1)
+		'minIncrease': RouterParam('minIncrease', 'Minimum increase', 'float', 'Set the minimum value for selecting a new valid point', default=10.0, lower=1.0, upper=100.0, step=0.1, digits=1)
 	}
 
 	def route (self, lastlog, time, start, end):

@@ -119,6 +119,7 @@ class RoutingWizardDialog:
 				adj = Gtk.Adjustment(value=p.value, step_incr=p.step, page_incr=p.step*10.0, lower=p.lower, upper=p.upper)
 				e = Gtk.SpinButton(adjustment=adj, digits=0)
 				
+			e.set_tooltip_text(p.tooltip)
 			e.connect('changed', self.onParamChange)
 			self.paramWidgets[e] = p
 			cb.add(e)
