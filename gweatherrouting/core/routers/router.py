@@ -28,6 +28,19 @@ from .. import utils
 
 # [[level1], [level2,level2], [level3,level3,level3,level3]]
 
+class RouterParam:
+	def __init__(self, code, name, ttype, tooltip, default, lower=None, upper=None, step=None, digits=None):
+		self.code = code
+		self.name = name
+		self.ttype = ttype
+		self.tooltip = tooltip
+		self.default = default
+		self.value = default
+
+		self.lower = lower
+		self.upper = upper
+		self.digits = digits
+		self.step = step
 
 class RoutingNoWindException(Exception):
 	pass
@@ -41,10 +54,14 @@ class RoutingResult:
 		self.progress = progress
 
 class Router:
+	PARAMS = {}
+
 	def __init__ (self, polar, gribManager):
 		self.polar = polar
 		self.gribManager = gribManager
 
+	def getParamValue(self, code):
+		return self.PARAMS[code].value
 
 	def calculateIsochrones (self, t, isocrone, nextwp):
 		dt = (1. / 60. * 60.)

@@ -1,22 +1,18 @@
 [
     {
         "name": "Mini 650",
-        "dir": "mini650",
-        "length": 6.50
+        "dir": "mini650"
     },
     {
         "name": "Mini 650 Proto",
-        "dir": "mini650proto",
-        "length": 6.50
+        "dir": "mini650proto"
     },
     {
         "name": "Class 40",
-        "dir": "class40",
-        "length": 20.0
+        "dir": "class40"
     },
     {
         "name": "Cat 20",
-        "dir": "cat20",
-        "length": 10.0
+        "dir": "cat20"
     }
 ]

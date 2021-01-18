@@ -23,6 +23,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, GObject
 
 from ...core import Boat, listRoutingAlgorithms
+from .timecontrol import TimeControl
 from .timepickerdialog import TimePickerDialog
 
 class RoutingWizardDialog:
@@ -38,41 +39,6 @@ class RoutingWizardDialog:
 	def destroy(self):
 		return self.dialog.destroy()
 
-	def drawPolar(self, widget, cr):
-		if not self.polar:
-			return
-
-		#print (self.polar.speedTable)
-		cr.set_source_rgb (1, 1, 1)
-		cr.paint ()
-
-		cr.set_line_width (0.3)
-		cr.set_source_rgb (0, 0, 0)
-		for x in self.polar.tws:# [::2]:
-			cr.arc (0.0, 100.0, x * 3, math.radians (-180), math.radians (180.0))
-			cr.stroke ()
-
-		for x in self.polar.twa:# [::8]:
-			cr.move_to (0.0, 100.0)
-			cr.line_to (0 + math.sin (x) * 100.0, 100 + math.cos (x) * 100.0)
-			cr.stroke ()
-
-		cr.set_line_width (0.5)
-		cr.set_source_rgb (1, 0, 0)
-
-		for i in range (0, len (self.polar.tws), 1):
-			for j in range (0, len (self.polar.twa), 1):
-				cr.line_to (5 * self.polar.speedTable [j][i] * math.sin (self.polar.twa[j]), 100 + 5 * self.polar.speedTable [j][i] * math.cos (self.polar.twa[j]))
-				cr.stroke ()
-				cr.move_to (5 * self.polar.speedTable [j][i] * math.sin (self.polar.twa[j]), 100 + 5 * self.polar.speedTable [j][i] * math.cos (self.polar.twa[j]))
-
-
-
-	def onBoatSelect(self, widget):
-		bdir = self.boats [self.builder.get_object('boat-select').get_active ()]['dir']
-		self.builder.get_object('boat-image').set_from_file(os.path.abspath(os.path.dirname(__file__)) + '/../../data/boats/' + bdir + '/image.png')
-		self.polar = Boat(bdir).polar
-		self.builder.get_object('boat-polar-area').queue_draw()
 		
 
 	def __init__(self, core, parent):
@@ -118,10 +84,59 @@ class RoutingWizardDialog:
 			track_store.append ([r.name])
 		self.builder.get_object('track-select').set_active (0)
 
-		self.builder.get_object('time-entry').set_text(datetime.datetime.today().strftime(TimePickerDialog.PICKER_FORMAT))
+		self.builder.get_object('time-entry').set_text(datetime.datetime.today().strftime(TimeControl.DFORMAT))
 
 		self.dialog.show_all ()
 
+	def onRoutingAlgoSelect(self, widget):
+		ralgo = listRoutingAlgorithms()[self.builder.get_object('routing-select').get_active ()]['class']
+
+		if len(ralgo.PARAMS.keys()) == 0:
+			self.builder.get_object('router-params').hide()
+			return 
+
+		
+		cont = self.builder.get_object('router-params-container')
+		
+		for x in cont.get_children():
+			cont.remove(x)
+
+		box = Gtk.VBox()
+		cont.add(box)
+
+		self.paramWidgets = {}
+
+		for x in ralgo.PARAMS:
+			p = ralgo.PARAMS[x]
+			cb = Gtk.HBox()
+			
+			cb.add(Gtk.Label(p.name))
+
+			if p.ttype == 'float':
+				adj = Gtk.Adjustment(value=p.value, step_incr=p.step, page_incr=p.step*10.0, lower=p.lower, upper=p.upper)
+				e = Gtk.SpinButton(adjustment=adj, digits=p.digits)
+			elif p.ttype == 'int':
+				adj = Gtk.Adjustment(value=p.value, step_incr=p.step, page_incr=p.step*10.0, lower=p.lower, upper=p.upper)
+				e = Gtk.SpinButton(adjustment=adj, digits=0)
+				
+			e.set_tooltip_text(p.tooltip)
+			e.connect('changed', self.onParamChange)
+			self.paramWidgets[e] = p
+			cb.add(e)
+
+			box.add(cb)
+
+		self.builder.get_object('router-params').show_all()
+
+	def onParamChange(self, widget):
+		p = self.paramWidgets[widget]
+		p.value = float(widget.get_text())
+
+	def onBoatSelect(self, widget):
+		bdir = self.boats [self.builder.get_object('boat-select').get_active ()]['dir']
+		self.builder.get_object('boat-image').set_from_file(os.path.abspath(os.path.dirname(__file__)) + '/../../data/boats/' + bdir + '/image.png')
+		self.polar = Boat(bdir).polar
+		self.builder.get_object('boat-polar-area').queue_draw()
 
 	def onTimeSelect(self, widget):
 		tp = TimePickerDialog.create(self.dialog)
@@ -129,13 +144,13 @@ class RoutingWizardDialog:
 		response = tp.run()
 
 		if response == Gtk.ResponseType.OK:
-			self.builder.get_object('time-entry').set_text(tp.getDateTime().strftime(TimePickerDialog.PICKER_FORMAT))
+			self.builder.get_object('time-entry').set_text(tp.getDateTime().strftime(TimeControl.DFORMAT))
 		
 		tp.destroy()
 
 
 	def getStartDateTime(self):
-		return datetime.datetime.strptime(self.builder.get_object('time-entry').get_text(), TimePickerDialog.PICKER_FORMAT)
+		return datetime.datetime.strptime(self.builder.get_object('time-entry').get_text(), TimeControl.DFORMAT)
 
 	def getSelectedTrack (self):
 		return self.core.trackManager.tracks[self.builder.get_object('track-select').get_active ()]
@@ -159,3 +174,35 @@ class RoutingWizardDialog:
 		else:
 			s -= 2
 			return self.core.poiManager.pois[s].position
+
+
+
+	def drawPolar(self, widget, cr):
+		if not self.polar:
+			return
+
+		#print (self.polar.speedTable)
+		cr.set_source_rgb (1, 1, 1)
+		cr.paint ()
+
+		cr.set_line_width (0.3)
+		cr.set_source_rgb (0, 0, 0)
+		for x in self.polar.tws:# [::2]:
+			cr.arc (0.0, 100.0, x * 3, math.radians (-180), math.radians (180.0))
+			cr.stroke ()
+
+		for x in self.polar.twa:# [::8]:
+			cr.move_to (0.0, 100.0)
+			cr.line_to (0 + math.sin (x) * 100.0, 100 + math.cos (x) * 100.0)
+			cr.stroke ()
+
+		cr.set_line_width (0.5)
+		cr.set_source_rgb (1, 0, 0)
+
+		for i in range (0, len (self.polar.tws), 1):
+			for j in range (0, len (self.polar.twa), 1):
+				cr.line_to (5 * self.polar.speedTable [j][i] * math.sin (self.polar.twa[j]), 100 + 5 * self.polar.speedTable [j][i] * math.cos (self.polar.twa[j]))
+				cr.stroke ()
+				cr.move_to (5 * self.polar.speedTable [j][i] * math.sin (self.polar.twa[j]), 100 + 5 * self.polar.speedTable [j][i] * math.cos (self.polar.twa[j]))
+
+
