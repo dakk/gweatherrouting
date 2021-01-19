@@ -93,7 +93,7 @@ class GribManager(Sessionable):
 
 
 	def getWind2D (self, tt, bounds):
-		dd = self.getWind(tt, bounds)
+		dd = sorted(self.getWind(tt, bounds), key=lambda x: x[2][1])
 
 		ddict = {}
 		for x in dd:
@@ -103,7 +103,7 @@ class GribManager(Sessionable):
 
 		ddlist = []
 		for x in ddict:
-			ddlist.append(ddict[x])
+			ddlist.append(sorted(ddict[x], key=lambda x: x[2][0]))
 
 		return ddlist
 

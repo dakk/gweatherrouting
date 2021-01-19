@@ -23,6 +23,7 @@ gi.require_version("OsmGpsMap", "1.0")
 
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap
 from itertools import tee
+import cairo
 
 
 
@@ -119,7 +120,6 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 		)
 		data = self.gribManager.getWind2D(self.timeControl.time, bounds)
 
-		print('data',len(data))
 		if not data or len(data) == 0:
 			return
 
@@ -130,6 +130,13 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 		cr.set_line_width(1.5 / (math.ceil(len(data) / 60)))
 		cr.set_line_width(1)
 
+		# Draw arrows
+		for x in data[::scale]:
+			for y in x[::scale]:
+				xx, yy = gpsmap.convert_geographic_to_screen(
+					OsmGpsMap.MapPoint.new_degrees(y[2][0], y[2][1])
+				)
+				self.drawWindArrow(cr, xx, yy, y[0], y[1])
 
 		# Draw gradients
 		# for i in range(0, len(data) - scale, scale):
@@ -138,21 +145,37 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 		# 			OsmGpsMap.MapPoint.new_degrees(data[i][j][2][0], data[i][j][2][1])
 		# 		)
 
-		# 		xx2, yy2 = gpsmap.convert_geographic_to_screen(
-		# 			OsmGpsMap.MapPoint.new_degrees(data[i+scale][j+scale][2][0], data[i+scale][j+scale][2][1])
-		# 		)
+		# 		try:
+		# 			xx2, yy2 = gpsmap.convert_geographic_to_screen(
+		# 				OsmGpsMap.MapPoint.new_degrees(data[i+scale][j+scale][2][0], data[i+scale][j+scale][2][1])
+		# 			)
+		# 		except:
+		# 			continue 
+
+		# 		dx = xx2-xx
+		# 		dy = yy-yy2
+
+		# 		pat = cairo.MeshPattern()
+		# 		pat.begin_patch()
+		# 		pat.move_to(xx, yy)
+		# 		pat.line_to(dx+xx, yy)
+		# 		pat.line_to(dx+xx, yy+dy)
+		# 		pat.line_to(dx, yy+dy)
+
 		# 		a, b, c = self._windColor(data[i][j][1])
-		# 		cr.set_source_rgba(a, b, c, 0.5)
-		# 		cr.rectangle(xx, yy, xx2-xx, yy-yy2)
+		# 		pat.set_corner_color_rgba(0, a, b, c, 0.6)
+		# 		a, b, c = self._windColor(data[i][j+1][1])
+		# 		pat.set_corner_color_rgba(1, a, b, c, 0.6)
+		# 		a, b, c = self._windColor(data[i+1][j+1][1])
+		# 		pat.set_corner_color_rgba(2, a, b, c, 0.6)
+		# 		a, b, c = self._windColor(data[i+1][j][1])
+		# 		pat.set_corner_color_rgba(3, a, b, c, 0.6)
+		# 		pat.end_patch()
+
+		# 		cr.set_source(pat)
+		# 		cr.rectangle(xx, yy, dx, dy)
 		# 		cr.fill()
 
-		# Draw arrows
-		for x in data[::scale]:
-			for y in x[::scale]:
-				xx, yy = gpsmap.convert_geographic_to_screen(
-					OsmGpsMap.MapPoint.new_degrees(y[2][0], y[2][1])
-				)
-				self.drawWindArrow(cr, xx, yy, y[0], y[1])
 
 	def do_render(self, gpsmap):
 		pass
