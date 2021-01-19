@@ -6,7 +6,6 @@ import math
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, GObject
 
-# Sections: grib, nmea, gps, chart
 
 class SettingsWindow:
 	def create(parent):

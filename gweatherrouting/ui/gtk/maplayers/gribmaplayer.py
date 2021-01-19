@@ -22,124 +22,146 @@ gi.require_version("Gtk", "3.0")
 gi.require_version("OsmGpsMap", "1.0")
 
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap
+from itertools import tee
+
+
 
 
 class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
-    def __init__(self, gribManager, timeControl):
-        GObject.GObject.__init__(self)
-        self.gribManager = gribManager
-        self.timeControl = timeControl
-        self.timeControl.connect("time-change", self.onTimeChange)
+	def __init__(self, gribManager, timeControl):
+		GObject.GObject.__init__(self)
+		self.gribManager = gribManager
+		self.timeControl = timeControl
+		self.timeControl.connect("time-change", self.onTimeChange)
 
-    def onTimeChange(self, t):
-        pass
+	def onTimeChange(self, t):
+		pass
 
-    def drawWindArrow(self, cr, x, y, wdir, wspeed):
-        wdir = -math.radians(wdir)
+	def _windColor(self, wspeed):
+		color = "0000CC"
+		if wspeed >= 0 and wspeed < 2:
+			color = "0000CC"
+		elif wspeed >= 2 and wspeed < 4:
+			color = "0066FF"
+		elif wspeed >= 4 and wspeed < 6:
+			color = "00FFFF"
+		elif wspeed >= 6 and wspeed < 8:
+			color = "00FF66"
+		elif wspeed >= 8 and wspeed < 10:
+			color = "00CC00"
+		elif wspeed >= 10 and wspeed < 12:
+			color = "66FF33"
+		elif wspeed >= 12 and wspeed < 14:
+			color = "CCFF33"
+		elif wspeed >= 14 and wspeed < 16:
+			color = "FFFF66"
+		elif wspeed >= 16 and wspeed < 18:
+			color = "FFCC00"
+		elif wspeed >= 18 and wspeed < 20:
+			color = "FF9900"
+		elif wspeed >= 20 and wspeed < 22:
+			color = "FF6600"
+		elif wspeed >= 22 and wspeed < 24:
+			color = "FF3300"
+		elif wspeed >= 24 and wspeed < 26:
+			color = "FF0000"
+		elif wspeed >= 26 and wspeed < 28:
+			color = "CC6600"
+		elif wspeed >= 28:
+			color = "CC0000"
 
-        # color = colorsys.hsv_to_rgb (1. - (float (wspeed) / 50.), 1, 1)
-        # cr.set_source_rgba (color[0], color[1], color[2], 0.8)
+		a = int(color[0:2], 16) / 255.0
+		b = int(color[2:4], 16) / 255.0
+		c = int(color[4:6], 16) / 255.0
+		return (a,b,c)
 
-        color = "0000CC"
-        if wspeed >= 0 and wspeed < 2:
-            color = "0000CC"
-        elif wspeed >= 2 and wspeed < 4:
-            color = "0066FF"
-        elif wspeed >= 4 and wspeed < 6:
-            color = "00FFFF"
-        elif wspeed >= 6 and wspeed < 8:
-            color = "00FF66"
-        elif wspeed >= 8 and wspeed < 10:
-            color = "00CC00"
-        elif wspeed >= 10 and wspeed < 12:
-            color = "66FF33"
-        elif wspeed >= 12 and wspeed < 14:
-            color = "CCFF33"
-        elif wspeed >= 14 and wspeed < 16:
-            color = "FFFF66"
-        elif wspeed >= 16 and wspeed < 18:
-            color = "FFCC00"
-        elif wspeed >= 18 and wspeed < 20:
-            color = "FF9900"
-        elif wspeed >= 20 and wspeed < 22:
-            color = "FF6600"
-        elif wspeed >= 22 and wspeed < 24:
-            color = "FF3300"
-        elif wspeed >= 24 and wspeed < 26:
-            color = "FF0000"
-        elif wspeed >= 26 and wspeed < 28:
-            color = "CC6600"
-        elif wspeed >= 28:
-            color = "CC0000"
+	def drawWindArrow(self, cr, x, y, wdir, wspeed):
+		wdir = -math.radians(wdir)
 
-        a = int(color[0:2], 16) / 255.0
-        b = int(color[2:4], 16) / 255.0
-        c = int(color[4:6], 16) / 255.0
-        cr.set_source_rgba(a, b, c, 0.5)
+		a, b, c = self._windColor(wspeed)
+		cr.set_source_rgba(a, b, c, 0.5)
 
-        length = 15
+		length = 15
 
-        cr.move_to(x, y)
+		cr.move_to(x, y)
 
-        # cr.line_to (x + (wspeed / 2 * math.sin (wdir)), y + 1 * math.cos (wdir))
-        cr.line_to(x + (length * math.sin(wdir)), y + (length * math.cos(wdir)))
+		# cr.line_to (x + (wspeed / 2 * math.sin (wdir)), y + 1 * math.cos (wdir))
+		cr.line_to(x + (length * math.sin(wdir)), y + (length * math.cos(wdir)))
 
-        cr.line_to(
-            x + (4 * math.sin(wdir - math.radians(30))),
-            y + (4 * math.cos(wdir - math.radians(30))),
-        )
-        cr.move_to(x + (length * math.sin(wdir)), y + (length * math.cos(wdir)))
-        cr.line_to(
-            x + (4 * math.sin(wdir + math.radians(30))),
-            y + (4 * math.cos(wdir + math.radians(30))),
-        )
+		cr.line_to(
+			x + (4 * math.sin(wdir - math.radians(30))),
+			y + (4 * math.cos(wdir - math.radians(30))),
+		)
+		cr.move_to(x + (length * math.sin(wdir)), y + (length * math.cos(wdir)))
+		cr.line_to(
+			x + (4 * math.sin(wdir + math.radians(30))),
+			y + (4 * math.cos(wdir + math.radians(30))),
+		)
 
-        cr.stroke()
+		cr.stroke()
 
-    def do_draw(self, gpsmap, cr):
-        p1, p2 = gpsmap.get_bbox()
+	def do_draw(self, gpsmap, cr):
+		p1, p2 = gpsmap.get_bbox()
 
-        p1lat, p1lon = p1.get_degrees()
-        p2lat, p2lon = p2.get_degrees()
+		p1lat, p1lon = p1.get_degrees()
+		p2lat, p2lon = p2.get_degrees()
 
-        width = float(gpsmap.get_allocated_width())
-        height = float(gpsmap.get_allocated_height())
+		width = float(gpsmap.get_allocated_width())
+		height = float(gpsmap.get_allocated_height())
 
-        cr.set_line_width(1)
-        cr.set_source_rgb(1, 0, 0)
-        # print (p1lat, p1lon, p2lat, p2lon)
+		cr.set_line_width(1)
+		cr.set_source_rgb(1, 0, 0)
+		# print (p1lat, p1lon, p2lat, p2lon)
 
-        bounds = (
-            (min(p1lat, p2lat), min(p1lon, p2lon)),
-            (max(p1lat, p2lat), max(p1lon, p2lon)),
-        )
-        data = self.gribManager.getWind(self.timeControl.time, bounds)
+		bounds = (
+			(min(p1lat, p2lat), min(p1lon, p2lon)),
+			(max(p1lat, p2lat), max(p1lon, p2lon)),
+		)
+		data = self.gribManager.getWind2D(self.timeControl.time, bounds)
 
-        if not data or len(data) == 0 or len(data[0]) == 0:
-            return
+		print('data',len(data))
+		if not data or len(data) == 0:
+			return
 
-        scale = int(gpsmap.get_scale() / 200.0)
-        if scale < 1:
-            scale = 1
+		scale = int(gpsmap.get_scale() / 500.0)
+		if scale < 1:
+			scale = 1
 
-        cr.set_line_width(1.5 / (math.ceil(len(data[0]) / 60)))
-        cr.set_line_width(1)
+		cr.set_line_width(1.5 / (math.ceil(len(data) / 60)))
+		cr.set_line_width(1)
 
-        for x in data[::scale]:
-            for y in x[::scale]:
-                xx, yy = gpsmap.convert_geographic_to_screen(
-                    OsmGpsMap.MapPoint.new_degrees(y[2][0], y[2][1])
-                )
-                self.drawWindArrow(cr, xx, yy, y[0], y[1])
 
-    def do_render(self, gpsmap):
-        pass
+		# Draw gradients
+		# for i in range(0, len(data) - scale, scale):
+		# 	for j in range(0, len(data[i]) - scale, scale):
+		# 		xx, yy = gpsmap.convert_geographic_to_screen(
+		# 			OsmGpsMap.MapPoint.new_degrees(data[i][j][2][0], data[i][j][2][1])
+		# 		)
 
-    def do_busy(self):
-        return False
+		# 		xx2, yy2 = gpsmap.convert_geographic_to_screen(
+		# 			OsmGpsMap.MapPoint.new_degrees(data[i+scale][j+scale][2][0], data[i+scale][j+scale][2][1])
+		# 		)
+		# 		a, b, c = self._windColor(data[i][j][1])
+		# 		cr.set_source_rgba(a, b, c, 0.5)
+		# 		cr.rectangle(xx, yy, xx2-xx, yy-yy2)
+		# 		cr.fill()
 
-    def do_button_press(self, gpsmap, gdkeventbutton):
-        return False
+		# Draw arrows
+		for x in data[::scale]:
+			for y in x[::scale]:
+				xx, yy = gpsmap.convert_geographic_to_screen(
+					OsmGpsMap.MapPoint.new_degrees(y[2][0], y[2][1])
+				)
+				self.drawWindArrow(cr, xx, yy, y[0], y[1])
+
+	def do_render(self, gpsmap):
+		pass
+
+	def do_busy(self):
+		return False
+
+	def do_button_press(self, gpsmap, gdkeventbutton):
+		return False
 
 
 GObject.type_register(GribMapLayer)

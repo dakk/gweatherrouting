@@ -117,13 +117,13 @@ class Grib:
 
 		otherside = None
 
-		if lon1 < 0.0 and lon2 < 0.0:
-			lon1 = 180. + abs (lon1)
-			lon2 = 180. + abs (lon2)
-		elif lon1 < 0.0:
-			otherside = (-180.0, lon1)
-		elif lon2 < 0.0:
-			otherside = (-180.0, lon2)
+		# if lon1 < 0.0 and lon2 < 0.0:
+		# 	lon1 = 180. + abs (lon1)
+		# 	lon2 = 180. + abs (lon2)
+		# elif lon1 < 0.0:
+		# 	otherside = (-180.0, lon1)
+		# elif lon2 < 0.0:
+		# 	otherside = (-180.0, lon2)
 
 		bounds = [(bounds[0][0], min (lon1, lon2)), (bounds[1][0], max (lon1, lon2))]
 		(uu1, vv1, latuu, lonuu) = self._getWindDataCached (t1, bounds)
@@ -150,16 +150,15 @@ class Grib:
 			uu = uu1[j] + (uu2[j] - uu1[j]) * (t - t1) * 1.0 / (t2 - t1)
 			vv = vv1[j] + (vv2[j] - vv1[j]) * (t - t1) * 1.0 / (t2 - t1)
 			
-			tws=0
-			twd=0
-			tws=(uu**2+vv**2)/2.
-			twd=math.atan2(uu,vv)+math.pi
-			twd=utils.reduce360(twd)
+			tws = (uu**2+vv**2)/2.
+			twd = math.degrees(utils.reduce360(math.atan2(uu,vv)+math.pi))
 
-			data.append ((math.degrees(twd), tws, (lat, lon)))
+			data.append ((twd, tws, (lat, lon)))
 		
-		
-		return [data] + dataotherside
+		return data + dataotherside
+
+
+
 
 	def _transformTime(self, t):
 		if (self.startTime + datetime.timedelta(hours=self.lastForecast)) < t:
@@ -175,7 +174,7 @@ class Grib:
 		bounds = [(math.floor (lat * 2) / 2., math.floor (lon * 2) / 2.), (math.ceil (lat * 2) / 2., math.ceil (lon * 2) / 2.)]
 		data = self.getWind (tt, bounds)
 
-		wind = (data[0][0][0], data[0][0][1])
+		wind = (data[0][0], data[0][1])
 		return wind
 
 
