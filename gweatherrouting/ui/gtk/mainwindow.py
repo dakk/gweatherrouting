@@ -35,6 +35,7 @@ from .gribmanagerwindow import GribManagerWindow, GribFileFilter
 from .maplayers import GribMapLayer, AISMapLayer
 from .charts import ChartManager
 
+from .settingsmanager import SettingsManager
 from .timecontrol import TimeControl
 from .mainwindow_poi import MainWindowPOI
 from .mainwindow_track import MainWindowTrack
@@ -52,6 +53,7 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 		self.conn = conn
 
 		self.timeControl = TimeControl()
+		self.settingsManager = SettingsManager()
 
 		self.builder = Gtk.Builder()
 		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/mainwindow.glade")

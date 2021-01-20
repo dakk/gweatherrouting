@@ -177,6 +177,7 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 		# 		cr.fill()
 
 
+
 	def do_render(self, gpsmap):
 		pass
 

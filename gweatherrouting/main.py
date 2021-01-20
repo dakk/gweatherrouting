@@ -16,7 +16,6 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import logging
 from . import log
-from .session import Config
 from .core import Core
 from .conn import ConnManager
 
@@ -28,8 +27,6 @@ def startUI ():
     gi.require_version('Gtk', '3.0')
     from gi.repository import Gtk
     from .ui.gtk.mainwindow import MainWindow
-
-    conf = Config.load('config')
 
     conn = ConnManager()
     conn.startPolling()

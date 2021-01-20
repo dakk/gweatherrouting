@@ -6,11 +6,13 @@ import logging
 import requests
 from shutil import copyfile
 from ..session import *
-from bs4 import BeautifulSoup
-
 from .grib import Grib
 
-defaultSession = {"opened": []}
+from bs4 import BeautifulSoup
+
+defaultSession = {
+	"opened": []
+}
 
 logger = logging.getLogger("gweatherrouting")
 

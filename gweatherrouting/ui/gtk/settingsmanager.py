@@ -1,10 +1,20 @@
-class SettingsManager:
-    def __init__(self):
-        pass
+from ...session import *
 
-    def load(self):
-        pass
+defaultSession = {
+	'grib': {
+		'arrowColor': '#ccc'
+	},
+	'charts': {
+		'directories': []
+	},
+	'ais': {
 
-    def save(self):
-        pass
-    
+	},
+	'nmea': {
+		
+	}
+}
+
+class SettingsManager(Sessionable):
+	def __init__(self):
+		Sessionable.__init__(self, "settings", defaultSession)
