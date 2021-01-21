@@ -8,8 +8,8 @@ from gi.repository import Gtk, Gio, GObject
 
 
 class SettingsWindow:
-	def create(parent):
-		return SettingsWindow(parent)
+	def create(parent, settingsManager):
+		return SettingsWindow(parent, settingsManager)
 
 	def show(self):
 		self.window.show_all()
@@ -17,8 +17,9 @@ class SettingsWindow:
 	def close(self):
 		self.window.hide()
 
-	def __init__(self, mainWindow):
+	def __init__(self, mainWindow, settingsManager):
 		self.mainWindow = mainWindow
+		self.settingsManager = settingsManager
 
 		self.builder = Gtk.Builder()
 		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/settingswindow.glade")
