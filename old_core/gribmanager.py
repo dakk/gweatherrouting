@@ -7,7 +7,6 @@ import requests
 from shutil import copyfile
 from ..session import *
 from .grib import Grib
-import weatherrouting
 
 from bs4 import BeautifulSoup
 
@@ -18,7 +17,7 @@ defaultSession = {
 logger = logging.getLogger("gweatherrouting")
 
 
-class GribManager(Sessionable, weatherrouting.Grib):
+class GribManager(Sessionable):
 	def __init__(self):
 		Sessionable.__init__(self, "grib-manager", defaultSession)
 

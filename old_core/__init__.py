@@ -14,10 +14,14 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
+from .boat import Boat
 from .grib import Grib 
+from .polar import Polar
 from .track import Track, RoutingTrack
 from .trackmanager import TrackManager
+from .routing import listRoutingAlgorithms, Routing
 from .utils import DictCache, EventDispatcher
 from .gribmanager import GribManager
 from .poimanager import POI, POIManager
 from .core import Core
+from .routers import RoutingNoWindException

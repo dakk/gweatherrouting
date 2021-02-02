@@ -22,7 +22,7 @@ import math
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, GObject
 
-from ...core import Boat, listRoutingAlgorithms
+import weatherrouting
 from .timecontrol import TimeControl
 from .timepickerdialog import TimePickerDialog
 
@@ -75,7 +75,7 @@ class RoutingWizardDialog:
 
 
 		routing_store = self.builder.get_object('routing-store')
-		for r in listRoutingAlgorithms():
+		for r in weatherrouting.listRoutingAlgorithms():
 			routing_store.append ([r['name']])
 		self.builder.get_object('routing-select').set_active (0)
 
@@ -89,7 +89,7 @@ class RoutingWizardDialog:
 		self.dialog.show_all ()
 
 	def onRoutingAlgoSelect(self, widget):
-		ralgo = listRoutingAlgorithms()[self.builder.get_object('routing-select').get_active ()]['class']
+		ralgo = weatherrouting.listRoutingAlgorithms()[self.builder.get_object('routing-select').get_active ()]['class']
 
 		if len(ralgo.PARAMS.keys()) == 0:
 			self.builder.get_object('router-params').hide()
@@ -134,8 +134,9 @@ class RoutingWizardDialog:
 
 	def onBoatSelect(self, widget):
 		bdir = self.boats [self.builder.get_object('boat-select').get_active ()]['dir']
-		self.builder.get_object('boat-image').set_from_file(os.path.abspath(os.path.dirname(__file__)) + '/../../data/boats/' + bdir + '/image.png')
-		self.polar = Boat(bdir).polar
+		boatPath = os.path.abspath(os.path.dirname(__file__)) + '/../../data/boats/' + bdir
+		self.builder.get_object('boat-image').set_from_file(boatPath + '/image.png')
+		self.polar = weatherrouting.Polar (boatPath + '/polar.pol')
 		self.builder.get_object('boat-polar-area').queue_draw()
 
 	def onTimeSelect(self, widget):
@@ -156,7 +157,7 @@ class RoutingWizardDialog:
 		return self.core.trackManager.tracks[self.builder.get_object('track-select').get_active ()]
 
 	def getSelectedAlgorithm (self):
-		return listRoutingAlgorithms()[self.builder.get_object('routing-select').get_active ()]['class']
+		return weatherrouting.listRoutingAlgorithms()[self.builder.get_object('routing-select').get_active ()]['class']
 
 	def getSelectedBoat (self):
 		return self.boats [self.builder.get_object('boat-select').get_active ()]['dir']

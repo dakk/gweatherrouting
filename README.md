@@ -22,6 +22,14 @@ First, install the following dependencies using your OS package manager:
 - osm-gps-map
 - eccodes
 
+Install libweatherrouting:
+
+```bash
+git clone https://github.com/dakk/libweatherrouting
+cd libweatherrouting
+sudo python3 setup.py install
+```
+
 Then checkout the repository and run:
 ```sudo python3 setup.py install```
 
