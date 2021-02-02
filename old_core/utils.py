@@ -89,8 +89,6 @@ def pointInCountry (lat, lon):
 
 	return False
 
-def pointValidity (lat, lon):
-	return not pointInCountry(lat, lon)
 
 def uniqueName(name, collection):
 	names = []
@@ -105,6 +103,28 @@ def uniqueName(name, collection):
 
 EARTH_RADIUS=60.0*360/(2*math.pi)#nm
 
+
+def ortodromic2 (lat1, lon1, lat2, lon2):
+	p1 = math.radians (lat1)
+	p2 = math.radians (lat2)
+	dp = math.radians (lat2-lat1)
+	dp2 = math.radians (lon2-lon1)
+
+	a = math.sin (dp/2) * math.sin (dp2/2) + math.cos (p1) * math.cos (p2) * math.sin (dp2/2) * math.sin (dp2/2)
+	c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+	return (EARTH_RADIUS * c, a)
+
+def ortodromic (latA,lonA,latB,lonB):
+	p1 = LatLon23.LatLon(LatLon23.Latitude(latA), LatLon23.Longitude(lonA))
+	p2 = LatLon23.LatLon(LatLon23.Latitude(latB), LatLon23.Longitude(lonB))
+
+	return (p1.distance (p2), math.radians (p1.heading_initial(p2)))
+
+def lossodromic (latA,lonA,latB,lonB):
+	p1 = LatLon23.LatLon(LatLon23.Latitude(latA), LatLon23.Longitude(lonA))
+	p2 = LatLon23.LatLon(LatLon23.Latitude(latB), LatLon23.Longitude(lonB))
+
+	return (p1.distance (p2, ellipse = 'sphere'), math.radians (p1.heading_initial(p2)))
 
 def pointDistance (latA, lonA, latB, lonB):
 	p1 = LatLon23.LatLon(LatLon23.Latitude(latA), LatLon23.Longitude(lonA))
@@ -132,6 +152,14 @@ def reduce360 (alfa):
 		return 0.0
 	return alfa
 
+def reduce180 (alfa):
+	if alfa>math.pi:
+		alfa=alfa-2*math.pi
+	if alfa<-math.pi:
+		alfa=2*math.pi+alfa
+	if alfa>math.pi or alfa<-math.pi:
+		return 0.0
+	return alfa
 
 
 class DictCache(dict):
