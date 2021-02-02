@@ -15,6 +15,7 @@ GWeatherRouting is an opensource sailing route calculator written in python/gtk3
 - Gtk3 interface
 
 
+
 ## Installation
 
 First, install the following dependencies using your OS package manager:
