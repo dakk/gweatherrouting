@@ -16,6 +16,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import logging
 import gpxpy
+import os
 
 from . import utils
 from .. import log
@@ -68,8 +69,8 @@ class Core(EventDispatcher):
             polar,
             track,
             self.gribManager,
-            startDatetime=startDatetime,
             utils.pointValidity,
+            startDatetime=startDatetime,
             startPosition=startPosition
         )
         return routing

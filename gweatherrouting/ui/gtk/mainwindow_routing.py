@@ -8,7 +8,8 @@ from gi.repository import Gtk, Gio, GObject, OsmGpsMap, Gdk
 
 from .routingwizarddialog import RoutingWizardDialog
 from .maplayers import IsochronesMapLayer
-from ...core import RoutingTrack, utils, RoutingNoWindException
+from ...core import RoutingTrack, utils
+from weatherrouting import RoutingNoWindException
 
 class MainWindowRouting:
 	routingThread = None

@@ -134,8 +134,9 @@ class RoutingWizardDialog:
 
 	def onBoatSelect(self, widget):
 		bdir = self.boats [self.builder.get_object('boat-select').get_active ()]['dir']
-		self.builder.get_object('boat-image').set_from_file(os.path.abspath(os.path.dirname(__file__)) + '/../../data/boats/' + bdir + '/image.png')
-		self.polar = weatherrouting.Polar (os.path.abspath(os.path.dirname(__file__)) + '/../data/boats/' + bdir + '/polar.pol')
+		boatPath = os.path.abspath(os.path.dirname(__file__)) + '/../../data/boats/' + bdir
+		self.builder.get_object('boat-image').set_from_file(boatPath + '/image.png')
+		self.polar = weatherrouting.Polar (boatPath + '/polar.pol')
 		self.builder.get_object('boat-polar-area').queue_draw()
 
 	def onTimeSelect(self, widget):
@@ -156,7 +157,7 @@ class RoutingWizardDialog:
 		return self.core.trackManager.tracks[self.builder.get_object('track-select').get_active ()]
 
 	def getSelectedAlgorithm (self):
-		return listRoutingAlgorithms()[self.builder.get_object('routing-select').get_active ()]['class']
+		return weatherrouting.listRoutingAlgorithms()[self.builder.get_object('routing-select').get_active ()]['class']
 
 	def getSelectedBoat (self):
 		return self.boats [self.builder.get_object('boat-select').get_active ()]['dir']
