@@ -22,6 +22,7 @@ import math
 import datetime
 import eccodes
 
+import weatherrouting
 from . import utils
 from .. import log
 
@@ -37,7 +38,7 @@ class MetaGrib:
 		self.path = path
 
 
-class Grib:
+class Grib(weatherrouting.Grib):
 	def __init__ (self, path, name, centre, bounds, rindex, startTime, lastForecast):
 		self.name = name
 		self.centre = centre.upper()
