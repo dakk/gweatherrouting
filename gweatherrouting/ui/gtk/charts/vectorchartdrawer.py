@@ -15,8 +15,5 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 class VectorChartDrawer:
-	def backgroundRender(self, gpsmap, cr):
-		raise ("Not implemented")
-
-	def featureRender(self, gpsmap, cr, feat, layer):
+	def draw(self, gpsmap, cr, vectorFile, bounding):
 		raise ("Not implemented")

@@ -211,7 +211,7 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 		dialog.hide ()
 
 	def onSettings(self, event):
-		w = SettingsWindow.create (self)
+		w = SettingsWindow.create (self, self.settingsManager)
 		w.show ()
 
 	def onProjectProperties(self, event):

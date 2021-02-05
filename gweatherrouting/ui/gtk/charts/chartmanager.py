@@ -51,8 +51,9 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 		# 	"/run/media/dakk/e6a53908-e899-475e-8a2c-134c0e394aeb/Maps/kap/L10-368-520-8-24_10.kap"
 		# )
 
-		# self.charts["s57"] = GDALVectorChart(
-		#     '/home/dakk/ENC_ROOT/US2EC03M/US2EC03M.000', 'S57'
+		# self.charts["s57test"] = ChartLayer(
+		#     GDALVectorChart('/home/dakk/ENC_ROOT/US2EC03M/US2EC03M.000', 'S57'),
+		# 	'/home/dakk/ENC_ROOT/US2EC03M/US2EC03M.000'
 		# )
 
 

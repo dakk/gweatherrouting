@@ -27,6 +27,23 @@ from .vectorchartdrawer import VectorChartDrawer
 
 
 class GeoJSONChartDrawer(VectorChartDrawer):
+	def draw(self, gpsmap, cr, vectorFile, bounding):
+		self.backgroundRender(gpsmap, cr)
+
+		for i in range(vectorFile.GetLayerCount()):
+			layer = vectorFile.GetLayerByIndex(i)
+			layer.SetSpatialFilter(bounding)
+
+			# Iterate over features
+			feat = layer.GetNextFeature()
+			while feat is not None:
+				feat = layer.GetNextFeature()
+
+				if not feat:
+					continue 
+
+				self.featureRender(gpsmap, cr, feat, layer)
+
 	def backgroundRender(self, gpsmap, cr):
 		width = float(gpsmap.get_allocated_width())
 		height = float(gpsmap.get_allocated_height())

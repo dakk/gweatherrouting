@@ -39,8 +39,13 @@ class GDALVectorChart:
 			elif path.find (".000") != -1:
 				drvName = "S57"
 				self.drawer = S57ChartDrawer()
+		else:
+			if drvName == 'S57':
+				self.drawer = S57ChartDrawer()
+			elif drvName == 'GeoJSON':
+				self.drawer = GeoJSONChartDrawer()
 
-		if drvName == None:
+		if drvName == None or self.drawer == None:
 			raise ("Invalid format")
 
 		drv = ogr.GetDriverByName(drvName)
@@ -55,7 +60,6 @@ class GDALVectorChart:
 	def do_draw(self, gpsmap, cr):
 		# Get bounding box
 		p1, p2 = gpsmap.get_bbox()
-
 
 		## TODO: this is wrong since some countries are not renderized correctly
 		p1lat, p1lon = p1.get_degrees()
@@ -73,35 +77,8 @@ class GDALVectorChart:
 			p1lat
 		)
 
-		# Iterate over layers
-		if self.drawer: 
-			self.drawer.backgroundRender(gpsmap, cr)
+		self.drawer.draw(gpsmap, cr, self.vectorFile, ogr.CreateGeometryFromWkt(wktbb))
 
-		for i in range(self.vectorFile.GetLayerCount()):
-			layer = self.vectorFile.GetLayerByIndex(i)
-			layer.SetSpatialFilter(ogr.CreateGeometryFromWkt(wktbb))
-
-			# Iterate over features
-			feat = layer.GetNextFeature()
-			while feat is not None:
-				feat = layer.GetNextFeature()
-
-				if not feat:
-					continue 
-
-				# print (feat.GetFieldCount())
-				for x in range(feat.GetFieldCount()):
-					fd = feat.GetFieldDefnRef(x)
-
-					# print(fd)
-					# print(fd.GetFieldName())
-
-					# if fd.GetFieldType() == ogr.OFTString:
-					# 	c = feat.GetFieldAsString(x)
-					# 	print(fd.GetFieldName(), c)
-
-				if self.drawer:
-					self.drawer.featureRender(gpsmap, cr, feat, layer)
 
 	def do_render(self, gpsmap):
 		pass
