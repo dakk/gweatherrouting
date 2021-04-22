@@ -66,6 +66,7 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 		# self.window.maximize ()
 
 		self.map = self.builder.get_object("map")
+
 		self.map.set_center_and_zoom (39., 9., 6)
 
 		self.chartManager = ChartManager(self.map)
@@ -75,7 +76,8 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 		self.gribMapLayer = GribMapLayer (self.core.gribManager, self.timeControl)
 		self.map.layer_add (self.gribMapLayer)
 		
-		self.map.layer_add (OsmGpsMap.MapOsd (show_dpad=True, show_zoom=True, show_crosshair=False))
+		# This causes rendering problem
+		#self.map.layer_add (OsmGpsMap.MapOsd (show_dpad=True, show_zoom=True, show_crosshair=False))
 
 		self.statusbar = self.builder.get_object("status-bar")
 
