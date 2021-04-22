@@ -20,7 +20,7 @@ import json
 from osgeo import ogr, osr, gdal
 
 gi.require_version("Gtk", "3.0")
-gi.require_version("OsmGpsMap", "1.0")
+gi.require_version("OsmGpsMap", "1.2")
 
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap
 from .vectorchartdrawer import VectorChartDrawer
