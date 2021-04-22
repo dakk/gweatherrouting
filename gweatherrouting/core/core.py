@@ -69,9 +69,9 @@ class Core(EventDispatcher):
             polar,
             track,
             self.gribManager,
-            utils.pointValidity,
             startDatetime=startDatetime,
-            startPosition=startPosition
+            startPosition=startPosition,
+            pointValidity=utils.pointValidity
         )
         return routing
 
