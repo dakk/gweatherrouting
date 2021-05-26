@@ -11,4 +11,3 @@ pyserial
 pynmea2
 gpxpy
 numpy
-rasterio
