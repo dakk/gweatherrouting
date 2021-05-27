@@ -182,13 +182,34 @@ class GDALRasterChart(ChartLayer):
 		i = 0
 
 		for x in files:
-			print (GDALSingleRasterChart.getFileInfo(self.path + x))
+			finfo = GDALSingleRasterChart.getFileInfo(self.path + x)
+			print(finfo)
 
 			i += 1
 			if onTickHandler:
 				onTickHandler(i/len(files))
 
-		onTickHandler(1.0)
+
+		# Load also the tiles
+		i = 0
+		ff = list(filter(lambda x: x.find('L10') != -1, [f for f in listdir(self.path) if isfile(join(self.path, f))]))
+		for x in ff:
+			i+=1
+
+			try:
+				print ('Loading',x)
+				r = GDALSingleRasterChart(self.path + x)
+				self.rasters.append(r)
+			except Exception as e:
+				print ('error', str(e))
+
+			if onTickHandler:
+				onTickHandler(i/len(ff))
+
+
+		if onTickHandler:
+			onTickHandler(1.0)
+
 		return True
 
 	def do_draw(self, gpsmap, cr):

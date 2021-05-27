@@ -19,7 +19,8 @@ import os
 import json
 import math
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gio, GObject
+from gi.repository import Gtk, Gio, GObject, Gdk
+from threading import Thread
 
 
 class SettingsWindow:
@@ -43,15 +44,58 @@ class SettingsWindow:
 		self.window = self.builder.get_object('settings-window')
 		self.window.set_default_size (550, 300)
 
-
-		self.chartStore = self.builder.get_object("chart-store")
-
-		for name in self.mainWindow.chartManager.charts:
-			x = self.mainWindow.chartManager.charts[name]
-			self.chartStore.append ([name, x.path, x.enabled, x.ctype])
-
+		self.builder.get_object('chart-progress').hide()
+		self.reloadChart()
 
 		# self.dialog.add_button("Cancel", Gtk.ResponseType.CANCEL)
 		# self.dialog.add_button("Save", Gtk.ResponseType.OK)
 
 		# self.dialog.show_all ()
+
+	def reloadChart(self):
+		self.chartStore = self.builder.get_object("chart-store")
+		self.chartStore.clear()
+		
+		for p in self.mainWindow.chartManager.charts:
+			self.chartStore.append ([p.path, p.enabled, p.ctype])
+
+	def registeringChart(self, l):
+		def ticker(x):
+			Gdk.threads_enter()
+			self.builder.get_object('chart-progress').set_fraction(x)
+			Gdk.threads_leave()
+
+
+		Gdk.threads_enter()
+		self.builder.get_object('chart-progress').show()
+		Gdk.threads_leave()
+
+		l.onRegister(ticker)
+
+		Gdk.threads_enter()
+		self.builder.get_object('chart-progress').hide()
+		Gdk.threads_leave()
+
+		self.reloadChart()
+
+
+	def onAddRasterChart(self, widget):
+		dialog = Gtk.FileChooserDialog ("Please select a directory", self.window,
+			Gtk.FileChooserAction.SELECT_FOLDER,
+			(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+
+
+		response = dialog.run ()
+
+		if response == Gtk.ResponseType.OK:
+			path = dialog.get_filename () + '/'
+			l = self.mainWindow.chartManager.loadRasterLayer(path)
+			dialog.destroy ()
+
+			Thread(target=self.registeringChart, args=(l,)).start()
+		else:
+			dialog.destroy ()
+			
+
+	def onAddVectorChart(self, widget):
+		pass

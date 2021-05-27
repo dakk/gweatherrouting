@@ -30,52 +30,36 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 	def __init__(self, m):
 		GObject.GObject.__init__(self)
 		self.map = m
-		self.charts = {}
+		self.charts = []
 
 	def loadBaseChart(self):
-		self.charts["countries.geojson"] = GDALVectorChart(os.path.abspath(os.path.dirname(__file__)) + "/../../../data/countries.geojson")
-
-		# self.charts["test"] = ChartLayer(
-		# 	GDALRasterChart("/run/media/dakk/e6a53908-e899-475e-8a2c-134c0e394aeb/Maps/kap/L10-368-520-8-24_10.kap"),
-		# 	"/run/media/dakk/e6a53908-e899-475e-8a2c-134c0e394aeb/Maps/kap/L10-368-520-8-24_10.kap"
-		# )
-
-		# self.charts["test"] = GDALRasterChart("/run/media/dakk/e6a53908-e899-475e-8a2c-134c0e394aeb/Maps/kap/")
-
-		# self.charts["s57test"] = ChartLayer(
-		#     GDALVectorChart('/home/dakk/ENC_ROOT/US2EC03M/US2EC03M.000', 'S57'),
-		# 	'/home/dakk/ENC_ROOT/US2EC03M/US2EC03M.000'
-		# )
-
+		self.charts += [GDALVectorChart(os.path.abspath(os.path.dirname(__file__)) + "/../../../data/countries.geojson")]
 
 	def loadVectorLayer(self, path):
-		self.charts[path] = GDALVectorChart(path)
+		l = GDALVectorChart(path)
+		self.charts += [l]
+		return l
 
 	def loadRasterLayer(self, path):
-		self.charts[path] = GDALRasterChart(path)
-
-	def removeLayer(self, name):
-		del self.charts[name]
+		l = GDALRasterChart(path)
+		self.charts += [l]
+		return l
 
 	def do_draw(self, gpsmap, cr):
-		for x in self.charts:
-			if self.charts[x].enabled:
-				self.charts[x].do_draw(gpsmap, cr)
+		for x in filter(lambda x: x.enabled, self.charts):
+			x.do_draw(gpsmap, cr)
 
 	def do_render(self, gpsmap):
-		for x in self.charts:
-			if self.charts[x].enabled:
-				self.charts[x].do_render(gpsmap)
+		for x in filter(lambda x: x.enabled, self.charts):
+			x.do_render(gpsmap)
 
 	def do_busy(self):
-		for x in self.charts:
-			if self.charts[x].enabled:
-				self.charts[x].do_busy()
+		for x in filter(lambda x: x.enabled, self.charts):
+			x.do_busy()
 
 	def do_button_press(self, gpsmap, gdkeventbutton):
-		for x in self.charts:
-			if self.charts[x].enabled:
-				self.charts[x].do_button_press(gpsmap, gdkeventbutton)
+		for x in filter(lambda x: x.enabled, self.charts):
+			x.do_button_press(gpsmap, gdkeventbutton)
 
 
 GObject.type_register(ChartManager)
