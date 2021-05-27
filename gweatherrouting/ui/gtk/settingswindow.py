@@ -55,7 +55,7 @@ class SettingsWindow:
 	def reloadChart(self):
 		self.chartStore = self.builder.get_object("chart-store")
 		self.chartStore.clear()
-		
+
 		for p in self.mainWindow.chartManager.charts:
 			self.chartStore.append ([p.path, p.enabled, p.ctype])
 
@@ -83,7 +83,6 @@ class SettingsWindow:
 		dialog = Gtk.FileChooserDialog ("Please select a directory", self.window,
 			Gtk.FileChooserAction.SELECT_FOLDER,
 			(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
-
 
 		response = dialog.run ()
 
