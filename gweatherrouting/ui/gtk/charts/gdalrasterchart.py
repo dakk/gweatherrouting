@@ -15,45 +15,21 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
 import gi
-import math
-import json
-import numpy
-import struct
 import cairo
+from os import listdir
+from os.path import isfile, join
 from osgeo import ogr, osr, gdal
 
 gi.require_version("Gtk", "3.0")
 gi.require_version('OsmGpsMap', '1.0')
 
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap
+from .chartlayer import ChartLayer
 
 # https://gdal.org/tutorials/raster_api_tut.html
 
-class GDALRasterChart:
-	def __init__(self, path, drvName=None):
-		dataset = gdal.Open(path, gdal.GA_ReadOnly)
-
-		if not dataset:
-			raise ("Unable to open raster chart %s" % path)
-
-		# print("Driver: {}/{}".format(dataset.GetDriver().ShortName,
-		# 					dataset.GetDriver().LongName))
-		# print("Size is {} x {} x {}".format(dataset.RasterXSize,
-		# 									dataset.RasterYSize,
-		# 									dataset.RasterCount))
-		# print("Projection is {}".format(dataset.GetProjection()))
-		geotransform = dataset.GetGeoTransform()
-		# if geotransform:
-		# 	print("Origin = ({}, {})".format(geotransform[0], geotransform[3]))
-		# 	print("Pixel Size = ({}, {})".format(geotransform[1], geotransform[5]))
-
-		self.geotransform = geotransform
-		self.dataset = dataset
-
-
-
-		# Calc origin
-		old_cs= osr.SpatialReference()
+def datasetBBox(dataset):
+		old_cs = osr.SpatialReference()
 		old_cs.ImportFromWkt(dataset.GetProjectionRef())
 
 		wgs84_wkt = """
@@ -76,15 +52,46 @@ class GDALRasterChart:
 		height = dataset.RasterYSize
 		gt = dataset.GetGeoTransform()
 		minx = gt[0]
-		miny = gt[3] # + width*gt[4] + height*gt[5] 
+		miny = gt[3]
 
-		self.origin = transform.TransformPoint(minx,miny) 
+		origin = transform.TransformPoint(minx,miny) 
 
-		minx = gt[0]
+		minx = gt[0] + width*gt[1] + height*gt[2] 
 		miny = gt[3] + width*gt[4] + height*gt[5] 
 
-		self.originbl = transform.TransformPoint(minx,miny) 
-		self.s = self.bandToSurface(1)
+		originbr = transform.TransformPoint(minx,miny) 
+
+		return [origin, originbr]
+	
+class GDALSingleRasterChart:
+	def getFileInfo(path):
+		dataset = gdal.Open(path, gdal.GA_ReadOnly)
+
+		if not dataset:
+			raise ("Unable to open raster chart %s" % path)
+
+		bbox = datasetBBox(dataset)
+
+		return (path, bbox, dataset.RasterXSize, dataset.RasterYSize)
+
+
+	def __init__(self, path, drvName=None):
+		dataset = gdal.Open(path, gdal.GA_ReadOnly)
+
+		if not dataset:
+			raise ("Unable to open raster chart %s" % path)
+
+		# print("Driver: {}/{}".format(dataset.GetDriver().ShortName,
+		# 					dataset.GetDriver().LongName))
+		# print("Size is {} x {} x {}".format(dataset.RasterXSize,
+		# 									dataset.RasterYSize,
+		# 									dataset.RasterCount))
+		geotransform = dataset.GetGeoTransform()
+
+		self.geotransform = geotransform
+		self.dataset = dataset
+		self.bbox = datasetBBox(dataset)
+		self.surface = self.bandToSurface(1)
 
 	def bandToSurface(self, i):
 		band = self.dataset.GetRasterBand(i)
@@ -120,17 +127,73 @@ class GDALRasterChart:
 
 		cr.save()
 		xx, yy = gpsmap.convert_geographic_to_screen(
-			OsmGpsMap.MapPoint.new_degrees(self.origin[0], self.origin[1])
+			OsmGpsMap.MapPoint.new_degrees(self.bbox[0][0], self.bbox[0][1])
 		)
 		xx2, yy2 = gpsmap.convert_geographic_to_screen(
-			OsmGpsMap.MapPoint.new_degrees(self.originbl[0], self.originbl[1])
+			OsmGpsMap.MapPoint.new_degrees(self.bbox[1][0], self.bbox[1][1])
 		)
-		scaling = (yy2 - yy)/self.dataset.RasterYSize
+		scalingy = (yy2 - yy) / self.dataset.RasterYSize
+		scalingx = (xx2 - xx) / self.dataset.RasterXSize
 		cr.translate(xx, yy)
-		cr.scale(scaling, scaling)
-		cr.set_source_surface(self.s, 0,0)
+		cr.scale(scalingx, scalingy)
+		cr.set_source_surface(self.surface, 0,0)
 		cr.paint()
 		cr.restore()
+
+	def do_render(self, gpsmap):
+		pass
+
+	def do_busy(self):
+		return False
+
+	def do_button_press(self, gpsmap, gdkeventbutton):
+		return False
+
+
+
+class GDALRasterChart(ChartLayer):
+	def __init__(self, path):
+		super().__init__(path, 'raster')
+		self.rasters = []
+
+		# Get Info
+		# Preload min zoom
+		# Offer loading for increased zoom
+
+		# i = 0
+		# for x in [f for f in listdir(path) if isfile(join(path, f))]:
+		# 	if x.find('L10') == -1:
+		# 		continue
+
+		# 	i+=1
+
+		# 	if i > 2:
+		# 		continue
+
+		# 	try:
+		# 		print ('Loading',x)
+		# 		r = GDALSingleRasterChart(path + x)
+		# 		self.rasters.append(r)
+		# 	except Exception as e:
+		# 		print ('error', str(e))
+
+	def onRegister(self, onTickHandler = None):
+		files = [f for f in listdir(self.path) if isfile(join(self.path, f))]
+		i = 0
+
+		for x in files:
+			print (GDALSingleRasterChart.getFileInfo(self.path + x))
+
+			i += 1
+			if onTickHandler:
+				onTickHandler(i/len(files))
+
+		onTickHandler(1.0)
+		return True
+
+	def do_draw(self, gpsmap, cr):
+		for x in self.rasters:
+			x.do_draw(gpsmap, cr)
 
 	def do_render(self, gpsmap):
 		pass

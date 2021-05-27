@@ -17,33 +17,31 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import gi
 import math
 import json
-from .geojsonchartdrawer import GeoJSONChartDrawer
-from .s57chartdrawer import S57ChartDrawer
+from .vectordrawer import GeoJSONChartDrawer
+from .vectordrawer import S57ChartDrawer
 from osgeo import ogr, osr, gdal
 
 gi.require_version("Gtk", "3.0")
 gi.require_version('OsmGpsMap', '1.0')
 
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap
+from .chartlayer import ChartLayer
 
-class GDALVectorChart:
-	def __init__(self, path, drvName = None):
+class GDALVectorChart(ChartLayer):
+	def __init__(self, path):
+		super().__init__(path, 'vector')
+
 		self.drawer = None 
 
-		if drvName == None:
-			if path.find("geojson") != -1:
-				drvName = "GeoJSON"
-				self.drawer = GeoJSONChartDrawer()
-			elif path.find("shp") != -1:
-				drvName = "ESRI Shapefile"
-			elif path.find (".000") != -1:
-				drvName = "S57"
-				self.drawer = S57ChartDrawer()
-		else:
-			if drvName == 'S57':
-				self.drawer = S57ChartDrawer()
-			elif drvName == 'GeoJSON':
-				self.drawer = GeoJSONChartDrawer()
+		drvName = None
+		if path.find("geojson") != -1:
+			drvName = "GeoJSON"
+			self.drawer = GeoJSONChartDrawer()
+		elif path.find("shp") != -1:
+			drvName = "ESRI Shapefile"
+		elif path.find (".000") != -1:
+			drvName = "S57"
+			self.drawer = S57ChartDrawer()
 
 		if drvName == None or self.drawer == None:
 			raise ("Invalid format")
@@ -55,7 +53,8 @@ class GDALVectorChart:
 		if self.vectorFile == None:
 			raise ("Unable to open vector map %s" % path)
 
-
+	def onRegister(self, onTickHandler = None):
+		print("Registered!")
 
 	def do_draw(self, gpsmap, cr):
 		# Get bounding box

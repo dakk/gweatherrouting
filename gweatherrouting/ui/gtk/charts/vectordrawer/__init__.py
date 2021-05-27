@@ -14,4 +14,5 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
-from .chartmanager import ChartManager
+from .geojsonchartdrawer import GeoJSONChartDrawer
+from .s57chartdrawer import S57ChartDrawer
