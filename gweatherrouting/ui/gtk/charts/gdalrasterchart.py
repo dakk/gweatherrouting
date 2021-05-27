@@ -36,28 +36,58 @@ class GDALRasterChart:
 		if not dataset:
 			raise ("Unable to open raster chart %s" % path)
 
-		# Raster info
-		print("Driver: {}/{}".format(dataset.GetDriver().ShortName,
-							dataset.GetDriver().LongName))
-		print("Size is {} x {} x {}".format(dataset.RasterXSize,
-											dataset.RasterYSize,
-											dataset.RasterCount))
-		print("Projection is {}".format(dataset.GetProjection()))
+		# print("Driver: {}/{}".format(dataset.GetDriver().ShortName,
+		# 					dataset.GetDriver().LongName))
+		# print("Size is {} x {} x {}".format(dataset.RasterXSize,
+		# 									dataset.RasterYSize,
+		# 									dataset.RasterCount))
+		# print("Projection is {}".format(dataset.GetProjection()))
 		geotransform = dataset.GetGeoTransform()
-		if geotransform:
-			print("Origin = ({}, {})".format(geotransform[0], geotransform[3]))
-			print("Pixel Size = ({}, {})".format(geotransform[1], geotransform[5]))
+		# if geotransform:
+		# 	print("Origin = ({}, {})".format(geotransform[0], geotransform[3]))
+		# 	print("Pixel Size = ({}, {})".format(geotransform[1], geotransform[5]))
 
 		self.geotransform = geotransform
 		self.dataset = dataset
 
-		self.s = self.bandToSurface(1)
 
+
+		# Calc origin
+		old_cs= osr.SpatialReference()
+		old_cs.ImportFromWkt(dataset.GetProjectionRef())
+
+		wgs84_wkt = """
+		GEOGCS["WGS 84",
+			DATUM["WGS_1984",
+				SPHEROID["WGS 84",6378137,298.257223563,
+					AUTHORITY["EPSG","7030"]],
+				AUTHORITY["EPSG","6326"]],
+			PRIMEM["Greenwich",0,
+				AUTHORITY["EPSG","8901"]],
+			UNIT["degree",0.01745329251994328,
+				AUTHORITY["EPSG","9122"]],
+			AUTHORITY["EPSG","4326"]]"""
+		new_cs = osr.SpatialReference()
+		new_cs .ImportFromWkt(wgs84_wkt)
+
+		transform = osr.CoordinateTransformation(old_cs,new_cs) 
+
+		width = dataset.RasterXSize
+		height = dataset.RasterYSize
+		gt = dataset.GetGeoTransform()
+		minx = gt[0]
+		miny = gt[3] # + width*gt[4] + height*gt[5] 
+
+		self.origin = transform.TransformPoint(minx,miny) 
+
+		minx = gt[0]
+		miny = gt[3] + width*gt[4] + height*gt[5] 
+
+		self.originbl = transform.TransformPoint(minx,miny) 
+		self.s = self.bandToSurface(1)
 
 	def bandToSurface(self, i):
 		band = self.dataset.GetRasterBand(i)
-
-		# print("Band Type={}".format(gdal.GetDataTypeName(band.DataType)))
 
 		min = band.GetMinimum()
 		max = band.GetMaximum()
@@ -67,7 +97,7 @@ class GDALRasterChart:
 		colors = {}
 		ct = band.GetRasterColorTable()
 		
-		for x in range(int(min), int(max) + 1):
+		for x in range(0, int(max) + 1):
 			try: 
 				c = ct.GetColorEntry(x)
 			except:
@@ -75,30 +105,10 @@ class GDALRasterChart:
 			
 			colors[x] = bytearray([c[0], c[1], c[2], 0])
 
-
-		# print("Min={:.3f}, Max={:.3f}".format(min,max))
-
-		# if band.GetOverviewCount() > 0:
-		# 	print("Band has {} overviews".format(band.GetOverviewCount()))
-
-
-		# Read a scanline
-
-		# scanline = band.ReadRaster(xoff=0, yoff=0,
-		# 				xsize=band.XSize, ysize=band.YSize,
-		# 				buf_xsize=band.XSize, buf_ysize=band.YSize,
-		# 				buf_type=gdal.GDT_Byte)
-		
-		# print ('read scanline')
-		# for x in scanline:
-		# 	data.extend(colors[int(x)])
-
 		data = bytearray()
 		for x in band.ReadAsArray():
 			for y in x:
 				data.extend(colors[int(y)])
-
-		print(self.geotransform)
 
 		return cairo.ImageSurface.create_for_data(data, cairo.Format.RGB24, band.XSize, band.YSize, cairo.Format.RGB24.stride_for_width(band.XSize))
 
@@ -108,15 +118,19 @@ class GDALRasterChart:
 		p1lat, p1lon = p1.get_degrees()
 		p2lat, p2lon = p2.get_degrees()
 
+		cr.save()
 		xx, yy = gpsmap.convert_geographic_to_screen(
-			OsmGpsMap.MapPoint.new_degrees((self.geotransform[0] / 10000 - p1lat) % 180, (self.geotransform[3] / 10000 - p1lon) % 360)
+			OsmGpsMap.MapPoint.new_degrees(self.origin[0], self.origin[1])
 		)
-		print(xx,yy)
-		cr.translate(yy, xx)
-		cr.scale(0.01, 0.01)
-		cr.set_source_surface(self.s, 0, 0)
+		xx2, yy2 = gpsmap.convert_geographic_to_screen(
+			OsmGpsMap.MapPoint.new_degrees(self.originbl[0], self.originbl[1])
+		)
+		scaling = (yy2 - yy)/self.dataset.RasterYSize
+		cr.translate(xx, yy)
+		cr.scale(scaling, scaling)
+		cr.set_source_surface(self.s, 0,0)
 		cr.paint()
-
+		cr.restore()
 
 	def do_render(self, gpsmap):
 		pass
