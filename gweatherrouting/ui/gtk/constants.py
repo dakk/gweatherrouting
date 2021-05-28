@@ -1,0 +1,35 @@
+
+ROUTING_TRACK_WIDTH = 2
+ROUTING_TRACK_COLOR = (1, 0, 0, 1)
+ROUTING_TRACK_FONT_COLOR = (1, 1, 1, 1)
+ROUTING_TRACK_FONT_SIZE = 13
+
+
+TRACK_POI_FONT_COLOR = (1,1,1,1)
+INACTIVE_TRACK_POI_FONT_COLOR = (1,1,1,0.7)
+TRACK_POI_FONT_SIZE = 13
+
+ACTIVE_TRACK_WIDTH = 2
+ACTIVE_TRACK_COLOR = (1, 1, 1, 1)
+ACTIVE_TRACK_FONT_COLOR = (1,1,1,1)
+ACTIVE_TRACK_FONT_SIZE = 13
+
+INACTIVE_TRACK_COLOR = (1, 1, 1, 0.6)
+INACTIVE_TRACK_WIDTH = 2
+INACTIVE_TRACK_FONT_COLOR = (1,1,1,0.6)
+INACTIVE_TRACK_FONT_SIZE = 13
+
+ROUTING_BOAT_COLOR = (0, 0.4, 0, 1.0)
+ROUTING_BOAT_WIDTH = 5
+
+POI_TRIANGLE_COLOR = (1, 1, 1, 1)
+POI_FONT_COLOR = (1, 1, 1, 1)
+POI_FONT_SIZE = 13
+
+def setStyle(cr, c, width = None, fontSize = None):
+    if width: 
+        cr.set_line_width(width)
+    if fontSize:
+        cr.set_font_size(fontSize)
+        
+    cr.set_source_rgba (c[0], c[1], c[2], c[3])
