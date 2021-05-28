@@ -17,6 +17,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import gi
 import time
 import cairo
+import multiprocessing
 import numpy as np
 from os import listdir
 from os.path import isfile, join
@@ -94,7 +95,18 @@ class GDALSingleRasterChart:
 		self.geotransform = geotransform
 		self.dataset = dataset
 		self.bbox = datasetBBox(dataset)
-		self.surface = self.bandToSurface(1)
+
+		def worker(i, return_dict):
+			return_dict['surface'] = self.bandToSurface(i)
+
+		manager = multiprocessing.Manager()
+		return_dict = manager.dict()
+		p = multiprocessing.Process(target=worker, args=(1, return_dict))
+		p.start()
+		p.join()
+		surface, bandXSize, bandYSize = return_dict['surface']
+		surf = cairo.ImageSurface.create_for_data(surface, cairo.Format.RGB24, bandXSize, bandYSize, cairo.Format.RGB24.stride_for_width(bandXSize))
+		self.surface = surf
 
 	def bandToSurface(self, i):
 		band = self.dataset.GetRasterBand(i)
@@ -117,7 +129,7 @@ class GDALSingleRasterChart:
 			# colors[x] = int(hex(c[0])[2:][::-1], 16)*0xFFFF + int(hex(c[1])[2:][::-1], 16)*0xFF + int(hex(c[2])[2:][::-1], 16) *0x1
 
 		data = np.vectorize(lambda x: colors[x], otypes=[np.int32])(band.ReadAsArray())
-		return cairo.ImageSurface.create_for_data(data, cairo.Format.RGB24, band.XSize, band.YSize, cairo.Format.RGB24.stride_for_width(band.XSize))
+		return data, band.XSize, band.YSize
 
 
 	def do_draw(self, gpsmap, cr):
@@ -139,7 +151,6 @@ class GDALSingleRasterChart:
 		cr.set_source_surface(self.surface, 0,0)
 		cr.paint()
 		cr.restore()
-
 
 
 
@@ -180,7 +191,6 @@ class GDALRasterChart(ChartLayer):
 	lastRect = None
 	lastRasters = None
 
-
 	def loadRaster(self, gpsmap, path):
 		with self.loadLock:
 			print ('Loading', path)
@@ -191,7 +201,6 @@ class GDALRasterChart(ChartLayer):
 			gpsmap.queue_draw()
 			Gdk.threads_leave()
 		
-
 	def do_draw(self, gpsmap, cr):
 		p1, p2 = gpsmap.get_bbox()
 		p1lat, p1lon = p1.get_degrees()
@@ -230,11 +239,9 @@ class GDALRasterChart(ChartLayer):
 			if a or b or c or d:
 				toload.append([path, bb, area, inside])
 
+
 		toload.sort(key=lambda x: x[2])
 		toload.reverse()
-
-		# print (len(toload), len(self.metadata))
-
 
 		# Check which rasters are already loaded
 		rasters = []
@@ -244,24 +251,45 @@ class GDALRasterChart(ChartLayer):
 				if self.cached[x[0]] != 'loading':
 					rasters.append(self.cached[x[0]])
 				continue
-				
-			# print ('Loading', x)
-			# r = GDALSingleRasterChart(x[0])
-			# self.cached[x[0]] = r
-			# rasters.append(r)
+			
 			self.cached[x[0]] = 'loading'
 
 			t = Thread(target=self.loadRaster, args=(gpsmap, x[0],))
 			t.daemon = True
 			t.start()
 
-
 		# Save and render
 		self.lastRect = [p1lat, p1lon, p2lat, p2lon]
 		self.lastRasters = rasters
 		
+		print ('rendering',len(rasters))
 		for x in rasters:
 			x.do_draw(gpsmap, cr)
+
+
+		for x in self.metadata:
+			bb = x[1]
+
+			minRLat = min(bb[0][0], bb[1][0])
+			maxRLat = max(bb[0][0], bb[1][0])
+			minRLon = min(bb[0][1], bb[1][1])
+			maxRLon = max(bb[0][1], bb[1][1])
+			
+			xx, yy = gpsmap.convert_geographic_to_screen(
+				OsmGpsMap.MapPoint.new_degrees(minRLat, minRLon)
+			)
+			xx2, yy2 = gpsmap.convert_geographic_to_screen(
+				OsmGpsMap.MapPoint.new_degrees(maxRLat, maxRLon)
+			)
+
+			cr.set_source_rgba(1,0,0,0.6)
+			cr.set_line_width(0.3)
+			cr.move_to(xx, yy)
+			cr.line_to(xx, yy2)
+			cr.line_to(xx2, yy2)
+			cr.line_to(xx2, yy)
+			cr.line_to(xx, yy)
+			cr.stroke()
 
 	def do_render(self, gpsmap):
 		pass
