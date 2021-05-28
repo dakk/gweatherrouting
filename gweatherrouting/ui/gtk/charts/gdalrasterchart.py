@@ -15,15 +15,18 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
 import gi
+import time
 import cairo
+import numpy as np
 from os import listdir
 from os.path import isfile, join
 from osgeo import ogr, osr, gdal
+from threading import Thread, Lock
 
 gi.require_version("Gtk", "3.0")
 gi.require_version('OsmGpsMap', '1.0')
 
-from gi.repository import Gtk, Gio, GObject, OsmGpsMap
+from gi.repository import Gtk, Gio, GObject, OsmGpsMap, Gdk
 from .chartlayer import ChartLayer
 
 # https://gdal.org/tutorials/raster_api_tut.html
@@ -109,14 +112,11 @@ class GDALSingleRasterChart:
 				c = ct.GetColorEntry(x)
 			except:
 				c = (0, 0, 0, 0)
-			
-			colors[x] = bytearray([c[0], c[1], c[2], 0])
+				
+			colors[x] = c[0]*0xFFFFFF + c[1]*0xFFFF + c[2] *0xFF
+			# colors[x] = int(hex(c[0])[2:][::-1], 16)*0xFFFF + int(hex(c[1])[2:][::-1], 16)*0xFF + int(hex(c[2])[2:][::-1], 16) *0x1
 
-		data = bytearray()
-		for x in band.ReadAsArray():
-			for y in x:
-				data.extend(colors[int(y)])
-
+		data = np.vectorize(lambda x: colors[x], otypes=[np.int32])(band.ReadAsArray())
 		return cairo.ImageSurface.create_for_data(data, cairo.Format.RGB24, band.XSize, band.YSize, cairo.Format.RGB24.stride_for_width(band.XSize))
 
 
@@ -140,42 +140,21 @@ class GDALSingleRasterChart:
 		cr.paint()
 		cr.restore()
 
-	def do_render(self, gpsmap):
-		pass
-
-	def do_busy(self):
-		return False
-
-	def do_button_press(self, gpsmap, gdkeventbutton):
-		return False
 
 
 
 class GDALRasterChart(ChartLayer):
 	def __init__(self, path, metadata = None):
 		super().__init__(path, 'raster', metadata)
-		self.rasters = []
+		self.cached = {}
+		self.loadLock = Lock()
 
-		# Get Info
-		# Preload min zoom
-		# Offer loading for increased zoom
+		if metadata:
+			self.onMetadataUpdate()
 
-		# i = 0
-		# for x in [f for f in listdir(path) if isfile(join(path, f))]:
-		# 	if x.find('L10') == -1:
-		# 		continue
 
-		# 	i+=1
-
-		# 	if i > 2:
-		# 		continue
-
-		# 	try:
-		# 		print ('Loading',x)
-		# 		r = GDALSingleRasterChart(path + x)
-		# 		self.rasters.append(r)
-		# 	except Exception as e:
-		# 		print ('error', str(e))
+	def onMetadataUpdate(self):
+		pass
 
 	def onRegister(self, onTickHandler = None):
 		self.metadata = []
@@ -191,31 +170,97 @@ class GDALRasterChart(ChartLayer):
 			if onTickHandler:
 				onTickHandler(i/len(files))
 
-
-		# Load also the tiles
-		# i = 0
-		# ff = list(filter(lambda x: x.find('L10') != -1, [f for f in listdir(self.path) if isfile(join(self.path, f))]))
-		# for x in ff:
-		# 	i+=1
-
-		# 	try:
-		# 		print ('Loading',x)
-		# 		r = GDALSingleRasterChart(self.path + x)
-		# 		self.rasters.append(r)
-		# 	except Exception as e:
-		# 		print ('error', str(e))
-
-		# 	if onTickHandler:
-		# 		onTickHandler(i/len(ff))
-
+		self.onMetadataUpdate(metadata)
 
 		if onTickHandler:
 			onTickHandler(1.0)
 
 		return True
 
+	lastRect = None
+	lastRasters = None
+
+
+	def loadRaster(self, gpsmap, path):
+		with self.loadLock:
+			print ('Loading', path)
+			r = GDALSingleRasterChart(path)
+			self.cached[path] = r
+			print ('Done loading', path)
+			Gdk.threads_enter()
+			gpsmap.queue_draw()
+			Gdk.threads_leave()
+		
+
 	def do_draw(self, gpsmap, cr):
-		for x in self.rasters:
+		p1, p2 = gpsmap.get_bbox()
+		p1lat, p1lon = p1.get_degrees()
+		p2lat, p2lon = p2.get_degrees()
+		scale = gpsmap.get_scale()
+
+		# Check if bounds hasn't changed
+		# if self.lastRasters and self.lastRect == [p1lat, p1lon, p2lat, p2lon]:
+		# 	for x in self.lastRasters:
+		# 		x.do_draw(gpsmap, cr)
+		# 	return
+
+		# Estimate which raster is necessary given bound and zoom
+		minBLat = min(p1lat, p2lat)
+		maxBLat = max(p1lat, p2lat)
+		minBLon = min(p1lon, p2lon)
+		maxBLon = max(p1lon, p2lon)
+
+		toload = []
+		for x in self.metadata:
+			bb, path, sizeX, sizeY = x[1], x[0], x[2], x[3]
+
+			minRLat = min(bb[0][0], bb[1][0])
+			maxRLat = max(bb[0][0], bb[1][0])
+			minRLon = min(bb[0][1], bb[1][1])
+			maxRLon = max(bb[0][1], bb[1][1])
+
+			inside = minRLat > minBLat and maxRLat < maxBLat and minRLon > minBLon and maxRLon < maxBLon
+			a = minRLat < minBLat and maxRLat > maxBLat and minRLon > minBLon and minRLon < maxBLon
+			b = minRLat < minBLat and maxRLat > maxBLat and minRLon < minBLon and maxRLon > minBLon
+			c = minRLat < minBLat and maxRLat > minBLat and minRLon < minBLon and maxRLon > maxBLon
+			d = minRLat < maxBLat and maxRLat > maxBLat and minRLon < minBLon and maxRLon > maxBLon
+
+			area = (((maxRLat + 90) - (minRLat + 90))) * (((maxRLon + 180) - (minRLon + 180)))
+
+			if a or b or c or d:
+				toload.append([path, bb, area, inside])
+
+		toload.sort(key=lambda x: x[2])
+		toload.reverse()
+
+		# print (len(toload), len(self.metadata))
+
+
+		# Check which rasters are already loaded
+		rasters = []
+
+		for x in toload:
+			if x[0] in self.cached:
+				if self.cached[x[0]] != 'loading':
+					rasters.append(self.cached[x[0]])
+				continue
+				
+			# print ('Loading', x)
+			# r = GDALSingleRasterChart(x[0])
+			# self.cached[x[0]] = r
+			# rasters.append(r)
+			self.cached[x[0]] = 'loading'
+
+			t = Thread(target=self.loadRaster, args=(gpsmap, x[0],))
+			t.daemon = True
+			t.start()
+
+
+		# Save and render
+		self.lastRect = [p1lat, p1lon, p2lat, p2lon]
+		self.lastRasters = rasters
+		
+		for x in rasters:
 			x.do_draw(gpsmap, cr)
 
 	def do_render(self, gpsmap):
