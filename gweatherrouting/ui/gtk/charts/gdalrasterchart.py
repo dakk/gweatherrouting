@@ -75,7 +75,7 @@ class GDALSingleRasterChart:
 		return (path, bbox, dataset.RasterXSize, dataset.RasterYSize)
 
 
-	def __init__(self, path, drvName=None):
+	def __init__(self, path):
 		dataset = gdal.Open(path, gdal.GA_ReadOnly)
 
 		if not dataset:
@@ -152,8 +152,8 @@ class GDALSingleRasterChart:
 
 
 class GDALRasterChart(ChartLayer):
-	def __init__(self, path):
-		super().__init__(path, 'raster')
+	def __init__(self, path, metadata = None):
+		super().__init__(path, 'raster', metadata)
 		self.rasters = []
 
 		# Get Info
@@ -178,12 +178,14 @@ class GDALRasterChart(ChartLayer):
 		# 		print ('error', str(e))
 
 	def onRegister(self, onTickHandler = None):
+		self.metadata = []
+
 		files = [f for f in listdir(self.path) if isfile(join(self.path, f))]
 		i = 0
 
 		for x in files:
 			finfo = GDALSingleRasterChart.getFileInfo(self.path + x)
-			print(finfo)
+			self.metadata.append(finfo)
 
 			i += 1
 			if onTickHandler:
@@ -191,20 +193,20 @@ class GDALRasterChart(ChartLayer):
 
 
 		# Load also the tiles
-		i = 0
-		ff = list(filter(lambda x: x.find('L10') != -1, [f for f in listdir(self.path) if isfile(join(self.path, f))]))
-		for x in ff:
-			i+=1
+		# i = 0
+		# ff = list(filter(lambda x: x.find('L10') != -1, [f for f in listdir(self.path) if isfile(join(self.path, f))]))
+		# for x in ff:
+		# 	i+=1
 
-			try:
-				print ('Loading',x)
-				r = GDALSingleRasterChart(self.path + x)
-				self.rasters.append(r)
-			except Exception as e:
-				print ('error', str(e))
+		# 	try:
+		# 		print ('Loading',x)
+		# 		r = GDALSingleRasterChart(self.path + x)
+		# 		self.rasters.append(r)
+		# 	except Exception as e:
+		# 		print ('error', str(e))
 
-			if onTickHandler:
-				onTickHandler(i/len(ff))
+		# 	if onTickHandler:
+		# 		onTickHandler(i/len(ff))
 
 
 		if onTickHandler:

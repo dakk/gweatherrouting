@@ -17,6 +17,8 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import gi
 import os
 
+from .... import log
+import logging
 from .chartlayer import ChartLayer
 from .gdalvectorchart import GDALVectorChart
 from .gdalrasterchart import GDALRasterChart
@@ -25,6 +27,8 @@ gi.require_version("Gtk", "3.0")
 gi.require_version('OsmGpsMap', '1.0')
 
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap
+
+logger = logging.getLogger ('gweatherrouting')
 
 class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 	def __init__(self, m):
@@ -35,13 +39,15 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 	def loadBaseChart(self):
 		self.charts += [GDALVectorChart(os.path.abspath(os.path.dirname(__file__)) + "/../../../data/countries.geojson")]
 
-	def loadVectorLayer(self, path):
-		l = GDALVectorChart(path)
+	def loadVectorLayer(self, path, metadata = None):
+		logger.info("Loading vector chart %s" % path)
+		l = GDALVectorChart(path, metadata)
 		self.charts += [l]
 		return l
 
-	def loadRasterLayer(self, path):
-		l = GDALRasterChart(path)
+	def loadRasterLayer(self, path, metadata = None):
+		logger.info("Loading raster chart %s" % path)
+		l = GDALRasterChart(path, metadata)
 		self.charts += [l]
 		return l
 

@@ -45,12 +45,12 @@ class SettingsWindow:
 		self.window.set_default_size (550, 300)
 
 		self.builder.get_object('chart-progress').hide()
-		self.reloadChart()
 
 		# self.dialog.add_button("Cancel", Gtk.ResponseType.CANCEL)
 		# self.dialog.add_button("Save", Gtk.ResponseType.OK)
 
 		# self.dialog.show_all ()
+		self.reloadChart()
 
 	def reloadChart(self):
 		self.chartStore = self.builder.get_object("chart-store")
@@ -59,7 +59,7 @@ class SettingsWindow:
 		for p in self.mainWindow.chartManager.charts:
 			self.chartStore.append ([p.path, p.enabled, p.ctype])
 
-	def registeringChart(self, l):
+	def registeringChart(self, l, t):
 		def ticker(x):
 			Gdk.threads_enter()
 			self.builder.get_object('chart-progress').set_fraction(x)
@@ -70,13 +70,26 @@ class SettingsWindow:
 		self.builder.get_object('chart-progress').show()
 		Gdk.threads_leave()
 
-		l.onRegister(ticker)
+		if l.onRegister(ticker):
+			vc = self.settingsManager.getSessionVariable(t + 'Charts')
+			if not vc:
+				vc = []
+
+			vc.append({
+				'path': l.path,
+				'metadata': l.metadata
+			})
+			self.settingsManager.storeSessionVariable(t+'Charts', vc)
+
+			self.reloadChart()
+		else:
+			# Show error
+			pass
 
 		Gdk.threads_enter()
 		self.builder.get_object('chart-progress').hide()
 		Gdk.threads_leave()
 
-		self.reloadChart()
 
 
 	def onAddRasterChart(self, widget):
@@ -91,7 +104,7 @@ class SettingsWindow:
 			l = self.mainWindow.chartManager.loadRasterLayer(path)
 			dialog.destroy ()
 
-			Thread(target=self.registeringChart, args=(l,)).start()
+			Thread(target=self.registeringChart, args=(l, 'raster', )).start()
 		else:
 			dialog.destroy ()
 			

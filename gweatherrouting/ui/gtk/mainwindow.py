@@ -72,6 +72,13 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 		self.chartManager = ChartManager(self.map)
 		self.chartManager.loadBaseChart()
 		self.map.layer_add (self.chartManager)
+		
+		for x in self.settingsManager.getSessionVariable('vectorCharts') or []:
+			l = self.chartManager.loadVectorLayer(x['path'], x['metadata'])
+
+		for x in self.settingsManager.getSessionVariable('rasterCharts') or []:
+			l = self.chartManager.loadRasterLayer(x['path'], x['metadata'])
+
 
 		self.gribMapLayer = GribMapLayer (self.core.gribManager, self.timeControl)
 		self.map.layer_add (self.gribMapLayer)

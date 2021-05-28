@@ -20,14 +20,11 @@ defaultSession = {
 	'grib': {
 		'arrowColor': '#ccc'
 	},
-	'charts': {
-		'directories': []
-	},
+	'vectorCharts': [],
+	'rasterCharts': [],
 	'ais': {
-
 	},
-	'nmea': {
-		
+	'nmea': {		
 	}
 }
 
