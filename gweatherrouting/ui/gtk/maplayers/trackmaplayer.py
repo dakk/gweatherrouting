@@ -15,7 +15,6 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 import gi
-import colorsys
 import math
 import dateutil.parser
 import datetime

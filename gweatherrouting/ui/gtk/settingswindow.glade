@@ -48,7 +48,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <child>
-                  <object class="GtkBox">
+                  <object class="GtkBox" id="general-tab">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="orientation">vertical</property>
@@ -151,6 +151,18 @@
                                   </packing>
                                 </child>
                                 <child>
+                                  <object class="GtkProgressBar" id="chart-progress">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="show-text">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                                <child>
                                   <object class="GtkBox">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
@@ -188,18 +200,6 @@
                                         <property name="position">1</property>
                                       </packing>
                                     </child>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">1</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkProgressBar" id="chart-progress">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="show-text">True</property>
                                   </object>
                                   <packing>
                                     <property name="expand">False</property>
@@ -372,7 +372,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkBox">
+                  <object class="GtkBox" id="ais-tab">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="orientation">vertical</property>
@@ -393,7 +393,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkBox">
+                  <object class="GtkBox" id="nmea-tab">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="orientation">vertical</property>

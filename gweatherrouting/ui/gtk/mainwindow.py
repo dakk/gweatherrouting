@@ -65,6 +65,9 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 		self.window.show_all()
 		# self.window.maximize ()
 
+
+		self.builder.get_object("project-properties-button").hide()
+
 		self.map = self.builder.get_object("map")
 
 		self.map.set_center_and_zoom (39., 9., 6)

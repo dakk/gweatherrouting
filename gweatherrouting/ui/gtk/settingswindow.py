@@ -46,6 +46,10 @@ class SettingsWindow:
 
 		self.builder.get_object('chart-progress').hide()
 
+		self.builder.get_object("nmea-tab").hide()
+		self.builder.get_object("ais-tab").hide()
+		self.builder.get_object("general-tab").hide()
+
 		# self.dialog.add_button("Cancel", Gtk.ResponseType.CANCEL)
 		# self.dialog.add_button("Save", Gtk.ResponseType.OK)
 

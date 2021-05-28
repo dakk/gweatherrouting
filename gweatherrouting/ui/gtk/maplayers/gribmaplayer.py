@@ -15,8 +15,8 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
 import gi
-import colorsys
 import math
+from ..constants import *
 
 gi.require_version("Gtk", "3.0")
 gi.require_version('OsmGpsMap', '1.0')
