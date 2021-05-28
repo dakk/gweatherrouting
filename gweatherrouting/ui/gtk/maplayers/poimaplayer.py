@@ -36,7 +36,7 @@ class POIMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 
             x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (tr.position[0], tr.position[1]))
 
-            cr.set_source_rgba (1, 1, 1, 0.8)
+            cr.set_source_rgba (1, 1, 1, 1)
             cr.set_font_size(13)
             cr.move_to(x-10, y-10)
             cr.show_text(tr.name)

@@ -14,6 +14,8 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
+from .... import log
+import logging
 import gi
 import time
 import cairo
@@ -29,6 +31,8 @@ gi.require_version('OsmGpsMap', '1.0')
 
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap, Gdk
 from .chartlayer import ChartLayer
+
+logger = logging.getLogger ('gweatherrouting')
 
 # https://gdal.org/tutorials/raster_api_tut.html
 
@@ -193,10 +197,10 @@ class GDALRasterChart(ChartLayer):
 
 	def loadRaster(self, gpsmap, path):
 		with self.loadLock:
-			print ('Loading', path)
+			logger.debug('Loading raster file ' + path)
 			r = GDALSingleRasterChart(path)
 			self.cached[path] = r
-			print ('Done loading', path)
+			logger.debug('Done loading raster file ' + path)
 			Gdk.threads_enter()
 			gpsmap.queue_draw()
 			Gdk.threads_leave()
@@ -262,7 +266,7 @@ class GDALRasterChart(ChartLayer):
 		self.lastRect = [p1lat, p1lon, p2lat, p2lon]
 		self.lastRasters = rasters
 		
-		print ('rendering',len(rasters))
+		# print ('rendering',len(rasters))
 		for x in rasters:
 			x.do_draw(gpsmap, cr)
 

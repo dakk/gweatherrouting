@@ -49,7 +49,7 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
                 x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (p[0], p[1]))
 
                 if prevp == None:
-                    cr.set_source_rgba (1, 1, 1, 0.8)
+                    cr.set_source_rgba (1, 1, 1, 1.0)
                     cr.set_font_size(13)
                     cr.move_to(x+10, y)
                     cr.show_text(tr.name)
@@ -73,7 +73,7 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
                         cr.fill()  
 
                 
-                cr.set_source_rgba (1, 1, 1, 0.8)
+                cr.set_source_rgba (1, 1, 1, 1.0)
                 cr.set_font_size(13)
                 # cr.move_to(x-4, y+18)
                 # cr.show_text(str(p[2]))
@@ -82,14 +82,14 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 
                 if prevx != None and prevy != None:
                     cr.set_line_width (3)
-                    cr.set_source_rgba (1, 0, 0, 0.8)
+                    cr.set_source_rgba (1, 0, 0, 1.0)
 
                     cr.move_to (prevx, prevy)
                     cr.line_to (x, y)
                     cr.stroke()
 
                 cr.set_line_width (2)
-                cr.set_source_rgba (1, 1, 1, 0.8)
+                cr.set_source_rgba (1, 1, 1, 1)
                 cr.arc(x, y, 5, 0, 2 * math.pi)
                 cr.stroke()
 
@@ -115,9 +115,9 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 
                 if prevx == None:
                     if active:
-                        cr.set_source_rgba (1, 1, 1, 0.8)
+                        cr.set_source_rgba (1, 1, 1, 1)
                     else:
-                        cr.set_source_rgba (1, 1, 1, 0.4)
+                        cr.set_source_rgba (1, 1, 1, 0.6)
                     cr.set_font_size(13)
                     cr.move_to(x-10, y-10)
                     cr.show_text(tr.name)
@@ -125,9 +125,9 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 
                 
                 if active:
-                    cr.set_source_rgba (1, 1, 1, 0.8)
+                    cr.set_source_rgba (1, 1, 1, 1)
                 else:
-                    cr.set_source_rgba (1, 1, 1, 0.4)
+                    cr.set_source_rgba (1, 1, 1, 0.6)
                 cr.set_font_size(13)
                 cr.move_to(x-4, y+18)
                 cr.show_text(str(i))
@@ -138,10 +138,10 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
                 if prevx != None and prevy != None:
                     if active:
                         cr.set_line_width (2)
-                        cr.set_source_rgba (1, 1, 1, 0.8)
+                        cr.set_source_rgba (1, 1, 1, 1)
                     else:
                         cr.set_line_width (2)
-                        cr.set_source_rgba (1, 1, 1, 0.4)
+                        cr.set_source_rgba (1, 1, 1, 0.6)
 
                     cr.move_to (prevx, prevy)
                     cr.line_to (x, y)
@@ -149,10 +149,10 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 
                 if active:
                     cr.set_line_width (2)
-                    cr.set_source_rgba (1, 1, 1, 0.8)
+                    cr.set_source_rgba (1, 1, 1, 1)
                 else:
                     cr.set_line_width (2)
-                    cr.set_source_rgba (1, 1, 1, 0.4)
+                    cr.set_source_rgba (1, 1, 1, 0.6)
                 cr.arc(x, y, 5, 0, 2 * math.pi)
                 cr.stroke()
 
