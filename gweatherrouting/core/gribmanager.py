@@ -5,23 +5,23 @@ import os
 import logging
 import requests
 from shutil import copyfile
-from ..session import *
+from ..storage import Storage, GRIB_DIR, TEMP_DIR
 from .grib import Grib
 import weatherrouting
 
 from bs4 import BeautifulSoup
 
-defaultSession = {
-	"opened": []
-}
-
 logger = logging.getLogger("gweatherrouting")
 
-
-class GribManager(Sessionable, weatherrouting.Grib):
+class GribManagerStorage(Storage):
 	def __init__(self):
-		Sessionable.__init__(self, "grib-manager", defaultSession)
+		Storage.__init__(self, "grib-manager")
+		self.opened = []
+		self.loadOrSaveDefault()
 
+class GribManager(weatherrouting.Grib):
+	def __init__(self):
+		self.storage = GribManagerStorage()
 		self.gribFiles = None
 
 		self.gribs = []
@@ -30,7 +30,7 @@ class GribManager(Sessionable, weatherrouting.Grib):
 		self.localGribs = []
 		self.refreshLocalGribs()
 
-		for x in self.getSessionVariable("opened"):
+		for x in self.storage.opened:
 			self.enable(x)
 
 	def refreshLocalGribs(self):
@@ -49,7 +49,7 @@ class GribManager(Sessionable, weatherrouting.Grib):
 				ss.index(x.name)
 			except:
 				ss.append(x.name)
-		self.storeSessionVariable("opened", ss)
+		self.storage.opened = ss
 
 	def load(self, path):
 		logger.info("Loading grib %s" % path)

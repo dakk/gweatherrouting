@@ -76,10 +76,10 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 		self.chartManager.loadBaseChart()
 		self.map.layer_add (self.chartManager)
 		
-		for x in self.settingsManager.getSessionVariable('vectorCharts') or []:
+		for x in self.settingsManager.vectorCharts:
 			l = self.chartManager.loadVectorLayer(x['path'], x['metadata'])
 
-		for x in self.settingsManager.getSessionVariable('rasterCharts') or []:
+		for x in self.settingsManager.rasterCharts:
 			l = self.chartManager.loadRasterLayer(x['path'], x['metadata'])
 
 

@@ -26,18 +26,20 @@ from itertools import tee
 import cairo
 
 
-
-
 class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 	def __init__(self, gribManager, timeControl, settingsManager):
 		GObject.GObject.__init__(self)
 		self.gribManager = gribManager
 		self.timeControl = timeControl
-		self.settingsManager = settingsManager
 		self.timeControl.connect("time-change", self.onTimeChange)
+
+		settingsManager.grib.register_on_change('arrowOpacity', self.onArrowOpacityChange)
 
 	def onTimeChange(self, t):
 		pass
+
+	def onArrowOpacityChange(self, v):
+		self.arrowOpacity = v
 
 	def _windColor(self, wspeed):
 		color = "0000CC"
@@ -77,11 +79,11 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 		c = int(color[4:6], 16) / 255.0
 		return (a,b,c)
 
-	def drawWindArrow(self, cr, x, y, wdir, wspeed, arrowOpacity):
+	def drawWindArrow(self, cr, x, y, wdir, wspeed):
 		wdir = -math.radians(wdir)
 
 		a, b, c = self._windColor(wspeed)
-		cr.set_source_rgba(a, b, c, arrowOpacity)
+		cr.set_source_rgba(a, b, c, self.arrowOpacity)
 
 		length = 15
 
@@ -103,7 +105,6 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 		cr.stroke()
 
 	def do_draw(self, gpsmap, cr):
-		arrowOpacity = self.settingsManager.getSessionVariable('grib')['arrowOpacity']
 		p1, p2 = gpsmap.get_bbox()
 
 		p1lat, p1lon = p1.get_degrees()
@@ -138,7 +139,7 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 				xx, yy = gpsmap.convert_geographic_to_screen(
 					OsmGpsMap.MapPoint.new_degrees(y[2][0], y[2][1])
 				)
-				self.drawWindArrow(cr, xx, yy, y[0], y[1], arrowOpacity)
+				self.drawWindArrow(cr, xx, yy, y[0], y[1])
 
 		# Draw gradients
 		# for i in range(0, len(data) - scale, scale):

@@ -14,12 +14,8 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
-from ..session import *
+from ..storage import Storage
 from .utils import uniqueName
-
-defaultSession = {
-	'pois': []
-}
 
 POI_TYPE_DEFAULT = 1
 
@@ -29,13 +25,20 @@ class POI:
 		self.position = position
 		self.visible = visible
 		self.type = poitype
+		self.loadOrSaveDefault()
 
-class POIManager(Sessionable):
+
+class PoiManagerStorage(Storage):
 	def __init__(self):
-		Sessionable.__init__(self, 'poi-manager', defaultSession)
+		Storage.__init__(self, "poi-manager")
 		self.pois = []
 
-		for x in self.getSessionVariable('pois'):
+class POIManager():
+	def __init__(self):
+		self.storage = PoiManagerStorage()
+		self.pois = []
+
+		for x in self.storage.pois:
 			tr = POI(name=x['name'], position=x['position'], visible=x['visible'], poitype=x['type'])
 			self.pois.append(tr)
 
@@ -56,7 +59,7 @@ class POIManager(Sessionable):
 		for x in self.pois:
 			ts.append({'name': x.name, 'position': x.position, 'visible': x.visible, 'type': x.type })
 
-		self.storeSessionVariable('pois', ts)
+		self.storage.pois = ts
 
 
 	def create(self, position):

@@ -16,50 +16,52 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 from .track import RoutingTrack, Track 
 from .utils import uniqueName
-from ..session import *
+from ..storage import Storage
 import gpxpy
 
 
-defaultSession = {
-	'tracks': [],
-	'activeTrack': '',
-	'routings': []
-}
-
-class TrackManager(Sessionable):
+class TrackManagerStorage(Storage):
 	def __init__(self):
-		Sessionable.__init__(self, 'track-manager', defaultSession)
+		Storage.__init__(self, "track-manager")
+		self.tracks = []
+		self.activeTrack = ''
+		self.routings = []
+		self.loadOrSaveDefault()
 
+
+class TrackManager():
+	def __init__(self):
+		self.storage = TrackManagerStorage()
 		self.tracks = []
 		self.routings = []
 		self.activeTrack = None
 
-		for x in self.getSessionVariable('tracks'):
+		for x in self.storage.tracks:
 			tr = Track(name=x['name'], waypoints=x['waypoints'], visible=x['visible'], trackManager=self)
 			self.tracks.append(tr)
 
-		for x in self.getSessionVariable('routings'):
+		for x in self.storage.routings:
 			tr = RoutingTrack(name=x['name'], waypoints=x['waypoints'], visible=x['visible'], trackManager=self)
 			self.routings.append(tr)
 
-		self.activate(self.getSessionVariable('activeTrack'))
+		self.activate(self.storage.activeTrack)
 
 	def saveTracks(self):
 		ts = []
 		for x in self.tracks:
 			ts.append({'name': x.name, 'waypoints': x.waypoints, 'visible': x.visible })
 
-		self.storeSessionVariable('tracks', ts)
+		self.storage.tracks = ts
 		if self.activeTrack:
-			self.storeSessionVariable('activeTrack', self.activeTrack.name)
+			self.storage.activeTrack = self.activeTrack.name
 		else:
-			self.storeSessionVariable('activeTrack', '')
+			self.storage.activeTrack = ''
 
 		ts = []
 		for x in self.routings:
 			ts.append({'name': x.name, 'waypoints': x.waypoints, 'visible': x.visible })
 
-		self.storeSessionVariable('routings', ts)
+		self.storage.routings = ts
 
 
 	def activate(self, name):

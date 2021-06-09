@@ -54,13 +54,11 @@ class SettingsWindow:
 
 		# self.dialog.show_all ()
 
-		self.builder.get_object('grib-arrow-opacity-adjustment').set_value(self.settingsManager.getSessionVariable('grib')['arrowOpacity'])
+		self.builder.get_object('grib-arrow-opacity-adjustment').set_value(self.settingsManager.grib.arrowOpacity)
 		self.reloadChart()
 
 	def onGribArrowOpacityChange(self, v):
-		gb = self.settingsManager.getSessionVariable('grib')
-		gb['arrowOpacity'] = v.get_value()
-		self.settingsManager.storeSessionVariable('grib', gb)
+		self.settingsManager.grib.arrowOpacity = v.get_value()
 
 
 	def reloadChart(self):
@@ -82,7 +80,7 @@ class SettingsWindow:
 		Gdk.threads_leave()
 
 		if l.onRegister(ticker):
-			vc = self.settingsManager.getSessionVariable(t + 'Charts')
+			vc = self.settingsManager[t + 'Charts']
 			if not vc:
 				vc = []
 
@@ -90,7 +88,7 @@ class SettingsWindow:
 				'path': l.path,
 				'metadata': l.metadata
 			})
-			self.settingsManager.storeSessionVariable(t+'Charts', vc)
+			self.settingsManager[t+'Charts'] = vc
 
 			self.reloadChart()
 		else:

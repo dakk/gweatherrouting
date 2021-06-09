@@ -14,20 +14,15 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
-from ...session import *
+from ...storage import Storage
 
-defaultSession = {
-	'grib': {
-		'arrowOpacity': 0.4
-	},
-	'vectorCharts': [],
-	'rasterCharts': [],
-	'ais': {
-	},
-	'nmea': {		
-	}
-}
-
-class SettingsManager(Sessionable):
+class SettingsManager(Storage):
 	def __init__(self):
-		Sessionable.__init__(self, "settings", defaultSession)
+		Storage.__init__(self, "settings")
+
+		self.grib = Storage(parent=self)
+		self.grib.arrowOpacity = 0.4
+		self.vectorCharts = []
+		self.rasterCharts = []
+		
+		self.loadOrSaveDefault()

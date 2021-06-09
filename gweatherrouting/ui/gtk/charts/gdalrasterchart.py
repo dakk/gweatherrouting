@@ -185,7 +185,7 @@ class GDALRasterChart(ChartLayer):
 			if onTickHandler:
 				onTickHandler(i/len(files))
 
-		self.onMetadataUpdate(metadata)
+		self.onMetadataUpdate()
 
 		if onTickHandler:
 			onTickHandler(1.0)
