@@ -32,6 +32,7 @@ class Style:
     class Track:
         RoutingTrack = CairoStyle(color=(1,0,0,1), lineWidth=2)
         RoutingTrackFont = CairoStyle(color=(1,1,1,1), fontSize=13)
+        RoutingTrackCircle = CairoStyle(color=(1,1,1,1), lineWidth=2)
 
         TrackActive = CairoStyle(color=(0x91/255., 0x4a/255., 0x7c/255., 1), lineWidth=2, dash=8.0)
         TrackActiveFont = CairoStyle(color=(1,1,1,1), fontSize=13)

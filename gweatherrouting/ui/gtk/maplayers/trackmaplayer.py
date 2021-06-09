@@ -75,7 +75,7 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
                     cr.line_to (x, y)
                     cr.stroke()
 
-                Style.Track.RoutingTrack.apply(cr)
+                Style.Track.RoutingTrackCircle.apply(cr)
                 cr.arc(x, y, 5, 0, 2 * math.pi)
                 cr.stroke()
 

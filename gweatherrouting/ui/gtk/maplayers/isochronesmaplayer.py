@@ -16,7 +16,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import gi
 import math
-from ..style import *
+from ..style import Style
 
 gi.require_version("Gtk", "3.0")
 gi.require_version('OsmGpsMap', '1.0')
@@ -50,27 +50,23 @@ class IsochronesMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
             )
 
             if prevx == None:
-                cr.set_source_rgba(1, 1, 1, 0.8)
-                cr.set_font_size(13)
+                Style.Track.RoutingTrackFont.apply(cr)
                 cr.move_to(x + 10, y)
                 cr.stroke()
 
-            cr.set_source_rgba(1, 1, 1, 0.8)
-            cr.set_font_size(13)
+            # Style.Track.RoutingTrackFont.apply(cr)
             cr.move_to(x - 4, y + 18)
             # cr.show_text(str(p[2]))
             # cr.stroke()
 
             if prevx != None and prevy != None:
-                cr.set_line_width(3)
-                cr.set_source_rgba(1, 0, 0, 0.8)
+                Style.Track.RoutingTrack.apply(cr)
 
                 cr.move_to(prevx, prevy)
                 cr.line_to(x, y)
                 cr.stroke()
 
-            cr.set_line_width(2)
-            cr.set_source_rgba(1, 1, 1, 0.8)
+            Style.Track.RoutingTrackCircle.apply(cr)
             cr.arc(x, y, 5, 0, 2 * math.pi)
             cr.stroke()
 
