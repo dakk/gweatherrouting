@@ -19,7 +19,7 @@ import math
 import dateutil.parser
 import datetime
 from ....core import utils
-from ..constants import *
+from ..style import *
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('OsmGpsMap', '1.0')
@@ -32,7 +32,6 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         self.trackManager = trackManager
         self.timeControl = timeControl
 
-     
 
     def do_draw (self, gpsmap, cr):
         for tr in self.trackManager.routings:
@@ -49,7 +48,7 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
                 x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (p[0], p[1]))
 
                 if prevp == None:
-                    setStyle(cr, ROUTING_TRACK_FONT_COLOR, fontSize=ROUTING_TRACK_FONT_SIZE)
+                    Style.Track.RoutingTrackFont.apply(cr)
                     cr.move_to(x+10, y)
                     cr.show_text(tr.name)
                     cr.stroke()
@@ -65,26 +64,18 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
                         
                         rp = utils.routagePointDistance (prevp[0], prevp[1], dl, math.radians(p[6]))
 
-                        setStyle(cr, ROUTING_BOAT_COLOR, ROUTING_BOAT_WIDTH)
+                        Style.Track.RoutingBoat.apply(cr)
                         xx, yy = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (rp[0], rp[1]))
                         cr.arc(xx, yy, 7, 0, 2 * math.pi)
                         cr.fill()  
 
-                
-                # cr.set_source_rgba (1, 1, 1, 1.0)
-                # cr.set_font_size(13)
-                # cr.move_to(x-4, y+18)
-                # cr.show_text(str(p[2]))
-                # cr.stroke()
-
-
                 if prevx != None and prevy != None:
-                    setStyle(cr, ROUTING_TRACK_COLOR, ROUTING_TRACK_WIDTH)
+                    Style.Track.RoutingTrack.apply(cr)
                     cr.move_to (prevx, prevy)
                     cr.line_to (x, y)
                     cr.stroke()
 
-                setStyle(cr, ROUTING_TRACK_COLOR, ROUTING_TRACK_WIDTH)
+                Style.Track.RoutingTrack.apply(cr)
                 cr.arc(x, y, 5, 0, 2 * math.pi)
                 cr.stroke()
 
@@ -110,9 +101,9 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 
                 if prevx == None:
                     if active:
-                        setStyle(cr, ACTIVE_TRACK_FONT_COLOR, fontSize=ACTIVE_TRACK_FONT_SIZE)
+                        Style.Track.TrackActiveFont.apply(cr)
                     else:
-                        setStyle(cr, INACTIVE_TRACK_FONT_COLOR, fontSize=INACTIVE_TRACK_FONT_SIZE)
+                        Style.Track.TrackInactiveFont.apply(cr)
 
                     cr.move_to(x-10, y-10)
                     cr.show_text(tr.name)
@@ -120,30 +111,31 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 
                 
                 if active:
-                    setStyle(cr, TRACK_POI_FONT_COLOR, fontSize=TRACK_POI_FONT_SIZE)
+                    Style.Track.TrackActivePoiFont.apply(cr)
                 else:
-                    setStyle(cr, INACTIVE_TRACK_POI_FONT_COLOR, fontSize=TRACK_POI_FONT_SIZE)
+                    Style.Track.TrackInactivePoiFont.apply(cr)
                     
                 cr.move_to(x-4, y+18)
                 cr.show_text(str(i))
                 cr.stroke()
 
-
-
                 if prevx != None and prevy != None:
                     if active:
-                        setStyle(cr, ACTIVE_TRACK_COLOR, ACTIVE_TRACK_WIDTH)
+                        Style.Track.TrackActive.apply(cr)
                     else:
-                        setStyle(cr, INACTIVE_TRACK_COLOR, INACTIVE_TRACK_WIDTH)
+                        Style.Track.TrackInactive.apply(cr)
 
                     cr.move_to (prevx, prevy)
                     cr.line_to (x, y)
                     cr.stroke()
 
                 if active:
-                    setStyle(cr, ACTIVE_TRACK_COLOR, ACTIVE_TRACK_WIDTH)
+                    Style.Track.TrackActive.apply(cr)
                 else:
-                    setStyle(cr, INACTIVE_TRACK_COLOR, INACTIVE_TRACK_WIDTH)
+                    Style.Track.TrackInactive.apply(cr)
+
+                Style.resetDash(cr)
+
                 cr.arc(x, y, 5, 0, 2 * math.pi)
                 cr.stroke()
 

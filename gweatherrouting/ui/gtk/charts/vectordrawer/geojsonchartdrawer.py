@@ -24,6 +24,7 @@ gi.require_version('OsmGpsMap', '1.0')
 
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap
 from .vectorchartdrawer import VectorChartDrawer
+from ...style import *
 
 
 class GeoJSONChartDrawer(VectorChartDrawer):
@@ -47,7 +48,7 @@ class GeoJSONChartDrawer(VectorChartDrawer):
 	def backgroundRender(self, gpsmap, cr):
 		width = float(gpsmap.get_allocated_width())
 		height = float(gpsmap.get_allocated_height())
-		cr.set_source_rgba(32 / 255, 125 / 255, 150 / 255, 1.0)
+		Style.GeoJSON.Sea.apply(cr)
 		cr.rectangle(0, 0, width, height)
 		cr.stroke_preserve()
 		cr.fill()
@@ -60,7 +61,7 @@ class GeoJSONChartDrawer(VectorChartDrawer):
 
 		if gj["type"] == "Polygon":
 			for l in gj["coordinates"]:
-				cr.set_source_rgba(245 / 255.0, 203 / 255.0, 66 / 255.0, 1.0)
+				Style.GeoJSON.LandStroke.apply(cr)
 				for x in l:
 					xx, yy = gpsmap.convert_geographic_to_screen(
 						OsmGpsMap.MapPoint.new_degrees(x[1], x[0])
@@ -69,13 +70,13 @@ class GeoJSONChartDrawer(VectorChartDrawer):
 
 				cr.close_path()
 				cr.stroke_preserve()
-				cr.set_source_rgba(245 / 255.0, 203 / 255.0, 66 / 255.0, 0.6)
+				Style.GeoJSON.LandFill.apply(cr)
 				cr.fill()
 
 		elif gj["type"] == "MultiPolygon":
 			for l in gj["coordinates"]:
 				for y in l:
-					cr.set_source_rgba(245 / 255.0, 203 / 255.0, 66 / 255.0, 1.0)
+					Style.GeoJSON.LandStroke.apply(cr)
 					for x in y:
 						xx, yy = gpsmap.convert_geographic_to_screen(
 							OsmGpsMap.MapPoint.new_degrees(x[1], x[0])
@@ -84,12 +85,12 @@ class GeoJSONChartDrawer(VectorChartDrawer):
 
 					cr.close_path()
 					cr.stroke_preserve()
-					cr.set_source_rgba(245 / 255.0, 203 / 255.0, 66 / 255.0, 0.6)
+					Style.GeoJSON.LandFill.apply(cr)
 					cr.fill()
 
 		elif gj["type"] == "LineString":
 			for x in gj["coordinates"]:
-				cr.set_source_rgba(245 / 255.0, 203 / 255.0, 66 / 255.0, 1.0)
+				Style.GeoJSON.LandStroke.apply(cr)
 				xx, yy = gpsmap.convert_geographic_to_screen(
 					OsmGpsMap.MapPoint.new_degrees(x[1], x[0])
 				)
@@ -97,7 +98,7 @@ class GeoJSONChartDrawer(VectorChartDrawer):
 
 			cr.close_path()
 			cr.stroke_preserve()
-			cr.set_source_rgba(245 / 255.0, 203 / 255.0, 66 / 255.0, 0.6)
+			Style.GeoJSON.LandFill.apply(cr)
 			cr.fill()
 
 		else:

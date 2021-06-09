@@ -28,7 +28,10 @@ class SettingsWindow:
 		return SettingsWindow(parent, settingsManager)
 
 	def show(self):
-		self.window.show_all()
+		self.window.show_all()	
+		self.builder.get_object("ais-tab").hide()
+		self.builder.get_object("general-tab").hide()
+		self.builder.get_object("nmea-tab").hide()
 
 	def close(self):
 		self.window.hide()
@@ -45,10 +48,6 @@ class SettingsWindow:
 		self.window.set_default_size (550, 300)
 
 		self.builder.get_object('chart-progress').hide()
-
-		self.builder.get_object("nmea-tab").hide()
-		self.builder.get_object("ais-tab").hide()
-		self.builder.get_object("general-tab").hide()
 
 		# self.dialog.add_button("Cancel", Gtk.ResponseType.CANCEL)
 		# self.dialog.add_button("Save", Gtk.ResponseType.OK)
