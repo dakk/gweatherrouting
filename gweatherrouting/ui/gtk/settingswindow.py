@@ -53,7 +53,15 @@ class SettingsWindow:
 		# self.dialog.add_button("Save", Gtk.ResponseType.OK)
 
 		# self.dialog.show_all ()
+
+		self.builder.get_object('grib-arrow-opacity-adjustment').set_value(self.settingsManager.getSessionVariable('grib')['arrowOpacity'])
 		self.reloadChart()
+
+	def onGribArrowOpacityChange(self, v):
+		gb = self.settingsManager.getSessionVariable('grib')
+		gb['arrowOpacity'] = v.get_value()
+		self.settingsManager.storeSessionVariable('grib', gb)
+
 
 	def reloadChart(self):
 		self.chartStore = self.builder.get_object("chart-store")

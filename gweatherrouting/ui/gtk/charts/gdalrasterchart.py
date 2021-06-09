@@ -204,6 +204,7 @@ class GDALRasterChart(ChartLayer):
 			Gdk.threads_enter()
 			gpsmap.queue_draw()
 			Gdk.threads_leave()
+			self.lastRasters.append(r)
 		
 	def do_draw(self, gpsmap, cr):
 		p1, p2 = gpsmap.get_bbox()
@@ -212,10 +213,10 @@ class GDALRasterChart(ChartLayer):
 		scale = gpsmap.get_scale()
 
 		# Check if bounds hasn't changed
-		# if self.lastRasters and self.lastRect == [p1lat, p1lon, p2lat, p2lon]:
-		# 	for x in self.lastRasters:
-		# 		x.do_draw(gpsmap, cr)
-		# 	return
+		if self.lastRasters and self.lastRect == [p1lat, p1lon, p2lat, p2lon]:
+			for x in self.lastRasters:
+				x.do_draw(gpsmap, cr)
+			return
 
 		# Estimate which raster is necessary given bound and zoom
 		minBLat = min(p1lat, p2lat)

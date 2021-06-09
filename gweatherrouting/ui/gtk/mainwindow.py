@@ -83,7 +83,7 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 			l = self.chartManager.loadRasterLayer(x['path'], x['metadata'])
 
 
-		self.gribMapLayer = GribMapLayer (self.core.gribManager, self.timeControl)
+		self.gribMapLayer = GribMapLayer (self.core.gribManager, self.timeControl, self.settingsManager)
 		self.map.layer_add (self.gribMapLayer)
 		
 		# This causes rendering problem

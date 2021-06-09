@@ -18,7 +18,7 @@ from ...session import *
 
 defaultSession = {
 	'grib': {
-		'arrowColor': '#ccc'
+		'arrowOpacity': 0.4
 	},
 	'vectorCharts': [],
 	'rasterCharts': [],
