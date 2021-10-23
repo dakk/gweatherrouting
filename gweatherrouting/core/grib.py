@@ -39,7 +39,7 @@ class MetaGrib:
 
 
 class Grib(weatherrouting.Grib):
-	def __init__ (self, path, name, centre, bounds, rindex, startTime, lastForecast):
+	def __init__ (self, path, name, centre, bounds, rindex, startTime, lastForecast, timeKey):
 		self.name = name
 		self.centre = centre.upper()
 		self.cache = utils.DictCache(16)
@@ -49,24 +49,25 @@ class Grib(weatherrouting.Grib):
 		self.startTime = startTime
 		self.lastForecast = lastForecast
 		self.path = path
+		self.timeKey = timeKey
 
 
 	def getRIndexData(self, t):
 		if t in self.rindex_data:
 			return self.rindex_data[t]
 
-		with eccodes.GribIndex(file_index=self.path + '.idx') as idx: 
-			msgu = idx.select({'P1': t, 'name': '10 metre U wind component' })   
-			msgv = idx.select({'P1': t, 'name': '10 metre V wind component' })   
-
-			u = eccodes.codes_grib_get_data(msgu.gid)
-			v = eccodes.codes_grib_get_data(msgv.gid)
-
-			# eccodes.codes_release(msgu.gid)
-			# eccodes.codes_release(msgv.gid)
-
+		iid = eccodes.codes_index_read(self.path + '.idx')
+		eccodes.codes_index_select(iid, 'name', '10 metre U wind component')	
+		eccodes.codes_index_select(iid, self.timeKey, t)	
+		gid = eccodes.codes_new_from_index(iid)
+		u = eccodes.codes_grib_get_data(gid)
+		
+		eccodes.codes_index_select(iid, 'name', '10 metre V wind component')	
+		eccodes.codes_index_select(iid, self.timeKey, t)
+		gid = eccodes.codes_new_from_index(iid)
+		v = eccodes.codes_grib_get_data(gid)
+		
 		self.rindex_data[t] = (u,v)
-
 		return u,v
 
 
@@ -80,7 +81,7 @@ class Grib(weatherrouting.Grib):
 			try:
 				u, v = self.getRIndexData (t)
 			except Exception as e:
-				print(e)
+				print('Get wind data cached exception: ', e)
 
 			uu1, latuu, lonuu = [],[],[]
 			vv1, latvv, lonvv = [],[],[]
@@ -180,38 +181,46 @@ class Grib(weatherrouting.Grib):
 
 
 	def parseMetadata(path):
-		grbs = eccodes.GribFile (path) 
+		f = open(path, 'rb')
 
 		# TODO: get bounds and timeframe
 		bounds = [0, 0, 0, 0]
 		hoursForecasted = None
 		startTime = None
-		rindex = {}			
 		centre = ''
 
-		for r in grbs:
-			if r['name'] != '10 metre U wind component' and r['name'] != '10 metre V wind component':
+		while True:
+			msgid = eccodes.codes_grib_new_from_file(f)
+
+			if msgid == None:
+				break
+
+			name = eccodes.codes_get(msgid, 'name')
+			if name != '10 metre U wind component' and name != '10 metre V wind component':
 				continue
 
-			if 'centre' in r.keys():
-				centre = r['centre']
+			vcentre = eccodes.codes_get(msgid, 'centre')
+			if vcentre:
+				centre = vcentre
 
-			if 'forecastTime' in r.keys():
-				ft = r['forecastTime']
-			else:
-				ft = r['P1']
+			try:
+				ft = eccodes.codes_get(msgid, 'forecastTime')
+			except:
+				ft = eccodes.codes_get(msgid, 'P1')
 
-			startTime = datetime.datetime(int(r['year']), int(r['month']), int(r['day']), int(r['hour']), int(r['minute']))
+			startTime = datetime.datetime(int(eccodes.codes_get(msgid, 'year')), int(eccodes.codes_get(msgid, 'month')), int(eccodes.codes_get(msgid, 'day')), int(eccodes.codes_get(msgid, 'hour')), int(eccodes.codes_get(msgid, 'minute')))
 
 			if hoursForecasted == None or hoursForecasted < int(ft):
 				hoursForecasted = int(ft)
 
-		grbs.close()
+			eccodes.codes_release(msgid)
+
+		f.close()
 		return MetaGrib(path, path.split('/')[-1], centre, bounds, startTime, hoursForecasted)
 
 
 	def parse (path):
-		grbs = eccodes.GribFile (path) 
+		f = open(path, 'rb')
 
 		# TODO: get bounds and timeframe
 		bounds = [0, 0, 0, 0]
@@ -219,34 +228,45 @@ class Grib(weatherrouting.Grib):
 		startTime = None
 		rindex = {}			
 		centre = ''
+		timeKey = "P1"
 
-		for r in grbs:
-			if r['name'] != '10 metre U wind component' and r['name'] != '10 metre V wind component':
+		while True:
+			msgid = eccodes.codes_grib_new_from_file(f)
+
+			if msgid == None:
+				break
+
+			name = eccodes.codes_get(msgid, 'name')
+			if name != '10 metre U wind component' and name != '10 metre V wind component':
 				continue
 
-			if 'centre' in r.keys():
-				centre = r['centre']
+			centre = eccodes.codes_get(msgid, 'centre')
 
-			if 'forecastTime' in r.keys():
-				ft = r['forecastTime']
-			else:
-				ft = r['P1']
+			try:
+				ft = eccodes.codes_get(msgid, 'forecastTime')
+				timeKey = "forecastTime"
+			except:
+				ft = eccodes.codes_get(msgid, 'P1')
+				timeKey = "P1"
 
-			startTime = datetime.datetime(int(r['year']), int(r['month']), int(r['day']), int(r['hour']), int(r['minute']))
+			startTime = datetime.datetime(int(eccodes.codes_get(msgid, 'year')), int(eccodes.codes_get(msgid, 'month')), int(eccodes.codes_get(msgid, 'day')), int(eccodes.codes_get(msgid, 'hour')), int(eccodes.codes_get(msgid, 'minute')))
 
 			if hoursForecasted == None or hoursForecasted < int(ft):
 				hoursForecasted = int(ft)
 
 			# timeIndex = str(r['dataDate'])+str(r['dataTime'])
-			if r['name'] == '10 metre U wind component':
-				rindex [hoursForecasted] = { 'u': r.gid } 
-			elif r['name'] == '10 metre V wind component':
-				rindex [hoursForecasted]['v'] = r.gid 
+			if name == '10 metre U wind component':
+				rindex [hoursForecasted] = { 'u': msgid } 
+			elif name == '10 metre V wind component':
+				rindex [hoursForecasted]['v'] = msgid 
 
-		with eccodes.GribIndex(path, ['name', 'P1']) as idx:                     
-			idx.write(path + '.idx')   
+			eccodes.codes_release(msgid)
 
-		grbs.close()
+		index_keys = ["name", timeKey]
+		iid = eccodes.codes_index_new_from_file(path, index_keys)
+		eccodes.codes_index_write(iid, path + '.idx')
+		eccodes.codes_index_release(iid)
+		f.close()
 
-		return Grib(path, path.split('/')[-1], centre, bounds, rindex, startTime, hoursForecasted)
+		return Grib(path, path.split('/')[-1], centre, bounds, rindex, startTime, hoursForecasted, timeKey)
 			
