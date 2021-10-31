@@ -11,3 +11,7 @@ pyserial
 pynmea2
 gpxpy
 numpy
+kivy[base]
+mapview
+briefcase
+kivymd
