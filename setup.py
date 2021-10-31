@@ -46,11 +46,12 @@ setup(name='gweatherrouting',
 		'gweatherrouting.ui', 'gweatherrouting.ui.gtk', 'gweatherrouting.ui.gtk.maplayers', 
 		'gweatherrouting.ui.gtk.charts', 'gweatherrouting.ui.gtk.charts.vectordrawer', 
 		'gweatherrouting.core'],
-	package_data={'gweatherrouting': ['data/*', 'data/boats/*', 'data/boats/*/*', 'ui/gtk/*.glade']},
+	package_data={'gweatherrouting': ['data/*', 'data/boats/*', 'data/boats/*/*', 'ui/kivy/*.kv', 'ui/gtk/*.glade']},
 	entry_points={
 		'console_scripts': [
 			'gweatherrouting=gweatherrouting.main:startUIGtk',
-			'gweatherrouting-kiwy=gweatherrouting.main:startUIKivy'
+			'gweatherrouting-kiwy=gweatherrouting.main:startUIKivy',
+			'gweatherrouting-beeware=gweatherrouting.main:startUIBeeWare'
 			# 'gweatherrouting_cli=gweatherrouting.main:startCli'
 		],
 	},

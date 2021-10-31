@@ -13,3 +13,4 @@ gpxpy
 numpy
 kivy[base]
 mapview
+briefcase

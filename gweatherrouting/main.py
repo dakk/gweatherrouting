@@ -30,6 +30,11 @@ def initCore():
     return core, conn
 
 
+def startUIBeeWare ():
+    from .ui.beeware.app import GWeatherRoutingApp
+    core, conn = initCore()
+    GWeatherRoutingApp(core, conn)
+
 def startUIKivy ():
     from .ui.kivy.app import GWeatherRoutingApp
     core, conn = initCore()
