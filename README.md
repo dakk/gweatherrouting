@@ -1,6 +1,8 @@
 # GWeatherRouting
 
-GWeatherRouting is an opensource sailing route calculator written in python/gtk3.
+GWeatherRouting is an opensource sailing route calculator written in python and:
+- Gtk3 for the desktop version (Linux/Mac/Windows)
+- Kivy for the mobile version (iOS/Android)
 
 ![Routing in progress](https://github.com/dakk/gweatherrouting/raw/master/media/routing_process.gif)
 
@@ -17,6 +19,7 @@ GWeatherRouting is an opensource sailing route calculator written in python/gtk3
     - GeoJSON (coastlines included)
     - KAP, GeoTiff charts and other raster formats
 - Gtk3 interface
+- Mobile version
 
 
 
