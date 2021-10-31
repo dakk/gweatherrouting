@@ -81,7 +81,7 @@ class Grib(weatherrouting.Grib):
 			try:
 				u, v = self.getRIndexData (t)
 			except Exception as e:
-				print('Get wind data cached exception: ', e)
+				pass #print('Get wind data cached exception: ', e)
 
 			uu1, latuu, lonuu = [],[],[]
 			vv1, latvv, lonvv = [],[],[]

@@ -14,5 +14,9 @@
     {
         "name": "Cat 20",
         "dir": "cat20"
+    },
+    {
+        "name": "Bavaria 38",
+        "dir": "bavaria38"
     }
 ]

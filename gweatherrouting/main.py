@@ -22,16 +22,26 @@ from .conn import ConnManager
 
 logger = logging.getLogger ('gweatherrouting')
 
-def startUI ():
+
+def initCore():
+    conn = ConnManager()
+    conn.startPolling()
+    core = Core(conn)
+    return core, conn
+
+
+def startUIKivy ():
+    from .ui.kivy.app import GWeatherRoutingApp
+    core, conn = initCore()
+    GWeatherRoutingApp(core, conn).run()
+
+def startUIGtk ():
     import gi
     gi.require_version('Gtk', '3.0')
     from gi.repository import Gtk
     from .ui.gtk.mainwindow import MainWindow
 
-    conn = ConnManager()
-    conn.startPolling()
-
-    core = Core(conn)
+    core, conn = initCore()
 
     MainWindow.create(core, conn)
     Gtk.main()
