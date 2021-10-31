@@ -1,8 +1,10 @@
 from kivy_garden.mapview import MapView
-from kivy.app import App, Builder
+# from kivy.app import App, Builder
 import os
+from kivymd.app import MDApp
+from kivy.app import Builder
 
-class GWeatherRoutingApp(App):
+class GWeatherRoutingApp(MDApp):
     def __init__(self, core, conn):
         super(GWeatherRoutingApp, self).__init__()
 

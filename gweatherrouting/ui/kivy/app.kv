@@ -1,27 +1,14 @@
-BoxLayout:
-    orientation: 'vertical'
+MDScreen:
+    MDBoxLayout:
+        orientation: 'vertical'
 
-    BoxLayout:
-        orientation: 'horizontal'
-        size_hint_y: None
-        height: 30
-        
+        MDToolbar:
+            title: "GWR"
+            md_bg_color: app.theme_cls.accent_color
+            right_action_items: [["dots-vertical", lambda x: app.callback()]]
+            left_action_items: [["menu", lambda x: app.callback()]]
 
-        Button:
-            id: btn1
-            text: 'Button 1'
-
-
-        Button:
-            text: 'Button 3'
-
-        Button:
-            text: 'Button 4'
-
-        Button:
-            text: 'Button 5'
-
-    MapView
-        zoom:   8
-        lat:    39
-        lon:    9
+        MapView
+            zoom:   8
+            lat:    39
+            lon:    9
