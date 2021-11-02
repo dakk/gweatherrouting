@@ -13,24 +13,3 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
-from kivy_garden.mapview import MapView
-import os
-from kivymd.app import MDApp
-from kivy.app import Builder
-from .maplayers import GribMapLayer
-from ..common import TimeControl
-
-class GWeatherRoutingApp(MDApp):
-	def __init__(self, core, conn):
-		super(GWeatherRoutingApp, self).__init__()
-		self.timeControl = TimeControl()
-		self.core = core
-		self.conn = conn
-		
-	def build(self):
-		root = Builder.load_file(os.path.abspath(os.path.dirname(__file__)) + "/app.kv")
-		mapView = root.ids.mapView
-		mapView.add_layer(GribMapLayer(self.core.gribManager, self.timeControl))
-
-		return root

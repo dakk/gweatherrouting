@@ -54,6 +54,7 @@ Start the software running:
 - NMEA interface
 - AIS rendering
 - Boat realtime dashboard
+- Mobile version
 
 
 ## License
