@@ -20,4 +20,5 @@ from .trackmanager import TrackManager
 from .utils import DictCache, EventDispatcher
 from .gribmanager import GribManager
 from .poimanager import POI, POIManager
+from .timecontrol import TimeControl
 from .core import Core

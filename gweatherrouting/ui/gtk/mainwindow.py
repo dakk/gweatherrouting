@@ -36,7 +36,7 @@ from .maplayers import GribMapLayer, AISMapLayer
 from .charts import ChartManager
 
 from .settingsmanager import SettingsManager
-from ..common import TimeControl
+from ...core import TimeControl
 from .mainwindow_poi import MainWindowPOI
 from .mainwindow_track import MainWindowTrack
 from .mainwindow_routing import MainWindowRouting

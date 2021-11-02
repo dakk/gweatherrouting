@@ -23,7 +23,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, GObject
 
 import weatherrouting
-from .timecontrol import TimeControl
+from ...core import TimeControl
 from .timepickerdialog import TimePickerDialog
 
 class RoutingWizardDialog:

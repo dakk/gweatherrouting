@@ -104,6 +104,7 @@ class GribMapLayer(MapLayer):
 		bbox = view.get_bbox()
 
 		p1lat, p1lon, p2lat, p2lon = bbox
+		print(bbox)
 
 		# width = float(gpsmap.get_allocated_width())
 		# height = float(gpsmap.get_allocated_height())

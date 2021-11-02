@@ -15,7 +15,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 import datetime
-from ...core import EventDispatcher
+from . import EventDispatcher
 
 
 class TimeControl(EventDispatcher):

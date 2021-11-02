@@ -19,7 +19,7 @@ import os
 from kivymd.app import MDApp
 from kivy.app import Builder
 from .maplayers import GribMapLayer
-from ..common import TimeControl
+from ...core import TimeControl
 
 class GWeatherRoutingApp(MDApp):
 	def __init__(self, core, conn):

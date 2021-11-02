@@ -8,6 +8,26 @@ MDScreen:
             right_action_items: [["dots-vertical", lambda x: app.callback()]]
             left_action_items: [["menu", lambda x: app.callback()]]
 
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+
+            MDIconButton:
+                icon: "step-backward"
+                user_font_size: "32sp"
+                on_press: app.timeControl.decrease(hours=1)
+
+            MDLabel:
+                text: str(app.timeControl.time)
+
+            MDIconButton:
+                icon: "step-forward"
+                user_font_size: "32sp"
+                on_press: app.timeControl.increase(hours=1)
+
+
+
         MapView
             id: mapView
             zoom:   8

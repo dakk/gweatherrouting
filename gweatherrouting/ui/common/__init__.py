@@ -13,8 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-from .timecontrol import TimeControl
-
 
 def windColor(wspeed):
     color = "0000CC"
