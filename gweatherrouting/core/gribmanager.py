@@ -55,6 +55,12 @@ class GribManager(weatherrouting.Grib):
 		logger.info("Loading grib %s" % path)
 		self.gribs.append(Grib.parse(path))
 
+	def changeState(self, name, state):
+		if not state:
+			self.disable(name)
+		else:
+			self.enable(name)
+
 	def enable(self, name):
 		self.load(GRIB_DIR + "/" + name)
 		self.storeOpenedGribs()

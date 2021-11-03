@@ -17,9 +17,11 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 from kivy_garden.mapview import MapView
 import os
 from kivymd.app import MDApp
-from kivy.app import Builder
+from kivymd.uix.list import OneLineIconListItem, TwoLineListItem
+from kivy.app import Builder, StringProperty
 from .maplayers import GribMapLayer
 from ...core import TimeControl
+
 
 class GWeatherRoutingApp(MDApp):
 	def __init__(self, core, conn):
@@ -29,8 +31,14 @@ class GWeatherRoutingApp(MDApp):
 		self.conn = conn
 		
 	def build(self):
-		root = Builder.load_file(os.path.abspath(os.path.dirname(__file__)) + "/app.kv")
-		mapView = root.ids.mapView
-		mapView.add_layer(GribMapLayer(self.core.gribManager, self.timeControl))
+		self.root = Builder.load_file(os.path.abspath(os.path.dirname(__file__)) + "/app.kv")
+		return self.root
 
-		return root
+
+	def on_start(self):
+		# Setup map
+		self.root.ids.mapView.add_layer(GribMapLayer(self.core.gribManager, self.timeControl))
+
+		# Setup grib
+		self.root.ids.gribScreen.gribManager = self.core.gribManager
+		# self.root.ids.gribScreen.updateLocalGribs()

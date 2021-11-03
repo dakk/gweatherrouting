@@ -51,8 +51,7 @@ setup(name='gweatherrouting',
 	entry_points={
 		'console_scripts': [
 			'gweatherrouting=gweatherrouting.main:startUIGtk',
-			'gweatherrouting-kivy=gweatherrouting.main:startUIKivy',
-			'gweatherrouting-beeware=gweatherrouting.main:startUIBeeWare'
+			'gweatherrouting-kivy=gweatherrouting.main:startUIKivy'
 			# 'gweatherrouting_cli=gweatherrouting.main:startCli'
 		],
 	},

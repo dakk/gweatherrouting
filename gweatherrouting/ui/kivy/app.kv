@@ -1,35 +1,150 @@
+#:kivy 1.0
+#:import name gweatherrouting.ui.kivy.gribscreen
+#:include gweatherrouting/ui/kivy/gribscreen.kv
+
+
 MDScreen:
-    MDBoxLayout:
-        orientation: 'vertical'
+    id: mainScreen
 
-        MDToolbar:
-            title: "GWR"
-            md_bg_color: app.theme_cls.accent_color
-            right_action_items: [["dots-vertical", lambda x: app.callback()]]
-            left_action_items: [["menu", lambda x: app.callback()]]
+    MDToolbar:
+        id: toolbar
+        title: "GWR"
+        pos_hint: {"top": 1}
+        elevation: 10
+        md_bg_color: app.theme_cls.accent_color
+        right_action_items: [["dots-vertical", lambda x: app.callback()]]
+        left_action_items: [["menu", lambda x: navDrawer.set_state("open")]]
+
+    # MDBottomAppBar:
+    #     MDToolbar:
+    #         title: "Title"
+    #         icon: "git"
+    #         type: "bottom"
+    #         left_action_items: [["menu", lambda x: x]]
+    #         on_action_button: app.callback(self.icon)
+
+    MDNavigationLayout:
+        y: toolbar.height
+        size_hint_y: None
+        height: root.height - toolbar.height
+
+        ScreenManager:
+            id: screenManager
+
+            MDScreen:
+                name: "Map Screen"
+                id: mapScreen
+
+                MDIconButton:
+                    icon: "step-backward"
+                    user_font_size: "32sp"
+                    on_press: app.timeControl.decrease(hours=1)
+
+                MDLabel:
+                    text: str(app.timeControl.time)
+
+                MDIconButton:
+                    icon: "step-forward"
+                    user_font_size: "32sp"
+                    on_press: app.timeControl.increase(hours=1)
 
 
-        MDBoxLayout:
-            orientation: 'horizontal'
-            size_hint_y: None
+                MapView
+                    id: mapView
+                    zoom:   8
+                    lat:    39
+                    lon:    9
 
-            MDIconButton:
-                icon: "step-backward"
-                user_font_size: "32sp"
-                on_press: app.timeControl.decrease(hours=1)
-
-            MDLabel:
-                text: str(app.timeControl.time)
-
-            MDIconButton:
-                icon: "step-forward"
-                user_font_size: "32sp"
-                on_press: app.timeControl.increase(hours=1)
+            GribScreen:
+                name: "Grib Screen"
+                id: gribScreen
 
 
+            MDScreen:
+                name: "Track Screen"
+                id: trackScreen
 
-        MapView
-            id: mapView
-            zoom:   8
-            lat:    39
-            lon:    9
+                MDLabel:
+                    text: "Screen 2"
+                    halign: "center"
+
+
+            MDScreen:
+                name: "Routings Screen"
+                id: routingScreen
+
+                MDLabel:
+                    text: "Screen 2"
+                    halign: "center"
+
+            MDScreen:
+                name: "Settings Screen"
+                id: settingsScreen
+
+                MDLabel:
+                    text: "Screen 2"
+                    halign: "center"
+
+        MDNavigationDrawer:
+            id: navDrawer
+
+            MDBoxLayout:
+                orientation: "vertical"
+                padding: "8dp"
+                spacing: "8dp"
+
+                ScrollView:
+                    MDList:
+                        id: drawerList
+
+                        OneLineListItem:
+                            text: "Map"
+
+                            on_press:
+                                root.ids.navDrawer.set_state("close")
+                                root.ids.screenManager.current = mapScreen.name
+
+                            IconLeftWidget:
+                                icon: "map"
+                                theme_text_color: "Custom"
+                                text_color: app.theme_cls.accent_color
+
+                        OneLineListItem:
+                            text: "Gribs"
+
+                            on_press:
+                                root.ids.navDrawer.set_state("close")
+                                root.ids.screenManager.current = gribScreen.name
+
+                            IconLeftWidget:
+                                icon: "language-python"
+
+                        OneLineListItem:
+                            text: "Tracks & POIs"
+
+                            on_press:
+                                root.ids.navDrawer.set_state("close")
+                                root.ids.screenManager.current = trackScreen.name
+                            
+                            IconLeftWidget:
+                                icon: "minus"
+
+                        OneLineListItem:
+                            text: "Routings"
+
+                            on_press:
+                                root.ids.navDrawer.set_state("close")
+                                root.ids.screenManager.current = routingScreen.name
+
+                            IconLeftWidget:
+                                icon: "plus"
+
+                        OneLineListItem:
+                            text: "Settings"
+
+                            on_press:
+                                root.ids.navDrawer.set_state("close")
+                                root.ids.screenManager.current = settingsScreen.name
+
+                            IconLeftWidget:
+                                icon: "map"

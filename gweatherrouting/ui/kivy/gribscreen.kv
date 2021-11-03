@@ -1,0 +1,16 @@
+#:kivy 1.0
+<LocalGribListItem>:
+    IconLeftWidget:
+        icon: root.icon
+
+    RightCheckbox:
+        active: root.active
+        on_active:
+            root.active = self.active
+            root.setEnabled(self.active)
+
+
+<GribScreen>:
+    ScrollView:
+        MDList:
+            id: gribList
