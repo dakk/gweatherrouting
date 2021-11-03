@@ -25,13 +25,14 @@ class POI:
 		self.position = position
 		self.visible = visible
 		self.type = poitype
-		self.loadOrSaveDefault()
+
 
 
 class PoiManagerStorage(Storage):
 	def __init__(self):
 		Storage.__init__(self, "poi-manager")
 		self.pois = []
+		self.loadOrSaveDefault()
 
 class POIManager():
 	def __init__(self):

@@ -43,6 +43,9 @@ class GWeatherRoutingApp(MDApp):
 		self.root.ids.gribScreen.gribManager = self.core.gribManager
 		# self.root.ids.gribScreen.updateLocalGribs()
 
+		self.root.ids.trackScreen.trackManager = self.core.trackManager
+		self.root.ids.trackScreen.poiManager = self.core.poiManager
+
 
 
 	def onForwardClick(self, hours):
@@ -50,6 +53,5 @@ class GWeatherRoutingApp(MDApp):
 		self.root.ids.timeLabel.text = str(self.timeControl.time)
 
 	def onBackwardClick(self, hours):
-		# if self.timeControl.time > 0:
 		self.timeControl.decrease(hours=hours)
 		self.root.ids.timeLabel.text = str(self.timeControl.time)

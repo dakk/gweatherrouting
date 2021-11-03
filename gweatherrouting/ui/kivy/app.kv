@@ -1,6 +1,10 @@
 #:kivy 1.0
+
 #:import name gweatherrouting.ui.kivy.gribscreen
 #:include gweatherrouting/ui/kivy/gribscreen.kv
+
+#:import name gweatherrouting.ui.kivy.trackscreen
+#:include gweatherrouting/ui/kivy/trackscreen.kv
 
 
 MDScreen:
@@ -67,14 +71,9 @@ MDScreen:
                 id: gribScreen
 
 
-            MDScreen:
+            TrackScreen:
                 name: "Track Screen"
                 id: trackScreen
-
-                MDLabel:
-                    text: "Screen 2"
-                    halign: "center"
-
 
             MDScreen:
                 name: "Routings Screen"

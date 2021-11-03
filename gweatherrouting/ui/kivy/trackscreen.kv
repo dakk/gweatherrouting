@@ -1,0 +1,25 @@
+#:kivy 1.0
+<TrackListItem>:
+    IconLeftWidget:
+        icon: 'map-marker-path'
+
+    RightCheckbox:
+        visible: root.visible
+        # on_active:
+        #     root.active = self.active
+        #     root.setEnabled(self.active)
+
+<POIListItem>:
+    IconLeftWidget:
+        icon: 'map-marker'
+
+    RightCheckbox:
+        visible: root.visible
+        # on_active:
+        #     root.active = self.active
+        #     root.setEnabled(self.active)
+
+<TrackScreen>:
+    ScrollView:
+        MDList:
+            id: trackList
