@@ -35,25 +35,32 @@ MDScreen:
                 name: "Map Screen"
                 id: mapScreen
 
-                MDIconButton:
-                    icon: "step-backward"
-                    user_font_size: "32sp"
-                    on_press: app.timeControl.decrease(hours=1)
+                MDBoxLayout:
+                    orientation: "vertical"
 
-                MDLabel:
-                    text: str(app.timeControl.time)
+                    MDBoxLayout:
+                        orientation: "horizontal"
 
-                MDIconButton:
-                    icon: "step-forward"
-                    user_font_size: "32sp"
-                    on_press: app.timeControl.increase(hours=1)
+                        MDIconButton:
+                            icon: "step-backward"
+                            user_font_size: "32sp"
+                            on_press: app.onBackwardClick(hours=6)
+
+                        MDLabel:
+                            id: timeLabel
+                            text: str(app.timeControl.time)
+
+                        MDIconButton:
+                            icon: "step-forward"
+                            user_font_size: "32sp"
+                            on_press: app.onForwardClick.increase(hours=6)
 
 
-                MapView
-                    id: mapView
-                    zoom:   8
-                    lat:    39
-                    lon:    9
+                    MapView
+                        id: mapView
+                        zoom:   8
+                        lat:    39
+                        lon:    9
 
             GribScreen:
                 name: "Grib Screen"

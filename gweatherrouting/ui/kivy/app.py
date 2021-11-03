@@ -42,3 +42,14 @@ class GWeatherRoutingApp(MDApp):
 		# Setup grib
 		self.root.ids.gribScreen.gribManager = self.core.gribManager
 		# self.root.ids.gribScreen.updateLocalGribs()
+
+
+
+	def onForwardClick(self, hours):
+		self.timeControl.increase(hours=hours)
+		self.root.ids.timeLabel.text = str(self.timeControl.time)
+
+	def onBackwardClick(self, hours):
+		# if self.timeControl.time > 0:
+		self.timeControl.decrease(hours=hours)
+		self.root.ids.timeLabel.text = str(self.timeControl.time)

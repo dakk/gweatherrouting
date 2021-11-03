@@ -13,6 +13,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
+import math
 from kivy.graphics import (
 	Canvas,
 	Color,
@@ -80,6 +81,13 @@ class GribMapLayer(MapLayer):
 		# cr.set_source_rgba(a, b, c, self.arrowOpacity)
 
 		length = 15
+		
+
+		# stroke = get_color_from_hex(properties.get("stroke", "#ffffff"))
+		# stroke_width = dp(properties.get("stroke-width"))
+		xy = [x,y, x+10, y]
+		# self.canvas_line.add(Color(*stroke))
+		self.canvas_line.add(Line(points=xy, width=2))
 
 		# cr.move_to(x, y)
 
@@ -119,7 +127,8 @@ class GribMapLayer(MapLayer):
 		)
 		data = self.gribManager.getWind2D(self.timeControl.time, bounds)
 
-		print(data)
+		self.canvas_line.clear()
+
 		if not data or len(data) == 0:
 			return
 
@@ -133,7 +142,7 @@ class GribMapLayer(MapLayer):
 		# Draw arrows
 		for x in data[::scale]:
 			for y in x[::scale]:
-				xx, yy = view.get_window_xy_from(y[2][0], y[2][1])
+				xx, yy = view.get_window_xy_from(y[2][0], y[2][1], zoom)
 				self.drawWindArrow(xx, yy, y[0], y[1])
 
 
