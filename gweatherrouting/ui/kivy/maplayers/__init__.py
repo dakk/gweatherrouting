@@ -15,3 +15,5 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 from .gribmaplayer import GribMapLayer
+from .poimaplayer import POIMapLayer
+from .trackmaplayer import TrackMapLayer

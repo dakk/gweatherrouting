@@ -19,7 +19,7 @@ import os
 from kivymd.app import MDApp
 from kivymd.uix.list import OneLineIconListItem, TwoLineListItem
 from kivy.app import Builder, StringProperty
-from .maplayers import GribMapLayer
+from .maplayers import GribMapLayer, POIMapLayer, TrackMapLayer
 from ...core import TimeControl
 from .timepickerdialog import TimePickerDialog
 
@@ -39,6 +39,8 @@ class GWeatherRoutingApp(MDApp):
 	def on_start(self):
 		# Setup map
 		self.root.ids.mapView.add_layer(GribMapLayer(self.core.gribManager, self.timeControl))
+		self.root.ids.mapView.add_layer(POIMapLayer(self.core.poiManager, self.timeControl))
+		self.root.ids.mapView.add_layer(TrackMapLayer(self.core.trackManager, self.timeControl))
 
 		# Setup grib
 		self.root.ids.gribScreen.gribManager = self.core.gribManager
@@ -47,7 +49,9 @@ class GWeatherRoutingApp(MDApp):
 		self.root.ids.trackScreen.trackManager = self.core.trackManager
 		self.root.ids.trackScreen.poiManager = self.core.poiManager
 
-
+	def onMapTouchDown(self, k):
+		print (k)
+		# TODO: open an menu with add poi / point to track
 
 	def onForwardClick(self, hours):
 		self.timeControl.increase(hours=hours)
