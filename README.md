@@ -44,6 +44,23 @@ Start the software running:
 ```gweatherrouting```
 
 
+## Building for android
+
+Install buildozer:
+
+```
+git clone https://github.com/kivy/buildozer.git
+cd buildozer
+sudo python setup.py install
+```
+
+Create an apk:
+
+```
+buildozer android debug deploy run
+```
+
+
 ## Planned features
 
 - Customizable routing calculator

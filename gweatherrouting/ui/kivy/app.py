@@ -21,6 +21,7 @@ from kivymd.uix.list import OneLineIconListItem, TwoLineListItem
 from kivy.app import Builder, StringProperty
 from .maplayers import GribMapLayer
 from ...core import TimeControl
+from .timepickerdialog import TimePickerDialog
 
 
 class GWeatherRoutingApp(MDApp):
@@ -55,3 +56,7 @@ class GWeatherRoutingApp(MDApp):
 	def onBackwardClick(self, hours):
 		self.timeControl.decrease(hours=hours)
 		self.root.ids.timeLabel.text = str(self.timeControl.time)
+
+	def openTimePickerDialog(self):
+		dialog = TimePickerDialog(self.timeControl.time)
+		dialog.open()

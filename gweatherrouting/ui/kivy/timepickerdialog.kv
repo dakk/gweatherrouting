@@ -1,0 +1,21 @@
+#:kivy 1.0
+
+<TimePickerDialogContent>:
+    orientation: "vertical"
+    spacing: "12dp"
+    size_hint_y: None
+    height: "220dp"
+
+    MDTextField:
+        hint_text: "Date"
+
+    MDRaisedButton:
+        text: "Set date"
+        on_press: root.openDatePicker()
+
+    MDTextField:
+        hint_text: "Time"
+
+    MDRaisedButton:
+        text: "Set time"
+        on_press: root.openTimePicker()
