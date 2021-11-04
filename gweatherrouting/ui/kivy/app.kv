@@ -54,14 +54,29 @@ MDScreen:
                         orientation: "horizontal"
 
                         MDIconButton:
+                            icon: "step-backward-2"
+                            user_font_size: "28sp"
+                            on_press: app.onBackwardClick(hours=12)
+
+                        MDIconButton:
                             icon: "step-backward"
                             user_font_size: "28sp"
-                            on_press: app.onBackwardClick(hours=6)
+                            on_press: app.onBackwardClick(hours=1)
 
                         MDIconButton:
                             icon: "step-forward"
                             user_font_size: "28sp"
-                            on_press: app.onForwardClick(hours=6)
+                            on_press: app.onForwardClick(hours=1)
+
+                        # MDIconButton:
+                        #     icon: "play"
+                        #     user_font_size: "28sp"
+                        #     on_press: app.onPlayClick()
+
+                        MDIconButton:
+                            icon: "step-forward-2"
+                            user_font_size: "28sp"
+                            on_press: app.onForwardClick(hours=12)
 
                         MDIconButton:
                             icon: "clock"

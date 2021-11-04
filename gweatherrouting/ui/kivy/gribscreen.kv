@@ -3,14 +3,48 @@
     IconLeftWidget:
         icon: root.icon
 
-    RightCheckbox:
-        active: root.active
-        on_active:
-            root.active = self.active
-            root.setEnabled(self.active)
+    RightBody:
+        orientation: 'horizontal'
+
+        MDIconButton:
+            icon: 'delete'
+            margin_right: dp(10)
+            on_release: root.remove()
+
+        MDCheckbox:
+            active: root.active
+            on_active:
+                root.active = self.active
+                root.setEnabled(self.active)
+
+<RemoteGribListItem>:
+    on_press: root.callback(self.url)
+
+    IconLeftWidget:
+        icon: "tailwind"
 
 
 <GribScreen>:
-    ScrollView:
+    MDProgressBar:
+        id: downloadProgress
+        value: 0
+        pos_hint: { 'bottom': 1 }
+
+    ScrollView:            
         MDList:
             id: gribList
+
+    MDFloatingActionButton:
+        icon: "cloud-download"
+        elevation_normal: 12
+        pos_hint: {'right': 1, 'bottom': 0.86}
+        md_bg_color: app.theme_cls.primary_color
+        on_release: root.openGribDownloadDialog()
+
+
+    # MDFloatingActionButton:
+    #     icon: "folder-open"
+    #     elevation_normal: 12
+    #     pos_hint: {'center_x': .6, 'bottom': 0.86 }
+    #     md_bg_color: app.theme_cls.primary_color
+    #     on_release: root.openGribDownloadDialog()
