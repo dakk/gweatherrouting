@@ -6,6 +6,9 @@
 #:import name gweatherrouting.ui.kivy.trackscreen
 #:include gweatherrouting/ui/kivy/trackscreen.kv
 
+#:import name gweatherrouting.ui.kivy.settingsscreen
+#:include gweatherrouting/ui/kivy/settingsscreen.kv
+
 #:import name gweatherrouting.ui.kivy.timepickerdialog
 #:include gweatherrouting/ui/kivy/timepickerdialog.kv
 
@@ -52,23 +55,23 @@ MDScreen:
 
                         MDIconButton:
                             icon: "step-backward"
-                            user_font_size: "32sp"
+                            user_font_size: "28sp"
                             on_press: app.onBackwardClick(hours=6)
 
                         MDIconButton:
                             icon: "step-forward"
-                            user_font_size: "32sp"
-                            on_press: app.onForwardClick.increase(hours=6)
+                            user_font_size: "28sp"
+                            on_press: app.onForwardClick(hours=6)
 
                         MDIconButton:
                             icon: "clock"
-                            user_font_size: "32sp"
+                            user_font_size: "28sp"
                             on_press: app.openTimePickerDialog()
 
                         MDLabel:
+                            pos_hint: {"right": 1}
                             id: timeLabel
                             text: str(app.timeControl.time)
-
 
 
                     MapView
@@ -94,13 +97,10 @@ MDScreen:
                     text: "Screen 2"
                     halign: "center"
 
-            MDScreen:
+            SettingsScreen:
                 name: "Settings Screen"
                 id: settingsScreen
 
-                MDLabel:
-                    text: "Screen 2"
-                    halign: "center"
 
         MDNavigationDrawer:
             id: navDrawer

@@ -4,18 +4,26 @@
     orientation: "vertical"
     spacing: "12dp"
     size_hint_y: None
-    height: "220dp"
+    height: "120dp"
 
-    MDTextField:
-        hint_text: "Date"
+    MDBoxLayout:
+        orientation: "horizontal"
 
-    MDRaisedButton:
-        text: "Set date"
-        on_press: root.openDatePicker()
+        MDLabel:
+            id: dateLabel
+            text: root.datetime.strftime("%m/%d/%Y")
 
-    MDTextField:
-        hint_text: "Time"
+        MDRaisedButton:
+            text: "Set date"
+            on_press: root.openDatePicker()
 
-    MDRaisedButton:
-        text: "Set time"
-        on_press: root.openTimePicker()
+    MDBoxLayout:
+        orientation: "horizontal"
+
+        MDLabel:
+            id: timeLabel
+            text: root.datetime.strftime("%H:%M:%S")
+
+        MDRaisedButton:
+            text: "Set time"
+            on_press: root.openTimePicker()

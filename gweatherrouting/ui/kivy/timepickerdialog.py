@@ -19,26 +19,36 @@ from kivymd.uix.list import IRightBodyTouch, TwoLineIconListItem
 from kivymd.uix.selectioncontrol import MDCheckbox
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.dialog import MDDialog
-from kivymd.uix.button import MDFlatButton
+from kivymd.uix.button import MDFlatButton, MDRaisedButton
 from kivymd.uix.picker import MDTimePicker, MDDatePicker
 
 
 class TimePickerDialogContent(MDBoxLayout):
     def __init__(self, datetime):
-        super().__init__()
         self.datetime = datetime
+        super().__init__()
+
+    def onTimeSave(self, instance, time):
+        self.datetime = self.datetime.replace(hour=time.hour, minute=time.minute)
+        self.ids.timeLabel.text = self.datetime.strftime("%H:%M")
+
+    def onDateSave(self, instance, date, date_range):
+        self.datetime = self.datetime.replace(year=date.year, month=date.month, day=date.day)
+        self.ids.dateLabel.text = self.datetime.strftime("%d/%m/%Y")
 
     def openTimePicker(self):
         time_dialog = MDTimePicker()
         time_dialog.set_time(self.datetime)
-        # time_dialog.bind(time=self.get_time)
+        time_dialog.bind(time=self.onTimeSave)
         time_dialog.open()
 
     def openDatePicker(self):
         date_dialog = MDDatePicker(year=self.datetime.year, month=self.datetime.month, day=self.datetime.day)
-        # date_dialog.bind(time=self.get_time)
+        date_dialog.bind(on_save=self.onDateSave)
         date_dialog.open()
 
+    def getResult(self):
+        return self.datetime
 
 class TimePickerDialog(MDDialog):
     def __init__(self, datetime):
@@ -54,10 +64,13 @@ class TimePickerDialog(MDDialog):
                     # theme_text_color="Custom",
                     # text_color=self.theme_cls.primary_color,
                 ),
-                MDFlatButton(
+                MDRaisedButton(
                     text="SET",
                     # theme_text_color="Custom",
                     # text_color=self.theme_cls.primary_color,
                 ),
             ],
         )
+
+    def getResult(self):
+        return self.pickerContent.getResult()
