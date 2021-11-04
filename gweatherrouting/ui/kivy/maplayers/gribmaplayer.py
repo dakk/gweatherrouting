@@ -43,6 +43,7 @@ class GribMapLayer(MapLayer):
 		self.gribManager = gribManager
 		self.timeControl = timeControl
 		self.timeControl.connect("time-change", self.onTimeChange)
+		self.arrowOpacity = 0.3
 
 		self.first_time = True
 		self.initial_zoom = None
@@ -60,51 +61,38 @@ class GribMapLayer(MapLayer):
 		with self.canvas_polygon.after:
 			PopMatrix()
 
+
 	def onTimeChange(self, t):
-		pass
+		self.draw()
 
 
 	def reposition(self):
 		""" Function called when :class:`MapView` is moved. You must recalculate
 		the position of your children. """
-		print ('called reposition')
 		self.draw()
 
 	def unload(self):
 		""" Called when the view want to completly unload the layer. """
-		print ('called unload')
+		pass
 	
 	def drawWindArrow(self, x, y, wdir, wspeed):
 		wdir = -math.radians(wdir)
 
 		a, b, c = windColor(wspeed)
-		# cr.set_source_rgba(a, b, c, self.arrowOpacity)
 
-		length = 15
-		
+		length = 25
+		RD = 30
+		self.canvas_line.add(Color(a, b, c, self.arrowOpacity))
 
-		# stroke = get_color_from_hex(properties.get("stroke", "#ffffff"))
-		# stroke_width = dp(properties.get("stroke-width"))
-		xy = [x,y, x+10, y]
-		# self.canvas_line.add(Color(*stroke))
-		self.canvas_line.add(Line(points=xy, width=2))
+		xy = [x,y, x + (length * math.sin(wdir)), y + (length * math.cos(wdir))]
+		self.canvas_line.add(Line(points=xy, width=1.5))
 
-		# cr.move_to(x, y)
+		xy = [x + (length * math.sin(wdir)), y + (length * math.cos(wdir)), x + (4 * math.sin(wdir - math.radians(RD))), y + (4 * math.cos(wdir - math.radians(RD)))]
+		self.canvas_line.add(Line(points=xy, width=1.5))
 
-		# # cr.line_to (x + (wspeed / 2 * math.sin (wdir)), y + 1 * math.cos (wdir))
-		# cr.line_to(x + (length * math.sin(wdir)), y + (length * math.cos(wdir)))
+		xy = [x + (length * math.sin(wdir)), y + (length * math.cos(wdir)), x + (4 * math.sin(wdir + math.radians(RD))), y + (4 * math.cos(wdir + math.radians(RD)))]
+		self.canvas_line.add(Line(points=xy, width=1.5))
 
-		# cr.line_to(
-		# 	x + (4 * math.sin(wdir - math.radians(30))),
-		# 	y + (4 * math.cos(wdir - math.radians(30))),
-		# )
-		# cr.move_to(x + (length * math.sin(wdir)), y + (length * math.cos(wdir)))
-		# cr.line_to(
-		# 	x + (4 * math.sin(wdir + math.radians(30))),
-		# 	y + (4 * math.cos(wdir + math.radians(30))),
-		# )
-
-		# cr.stroke()
 
 	def draw(self):
 		view = self.parent
@@ -112,14 +100,6 @@ class GribMapLayer(MapLayer):
 		bbox = view.get_bbox()
 
 		p1lat, p1lon, p2lat, p2lon = bbox
-		print(bbox)
-
-		# width = float(gpsmap.get_allocated_width())
-		# height = float(gpsmap.get_allocated_height())
-
-		# cr.set_line_width(1)
-		# cr.set_source_rgb(1, 0, 0)
-		# print (p1lat, p1lon, p2lat, p2lon)
 
 		bounds = (
 			(min(p1lat, p2lat), min(p1lon, p2lon)),
@@ -132,12 +112,26 @@ class GribMapLayer(MapLayer):
 		if not data or len(data) == 0:
 			return
 
-		scale = int(zoom / 500.0)
-		if scale < 1:
+		# scale = int(math.fabs(zoom - 8))
+		if zoom > 8:
 			scale = 1
+		elif zoom > 7:
+			scale = 2
+		elif zoom > 6:
+			scale = 3
+		elif zoom > 5:
+			scale = 4
+		elif zoom > 4:
+			scale = 5
+		elif zoom > 3:
+			scale = 6
+		elif zoom > 2:
+			scale = 7
+		elif zoom > 1:
+			scale = 8
+		elif zoom > 0:
+			scale = 9
 
-		# cr.set_line_width(1.5 / (math.ceil(len(data) / 60)))
-		# cr.set_line_width(1)
 
 		# Draw arrows
 		for x in data[::scale]:
