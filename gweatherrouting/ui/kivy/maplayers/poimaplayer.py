@@ -18,6 +18,7 @@ from kivy.graphics import (
 	Canvas,
 	Color,
 	Line,
+	Rectangle,
 	Triangle,
 	MatrixInstruction,
 	Mesh,
@@ -26,6 +27,7 @@ from kivy.graphics import (
 	Scale,
 	Translate,
 )
+from kivy.core.text import Label as CoreLabel
 from kivy.graphics.tesselator import TYPE_POLYGONS, WINDING_ODD, Tesselator
 from kivy.metrics import dp
 from kivy.properties import ObjectProperty, StringProperty
@@ -61,6 +63,7 @@ class POIMapLayer(MapLayer):
 		view = self.parent
 		zoom = view.zoom
 		bbox = view.get_bbox()
+		self.canvas.clear()
 
 		for tr in self.poiManager.pois:
 			if not tr.visible:
@@ -68,7 +71,16 @@ class POIMapLayer(MapLayer):
 
 			x, y = view.get_window_xy_from(tr.position[0], tr.position[1], zoom)
 
+			# self.canvas.add(Color(1-self.colour, self.colour, 0, 1))
+			# self.rect = Rectangle(size=self.size, pos=self.pos)
+			# self.canvas.add(self.rect)
 			self.canvas.add(Color(1, 1, 1))
+			label = CoreLabel(text=tr.name, font_size=16)
+			label.refresh()
+			text = label.texture
+			self.canvas.add(Rectangle(size=text.size, pos=[x - 20, y - 20], texture=text))
+			# self.canvas.ask_update()
+
 			# self.canvas.add(Triangle([x - 5, y - 5, x, y + 5, x + 5, y - 5]))
 
 			# Style.Poi.Font.apply(cr)
@@ -77,10 +89,7 @@ class POIMapLayer(MapLayer):
 			# cr.stroke()
 
 			# Style.Poi.Triangle.apply(cr)
-			# cr.move_to(x - 5, y - 5)
-			# cr.line_to(x, y + 5)
-			# cr.move_to(x + 5, y - 5)
-			# cr.line_to(x, y + 5)
-			# cr.move_to(x - 5, y - 5)
-			# cr.line_to(x + 5, y - 5)
-			# cr.stroke()
+
+			self.canvas.add(Line(points=[x - 5, y - 5, x, y + 5]))
+			self.canvas.add(Line(points=[x + 5, y - 5, x, y + 5]))
+			self.canvas.add(Line(points=[x - 5, y - 5, x + 5, y - 5]))
