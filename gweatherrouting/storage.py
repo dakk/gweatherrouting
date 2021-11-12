@@ -37,8 +37,6 @@ def app_data_path (appname, roaming=True):
 		system = sys.platform
 
 	if system == "win32":
-		if appauthor is None:
-			appauthor = appname
 		const = roaming and "CSIDL_APPDATA" or "CSIDL_LOCAL_APPDATA"
 		path = os.path.normpath(_get_win_folder(const))
 		if appname:
@@ -62,8 +60,6 @@ TEMP_DIR = DATA_DIR + '/temp/'
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(GRIB_DIR, exist_ok=True)
 os.makedirs(TEMP_DIR, exist_ok=True)
-
-
 
 class Storage(dict):
     __init = False

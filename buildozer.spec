@@ -36,7 +36,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy,eccodes,weatherrouting==0.1.2,LatLon23,pyproj,geojson_utils,requests,urllib3,chardet,idna,geojson,gpxpy
+requirements = python3,kivy,eccodes,weatherrouting==0.1.2,LatLon23,pyproj,geojson_utils,PIL,requests,urllib3,chardet,idna,geojson,gpxpy,kivymd,bs4,pyserial,pynmea2
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
