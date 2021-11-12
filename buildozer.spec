@@ -13,7 +13,7 @@ package.domain = org.gweatherrouting
 source.dir = ./gweatherrouting
 
 # (list) Source files to include (let empty to include all the files)
-source.include_exts = py,png,jpg,kv,atlas
+source.include_exts = py,png,jpg,kv,atlas,geojson,pol
 
 # (list) List of inclusions using pattern matching
 #source.include_patterns = assets/*,images/*.png
@@ -36,7 +36,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy,eccodes
+requirements = python3,kivy,eccodes,weatherrouting==0.1.2,LatLon23,pyproj,geojson_utils,requests,urllib3,chardet,idna,geojson,gpxpy
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes

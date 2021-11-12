@@ -18,7 +18,6 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import logging
 import math
 import datetime
-import eccodes
 
 import weatherrouting
 from . import utils
@@ -50,6 +49,7 @@ class Grib(weatherrouting.Grib):
 
 
 	def getRIndexData(self, t):
+		import eccodes
 		if t in self.rindex_data:
 			return self.rindex_data[t]
 
@@ -178,6 +178,7 @@ class Grib(weatherrouting.Grib):
 
 
 	def parseMetadata(path):
+		import eccodes
 		f = open(path, 'rb')
 
 		# TODO: get bounds and timeframe
@@ -217,6 +218,7 @@ class Grib(weatherrouting.Grib):
 
 
 	def parse (path):
+		import eccodes
 		f = open(path, 'rb')
 
 		# TODO: get bounds and timeframe
