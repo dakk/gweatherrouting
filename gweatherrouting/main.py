@@ -15,9 +15,9 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 import logging
-from . import log
-from .core import Core
-from .conn import ConnManager
+# from . import log
+from core import Core
+from conn import ConnManager
 
 
 logger = logging.getLogger ('gweatherrouting')
@@ -48,4 +48,5 @@ def startUIGtk ():
     Gtk.main()
 
 
-# startUIKivy()
+if __name__ == "__main__":
+    startUIKivy()

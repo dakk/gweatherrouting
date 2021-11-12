@@ -16,15 +16,12 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 import logging
-import random
-import struct
 import math
 import datetime
 import eccodes
 
 import weatherrouting
 from . import utils
-from .. import log
 
 logger = logging.getLogger ('gweatherrouting')
 

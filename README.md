@@ -54,10 +54,11 @@ cd buildozer
 sudo python setup.py install
 ```
 
+
 Create an apk:
 
 ```
-buildozer android debug deploy run
+buildozer android debug deploy run && buildozer android logcat | grep gweat
 ```
 
 
