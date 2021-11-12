@@ -14,10 +14,15 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
+# Fix for python-for-android relative imports
+import sys
+sys.path.append("..")
+sys.path.append("...")
+
 import logging
-# from . import log
-from core import Core
-from conn import ConnManager
+from . import log
+from .core import Core
+from .conn import ConnManager
 
 
 logger = logging.getLogger ('gweatherrouting')

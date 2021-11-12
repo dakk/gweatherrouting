@@ -36,11 +36,12 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy,eccodes,weatherrouting==0.1.2,LatLon23,pyproj,geojson_utils,PIL,requests,urllib3,chardet,idna,geojson,gpxpy,kivymd,bs4,pyserial,pynmea2
+requirements = python3,kivy,eccodes,weatherrouting==0.1.2,mapview,LatLon23,pyproj,geojson_utils,PIL,requests,urllib3,chardet,idna,geojson,gpxpy,kivymd,bs4,pyserial,pynmea2
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
 # requirements.source.kivy = ../../kivy
+#requirements.source.gweatherrouting=./
 
 # (str) Presplash of the application
 #presplash.filename = %(source.dir)s/data/presplash.png
@@ -301,7 +302,7 @@ p4a.local_recipes = android_recipes
 #p4a.hook =
 
 # (str) Bootstrap to use for android builds
-# p4a.bootstrap = sdl2
+#p4a.bootstrap = sdl2
 
 # (int) port number to specify an explicit --port= p4a argument (eg for bootstrap flask)
 #p4a.port =

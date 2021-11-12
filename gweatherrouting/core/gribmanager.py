@@ -1,15 +1,18 @@
 import tempfile
 import json
-import bz2
+# import bz2
 import os
 import logging
 import requests
 from shutil import copyfile
-from ..storage import Storage, GRIB_DIR, TEMP_DIR
 from .grib import Grib
 import weatherrouting
+try:
+	from ..storage import Storage, GRIB_DIR, TEMP_DIR
+except:
+	from .dummy_storage import Storage
 
-from bs4 import BeautifulSoup
+# from bs4 import BeautifulSoup
 
 logger = logging.getLogger("gweatherrouting")
 
@@ -117,6 +120,8 @@ class GribManager(weatherrouting.Grib):
 		return ddlist
 
 	def getDownloadList(self, force=False):
+		from bs4 import BeautifulSoup
+
 		# https://openskiron.org/en/openskiron
 		# https://openskiron.org/en/openwrf
 		if not self.gribFiles or force:
@@ -176,6 +181,8 @@ class GribManager(weatherrouting.Grib):
 			logger.error(str(e))
 
 	def download(self, uri, percentageCallback, callback):
+		import bz2
+
 		name = uri.split("/")[-1]
 		logger.info("Downloading grib %s" % uri)
 

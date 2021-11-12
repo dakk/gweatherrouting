@@ -16,8 +16,11 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 from .track import RoutingTrack, Track 
 from .utils import uniqueName
-from ..storage import Storage
 import gpxpy
+try:
+	from ..storage import Storage
+except:
+	from .dummy_storage import Storage
 
 
 class TrackManagerStorage(Storage):

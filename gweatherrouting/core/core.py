@@ -19,7 +19,6 @@ import gpxpy
 import os
 
 from . import utils
-from .. import log
 from .poimanager import POI
 from .track import Track
 import weatherrouting
@@ -35,7 +34,7 @@ class BoatInfo:
     heading = 0.0
 
     def isValid(self):
-        return latitude != 0.0 and longitude != 0.0
+        return self.latitude != 0.0 and self.longitude != 0.0
 
 
 class Core(EventDispatcher):

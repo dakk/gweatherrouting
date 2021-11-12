@@ -14,8 +14,11 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
-from ..storage import Storage
 from .utils import uniqueName
+try:
+	from ..storage import Storage
+except:
+	from .dummy_storage import Storage
 
 POI_TYPE_DEFAULT = 1
 
