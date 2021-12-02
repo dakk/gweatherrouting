@@ -16,14 +16,15 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import gi
 import os
-import json
-import math
+from gweatherrouting.ui.gtk.settingswindow_charts import SettingsWindowCharts
+
+from gweatherrouting.ui.gtk.settingswindow_connections import SettingsWindowConnections
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, GObject, Gdk
 from threading import Thread
 
 
-class SettingsWindow:
+class SettingsWindow(SettingsWindowConnections, SettingsWindowCharts):
 	def create(parent, settingsManager):
 		return SettingsWindow(parent, settingsManager)
 
@@ -31,7 +32,6 @@ class SettingsWindow:
 		self.window.show_all()	
 		self.builder.get_object("ais-tab").hide()
 		self.builder.get_object("general-tab").hide()
-		self.builder.get_object("nmea-tab").hide()
 
 	def close(self):
 		self.window.hide()
@@ -47,76 +47,16 @@ class SettingsWindow:
 		self.window = self.builder.get_object('settings-window')
 		self.window.set_default_size (550, 300)
 
-		self.builder.get_object('chart-progress').hide()
-
 		# self.dialog.add_button("Cancel", Gtk.ResponseType.CANCEL)
 		# self.dialog.add_button("Save", Gtk.ResponseType.OK)
 
 		# self.dialog.show_all ()
 
 		self.builder.get_object('grib-arrow-opacity-adjustment').set_value(self.settingsManager.grib.arrowOpacity)
-		self.reloadChart()
+
+		SettingsWindowConnections.__init__(self, mainWindow, settingsManager)
+		SettingsWindowCharts.__init__(self, mainWindow, settingsManager)
 
 	def onGribArrowOpacityChange(self, v):
 		self.settingsManager.grib.arrowOpacity = v.get_value()
 
-
-	def reloadChart(self):
-		self.chartStore = self.builder.get_object("chart-store")
-		self.chartStore.clear()
-
-		for p in self.mainWindow.chartManager.charts:
-			self.chartStore.append ([p.path, p.enabled, p.ctype])
-
-	def registeringChart(self, l, t):
-		def ticker(x):
-			Gdk.threads_enter()
-			self.builder.get_object('chart-progress').set_fraction(x)
-			Gdk.threads_leave()
-
-
-		Gdk.threads_enter()
-		self.builder.get_object('chart-progress').show()
-		Gdk.threads_leave()
-
-		if l.onRegister(ticker):
-			vc = self.settingsManager[t + 'Charts']
-			if not vc:
-				vc = []
-
-			vc.append({
-				'path': l.path,
-				'metadata': l.metadata
-			})
-			self.settingsManager[t+'Charts'] = vc
-
-			self.reloadChart()
-		else:
-			# Show error
-			pass
-
-		Gdk.threads_enter()
-		self.builder.get_object('chart-progress').hide()
-		Gdk.threads_leave()
-
-
-
-	def onAddRasterChart(self, widget):
-		dialog = Gtk.FileChooserDialog ("Please select a directory", self.window,
-			Gtk.FileChooserAction.SELECT_FOLDER,
-			(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
-
-		response = dialog.run ()
-
-		if response == Gtk.ResponseType.OK:
-			path = dialog.get_filename () + '/'
-			l = self.mainWindow.chartManager.loadRasterLayer(path)
-			dialog.destroy ()
-
-			Thread(target=self.registeringChart, args=(l, 'raster', )).start()
-		else:
-			dialog.destroy ()
-			
-
-	def onAddVectorChart(self, widget):
-		pass

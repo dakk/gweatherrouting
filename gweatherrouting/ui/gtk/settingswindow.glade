@@ -12,6 +12,33 @@
       <column type="gchararray"/>
     </columns>
   </object>
+  <object class="GtkMenu" id="connection-menu">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <child>
+      <object class="GtkMenuItem">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Remove</property>
+        <property name="use-underline">True</property>
+        <signal name="activate" handler="onConnectionRemove" swapped="no"/>
+      </object>
+    </child>
+  </object>
+  <object class="GtkListStore" id="connection-store">
+    <columns>
+      <!-- column-name type -->
+      <column type="gchararray"/>
+      <!-- column-name source_type -->
+      <column type="gchararray"/>
+      <!-- column-name host_or_file -->
+      <column type="gchararray"/>
+      <!-- column-name port_or_baudrate -->
+      <column type="guint"/>
+      <!-- column-name active -->
+      <column type="gboolean"/>
+    </columns>
+  </object>
   <object class="GtkAdjustment" id="grib-arrow-opacity-adjustment">
     <property name="upper">1</property>
     <property name="value">0.80</property>
@@ -75,7 +102,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkBox">
+                  <object class="GtkBox" id="charts-tab">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="orientation">vertical</property>
@@ -244,7 +271,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkBox">
+                  <object class="GtkBox" id="grib-tab">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="orientation">vertical</property>
@@ -343,6 +370,141 @@
                   </packing>
                 </child>
                 <child>
+                  <object class="GtkBox" id="connections-tab">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="orientation">vertical</property>
+                    <child>
+                      <object class="GtkFrame">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label-xalign">0</property>
+                        <property name="shadow-type">none</property>
+                        <child>
+                          <object class="GtkAlignment">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="left-padding">12</property>
+                            <child>
+                              <object class="GtkBox">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="orientation">vertical</property>
+                                <child>
+                                  <object class="GtkScrolledWindow">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="shadow-type">in</property>
+                                    <child>
+                                      <object class="GtkTreeView" id="connection-treeview">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">True</property>
+                                        <property name="model">connection-store</property>
+                                        <property name="enable-search">False</property>
+                                        <signal name="button-press-event" handler="onConnectionClick" swapped="no"/>
+                                        <child internal-child="selection">
+                                          <object class="GtkTreeSelection"/>
+                                        </child>
+                                        <child>
+                                          <object class="GtkTreeViewColumn">
+                                            <property name="title" translatable="yes">Active</property>
+                                            <child>
+                                              <object class="GtkCellRendererToggle"/>
+                                              <attributes>
+                                                <attribute name="activatable">4</attribute>
+                                              </attributes>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkTreeViewColumn">
+                                            <property name="title" translatable="yes">Data Type</property>
+                                            <child>
+                                              <object class="GtkCellRendererCombo">
+                                                <property name="editable">True</property>
+                                              </object>
+                                              <attributes>
+                                                <attribute name="text">0</attribute>
+                                                <attribute name="model">0</attribute>
+                                              </attributes>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkTreeViewColumn">
+                                            <property name="title" translatable="yes">Source Type</property>
+                                            <child>
+                                              <object class="GtkCellRendererCombo">
+                                                <property name="editable">True</property>
+                                              </object>
+                                              <attributes>
+                                                <attribute name="text">1</attribute>
+                                                <attribute name="model">1</attribute>
+                                              </attributes>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkTreeViewColumn">
+                                            <property name="title" translatable="yes">Host / Device</property>
+                                            <child>
+                                              <object class="GtkCellRendererText">
+                                                <property name="editable">True</property>
+                                              </object>
+                                              <attributes>
+                                                <attribute name="text">2</attribute>
+                                              </attributes>
+                                            </child>
+                                          </object>
+                                        </child>
+                                        <child>
+                                          <object class="GtkTreeViewColumn">
+                                            <property name="title" translatable="yes">Port / Baudrate</property>
+                                            <child>
+                                              <object class="GtkCellRendererText">
+                                                <property name="editable">True</property>
+                                              </object>
+                                              <attributes>
+                                                <attribute name="text">3</attribute>
+                                              </attributes>
+                                            </child>
+                                          </object>
+                                        </child>
+                                      </object>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">True</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child type="label">
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">Connections</property>
+                          </object>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="name">connections</property>
+                    <property name="title" translatable="yes">Connections</property>
+                    <property name="position">3</property>
+                  </packing>
+                </child>
+                <child>
                   <object class="GtkBox" id="ais-tab">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -360,27 +522,6 @@
                   <packing>
                     <property name="name">ais</property>
                     <property name="title" translatable="yes">AIS</property>
-                    <property name="position">3</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkBox" id="nmea-tab">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="orientation">vertical</property>
-                    <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
-                    </child>
-                  </object>
-                  <packing>
-                    <property name="name">nmea</property>
-                    <property name="title" translatable="yes">NMEA</property>
                     <property name="position">4</property>
                   </packing>
                 </child>

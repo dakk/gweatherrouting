@@ -16,13 +16,11 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import gi
 import os
-import json
-import math
 import datetime
 import dateutil.parser
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, Gio, GObject
+from gi.repository import Gtk
 
 
 class TimePickerDialog:
