@@ -51,13 +51,10 @@ class Core(EventDispatcher):
 
     def dataHandler(self, dps):
         for x in dps:
-            try:
-                self.boatInfo.latitude = x.latitude
-                self.boatInfo.longitude = x.longitude
-
+            if x.isPosition():
+                self.boatInfo.latitude = x.data.latitude
+                self.boatInfo.longitude = x.data.longitude
                 self.dispatch("boatPosition", self.boatInfo)
-            except:
-                pass
 
     # Simulation
     def createRouting(self, algorithm, boatModel, track, startDatetime, startPosition):

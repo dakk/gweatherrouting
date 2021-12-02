@@ -16,6 +16,8 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import serial
 import pynmea2
+
+from gweatherrouting.conn.datasource import NMEADataPacket
 from . import DataSource
 
 class SerialDataSource(DataSource):
@@ -32,7 +34,7 @@ class SerialDataSource(DataSource):
             for x in d.split('\n'):
                 try:
                     msg = pynmea2.parse(x)
-                    msgs.append(msg)
+                    msgs.append(NMEADataPacket(msg))
                 except:
                     pass
         

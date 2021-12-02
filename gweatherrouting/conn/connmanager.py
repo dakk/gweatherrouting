@@ -15,10 +15,13 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 import logging
+from pynmea2.nmea_utils import LatLonFix
 import serial
 import time
 from threading import Thread
 import serial.tools.list_ports
+
+from gweatherrouting.conn.datasource import NMEADataPacket
 from . import SerialDataSource
 from ..core import EventDispatcher
 

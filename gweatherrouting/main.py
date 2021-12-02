@@ -34,8 +34,6 @@ def initCore():
     core = Core(conn)
     return core, conn
 
-
-
 def startUIKivy ():
     from .ui.kivy.app import GWeatherRoutingApp
     core, conn = initCore()

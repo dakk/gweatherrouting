@@ -14,5 +14,23 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
+from pynmea2.nmea_utils import LatLonFix
+
+
+class DataPacket:
+    def __init__(self, t, sentence):
+        self.t = t
+        self.data = sentence
+        
+    def isPosition(self):
+        return False
+
+class NMEADataPacket(DataPacket):
+    def __init__(self, sentence):
+        DataPacket.__init__(self, 'nmea', sentence)
+
+    def isPosition(self):
+        return isinstance(self.data, LatLonFix)
+
 class DataSource:
     pass
