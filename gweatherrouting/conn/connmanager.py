@@ -24,55 +24,71 @@ import serial.tools.list_ports
 from gweatherrouting.conn.datasource import NMEADataPacket
 from . import SerialDataSource
 from ..core import EventDispatcher
+from ..storage import Storage
 
 logger = logging.getLogger ('gweatherrouting')
 
+
+# Every connection can be of type:
+# - serial: data port, baudrate, protocol
+# - connection: tcpudp, host, data port, protocol
+
+class ConnManagerStorage(Storage):
+	def __init__(self):
+		Storage.__init__(self, "conn-manager")
+		self.connections = []
+		self.loadOrSaveDefault()
+
+
 class ConnManager(EventDispatcher):
-    def __init__(self):
-        self.running = True
-        self.sources = {}
+	def __init__(self):
+		self.storage = ConnManagerStorage()
+		self.running = True
+		self.sources = {}
 
-    def __del__(self):
-        self.running = False
+	def __del__(self):
+		self.running = False
 
-    def plugAll(self):
-        for x in serial.tools.list_ports.comports():
-            try:
-                self.sources[x.device] = SerialDataSource(x.device)
-                logger.info ('Detected new data source: %s [%s]' % (x.device, x.description))
-            except:
-                pass 
+	def plugAll(self):
+		for x in self.storage.connections:
+			pass
+		# for x in serial.tools.list_ports.comports():
+		# 	try:
+		# 		self.sources[x.device] = SerialDataSource(x.device)
+		# 		logger.info ('Detected new data source: %s [%s]' % (x.device, x.description))
+		# 	except:
+		# 		pass 
 
-    def poll(self):
-        dd = []
-        todel = []
+	def poll(self):
+		dd = []
+		todel = []
 
-        for x in self.sources:
-            ds = self.sources[x]
-            try:
-                d = ds.read()
-                if len(d): 
-                    dd += d
-            except:
-                logger.info ('Data source %s disconnected' % ds.uri)
-                todel.append(x)
+		for x in self.sources:
+			ds = self.sources[x]
+			try:
+				d = ds.read()
+				if len(d): 
+					dd += d
+			except:
+				logger.info ('Data source %s disconnected' % ds.uri)
+				todel.append(x)
 
-        if len(dd) > 0:
-            self.dispatch('data', dd)
+		if len(dd) > 0:
+			self.dispatch('data', dd)
 
-        if len(todel) > 0:
-            for x in todel:
-                del self.sources[x]
-        if len(self.sources) == 0:
-            self.plugAll()
+		if len(todel) > 0:
+			for x in todel:
+				del self.sources[x]
+		if len(self.sources) == 0:
+			self.plugAll()
 
 
-    def pollLoop(self):
-        while self.running:
-            self.poll()
-            time.sleep(0.5)
+	def pollLoop(self):
+		while self.running:
+			self.poll()
+			time.sleep(0.5)
 
-    def startPolling(self):
-        logger.info ('Polling started')
-        self.thread = Thread(target=self.pollLoop, args=())
-        self.thread.start()
+	def startPolling(self):
+		logger.info ('Polling started')
+		self.thread = Thread(target=self.pollLoop, args=())
+		self.thread.start()

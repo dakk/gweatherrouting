@@ -18,6 +18,8 @@ import gi
 import os
 import json
 import math
+
+from gweatherrouting.ui.gtk.connectioneditdialog import ConnectionEditDialog
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, GObject, Gdk
 from threading import Thread
@@ -28,21 +30,35 @@ class SettingsWindowConnections:
 		self.reloadConnections()
 
 	def reloadConnections(self):
-		self.connectionStore = self.builder.get_object("connection-store")
-		self.connectionStore.clear()
+		# self.connectionStore = self.builder.get_object("connection-store")
+		# self.connectionStore.clear()
 
-		# for c in self.mainWindow.conn.connections:
-		# 	self.connectionStore.append ([])
-		# 	pass 
+		# for c in self.mainWindow.conn.storage.connections:
+		# self.connectionStore.append([c['type'], c['source_type'], c['host_or_file'], c['port_or_baudrate'], c['active']])
+		pass 
 
-	def onAddNetworkConnection(self, widget):
-		pass
-
-	def onAddDeviceConnection(self, widget):
-		pass
+	def onAddConnection(self, widget):
+		d = ConnectionEditDialog.create(self.window, None)
+		d.run()
+		data = d.data
+		d.destroy()
+		if data != None:
+			pass 
+		
+		# self.mainWindow.conn.storage.connections.append({
+		# })
+		self.reloadConnections()
 
 	def onConnectionRemove(self, widget):
 		pass
+
+	def onConnectionEdit(self, widget):
+		d = ConnectionEditDialog.create(self.window)
+		d.run()
+		data = d.data
+		d.destroy()
+		if data != None:
+			pass 
 
 	def onConnectionClick(self, widget, event):
 		if event.button == 3:

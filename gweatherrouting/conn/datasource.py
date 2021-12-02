@@ -14,6 +14,8 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
+import serial
+import pynmea2
 from pynmea2.nmea_utils import LatLonFix
 
 
@@ -34,3 +36,4 @@ class NMEADataPacket(DataPacket):
 
 class DataSource:
     pass
+
