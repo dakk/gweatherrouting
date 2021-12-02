@@ -61,6 +61,10 @@
               <object class="GtkComboBoxText" id="type-combo">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
+                <property name="margin-start">5</property>
+                <property name="margin-end">5</property>
+                <property name="margin-top">5</property>
+                <property name="margin-bottom">5</property>
                 <property name="active">1</property>
                 <signal name="changed" handler="onTypeChange" swapped="no"/>
               </object>
@@ -80,8 +84,12 @@
                   <object class="GtkGrid">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
+                    <property name="margin-start">5</property>
+                    <property name="margin-end">5</property>
+                    <property name="margin-bottom">5</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
+                    <property name="row-spacing">5</property>
                     <child>
                       <object class="GtkEntry" id="serial-data-port">
                         <property name="visible">True</property>
@@ -156,6 +164,10 @@
                   <object class="GtkGrid">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
+                    <property name="margin-start">5</property>
+                    <property name="margin-end">5</property>
+                    <property name="margin-bottom">5</property>
+                    <property name="row-spacing">5</property>
                     <child>
                       <object class="GtkLabel">
                         <property name="visible">True</property>
@@ -242,8 +254,11 @@
               <object class="GtkGrid">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
+                <property name="margin-start">5</property>
+                <property name="margin-end">5</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
+                <property name="row-spacing">5</property>
                 <child>
                   <object class="GtkLabel">
                     <property name="visible">True</property>
@@ -305,6 +320,17 @@
           </packing>
         </child>
       </object>
+    </child>
+    <child type="titlebar">
+        <object class="GtkHeaderBar">
+          <property name="visible">True</property>
+          <property name="can-focus">False</property>
+          <property name="title" translatable="yes">Add / Edit Connection</property>
+          <property name="show-close-button">True</property>
+          <child>
+            <placeholder/>
+          </child>
+        </object>
     </child>
   </object>
 </interface>

@@ -111,7 +111,7 @@ class ConnectionEditDialog:
 			self.builder.get_object('network-frame').hide()
 			self.builder.get_object('serial-frame').show()
 
-	def onSave(self, widget):
+	def saveData(self):
 		self.data = {
 			'type': lower(self.typeCombo.get_active_text()),
 			'protocol': lower(self.protocolCombo.get_active_text()),
@@ -125,7 +125,17 @@ class ConnectionEditDialog:
 			self.data['host'] = self.builder.get_object('network-host').get_text()
 			self.data['port'] = int(self.builder.get_object('network-port').get_text())
 
-		self.dialog.response(Gtk.ResponseType.OK)
+
+	def onSave(self, widget):
+		try:
+			self.saveData()
+			self.dialog.response(Gtk.ResponseType.OK)
+		except Exception as e:
+			# Open a message dialog 
+			dialog = Gtk.MessageDialog(self.dialog, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
+			dialog.format_secondary_text("Invalid data")
+			dialog.run()
+			dialog.destroy()
 
 	def onClose(self, widget):
 		self.dialog.response(Gtk.ResponseType.CANCEL)
