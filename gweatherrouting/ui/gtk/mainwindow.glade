@@ -137,7 +137,6 @@ Riccardo Apolloni</property>
     <property name="can-focus">False</property>
     <child>
       <object class="GtkMenuItem">
-        <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Settings</property>
         <property name="use-underline">True</property>
@@ -146,7 +145,6 @@ Riccardo Apolloni</property>
     </child>
     <child>
       <object class="GtkSeparatorMenuItem">
-        <property name="visible">True</property>
         <property name="can-focus">False</property>
       </object>
     </child>
@@ -942,6 +940,26 @@ Riccardo Apolloni</property>
           </packing>
         </child>
         <child>
+          <object class="GtkMenuButton">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="focus-on-click">False</property>
+            <property name="receives-default">True</property>
+            <property name="popup">settings-menu</property>
+            <child>
+              <object class="GtkImage">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="icon-name">open-menu-symbolic</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="pack-type">end</property>
+            <property name="position">3</property>
+          </packing>
+        </child>
+        <child>
           <object class="GtkButton" id="routing-button">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
@@ -961,17 +979,37 @@ Riccardo Apolloni</property>
           </packing>
         </child>
         <child>
-          <object class="GtkMenuButton">
+          <object class="GtkButton">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
-            <property name="focus-on-click">False</property>
             <property name="receives-default">True</property>
-            <property name="popup">settings-menu</property>
+            <signal name="clicked" handler="onSettings" swapped="no"/>
             <child>
               <object class="GtkImage">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="icon-name">open-menu-symbolic</property>
+                <property name="icon-name">settings</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="pack-type">end</property>
+            <property name="position">4</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="grib-button">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">True</property>
+            <property name="tooltip-text" translatable="yes">Grib Manager</property>
+            <property name="margin-end">3</property>
+            <signal name="clicked" handler="onGribManager" swapped="no"/>
+            <child>
+              <object class="GtkImage">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="icon-name">weather-windy-symbolic.symbolic</property>
               </object>
             </child>
           </object>
@@ -998,27 +1036,6 @@ Riccardo Apolloni</property>
           <packing>
             <property name="pack-type">end</property>
             <property name="position">6</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkButton" id="grib-button">
-            <property name="visible">True</property>
-            <property name="can-focus">True</property>
-            <property name="receives-default">True</property>
-            <property name="tooltip-text" translatable="yes">Grib Manager</property>
-            <property name="margin-end">3</property>
-            <signal name="clicked" handler="onGribManager" swapped="no"/>
-            <child>
-              <object class="GtkImage">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="icon-name">weather-windy-symbolic.symbolic</property>
-              </object>
-            </child>
-          </object>
-          <packing>
-            <property name="pack-type">end</property>
-            <property name="position">7</property>
           </packing>
         </child>
       </object>

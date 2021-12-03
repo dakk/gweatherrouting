@@ -22,6 +22,7 @@ import math
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, GObject
 
+from .style import drawPolar
 import weatherrouting
 from ...core import TimeControl
 from .timepickerdialog import TimePickerDialog
@@ -182,28 +183,4 @@ class RoutingWizardDialog:
 		if not self.polar:
 			return
 
-		#print (self.polar.speedTable)
-		cr.set_source_rgb (1, 1, 1)
-		cr.paint ()
-
-		cr.set_line_width (0.3)
-		cr.set_source_rgb (0, 0, 0)
-		for x in self.polar.tws:# [::2]:
-			cr.arc (0.0, 100.0, x * 3, math.radians (-180), math.radians (180.0))
-			cr.stroke ()
-
-		for x in self.polar.twa:# [::8]:
-			cr.move_to (0.0, 100.0)
-			cr.line_to (0 + math.sin (x) * 100.0, 100 + math.cos (x) * 100.0)
-			cr.stroke ()
-
-		cr.set_line_width (0.5)
-		cr.set_source_rgb (1, 0, 0)
-
-		for i in range (0, len (self.polar.tws), 1):
-			for j in range (0, len (self.polar.twa), 1):
-				cr.line_to (5 * self.polar.speedTable [j][i] * math.sin (self.polar.twa[j]), 100 + 5 * self.polar.speedTable [j][i] * math.cos (self.polar.twa[j]))
-				cr.stroke ()
-				cr.move_to (5 * self.polar.speedTable [j][i] * math.sin (self.polar.twa[j]), 100 + 5 * self.polar.speedTable [j][i] * math.cos (self.polar.twa[j]))
-
-
+		drawPolar(self.polar, cr)
