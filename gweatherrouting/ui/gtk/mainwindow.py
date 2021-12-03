@@ -29,13 +29,13 @@ from gi.repository import Gtk, Gio, GObject, OsmGpsMap, Gdk
 from ... import log
 import logging
 
-from .settingswindow import SettingsWindow
+from .settings import SettingsWindow
 from .projectpropertieswindow import ProjectPropertiesWindow
 from .gribmanagerwindow import GribManagerWindow, GribFileFilter
 from .maplayers import GribMapLayer, AISMapLayer
 from .charts import ChartManager
 
-from .settingsmanager import SettingsManager
+from .settings import SettingsManager
 from ...core import TimeControl
 from .mainwindow_poi import MainWindowPOI
 from .mainwindow_track import MainWindowTrack
@@ -115,7 +115,8 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 
 
 	def boatInfoHandler(self, bi):
-		self.map_gps_add(bi.latitude, bi.longitude, 0.0)
+		print(bi.latitude, bi.longitude)
+		self.map.gps_add(bi.latitude, bi.longitude, heading=bi.heading)
 		self.map.queue_draw ()
 
 	def quit(self, a, b):

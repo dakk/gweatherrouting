@@ -15,11 +15,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 import gi
-import os
-import json
-import math
 
-from gweatherrouting.ui.gtk.settingswindow_connections import SettingsWindowConnections
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, GObject, Gdk
 from threading import Thread

@@ -15,27 +15,42 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 import gi
-import os
-import json
-import math
-
-from gweatherrouting.ui.gtk.connectioneditdialog import ConnectionEditDialog
+from .connectioneditdialog import ConnectionEditDialog
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, GObject, Gdk
 from threading import Thread
 
 
+class ConnectionListBoxRow(Gtk.ListBoxRow):
+	def __init__(self, data):
+		super().__init__()
+		self.data = data
+
+		label = Gtk.Label()
+
+		if self.data['type'] == 'serial':	
+			label.set_markup('<b>Serial [{}, {}]</b> Port: {} (Baudrate: {})'.format(data['protocol'], data['direction'], data['data-port'], data['baudrate']))
+		elif self.data['type'] == 'network':
+			label.set_markup('<b>Network [{}, {}]</b> Host: {} (Port: {})'.format(data['protocol'], data['direction'], data['host'], data['port']))
+		
+		self.add(label)
+
+
 class SettingsWindowConnections:
 	def __init__(self, mainWindow, settingsManager):
+		self.selectedConnection = None
+		self.connectionListBox = self.builder.get_object("connections-listbox")
 		self.reloadConnections()
 
 	def reloadConnections(self):
-		# self.connectionStore = self.builder.get_object("connection-store")
-		# self.connectionStore.clear()
+		self.connectionListBox.set_selection_mode(Gtk.SelectionMode.SINGLE)
+		for x in self.connectionListBox.get_children():
+			self.connectionListBox.remove(x)
 
-		# for c in self.mainWindow.conn.storage.connections:
-		# self.connectionStore.append([c['type'], c['source_type'], c['host_or_file'], c['port_or_baudrate'], c['active']])
-		pass 
+		for c in self.mainWindow.conn.connections:
+			clbr = ConnectionListBoxRow(c)
+			self.connectionListBox.add(clbr)
+		self.connectionListBox.show_all()
 
 	def onAddConnection(self, widget):
 		d = ConnectionEditDialog.create(self.window, None)
@@ -43,14 +58,17 @@ class SettingsWindowConnections:
 		data = d.data
 		d.destroy()
 		if data != None:
-			pass 
-		
-		# self.mainWindow.conn.storage.connections.append({
-		# })
+			self.mainWindow.conn.addConnection(data)
 		self.reloadConnections()
 
 	def onConnectionRemove(self, widget):
-		pass
+		if self.selectedConnection != None:	
+			self.mainWindow.conn.removeConnection(self.selectedConnection.data)
+			self.reloadConnections()
+
+	def onConnectionSelected(self, widget, sel):
+		self.selectedConnection = sel
+
 
 	def onConnectionEdit(self, widget):
 		d = ConnectionEditDialog.create(self.window)
@@ -58,7 +76,7 @@ class SettingsWindowConnections:
 		data = d.data
 		d.destroy()
 		if data != None:
-			pass 
+			self.mainWindow.conn.editConnection(data)
 
 	def onConnectionClick(self, widget, event):
 		if event.button == 3:

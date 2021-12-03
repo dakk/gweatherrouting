@@ -46,7 +46,6 @@ class Core(EventDispatcher):
         self.boatInfo = BoatInfo()
 
         self.conn.connect("data", self.dataHandler)
-
         logger.info("Initialized")
 
     def dataHandler(self, dps):

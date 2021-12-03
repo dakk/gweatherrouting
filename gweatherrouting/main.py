@@ -30,6 +30,7 @@ logger = logging.getLogger ('gweatherrouting')
 
 def initCore():
     conn = ConnManager()
+    conn.plugAll()
     conn.startPolling()
     core = Core(conn)
     return core, conn

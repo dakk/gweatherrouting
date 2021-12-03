@@ -15,27 +15,34 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 import serial
-import pynmea2
+from serial.tools import list_ports
+import logging
 
-from gweatherrouting.conn.datasource import NMEADataPacket
 from . import DataSource
 
+logger = logging.getLogger ('gweatherrouting')
+
 class SerialDataSource(DataSource):
-    def __init__(self, port):
-        self.uri = port
-        self.s = serial.Serial(port)
+	def __init__(self, protocol, direction, port, baudrate=9600):
+		DataSource.__init__(self, protocol, direction)
+		self.uri = port
+		self.s = serial.Serial(port, baudrate=9600)
 
-    def read(self):
-        msgs = []
+	def detect():
+		devices = []
+		for x in list_ports.comports():
+			try:
+				devices.append(x.device)
+				logger.info ('Detected new data source: %s [%s]' % (x.device, x.description))
+			except:
+		 		pass 
+		return devices
 
-        if (self.s.inWaiting() > 0):
-            d = self.s.read(self.s.inWaiting()).decode('ascii')
+	def _read(self):
+		if (self.s.inWaiting() > 0):
+			return self.s.read(self.s.inWaiting()).decode('ascii').split('\n')
+		
+		return []
 
-            for x in d.split('\n'):
-                try:
-                    msg = pynmea2.parse(x)
-                    msgs.append(NMEADataPacket(msg))
-                except:
-                    pass
-        
-        return msgs
+	def _write(self, msg):
+		self.s.write(msg.encode('ascii'))

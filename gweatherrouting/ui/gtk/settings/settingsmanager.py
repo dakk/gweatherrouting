@@ -14,6 +14,15 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
-from .datasource import DataSource, NMEADataPacket, DataPacket
-from .serialdatasource import SerialDataSource
-from .connmanager import ConnManager
+from ....storage import Storage
+
+class SettingsManager(Storage):
+	def __init__(self):
+		Storage.__init__(self, "settings")
+
+		self.grib = Storage(parent=self)
+		self.grib.arrowOpacity = 0.4
+		self.vectorCharts = []
+		self.rasterCharts = []
+		
+		self.loadOrSaveDefault()

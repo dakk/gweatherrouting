@@ -13,17 +13,5 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
-from ...storage import Storage
-
-class SettingsManager(Storage):
-	def __init__(self):
-		Storage.__init__(self, "settings")
-
-		self.grib = Storage(parent=self)
-		self.grib.arrowOpacity = 0.4
-		self.vectorCharts = []
-		self.rasterCharts = []
-		self.connections = []
-		
-		self.loadOrSaveDefault()
+from .settingswindow import SettingsWindow
+from .settingsmanager import SettingsManager

@@ -27,13 +27,61 @@ class DataPacket:
     def isPosition(self):
         return False
 
+    def parse(data):
+        raise NotImplementedError
+
+    def serialize(self):
+        raise NotImplementedError
+
+
 class NMEADataPacket(DataPacket):
+    PROTOCOL = "nmea0183"
+
     def __init__(self, sentence):
         DataPacket.__init__(self, 'nmea', sentence)
 
     def isPosition(self):
-        return isinstance(self.data, LatLonFix)
+        return isinstance(self.data, LatLonFix) and self.data.latitude != 0.0 and self.data.longitude != 0.0       
+
+    def parse(data):
+        return NMEADataPacket(pynmea2.parse(data))
+
+    def serialize(self):
+        return str(self.data)
+
+
 
 class DataSource:
-    pass
+    def __init__(self, protocol, direction):
+        self.protocol = protocol
+        self.direction = direction
 
+        if self.protocol == 'nmea0183':
+            self.parser = NMEADataPacket
+        else:
+            raise NotImplementedError
+
+    def write(self, packet):
+        if self.direction == 'in':
+            return False
+        
+        return self._write(packet.serialize())
+
+    def read(self):
+        if self.direction == 'out':
+            return []
+
+        data = self._read()
+        msgs = []
+        for msg in data:
+            try:
+                msgs.append(self.parser.parse(msg))
+            except:
+                pass
+        return msgs
+
+    def _read(self):
+        raise NotImplementedError
+
+    def _write(self):
+        raise NotImplementedError

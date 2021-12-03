@@ -16,11 +16,9 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import gi
 import os
-import json
-import datetime
-import math
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, GObject
+from ....conn import SerialDataSource
 
 ctypes = [
 	"Network",
@@ -42,6 +40,8 @@ protocols = [
 	'NMEA0183'
 ]
 
+baudrates = [9600, 19200, 38400, 57600, 115200]
+
 def lower(s): 
 	return s.lower()
 
@@ -57,6 +57,7 @@ class ConnectionEditDialog:
 		return self.dialog.destroy()
 
 	def __init__(self, parent, data):
+		self.parent = parent
 		self.data = data
 		self.builder = Gtk.Builder()
 		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/connectioneditdialog.glade")
@@ -89,12 +90,22 @@ class ConnectionEditDialog:
 			self.protocolCombo.append_text(x)
 		self.protocolCombo.set_active(0)
 
+		self.serialDataPortCombo = self.builder.get_object('serial-data-port-combo')
+		for x in SerialDataSource.detect():
+			self.serialDataPortCombo.append_text(x)
+		self.serialDataPortCombo.set_active(0)
+
+		self.serialBaudrateCombo = self.builder.get_object('serial-baudrate-combo')
+		for x in baudrates:
+			self.serialBaudrateCombo.append_text(str(x))
+		self.serialBaudrateCombo.set_active(0)
+
 		if self.data != None:
 			# Set data
 			if self.data['type'] == 'serial':
 				self.typeCombo.set_active(0)
 				self.builder.get_object('serial-data-port').set_text(self.data['data-port'])
-				self.builder.get_object('serial-baudrate').set_text(str(self.data['baudrate']))
+				self.serialBaudrateCombo.set_active(map(lower, baudrates).index(self.data['baudrate']))
 			elif self.data['type'] == 'network':
 				self.typeCombo.set_active(1)
 				self.networkTypeCombo.set_active(map(lower, ntypes).index(self.data['network']))
@@ -102,6 +113,7 @@ class ConnectionEditDialog:
 				self.builder.get_object('network-port').set_text(str(self.data['port']))
 			self.protocolCombo.set_active(map(lower, protocols).index(self.data['protocol']))
 			self.directionCombo.set_active(map(lower, directions).index(self.data['direction']))
+
 
 	def onTypeChange(self, widget):
 		if self.typeCombo.get_active() == 0:
@@ -118,8 +130,8 @@ class ConnectionEditDialog:
 			'direction': lower(self.directionCombo.get_active_text()),
 		}
 		if self.data['type'] == 'serial':
-			self.data['data-port'] = self.builder.get_object('serial-data-port').get_text()
-			self.data['baudrate'] = int(self.builder.get_object('serial-baudrate').get_text())
+			self.data['data-port'] = self.serialDataPortCombo.get_active_text()
+			self.data['baudrate'] = int(self.serialBaudrateCombo.get_active_text())
 		elif self.data['type'] == 'network':
 			self.data['network'] = lower(self.networkTypeCombo.get_active_text())
 			self.data['host'] = self.builder.get_object('network-host').get_text()
@@ -131,8 +143,7 @@ class ConnectionEditDialog:
 			self.saveData()
 			self.dialog.response(Gtk.ResponseType.OK)
 		except Exception as e:
-			# Open a message dialog 
-			dialog = Gtk.MessageDialog(self.dialog, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
+			dialog = Gtk.MessageDialog(self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
 			dialog.format_secondary_text("Invalid data")
 			dialog.run()
 			dialog.destroy()

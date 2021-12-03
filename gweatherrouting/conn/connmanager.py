@@ -15,13 +15,8 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 import logging
-from pynmea2.nmea_utils import LatLonFix
-import serial
 import time
 from threading import Thread
-import serial.tools.list_ports
-
-from gweatherrouting.conn.datasource import NMEADataPacket
 from . import SerialDataSource
 from ..core import EventDispatcher
 from ..storage import Storage
@@ -40,6 +35,11 @@ class ConnManagerStorage(Storage):
 		self.loadOrSaveDefault()
 
 
+# { type: 'serial|network', protocol: 'nmea0183', direction: 'in|out|both' }
+# Serial: { data-port: '/dev/ttyACM0', baudrate: 9600 }
+# Network: { network: 'tcp|udp', host: 'localhost', port: '1234' }
+
+
 class ConnManager(EventDispatcher):
 	def __init__(self):
 		self.storage = ConnManagerStorage()
@@ -49,15 +49,33 @@ class ConnManager(EventDispatcher):
 	def __del__(self):
 		self.running = False
 
+	@property
+	def connections(self):
+		return self.storage.connections
+
 	def plugAll(self):
+		self.sources = {}
 		for x in self.storage.connections:
-			pass
-		# for x in serial.tools.list_ports.comports():
-		# 	try:
-		# 		self.sources[x.device] = SerialDataSource(x.device)
-		# 		logger.info ('Detected new data source: %s [%s]' % (x.device, x.description))
-		# 	except:
-		# 		pass 
+			if x['type'] == 'serial':
+				self.sources[x['data-port']] = SerialDataSource(x['protocol'], x['direction'], x['data-port'], x['baudrate'])
+			elif x['type'] == 'network':
+				pass 
+
+	def addConnection(self, d):
+		if d['type'] == 'serial':
+			if list(filter(lambda x: x['data-port'] == d['data-port'], self.connections)) == []:
+				self.storage.connections.append(d)
+		elif d['type'] == 'network':
+			if list(filter(lambda x: x['host'] == d['host'] and x['port'] == d['port'], self.connections)) == []:
+				self.storage.connections.append(d)
+
+		self.storage.save()
+		self.plugAll()
+
+	def removeConnection(self, d):
+		self.storage.connections.remove(d)
+		self.storage.save()
+		self.plugAll()
 
 	def poll(self):
 		dd = []
@@ -69,7 +87,8 @@ class ConnManager(EventDispatcher):
 				d = ds.read()
 				if len(d): 
 					dd += d
-			except:
+			except Exception as e:
+				logger.error ('Error reading data from source: ' + str(e))
 				logger.info ('Data source %s disconnected' % ds.uri)
 				todel.append(x)
 
