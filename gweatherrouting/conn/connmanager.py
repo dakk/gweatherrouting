@@ -17,7 +17,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import logging
 import time
 from threading import Thread
-from . import SerialDataSource
+from . import SerialDataSource, NetworkDataSource
 from ..core import EventDispatcher
 from ..storage import Storage
 
@@ -54,12 +54,13 @@ class ConnManager(EventDispatcher):
 		return self.storage.connections
 
 	def plugAll(self):
+		logger.info ('Plugging all connections')
 		self.sources = {}
 		for x in self.storage.connections:
 			if x['type'] == 'serial':
 				self.sources[x['data-port']] = SerialDataSource(x['protocol'], x['direction'], x['data-port'], x['baudrate'])
 			elif x['type'] == 'network':
-				pass 
+				self.sources[x['host'] + ':' + str(x['port'])] = NetworkDataSource(x['protocol'], x['direction'], x['host'], x['port'], x['network'])
 
 	def addConnection(self, d):
 		if d['type'] == 'serial':
