@@ -198,9 +198,13 @@ class GDALRasterChart(ChartLayer):
 	def loadRaster(self, gpsmap, path):
 		with self.loadLock:
 			logger.debug('Loading raster file ' + path)
-			r = GDALSingleRasterChart(path)
-			self.cached[path] = r
-			logger.debug('Done loading raster file ' + path)
+			try:
+				r = GDALSingleRasterChart(path)
+				self.cached[path] = r
+				logger.debug('Done loading raster file ' + path)
+			except:
+				logger.error('Error loading raster file ' + path)
+				return None
 			Gdk.threads_enter()
 			gpsmap.queue_draw()
 			Gdk.threads_leave()

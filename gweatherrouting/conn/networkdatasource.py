@@ -24,12 +24,23 @@ logger = logging.getLogger ('gweatherrouting')
 class NetworkDataSource(DataSource):
 	def __init__(self, protocol, direction, host, port, cnetwork):
 		DataSource.__init__(self, protocol, direction)
+		self.host = host
+		self.port = port
+
 		# Create socket
 		if cnetwork == 'tcp':
 			self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		elif cnetwork == 'udp':
 			self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-		self.s.connect((host, port))
+
+	def connect(self):
+		try:
+			self.s.connect((self.host, self.port))
+			self.connected = True
+			return True
+		except Exception as e:
+			logger.error ('Error while connecting to the network: %s' % e)
+			return False
 
 
 	def _read(self):

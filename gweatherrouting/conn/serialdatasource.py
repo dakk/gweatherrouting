@@ -25,8 +25,18 @@ logger = logging.getLogger ('gweatherrouting')
 class SerialDataSource(DataSource):
 	def __init__(self, protocol, direction, port, baudrate=9600):
 		DataSource.__init__(self, protocol, direction)
-		self.uri = port
-		self.s = serial.Serial(port, baudrate=9600)
+		self.port = port
+		self.baudrate = baudrate
+		self.s = None
+
+	def connect(self):
+		try:
+			self.s = serial.Serial(self.port, baudrate=self.baudrate)
+			self.connected = True
+			return True
+		except:
+			logger.error ('Error connecting to serial port %s' % self.port)
+			return False
 
 	def detect():
 		devices = []

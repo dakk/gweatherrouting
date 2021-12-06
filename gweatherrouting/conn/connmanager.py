@@ -59,8 +59,14 @@ class ConnManager(EventDispatcher):
 		for x in self.storage.connections:
 			if x['type'] == 'serial':
 				self.sources[x['data-port']] = SerialDataSource(x['protocol'], x['direction'], x['data-port'], x['baudrate'])
+				if self.sources[x['data-port']].connect():
+					logger.info ('Data source %s connected' % self.sources[x['data-port']].uri)
+
+
 			elif x['type'] == 'network':
 				self.sources[x['host'] + ':' + str(x['port'])] = NetworkDataSource(x['protocol'], x['direction'], x['host'], x['port'], x['network'])
+				if self.sources[x['host'] + ':' + str(x['port'])].connect():
+					logger.info ('Data source %s connected' % self.sources[x['host'] + ':' + str(x['port'])].uri)
 
 	def addConnection(self, d):
 		if d['type'] == 'serial':
@@ -73,6 +79,7 @@ class ConnManager(EventDispatcher):
 		self.storage.save()
 		self.plugAll()
 
+
 	def removeConnection(self, d):
 		self.storage.connections.remove(d)
 		self.storage.save()
@@ -80,26 +87,26 @@ class ConnManager(EventDispatcher):
 
 	def poll(self):
 		dd = []
-		todel = []
+		rf = 0
 
 		for x in self.sources:
 			ds = self.sources[x]
+			if not ds.connected:
+				continue
+
+			rf += 1
 			try:
 				d = ds.read()
 				if len(d): 
 					dd += d
 			except Exception as e:
-				logger.error ('Error reading data from source: ' + str(e))
-				logger.info ('Data source %s disconnected' % ds.uri)
-				todel.append(x)
+				logger.error ('Error reading data from source')
 
 		if len(dd) > 0:
 			self.dispatch('data', dd)
 
-		if len(todel) > 0:
-			for x in todel:
-				del self.sources[x]
-		if len(self.sources) == 0:
+		if rf < len(self.sources):
+			time.sleep(30)
 			self.plugAll()
 
 

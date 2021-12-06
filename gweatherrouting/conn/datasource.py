@@ -55,6 +55,7 @@ class DataSource:
     def __init__(self, protocol, direction):
         self.protocol = protocol
         self.direction = direction
+        self.connected = False
 
         if self.protocol == 'nmea0183':
             self.parser = NMEADataPacket
@@ -62,12 +63,18 @@ class DataSource:
             raise NotImplementedError
 
     def write(self, packet):
+        if not self.connected:
+            return False 
+
         if self.direction == 'in':
             return False
         
         return self._write(packet.serialize())
 
     def read(self):
+        if not self.connected:
+            return None 
+            
         if self.direction == 'out':
             return []
 
