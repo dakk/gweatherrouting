@@ -137,6 +137,15 @@ Riccardo Apolloni</property>
     <property name="can-focus">False</property>
     <child>
       <object class="GtkMenuItem">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Logs</property>
+        <property name="use-underline">True</property>
+        <signal name="activate" handler="onLogs" swapped="no"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem">
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Settings</property>
         <property name="use-underline">True</property>
@@ -145,6 +154,7 @@ Riccardo Apolloni</property>
     </child>
     <child>
       <object class="GtkSeparatorMenuItem">
+        <property name="visible">True</property>
         <property name="can-focus">False</property>
       </object>
     </child>

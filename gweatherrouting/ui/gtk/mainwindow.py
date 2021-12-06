@@ -21,6 +21,8 @@ import time
 import gi
 import os
 
+from .logswindow import LogsWindow
+
 gi.require_version('Gtk', '3.0')
 gi.require_version('OsmGpsMap', '1.0')
 
@@ -152,6 +154,10 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 		self.core.trackManager.create()
 		self.updateTrack ()
 		self.map.queue_draw ()
+
+
+	def onLogs(self,widget):
+		LogsWindow(self.chartManager)
 
 
 
