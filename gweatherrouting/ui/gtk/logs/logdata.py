@@ -60,29 +60,12 @@ class LogData:
 		plt.rcParams.update({'font.size': 8})
 		x = numpy.array([x.time for x in self.data[::s]])
 
-		# fig  = plt.figure(figsize=((a.width / 100), (a.height / 100.)),facecolor = 'white', dpi=100)
-		# if self.speedChart:
-		# 	plt.plot(x, list(map(lambda x: x.speed, self.data)),linewidth=0.6,label='Speed')	
-		# if self.apparentWindChart:
-		# 	plt.plot(x, list(map(lambda x: x.aws, self.data)),linewidth=0.6,label='AWS')
-		# if self.trueWindChart:
-		# 	plt.plot(x, list(map(lambda x: x.tws, self.data)),linewidth=0.6,label='TWS')
-		# if self.depthChart:
-		# 	plt.plot(x, list(map(lambda x: x.depth, self.data)),linewidth=0.6,label='Depth')
-
-		# leg = plt.legend()
-
-
 		fig, ax1 = plt.subplots(2 if self.hdgChart or self.apparentWindChart or self.trueWindChart else 1)
 		fig.set_size_inches((a.width / 100), (a.height / 100.))
 
 		if not (self.hdgChart or self.apparentWindChart or self.trueWindChart):
 			ax1 = [ax1]
 
-
-		# color = 'tab:red'
-		# ax1.set_xlabel('time (s)')
-		# ax1.set_ylabel('exp', color=color)
 		if self.speedChart:
 			ax1[0].plot(x, list(map(lambda x: x.speed if x.speed else 0, self.data[::s])), color='#8dd3c7', linewidth=0.6,label='Speed')	
 		if self.apparentWindChart:
@@ -91,23 +74,21 @@ class LogData:
 			ax1[0].plot(x, list(map(lambda x: x.tws if x.tws else 0, self.data[::s])), color='#bfbbd9', linewidth=0.6,label='TWS')
 		if self.depthChart:
 			ax1[0].plot(x, list(map(lambda x: x.depth if x.depth else 0, self.data[::s])), color='#fa8174', linewidth=0.6,label='Depth')	
-		# ax1.tick_params(axis='y', labelcolor=color)
+		
 		ax1[0].legend()
 
 
 		if self.hdgChart or self.apparentWindChart or self.trueWindChart:
-			ax2 = ax1[1] #.twinx()  # instantiate a second axes that shares the same x-axis
+			ax2 = ax1[1]
 			
 			plt.setp(ax1[0].get_xticklabels(), visible=False)
-			# color = 'tab:blue'
-			# ax2.set_ylabel('sin', color=color)  # we already handled the x-label with ax1
+			
 			if self.apparentWindChart:
 				ax2.plot(x, list(map(lambda x: x.awa if x.awa else 0, self.data[::s])), color='#feffb3', linewidth=0.6,label='AWA')
 			if self.trueWindChart:
 				ax2.plot(x, list(map(lambda x: x.twa if x.twa else 0, self.data[::s])), color='#bfbbd9', linewidth=0.6,label='TWA')
 			if self.hdgChart:
 				ax2.plot(x, list(map(lambda x: x.hdg if x.hdg else 0, self.data[::s])), color='#81b1d2', linewidth=0.6,label='HDG')
-			# ax2.tick_params(axis='y', labelcolor=color)
 
 			ax2.legend()
 
@@ -129,6 +110,3 @@ class LogData:
 
 		fig.clf()
 		plt.close(fig)
-
-
-

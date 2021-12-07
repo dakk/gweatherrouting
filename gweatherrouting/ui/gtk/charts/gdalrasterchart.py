@@ -109,7 +109,7 @@ class GDALSingleRasterChart:
 		p.start()
 		p.join()
 		surface, bandXSize, bandYSize = return_dict['surface']
-		surf = cairo.ImageSurface.create_for_data(surface, cairo.Format.RGB24, bandXSize, bandYSize, cairo.Format.RGB24.stride_for_width(bandXSize))
+		surf = cairo.ImageSurface.create_for_data(surface, cairo.Format.ARGB32, bandXSize, bandYSize, cairo.Format.RGB24.stride_for_width(bandXSize))
 		self.surface = surf
 
 	def bandToSurface(self, i):
@@ -129,18 +129,14 @@ class GDALSingleRasterChart:
 			except:
 				c = (0, 0, 0, 0)
 				
-			colors[x] = c[0]*0xFFFFFF + c[1]*0xFFFF + c[2] *0xFF
-			# colors[x] = int(hex(c[0])[2:][::-1], 16)*0xFFFF + int(hex(c[1])[2:][::-1], 16)*0xFF + int(hex(c[2])[2:][::-1], 16) *0x1
+			# convert rgba tuple c to rgba32 int 
+			colors[x] = (c[3] << 24) | (c[2] << 16) | (c[1] << 8) | c[0]
 
 		data = np.vectorize(lambda x: colors[x], otypes=[np.int32])(band.ReadAsArray())
 		return data, band.XSize, band.YSize
 
 
 	def do_draw(self, gpsmap, cr):
-		p1, p2 = gpsmap.get_bbox()
-		p1lat, p1lon = p1.get_degrees()
-		p2lat, p2lon = p2.get_degrees()
-
 		cr.save()
 		xx, yy = gpsmap.convert_geographic_to_screen(
 			OsmGpsMap.MapPoint.new_degrees(self.bbox[0][0], self.bbox[0][1])
@@ -214,7 +210,6 @@ class GDALRasterChart(ChartLayer):
 		p1, p2 = gpsmap.get_bbox()
 		p1lat, p1lon = p1.get_degrees()
 		p2lat, p2lon = p2.get_degrees()
-		scale = gpsmap.get_scale()
 
 		# Check if bounds hasn't changed
 		if self.lastRasters and self.lastRect == [p1lat, p1lon, p2lat, p2lon]:
