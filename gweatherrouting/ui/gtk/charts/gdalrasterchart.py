@@ -293,7 +293,9 @@ class GDALRasterChart(ChartLayer):
 			cr.line_to(xx2, yy2)
 			cr.line_to(xx2, yy)
 			cr.line_to(xx, yy)
-			cr.stroke()
+
+			# Disable bbox rendering
+			# cr.stroke()
 
 	def do_render(self, gpsmap):
 		pass

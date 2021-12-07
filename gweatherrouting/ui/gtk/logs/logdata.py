@@ -38,6 +38,8 @@ class LogData:
 		res = pip.runPartial()
 		self.data = res[1::]
 
+		# TODO: add poitns to map using track 
+
 
 	def saveToFile(self, filepath):
 		pass 
