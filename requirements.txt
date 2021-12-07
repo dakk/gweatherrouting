@@ -15,3 +15,4 @@ kivy[base]
 mapview
 briefcase
 kivymd
+nmeatoolkit

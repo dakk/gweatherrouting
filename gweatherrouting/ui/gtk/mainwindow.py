@@ -21,7 +21,7 @@ import time
 import gi
 import os
 
-from .logswindow import LogsWindow
+from .logs.logswindow import LogsWindow
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('OsmGpsMap', '1.0')
@@ -155,12 +155,6 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 		self.updateTrack ()
 		self.map.queue_draw ()
 
-
-	def onLogs(self,widget):
-		LogsWindow(self.chartManager)
-
-
-
 	def onImport (self, widget):
 		dialog = Gtk.FileChooserDialog ("Please choose a file", self.window,
 					Gtk.FileChooserAction.OPEN,
@@ -240,3 +234,6 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 	def onGribManager(self, event):
 		w = GribManagerWindow.create (self.core.gribManager)
 		w.show ()
+
+	def onLogs(self,widget):
+		LogsWindow(self.chartManager, self.core.conn)
