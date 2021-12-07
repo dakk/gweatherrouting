@@ -35,6 +35,7 @@ class LogsWindow(Gtk.Window):
 		self.set_default_size (800, 600)
 
 		self.add(self.builder.get_object("logscontent"))
+		self.graphArea = self.builder.get_object("grapharea")
 
 		self.show_all()
 
@@ -43,8 +44,7 @@ class LogsWindow(Gtk.Window):
 		self.map.set_center_and_zoom (39., 9., 6)
 		self.map.layer_add (chartManager)
 
-		self.graph_area = self.builder.get_object("graph_area")
-		self.logData = LogData(connManager, self.graph_area, self.map)
+		self.logData = LogData(connManager, self.graphArea, self.map)
 
 
 	
@@ -85,3 +85,23 @@ class LogsWindow(Gtk.Window):
 
 	def onGraphDraw(self, widget, cr):
 		self.logData.draw(widget, cr)
+
+	def toggleSpeedChart(self, widget):
+		self.logData.speedChart = not self.logData.speedChart
+		self.graphArea.queue_draw()		
+
+	def toggleApparentWindChart(self, widget):
+		self.logData.apparentWindChart = not self.logData.apparentWindChart
+		self.graphArea.queue_draw()
+
+	def toggleTrueWindChart(self, widget):
+		self.logData.trueWindChart = not self.logData.trueWindChart
+		self.graphArea.queue_draw()
+
+	def toggleDepthChart(self, widget):
+		self.logData.depthChart = not self.logData.depthChart
+		self.graphArea.queue_draw()
+
+	def toggleHDGChart(self, widget):
+		self.logData.hdgChart = not self.logData.hdgChart
+		self.graphArea.queue_draw()

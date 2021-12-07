@@ -75,6 +75,8 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
+                <property name="active">True</property>
+                <signal name="toggled" handler="toggleSpeedChart" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -88,6 +90,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
+                <signal name="toggled" handler="toggleApparentWindChart" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -101,6 +104,8 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
+                <property name="active">True</property>
+                <signal name="toggled" handler="toggleTrueWindChart" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -110,15 +115,31 @@
             </child>
             <child>
               <object class="GtkToggleButton">
-                <property name="label" translatable="yes">Deep</property>
+                <property name="label" translatable="yes">Depth</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
+                <signal name="toggled" handler="toggleDepthChart" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToggleButton">
+                <property name="label" translatable="yes">HDG</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="active">True</property>
+                <signal name="toggled" handler="toggleHDGChart" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">4</property>
               </packing>
             </child>
           </object>
@@ -136,10 +157,10 @@
       </packing>
     </child>
     <child>
-      <object class="GtkDrawingArea" id="graph-area">
+      <object class="OsmGpsMap" id="map">
         <property name="visible">True</property>
-        <property name="can-focus">False</property>
-        <signal name="draw" handler="onGraphDraw" swapped="no"/>
+        <property name="can-focus">True</property>
+        <property name="tile-cache">/home/dakk/.cache/osmgpsmap/b477b51738b9962abcc425a3dcb26b4d</property>
       </object>
       <packing>
         <property name="expand">True</property>
@@ -148,10 +169,10 @@
       </packing>
     </child>
     <child>
-      <object class="OsmGpsMap" id="map">
+      <object class="GtkDrawingArea" id="grapharea">
         <property name="visible">True</property>
-        <property name="can-focus">True</property>
-        <property name="tile-cache">/home/dakk/.cache/osmgpsmap/b477b51738b9962abcc425a3dcb26b4d</property>
+        <property name="can-focus">False</property>
+        <signal name="draw" handler="onGraphDraw" swapped="no"/>
       </object>
       <packing>
         <property name="expand">True</property>

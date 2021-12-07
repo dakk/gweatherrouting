@@ -16,3 +16,4 @@ mapview
 briefcase
 kivymd
 nmeatoolkit
+matplotlib
