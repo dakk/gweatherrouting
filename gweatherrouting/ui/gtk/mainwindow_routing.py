@@ -49,7 +49,7 @@ class MainWindowRouting:
 			epop.show_all()
 			return
 
-		if len (self.core.trackManager.activeTrack) < 2:
+		if not self.core.trackManager.activeTrack or len (self.core.trackManager.activeTrack) < 2:
 			epop = self.builder.get_object('routing-2points-error-popover')
 			epop.show_all()
 			return

@@ -46,7 +46,7 @@ class RoutingWizardDialog:
 		self.core = core
 		self.polar = None
 
-		self.boats = json.load (open (os.path.abspath(os.path.dirname(__file__)) + '/../../data/boats/list.json'))
+		self.polars = os.listdir(os.path.abspath(os.path.dirname(__file__)) + '/../../data/polars/')
 
 		self.builder = Gtk.Builder()
 		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/routingwizarddialog.glade")
@@ -70,8 +70,8 @@ class RoutingWizardDialog:
 
 
 		boat_store = self.builder.get_object('boat-store')
-		for boat in self.boats:
-			boat_store.append ([boat['name']])
+		for polar in self.polars:
+			boat_store.append ([polar])
 		self.builder.get_object('boat-select').set_active (0)
 
 
@@ -134,10 +134,9 @@ class RoutingWizardDialog:
 		p.value = float(widget.get_text())
 
 	def onBoatSelect(self, widget):
-		bdir = self.boats [self.builder.get_object('boat-select').get_active ()]['dir']
-		boatPath = os.path.abspath(os.path.dirname(__file__)) + '/../../data/boats/' + bdir
-		self.builder.get_object('boat-image').set_from_file(boatPath + '/image.png')
-		self.polar = weatherrouting.Polar (boatPath + '/polar.pol')
+		pfile = self.polars [self.builder.get_object('boat-select').get_active ()]
+		self.polar = weatherrouting.Polar (os.path.abspath(os.path.dirname(__file__)) + '/../../data/polars/' + pfile)
+		print(self.polar)
 		self.builder.get_object('boat-polar-area').queue_draw()
 
 	def onTimeSelect(self, widget):

@@ -50,7 +50,7 @@ setup(name='gweatherrouting',
 		'gweatherrouting.core'],
 	package_data={
 		'gweatherrouting': [
-			'data/*', 'data/boats/*', 'data/boats/*/*', 
+			'data/*', 'data/boats/*', 'data/polars/*', 
 			'ui/kivy/*.kv',  # Kivy
 			'ui/gtk/*.glade', 'ui/gtk/settings/*.glade', 'ui/gtk/logs/*.glade' # Gtk
 		]
