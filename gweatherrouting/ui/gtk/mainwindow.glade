@@ -853,6 +853,27 @@ Riccardo Apolloni</property>
                         <property name="position">6</property>
                       </packing>
                     </child>
+                    <child>
+                      <object class="GtkComboBoxText" id="time-unit-combo">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <items>
+                          <item translatable="yes">15m</item>
+                          <item translatable="yes">30m</item>
+                          <item translatable="yes">1h</item>
+                          <item translatable="yes">3h</item>
+                          <item translatable="yes">6h</item>
+                          <item translatable="yes">12h</item>
+                          <item translatable="yes">24h</item>
+                        </items>
+                        <signal name="changed" handler="onTimeUnitComboChange" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">7</property>
+                      </packing>
+                    </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
