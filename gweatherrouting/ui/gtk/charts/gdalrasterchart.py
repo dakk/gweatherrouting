@@ -123,14 +123,12 @@ class GDALSingleRasterChart:
 		colors = {}
 		ct = band.GetRasterColorTable()
 		
-		for x in range(0, int(max) + 1):
+		for x in range(int(min), int(max) + 1):
 			try: 
 				c = ct.GetColorEntry(x)
+				colors[x] = (c[3] << 24) | (c[2] << 16) | (c[1] << 8) | c[0]
 			except:
-				c = (0, 0, 0, 0)
-				
-			# convert rgba tuple c to rgba32 int 
-			colors[x] = (c[3] << 24) | (c[2] << 16) | (c[1] << 8) | c[0]
+				colors[x] = 0x00000000
 
 		data = np.vectorize(lambda x: colors[x], otypes=[np.int32])(band.ReadAsArray())
 		return data, band.XSize, band.YSize
@@ -195,11 +193,12 @@ class GDALRasterChart(ChartLayer):
 		with self.loadLock:
 			logger.debug('Loading raster file ' + path)
 			try:
+				s = time.time()
 				r = GDALSingleRasterChart(path)
 				self.cached[path] = r
-				logger.debug('Done loading raster file ' + path)
+				logger.debug('Done loading raster file ' + path.split('/')[-1] + ' in ' + str(int((time.time() - s)* 10.)/10.) + ' seconds')
 			except:
-				logger.error('Error loading raster file ' + path)
+				logger.error('Error loading raster file ' + path.split('/')[-1])
 				return None
 			Gdk.threads_enter()
 			gpsmap.queue_draw()
@@ -272,6 +271,9 @@ class GDALRasterChart(ChartLayer):
 
 
 		for x in self.metadata:
+			# Disable bbox rendering
+			continue
+
 			bb = x[1]
 
 			minRLat = min(bb[0][0], bb[1][0])
@@ -294,8 +296,7 @@ class GDALRasterChart(ChartLayer):
 			cr.line_to(xx2, yy)
 			cr.line_to(xx, yy)
 
-			# Disable bbox rendering
-			# cr.stroke()
+			cr.stroke()
 
 	def do_render(self, gpsmap):
 		pass
