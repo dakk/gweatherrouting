@@ -42,24 +42,22 @@ setup(name='gweatherrouting',
 	setup_requires='setuptools',
 	author_email=['gessadavide@gmail.com', 'riccardo.apolloni@gmail.com'],
 	packages=['gweatherrouting', 'gweatherrouting.conn', 
+		'gweatherrouting.ui.kivy', 'gweatherrouting.ui.kivy.maplayers',
 		'gweatherrouting.ui.common',
-		'gweatherrouting.ui', 'gweatherrouting.ui.gtk', 'gweatherrouting.ui.gtk.maplayers', 
-		'gweatherrouting.ui.gtk.settings', 'gweatherrouting.ui.gtk.logs',
-		'gweatherrouting.ui.gtk.charts', 'gweatherrouting.ui.gtk.charts.vectordrawer', 
+		'gweatherrouting.ui', 
 		'gweatherrouting.core'],
 	package_data={
 		'gweatherrouting': [
 			'data/*', 'data/boats/*', 'data/polars/*', 
-			'ui/gtk/*.glade', 'ui/gtk/settings/*.glade', 'ui/gtk/logs/*.glade'
+			'ui/kivy/*.kv'
 		]
 	},
 	entry_points={
 		'console_scripts': [
-			'gweatherrouting=gweatherrouting.main:startUIGtk',
-			# 'gweatherrouting_cli=gweatherrouting.main:startCli'
+			'gweatherrouting-kivy=gweatherrouting.main:startUIKivy'
 		],
 	},
 	options=buildOptions,
 	executables=executables,
-	install_requires=open ('requirements.txt', 'r').read ().split ('\n')
+	install_requires=open ('requirements.kivy.txt', 'r').read ().split ('\n')
 )
