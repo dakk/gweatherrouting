@@ -28,23 +28,52 @@ import io
 import numpy
 import PIL
 
-
 class MPLWidget(Gtk.DrawingArea):
-    def __init__(self, parent):      
-        self.par = parent
-        super(MPLWidget, self).__init__()
+	def __init__(self, parent):      
+		self.par = parent
+		super(MPLWidget, self).__init__()
  
-        # self.set_size_request(-1, 30)
-        self.connect("expose-event", self.expose)
-    
+		self.plotDrawer = None 
 
-    def expose(self, widget, event):      
-        cr = widget.window.cairo_create()
+		# self.set_size_request(-1, 30)
+		self.connect("draw", self.draw)
 
-        width = self.allocation.width
-        height = self.allocation.height
-     
+	def setPlotDrawer(self, f):
+		self.plotDrawer = f	
 
-    
+	def draw(self, area, ctx):      
+		if not self.plotDrawer:
+			return
 
-       
+		width = self.allocation.width
+		height = self.allocation.height
+	 
+		s = 20
+		a = self.get_allocation()
+		import matplotlib.pyplot as plt
+
+		plt.style.use('dark_background')
+		plt.rcParams.update({'font.size': 8})
+
+		self.plotDrawer(width, height, plt, self)
+
+		buf = io.BytesIO()
+		plt.savefig(buf, dpi=100)
+		buf.seek(0)
+		buf2= PIL.Image.open(buf)
+	
+		arr = numpy.array(buf2)
+		height, width, channels = arr.shape
+		surface = cairo.ImageSurface.create_for_data(arr, cairo.FORMAT_RGB24, width, height)
+
+		ctx.save()
+		ctx.set_source_surface (surface, 0, 0)
+		ctx.paint()
+		ctx.restore()
+
+		# fig.clf()
+		# plt.close(fig)
+
+	
+
+	   

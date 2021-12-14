@@ -23,5 +23,59 @@ from threading import Thread
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, GObject, Gdk
 
-class PolarWidget(Gtk.Widget):
-    pass
+class PolarWidget(Gtk.DrawingArea):
+    def __init__(self, parent):      
+        self.par = parent
+        super(PolarWidget, self).__init__()
+ 
+        self.set_size_request(60,180)
+        self.connect("draw", self.draw)
+        self.polar = None
+    
+    def setPolar(self, polar):
+        self.polar = polar
+        self.queue_draw()
+
+    def draw(self, area, cr):  
+        if not self.polar:
+            return
+    
+        # width = self.allocation.width
+        # height = self.allocation.height
+
+        cr.set_source_rgb (0.3, 0.3, 0.3)
+        cr.paint ()
+
+        cr.set_line_width (0.3)
+        cr.set_source_rgb (1, 1, 1)
+
+        for x in self.polar.tws:# [::2]:
+            cr.arc (100.0, 100.0, x * 3, math.radians (-180), math.radians (180.0))
+            cr.stroke ()
+
+        cr.set_source_rgba (1, 1, 1, 0.6)
+
+        for x in self.polar.twa:# [::8]:
+            cr.move_to (100.0, 100.0)
+            cr.line_to (100 + math.sin (x) * 100.0, 100 + math.cos (x) * 100.0)
+            cr.stroke ()
+
+        for x in self.polar.twa:# [::8]:
+            cr.move_to (100.0, 100.0)
+            cr.line_to (100 - math.sin (x) * 100.0, 100 + math.cos (x) * 100.0)
+            cr.stroke ()
+
+        cr.set_line_width (0.5)
+        cr.set_source_rgb (1, 0, 0)
+
+        for i in range (0, len (self.polar.tws), 1):
+            for j in range (0, len (self.polar.twa), 1):
+                cr.line_to (100 + 5 * self.polar.speedTable [j][i] * math.sin (self.polar.twa[j]), 100 + 5 * self.polar.speedTable [j][i] * math.cos (self.polar.twa[j]))
+                cr.stroke ()
+                cr.move_to (100 + 5 * self.polar.speedTable [j][i] * math.sin (self.polar.twa[j]), 100 + 5 * self.polar.speedTable [j][i] * math.cos (self.polar.twa[j]))
+
+        for i in range (0, len (self.polar.tws), 1):
+            for j in range (0, len (self.polar.twa), 1):
+                cr.line_to (100 - 5 * self.polar.speedTable [j][i] * math.sin (self.polar.twa[j]), 100 + 5 * self.polar.speedTable [j][i] * math.cos (self.polar.twa[j]))
+                cr.stroke ()
+                cr.move_to (100 - 5 * self.polar.speedTable [j][i] * math.sin (self.polar.twa[j]), 100 + 5 * self.polar.speedTable [j][i] * math.cos (self.polar.twa[j]))

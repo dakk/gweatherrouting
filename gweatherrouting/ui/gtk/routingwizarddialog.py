@@ -22,10 +22,10 @@ import math
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, GObject
 
-from .style import drawPolar
 import weatherrouting
 from ...core import TimeControl
 from .timepickerdialog import TimePickerDialog
+from .widgets.polar import PolarWidget
 
 class RoutingWizardDialog:
 	def create(core, parent):
@@ -39,8 +39,6 @@ class RoutingWizardDialog:
 
 	def destroy(self):
 		return self.dialog.destroy()
-
-		
 
 	def __init__(self, core, parent):
 		self.core = core
@@ -59,6 +57,8 @@ class RoutingWizardDialog:
 		self.dialog.add_button("Cancel", Gtk.ResponseType.CANCEL)
 		self.dialog.add_button("Run", Gtk.ResponseType.OK)
 
+		self.polarWidget = PolarWidget(self.dialog)
+		self.builder.get_object('polar-container').add(self.polarWidget)
 
 		start_store = self.builder.get_object('start-store')
 		start_store.append (['First track point', 'first-track-point'])
@@ -87,6 +87,7 @@ class RoutingWizardDialog:
 
 		self.builder.get_object('time-entry').set_text(datetime.datetime.today().strftime(TimeControl.DFORMAT))
 
+
 		self.dialog.show_all ()
 
 	def onRoutingAlgoSelect(self, widget):
@@ -95,7 +96,6 @@ class RoutingWizardDialog:
 		if len(ralgo.PARAMS.keys()) == 0:
 			self.builder.get_object('router-params').hide()
 			return 
-
 		
 		cont = self.builder.get_object('router-params-container')
 		
@@ -136,8 +136,7 @@ class RoutingWizardDialog:
 	def onBoatSelect(self, widget):
 		pfile = self.polars [self.builder.get_object('boat-select').get_active ()]
 		self.polar = weatherrouting.Polar (os.path.abspath(os.path.dirname(__file__)) + '/../../data/polars/' + pfile)
-		print(self.polar)
-		self.builder.get_object('boat-polar-area').queue_draw()
+		self.polarWidget.setPolar (self.polar)
 
 	def onTimeSelect(self, widget):
 		tp = TimePickerDialog.create(self.dialog)
@@ -175,11 +174,3 @@ class RoutingWizardDialog:
 		else:
 			s -= 2
 			return self.core.poiManager.pois[s].position
-
-
-
-	def drawPolar(self, widget, cr):
-		if not self.polar:
-			return
-
-		drawPolar(self.polar, cr)
