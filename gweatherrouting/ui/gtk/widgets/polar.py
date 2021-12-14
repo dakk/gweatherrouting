@@ -15,28 +15,13 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 import gi
+import os
+import json
 import math
-from ..style import *
-
+import datetime
+from threading import Thread
 gi.require_version('Gtk', '3.0')
-gi.require_version('OsmGpsMap', '1.2')
+from gi.repository import Gtk, Gio, GObject, Gdk
 
-from gi.repository import Gtk, Gio, GObject, OsmGpsMap
-
-class AISMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
-    def __init__ (self):
-        GObject.GObject.__init__ (self)
-
-    def do_draw (self, gpsmap, cr):
-        pass
-
-    def do_render (self, gpsmap):
-        pass
-
-    def do_busy (self):
-        return False
-
-    def do_button_press (self, gpsmap, gdkeventbutton):
-        return False
-
-GObject.type_register (AISMapLayer)
+class PolarWidget(Gtk.Widget):
+    pass

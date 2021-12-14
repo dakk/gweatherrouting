@@ -42,7 +42,7 @@ class LogsWindow(Gtk.Window):
 
 		self.map = self.builder.get_object("map")
 		self.map.set_center_and_zoom (39., 9., 6)
-		self.map.layer_add (chartManager)
+		# self.map.layer_add (chartManager)
 
 		self.logData = LogData(connManager, self.graphArea, self.map)
 

@@ -15,28 +15,36 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 import gi
+import os
+import json
 import math
-from ..style import *
-
+import datetime
+from threading import Thread
 gi.require_version('Gtk', '3.0')
-gi.require_version('OsmGpsMap', '1.2')
+from gi.repository import Gtk, Gio, GObject, Gdk
+import cairo
+import matplotlib.pyplot as plt
+import io
+import numpy
+import PIL
 
-from gi.repository import Gtk, Gio, GObject, OsmGpsMap
 
-class AISMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
-    def __init__ (self):
-        GObject.GObject.__init__ (self)
+class MPLWidget(Gtk.DrawingArea):
+    def __init__(self, parent):      
+        self.par = parent
+        super(MPLWidget, self).__init__()
+ 
+        # self.set_size_request(-1, 30)
+        self.connect("expose-event", self.expose)
+    
 
-    def do_draw (self, gpsmap, cr):
-        pass
+    def expose(self, widget, event):      
+        cr = widget.window.cairo_create()
 
-    def do_render (self, gpsmap):
-        pass
+        width = self.allocation.width
+        height = self.allocation.height
+     
 
-    def do_busy (self):
-        return False
+    
 
-    def do_button_press (self, gpsmap, gdkeventbutton):
-        return False
-
-GObject.type_register (AISMapLayer)
+       

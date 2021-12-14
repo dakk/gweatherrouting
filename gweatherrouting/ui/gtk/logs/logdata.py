@@ -4,6 +4,11 @@ import matplotlib.pyplot as plt
 import io
 import numpy
 import PIL
+import gi
+
+gi.require_version('OsmGpsMap', '1.2')
+
+from gi.repository import Gtk, Gio, GObject, OsmGpsMap, Gdk
 
 
 class LogData:
@@ -13,6 +18,7 @@ class LogData:
 		self.map = map
 		self.recording = False
 		self.data = []
+		self.track = None
 
 		self.depthChart = False
 		self.speedChart = True
@@ -38,8 +44,18 @@ class LogData:
 		res = pip.runPartial()
 		self.data = res[1::]
 
-		# TODO: add poitns to map using track 
+		# Add poitns to map using track 
+		if self.track:
+			self.map.track_remove(self.track)
 
+		self.track = OsmGpsMap.MapTrack()
+		self.map.track_add(self.track)
+		
+		for x in self.data:
+			point = OsmGpsMap.MapPoint.new_degrees(x.lat, x.lon)
+			self.track.add_point(point)
+
+		self.map.set_center_and_zoom (self.data[0].lat, self.data[0].lon, 10)
 
 	def saveToFile(self, filepath):
 		pass 
