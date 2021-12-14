@@ -16,12 +16,26 @@
             <property name="visible">True</property>
             <property name="can-focus">False</property>
             <child>
-              <object class="GtkToolButton">
+              <object class="GtkToolButton" id="record-button">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="label" translatable="yes">Record</property>
                 <property name="use-underline">True</property>
                 <property name="stock-id">gtk-media-record</property>
+                <signal name="clicked" handler="startRecording" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToolButton" id="stop-button">
+                <property name="can-focus">False</property>
+                <property name="label" translatable="yes">Stop</property>
+                <property name="use-underline">True</property>
+                <property name="stock-id">gtk-stop</property>
+                <signal name="clicked" handler="stopRecording" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>

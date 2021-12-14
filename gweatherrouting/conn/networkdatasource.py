@@ -32,6 +32,7 @@ class NetworkDataSource(DataSource):
 			self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		elif cnetwork == 'udp':
 			self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+		self.s.settimeout(0.5)
 
 	def connect(self):
 		try:
@@ -44,8 +45,11 @@ class NetworkDataSource(DataSource):
 
 
 	def _read(self):
-		d = self.s.recv().decode('ascii')
-		return d.split('\n')
+		try:
+			d = self.s.recv(64).decode('ascii')
+			return d.split('\n')
+		except:
+			return []
 
 	def _write(self, msg):
 		self.s.send(msg.encode('ascii'))

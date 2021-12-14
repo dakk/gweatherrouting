@@ -46,6 +46,8 @@ class LogsWindow(Gtk.Window):
 		# self.map.layer_add (chartManager)
 
 		self.logData = LogData(connManager, self.graphArea, self.map)
+		self.builder.get_object('stop-button').hide()
+		self.builder.get_object('loading-progress').hide()
 
 
 	
@@ -86,6 +88,20 @@ class LogsWindow(Gtk.Window):
 				edialog.destroy ()
 		else:
 			dialog.destroy()
+
+	def startRecording(self, widget):
+		if self.logData.recording:
+			return 
+
+		self.builder.get_object('record-button').hide()
+		self.builder.get_object('stop-button').show()
+		t = Thread(target=self.logData.startRecording, args=())
+		t.start()
+
+	def stopRecording(self, widget):
+		self.logData.stopRecording()
+		self.builder.get_object('record-button').show()
+		self.builder.get_object('stop-button').hide()
 
 	def onLogLoadPercentage (self, s):
 		if s % 1000 == 0:

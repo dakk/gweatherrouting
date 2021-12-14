@@ -12,7 +12,7 @@ from gi.repository import Gtk, Gio, GObject, OsmGpsMap, Gdk
 from threading import Thread
 
 
-class LogData(nt.Output):
+class LogData(nt.Output, nt.Input):
 	def __init__(self, connManager, graphArea, map):
 		self.conn = connManager
 		self.graphArea = graphArea
@@ -20,12 +20,30 @@ class LogData(nt.Output):
 		self.recording = False
 		self.data = []
 		self.track = None
+		self.recordedData = []
+		self.toSend = []
 
 		self.depthChart = False
 		self.speedChart = True
 		self.apparentWindChart = False
 		self.trueWindChart = True
 		self.hdgChart = True
+
+		self.conn.connect("data", self.dataHandler)
+
+	def dataHandler(self, d):
+		if self.recording:
+			for x in d:
+				self.recordedData.append(x.data)
+				self.toSend.append(x.data)
+
+	def readSentence(self):
+		if len(self.toSend) > 0:
+			return self.toSend.pop(0)
+		return None 		
+
+	def end(self):
+		return not self.recording
 
 	def write(self, x):
 		if not x or not isinstance(x, nt.TrackPoint):
@@ -44,6 +62,9 @@ class LogData(nt.Output):
 		Gdk.threads_leave()
 
 	def close(self):
+		if len(self.data) < 2:
+			return
+
 		self.data = self.data[1::]
 
 		Gdk.threads_enter()
@@ -82,11 +103,39 @@ class LogData(nt.Output):
 	def saveToFile(self, filepath):
 		pass 
 
+	def stopRecording(self):
+		self.recording = False
+
 	def startRecording(self):
-		pass 
+		self.data = []
+		self.recordedData = []
+		self.toSend = []
+		self.recording = True
+
+		if self.track:
+			self.map.track_remove(self.track)
+
+		self.track = OsmGpsMap.MapTrack()
+		self.map.track_add(self.track)
+		self.track.set_property('line-width', 1)
+
+		pip = nt.Pipeline(
+			self,
+			self,
+			nt.TrackPointTranslator(),
+			[
+				nt.SeatalkPipe(),
+				nt.TrueWindPipe()
+			]
+		)
+		pip.run()
 
 	def clear(self):
 		self.data = []
+		self.recording = False
+		self.map.queue_draw()
+		self.graphArea.queue_draw()
+
 
 	def draw(self, widget, ctx):
 		s = 20

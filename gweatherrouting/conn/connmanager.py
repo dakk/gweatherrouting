@@ -60,20 +60,20 @@ class ConnManager(EventDispatcher):
 			if x['type'] == 'serial':
 				self.sources[x['data-port']] = SerialDataSource(x['protocol'], x['direction'], x['data-port'], x['baudrate'])
 				if self.sources[x['data-port']].connect():
-					logger.info ('Data source %s connected' % self.sources[x['data-port']].uri)
+					logger.info ('Data source %s connected' % x['data-port'])
 
 
 			elif x['type'] == 'network':
 				self.sources[x['host'] + ':' + str(x['port'])] = NetworkDataSource(x['protocol'], x['direction'], x['host'], x['port'], x['network'])
 				if self.sources[x['host'] + ':' + str(x['port'])].connect():
-					logger.info ('Data source %s connected' % self.sources[x['host'] + ':' + str(x['port'])].uri)
+					logger.info ('Data source %s:%d connected' % (x['host'], x['port']))
 
 	def addConnection(self, d):
 		if d['type'] == 'serial':
-			if list(filter(lambda x: x['data-port'] == d['data-port'], self.connections)) == []:
+			if list(filter(lambda x: x['type'] == 'serial' and x['data-port'] == d['data-port'], self.connections)) == []:
 				self.storage.connections.append(d)
 		elif d['type'] == 'network':
-			if list(filter(lambda x: x['host'] == d['host'] and x['port'] == d['port'], self.connections)) == []:
+			if list(filter(lambda x: x['type'] == 'network' and x['host'] == d['host'] and x['port'] == d['port'], self.connections)) == []:
 				self.storage.connections.append(d)
 
 		self.storage.save()
@@ -110,12 +110,17 @@ class ConnManager(EventDispatcher):
 			self.plugAll()
 
 
-	def pollLoop(self):
+	def pollLoop(self, b):
 		while self.running:
-			self.poll()
-			time.sleep(0.5)
+			try:
+				self.poll()
+			except Exception as e:
+				print(e)
+				logger.error ('Error polling data')
+			time.sleep(0.6)
+
 
 	def startPolling(self):
 		logger.info ('Polling started')
-		self.thread = Thread(target=self.pollLoop, args=())
+		self.thread = Thread(target=self.pollLoop, args=(True, ))
 		self.thread.start()
