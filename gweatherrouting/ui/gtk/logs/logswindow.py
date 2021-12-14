@@ -14,6 +14,7 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
+from threading import Thread
 import gi
 import os
 import json
@@ -72,7 +73,11 @@ class LogsWindow(Gtk.Window):
 			dialog.destroy ()
 
 			try:
-				self.logData.loadFromFile(filepath)
+				self.builder.get_object('loading-progress').show()
+				self.builder.get_object('loading-progress').set_fraction(0.1)
+				self.builder.get_object('loading-progress').set_text("Loading %s" % filepath)
+				t = Thread(target=self.logData.loadFromFile, args=(filepath, self.onLogLoadPercentage, self.onLogLoadCompleted,))
+				t.start ()
 			except Exception as e:
 				print(e)
 				edialog = Gtk.MessageDialog (self, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
@@ -82,6 +87,16 @@ class LogsWindow(Gtk.Window):
 		else:
 			dialog.destroy()
 
+	def onLogLoadPercentage (self, s):
+		if s % 1000 == 0:
+			print ('Loading log file: %d sentences' % s)
+			self.builder.get_object('loading-progress').set_fraction(0.5)
+			self.builder.get_object('loading-progress').set_text("%d points" % s)
+
+	def onLogLoadCompleted (self):
+		self.builder.get_object('loading-progress').set_fraction(1.)
+		self.builder.get_object('loading-progress').set_text("Load completed!")
+		GObject.timeout_add (3000, self.builder.get_object('loading-progress').hide)
 
 	def onGraphDraw(self, widget, cr):
 		self.logData.draw(widget, cr)

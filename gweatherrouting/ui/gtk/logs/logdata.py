@@ -9,9 +9,10 @@ import gi
 gi.require_version('OsmGpsMap', '1.2')
 
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap, Gdk
+from threading import Thread
 
 
-class LogData:
+class LogData(nt.Output):
 	def __init__(self, connManager, graphArea, map):
 		self.conn = connManager
 		self.graphArea = graphArea
@@ -26,36 +27,57 @@ class LogData:
 		self.trueWindChart = True
 		self.hdgChart = True
 
+	def write(self, x):
+		if not x or not isinstance(x, nt.TrackPoint):
+			return None 
 
-	def loadFromFile(self, filepath):
+		self.data.append(x)
+
+		Gdk.threads_enter()
+		
+		point = OsmGpsMap.MapPoint.new_degrees(x.lat, x.lon)
+		self.map.set_center_and_zoom (x.lat, x.lon, 12)
+		self.track.add_point(point)
+		self.map.queue_draw()
+		self.llperc(len(self.data))
+
+		Gdk.threads_leave()
+
+	def close(self):
+		self.data = self.data[1::]
+
+		Gdk.threads_enter()
+		self.map.set_center_and_zoom (self.data[0].lat, self.data[0].lon, 12)
+		self.map.queue_draw()
+		self.graphArea.queue_draw()
+		Gdk.threads_leave()
+
+	def loadFromFile(self, filepath, llperc, llcomplete):
+		self.llperc = llperc
+		self.data = []
 		ext = filepath.split('.')[-1]
 
 		# TODO: support for gpx files 
 
+		if self.track:
+			self.map.track_remove(self.track)
+
+		self.track = OsmGpsMap.MapTrack()
+		self.map.track_add(self.track)
+		self.track.set_property('line-width', 1)
+
 		pip = nt.Pipeline(
 			nt.FileInput(filepath),
-			None,
+			self,
 			nt.TrackPointTranslator(),
 			[
 				nt.SeatalkPipe(),
 				nt.TrueWindPipe()
 			]
 		)
-		res = pip.runPartial()
-		self.data = res[1::]
+		pip.run()
+		llcomplete()
 
-		# Add poitns to map using track 
-		if self.track:
-			self.map.track_remove(self.track)
-
-		self.track = OsmGpsMap.MapTrack()
-		self.map.track_add(self.track)
-		
-		for x in self.data:
-			point = OsmGpsMap.MapPoint.new_degrees(x.lat, x.lon)
-			self.track.add_point(point)
-
-		self.map.set_center_and_zoom (self.data[0].lat, self.data[0].lon, 10)
 
 	def saveToFile(self, filepath):
 		pass 
