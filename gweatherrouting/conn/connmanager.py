@@ -100,6 +100,7 @@ class ConnManager(EventDispatcher):
 				if len(d): 
 					dd += d
 			except Exception as e:
+				print (e)
 				logger.error ('Error reading data from source')
 
 		if len(dd) > 0:
@@ -109,15 +110,20 @@ class ConnManager(EventDispatcher):
 			time.sleep(30)
 			self.plugAll()
 
+		return len(dd)
+
 
 	def pollLoop(self, b):
 		while self.running:
 			try:
-				self.poll()
+				n = self.poll()
 			except Exception as e:
 				print(e)
 				logger.error ('Error polling data')
-			time.sleep(0.6)
+			if n > 0:
+				time.sleep(0.05)
+			else:
+				time.sleep(0.5)
 
 
 	def startPolling(self):

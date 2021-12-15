@@ -44,12 +44,20 @@ class NetworkDataSource(DataSource):
 			return False
 
 
+	cached = ''
 	def _read(self):
-		try:
-			d = self.s.recv(64).decode('ascii')
-			return d.split('\n')
-		except:
-			return []
+		dd = self.cached
+
+		while True:
+			try:
+				d = self.s.recv(128).decode('ascii')
+				dd += d
+				if dd.find("\n") != -1 or dd.find("\r") != -1:
+					cc = dd.split('\n')
+					self.cached = cc[-1]
+					return cc[0:-1]
+			except:
+				pass 
 
 	def _write(self, msg):
 		self.s.send(msg.encode('ascii'))

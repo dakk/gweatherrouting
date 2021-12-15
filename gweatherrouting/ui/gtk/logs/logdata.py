@@ -9,8 +9,10 @@ import gi
 gi.require_version('OsmGpsMap', '1.2')
 
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap, Gdk
-from threading import Thread
+from threading import Lock
+import logging
 
+logger = logging.getLogger ('gweatherrouting')
 
 class LogData(nt.Output, nt.Input):
 	def __init__(self, connManager, graphArea, map):
@@ -30,6 +32,8 @@ class LogData(nt.Output, nt.Input):
 		self.hdgChart = True
 
 		self.conn.connect("data", self.dataHandler)
+		self.llperc = None
+
 
 	def dataHandler(self, d):
 		if self.recording:
@@ -46,20 +50,26 @@ class LogData(nt.Output, nt.Input):
 		return not self.recording
 
 	def write(self, x):
-		if not x or not isinstance(x, nt.TrackPoint):
-			return None 
+		if not x or not isinstance(x, nt.TrackPoint) or not self.recording:
+			return None
 
 		self.data.append(x)
-
-		Gdk.threads_enter()
 		
+		Gdk.threads_enter()
 		point = OsmGpsMap.MapPoint.new_degrees(x.lat, x.lon)
-		self.map.set_center_and_zoom (x.lat, x.lon, 12)
 		self.track.add_point(point)
-		self.map.queue_draw()
-		self.llperc(len(self.data))
 
+		self.map.set_center_and_zoom (x.lat, x.lon, 12)
+		self.map.queue_draw()
+
+		if len(self.data) % 20 == 1:
+			self.graphArea.queue_draw()
+			logger.debug("Recorded %d points" % len(self.data))
+
+		if self.llperc:
+			self.llperc(len(self.data))
 		Gdk.threads_leave()
+
 
 	def close(self):
 		if len(self.data) < 2:
@@ -72,6 +82,8 @@ class LogData(nt.Output, nt.Input):
 		self.map.queue_draw()
 		self.graphArea.queue_draw()
 		Gdk.threads_leave()
+		self.llperc = None
+
 
 	def loadFromFile(self, filepath, llperc, llcomplete):
 		self.llperc = llperc
@@ -105,19 +117,31 @@ class LogData(nt.Output, nt.Input):
 
 	def stopRecording(self):
 		self.recording = False
+		self.toSend = []
+		logger.debug("Stopping recording...")
 
-	def startRecording(self):
+
+	def clearData(self):
 		self.data = []
 		self.recordedData = []
 		self.toSend = []
+		if self.track:
+			self.map.track_remove(self.track)		
+		self.track = OsmGpsMap.MapTrack()
+		self.track.set_property('line-width', 1)
+		self.map.track_add(self.track)
+		self.map.queue_draw()
+		self.graphArea.queue_draw()
+		logger.debug("Data cleared")
+
+	def startRecording(self):
+		logger.debug("Recording started")
 		self.recording = True
 
-		if self.track:
-			self.map.track_remove(self.track)
-
-		self.track = OsmGpsMap.MapTrack()
-		self.map.track_add(self.track)
-		self.track.set_property('line-width', 1)
+		if not self.track:
+			self.track = OsmGpsMap.MapTrack()
+			self.track.set_property('line-width', 1)
+			self.map.track_add(self.track)
 
 		pip = nt.Pipeline(
 			self,
@@ -128,13 +152,12 @@ class LogData(nt.Output, nt.Input):
 				nt.TrueWindPipe()
 			]
 		)
-		pip.run()
 
-	def clear(self):
-		self.data = []
-		self.recording = False
-		self.map.queue_draw()
-		self.graphArea.queue_draw()
+		r = True
+		while self.recording and r:
+			r = pip.runOnce()
+		logger.debug("Recording stopped")
+
 
 
 	def draw(self, widget, ctx):

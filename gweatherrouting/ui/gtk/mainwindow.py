@@ -117,7 +117,6 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 
 
 	def boatInfoHandler(self, bi):
-		print(bi.latitude, bi.longitude)
 		self.map.gps_add(bi.latitude, bi.longitude, heading=bi.heading)
 		self.map.queue_draw ()
 

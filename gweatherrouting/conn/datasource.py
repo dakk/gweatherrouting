@@ -79,12 +79,16 @@ class DataSource:
             return []
 
         data = self._read()
+        
+        if data == None:
+            return []
+            
         msgs = []
         for msg in data:
             try:
                 msgs.append(self.parser.parse(msg))
-            except:
-                pass
+            except Exception as e:
+                print(e)
         return msgs
 
     def _read(self):

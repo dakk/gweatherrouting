@@ -49,6 +49,9 @@ class LogsWindow(Gtk.Window):
 		self.builder.get_object('stop-button').hide()
 		self.builder.get_object('loading-progress').hide()
 
+		self.recordinThread = None 
+		self.loadingThread = None
+
 
 	
 	def onLoadClick(self, widget):
@@ -78,8 +81,8 @@ class LogsWindow(Gtk.Window):
 				self.builder.get_object('loading-progress').show()
 				self.builder.get_object('loading-progress').set_fraction(0.1)
 				self.builder.get_object('loading-progress').set_text("Loading %s" % filepath)
-				t = Thread(target=self.logData.loadFromFile, args=(filepath, self.onLogLoadPercentage, self.onLogLoadCompleted,))
-				t.start ()
+				self.loadingThread = Thread(target=self.logData.loadFromFile, args=(filepath, self.onLogLoadPercentage, self.onLogLoadCompleted,))
+				self.loadingThread.start ()
 			except Exception as e:
 				print(e)
 				edialog = Gtk.MessageDialog (self, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
@@ -89,19 +92,32 @@ class LogsWindow(Gtk.Window):
 		else:
 			dialog.destroy()
 
+	def __del__(self):
+		if self.logData.recording:
+			self.logData.stopRecording()
+			self.recordinThread.join()
+
+		if self.loadingThread:
+			self.loadingThread.join()
+			
+
+	def clearData(self, widget):
+		self.logData.clearData()
+
 	def startRecording(self, widget):
 		if self.logData.recording:
 			return 
 
 		self.builder.get_object('record-button').hide()
 		self.builder.get_object('stop-button').show()
-		t = Thread(target=self.logData.startRecording, args=())
-		t.start()
+		self.recordinThread = Thread(target=self.logData.startRecording, args=())
+		self.recordinThread.start()
 
 	def stopRecording(self, widget):
 		self.logData.stopRecording()
 		self.builder.get_object('record-button').show()
 		self.builder.get_object('stop-button').hide()
+		self.recordinThread.join()
 
 	def onLogLoadPercentage (self, s):
 		if s % 1000 == 0:
