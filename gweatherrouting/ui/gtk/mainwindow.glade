@@ -264,14 +264,14 @@ loaded to created a routing</property>
   <object class="GtkWindow" id="main-window">
     <property name="can-focus">False</property>
     <child>
-      <object class="GtkBox">
+      <object class="GtkStack" id="stack1">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-        <property name="orientation">vertical</property>
         <child>
-          <object class="GtkStack" id="stack1">
+          <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
+            <property name="orientation">vertical</property>
             <child>
               <object class="GtkBox">
                 <property name="visible">True</property>
@@ -957,82 +957,82 @@ loaded to created a routing</property>
                 </child>
               </object>
               <packing>
-                <property name="name">Charts</property>
-                <property name="title" translatable="yes">Charts</property>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
               </packing>
             </child>
             <child>
-              <object class="GtkBox">
+              <object class="GtkStatusbar" id="status-bar">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
+                <property name="margin-left">10</property>
+                <property name="margin-right">10</property>
+                <property name="margin-start">10</property>
+                <property name="margin-end">10</property>
+                <property name="margin-top">6</property>
+                <property name="margin-bottom">6</property>
                 <property name="orientation">vertical</property>
-                <child>
-                  <object class="GtkBox" id="logscontainer">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="orientation">vertical</property>
-                    <child>
-                      <placeholder/>
-                    </child>
-                  </object>
-                  <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
+                <property name="spacing">2</property>
               </object>
               <packing>
-                <property name="name">Logs</property>
-                <property name="title" translatable="yes">Logs</property>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
                 <property name="position">1</property>
               </packing>
             </child>
+          </object>
+          <packing>
+            <property name="name">Charts</property>
+            <property name="title" translatable="yes">Charts</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="orientation">vertical</property>
             <child>
-              <object class="GtkBox">
+              <object class="GtkBox" id="logscontainer">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="orientation">vertical</property>
                 <child>
                   <placeholder/>
                 </child>
-                <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <placeholder/>
-                </child>
               </object>
               <packing>
-                <property name="name">Polars</property>
-                <property name="title" translatable="yes">Polars</property>
-                <property name="position">2</property>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
               </packing>
             </child>
           </object>
           <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
+            <property name="name">Logs</property>
+            <property name="title" translatable="yes">Logs</property>
+            <property name="position">1</property>
           </packing>
         </child>
         <child>
-          <object class="GtkStatusbar" id="status-bar">
+          <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="margin-left">10</property>
-            <property name="margin-right">10</property>
-            <property name="margin-start">10</property>
-            <property name="margin-end">10</property>
-            <property name="margin-top">6</property>
-            <property name="margin-bottom">6</property>
             <property name="orientation">vertical</property>
-            <property name="spacing">2</property>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
           </object>
           <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
+            <property name="name">Polars</property>
+            <property name="title" translatable="yes">Polars</property>
+            <property name="position">2</property>
           </packing>
         </child>
       </object>
