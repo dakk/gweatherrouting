@@ -25,17 +25,18 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, GObject
 
 
-class LogsWindow(Gtk.Window):		
+class LogsWidget(Gtk.Box):		
 	def __init__(self, chartManager, connManager):
-		Gtk.Window.__init__(self, title="Logs")
+		Gtk.Widget.__init__(self)
 
 		self.builder = Gtk.Builder()
 		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/logscontent.glade")
 		self.builder.connect_signals(self)
 
-		self.set_default_size (800, 600)
+		# self.set_default_size (800, 600)
 
-		self.add(self.builder.get_object("logscontent"))
+
+		self.pack_start(self.builder.get_object("logscontent"), True, True, 0)
 		self.graphArea = self.builder.get_object("grapharea")
 
 		self.show_all()

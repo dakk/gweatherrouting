@@ -21,7 +21,7 @@ import time
 import gi
 import os
 
-from .logs.logswindow import LogsWindow
+from .logs.logs import LogsWidget
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('OsmGpsMap', '1.2')
@@ -101,6 +101,9 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 		Gdk.threads_init()
 
 		self.core.connect('boatPosition', self.boatInfoHandler)
+
+		self.logsWidget = LogsWidget(self.chartManager, self.core.conn)
+		self.builder.get_object("logscontainer").pack_start(self.logsWidget, True, True, 0)
 
 		# https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/#Z/#Y/#X
 		# https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/#Z/#Y/#X
