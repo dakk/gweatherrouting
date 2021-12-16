@@ -14,7 +14,7 @@ with conn:
             try:
                 conn.send(x.encode('ascii') + '\n'.encode('ascii'))
                 print(x)
-                time.sleep(0.2)
+                time.sleep(0.01)
             except:
                 conn.close()
                 s.close()

@@ -37,12 +37,14 @@ logger = logging.getLogger ('gweatherrouting')
 
 class LogsWidget(Gtk.Box, nt.Output, nt.Input):		
 	def __init__(self, parent, chartManager, connManager):
+		Gtk.Widget.__init__(self)
+
 		self.parent = parent
 		self.conn = connManager
 		self.recording = False
 		self.data = []
 		self.track = None
-		self.recordedData = []
+		self.recordedData = None
 		self.toSend = []
 
 		self.depthChart = False
@@ -53,20 +55,14 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 
 		self.conn.connect("data", self.dataHandler)
 
-		Gtk.Widget.__init__(self)
-
 		self.builder = Gtk.Builder()
 		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/logs.glade")
 		self.builder.connect_signals(self)
-
-		# self.set_default_size (800, 600)
-
 
 		self.pack_start(self.builder.get_object("logscontent"), True, True, 0)
 		self.graphArea = self.builder.get_object("grapharea")
 
 		self.show_all()
-
 
 		self.map = self.builder.get_object("map")
 		self.map.set_center_and_zoom (39., 9., 6)
@@ -78,6 +74,11 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 		self.recordinThread = None 
 		self.loadingThread = None
 
+		try:
+			self.loadingThread = Thread(target=self.loadFromFile, args=('/tmp/gwr-recording.log',))
+			self.loadingThread.start ()
+		except:
+			pass 
 
 	
 	def onLoadClick(self, widget):
@@ -136,20 +137,26 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 
 		self.builder.get_object('record-button').hide()
 		self.builder.get_object('stop-button').show()
+
+		self.builder.get_object('loading-progress').show()
+		self.builder.get_object('loading-progress').set_fraction(0.1)
+		self.builder.get_object('loading-progress').set_text("Recording from devices...")
 		self.recordinThread = Thread(target=self.startRecording, args=())
 		self.recordinThread.start()
 
 	def onStopRecordingClick(self, widget):
 		self.recording = False
+		self.recordedData.close()
 		self.toSend = []
 		logger.debug("Stopping recording...")
 
 		self.builder.get_object('record-button').show()
 		self.builder.get_object('stop-button').hide()
+		self.builder.get_object('loading-progress').hide()
 		self.recordinThread.join()
 
 	def onLogLoadPercentage (self, s):
-		if s % 1000 == 0:
+		if s % 100 == 0:
 			print ('Loading log file: %d sentences' % s)
 			self.builder.get_object('loading-progress').set_fraction(0.5)
 			self.builder.get_object('loading-progress').set_text("%d points" % s)
@@ -181,11 +188,10 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 		self.graphArea.queue_draw()
 
 
-
 	def dataHandler(self, d):
 		if self.recording:
 			for x in d:
-				self.recordedData.append(x.data)
+				self.recordedData.write(str(x.data) + '\n')
 				self.toSend.append(x.data)
 
 	def readSentence(self):
@@ -246,7 +252,8 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 			self,
 			nt.TrackPointTranslator(),
 			[
-				nt.SeatalkPipe(),
+				#nt.SeatalkPipe(),
+				nt.FilterPipe(exclude=["STALK", "AIVDM"]),
 				nt.TrueWindPipe()
 			]
 		)
@@ -259,7 +266,10 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 
 	def clearData(self, widget):
 		self.data = []
-		self.recordedData = []
+	
+		if self.recordedData:
+			self.recordedData.close()
+		self.recordedData = open('/tmp/gwr-recording.log', 'w')
 		self.toSend = []
 		if self.track:
 			self.map.track_remove(self.track)		
@@ -273,6 +283,7 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 	def startRecording(self):
 		logger.debug("Recording started")
 		self.recording = True
+		self.recordedData = open('/tmp/gwr-recording.log', 'w')
 
 		if not self.track:
 			self.track = OsmGpsMap.MapTrack()
@@ -284,7 +295,8 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 			self,
 			nt.TrackPointTranslator(),
 			[
-				nt.SeatalkPipe(),
+				#nt.SeatalkPipe(),
+				nt.FilterPipe(exclude=["STALK", "AIVDM"]),
 				nt.TrueWindPipe()
 			]
 		)
