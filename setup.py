@@ -44,7 +44,7 @@ setup(name='gweatherrouting',
 	packages=['gweatherrouting', 'gweatherrouting.conn', 
 		'gweatherrouting.ui.common',
 		'gweatherrouting.ui', 'gweatherrouting.ui.gtk', 'gweatherrouting.ui.gtk.maplayers', 
-		'gweatherrouting.ui.gtk.settings', 'gweatherrouting.ui.gtk.logs', 'gweatherrouting.ui.gtk.widgets',
+		'gweatherrouting.ui.gtk.settings', 'gweatherrouting.ui.gtk.widgets',
 		'gweatherrouting.ui.gtk.charts', 'gweatherrouting.ui.gtk.charts.vectordrawer', 
 		'gweatherrouting.core'],
 	package_data={

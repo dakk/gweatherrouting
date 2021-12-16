@@ -26,7 +26,7 @@
                 <property name="label" translatable="yes">Record</property>
                 <property name="use-underline">True</property>
                 <property name="stock-id">gtk-media-record</property>
-                <signal name="clicked" handler="startRecording" swapped="no"/>
+                <signal name="clicked" handler="onRecordingClick" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -39,7 +39,7 @@
                 <property name="label" translatable="yes">Stop</property>
                 <property name="use-underline">True</property>
                 <property name="stock-id">gtk-stop</property>
-                <signal name="clicked" handler="stopRecording" swapped="no"/>
+                <signal name="clicked" handler="onStopRecordingClick" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
