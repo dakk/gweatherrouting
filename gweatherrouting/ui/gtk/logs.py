@@ -54,6 +54,7 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 		self.apparentWindChart = False
 		self.trueWindChart = True
 		self.hdgChart = True
+		self.rwChart = False
 
 		self.conn.connect("data", self.dataHandler)
 
@@ -185,6 +186,10 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 
 	def toggleHDGChart(self, widget):
 		self.hdgChart = not self.hdgChart
+		self.graphArea.queue_draw()
+
+	def toggleRWChart(self, widget):
+		self.rwChart = not self.rwChart
 		self.graphArea.queue_draw()
 
 
@@ -323,33 +328,68 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 		y = self.data[::s]
 		x = numpy.array([x.time for x in y])
 
-		fig, ax1 = plt.subplots(2 if self.hdgChart or self.apparentWindChart or self.trueWindChart else 1)
+		nplots = 1
+
+		if self.hdgChart or self.apparentWindChart or self.trueWindChart:
+			nplots += 1
+		
+		if self.speedChart:
+			nplots += 1
+
+		if self.depthChart:
+			nplots += 1
+
+		fig, ax1 = plt.subplots(nplots)
+		try:
+			ax1[0] 
+		except:
+			ax1 = [ax1]
 		fig.set_size_inches((a.width / 100), (a.height / 100.))
 
-		if not (self.hdgChart or self.apparentWindChart or self.trueWindChart):
-			ax1 = [ax1]
+		i = 0
 
 		if self.speedChart:
-			ax1[0].plot(x, list(map(lambda x: x.speed if x.speed else 0, y)), color='#8dd3c7', linewidth=0.6,label='Speed')	
-		if self.apparentWindChart:
-			ax1[0].plot(x, list(map(lambda x: x.aws if x.aws else 0, y)), color='#feffb3', linewidth=0.6,label='AWS')
-		if self.trueWindChart:
-			ax1[0].plot(x, list(map(lambda x: x.tws if x.tws else 0, y)), color='#bfbbd9', linewidth=0.6,label='TWS')
+			if i < nplots - 1:
+				plt.setp(ax1[i].get_xticklabels(), visible=False)
+
+			ax1[i].plot(x, list(map(lambda x: x.speed if x.speed else 0, y)), color='#8dd3c7', linewidth=0.6,label='Speed')	
+			ax1[i].legend()
+			i+=1
+		if self.apparentWindChart or self.trueWindChart:
+			if i < nplots - 1:
+				plt.setp(ax1[i].get_xticklabels(), visible=False)
+
+			if self.apparentWindChart:
+				ax1[i].plot(x, list(map(lambda x: x.aws if x.aws else 0, y)), color='#feffb3', linewidth=0.6,label='AWS')
+				ax1[i].legend()
+			if self.trueWindChart:
+				ax1[i].plot(x, list(map(lambda x: x.tws if x.tws else 0, y)), color='#bfbbd9', linewidth=0.6,label='TWS')
+				ax1[i].legend()
+			i+=1
+
 		if self.depthChart:
-			ax1[0].plot(x, list(map(lambda x: x.depth if x.depth else 0, y)), color='#fa8174', linewidth=0.6,label='Depth')	
-		
-		ax1[0].legend()
+			if i < nplots - 1:
+				plt.setp(ax1[i].get_xticklabels(), visible=False)
+
+			ax1[i].plot(x, list(map(lambda x: x.depth if x.depth else 0, y)), color='#fa8174', linewidth=0.6,label='Depth')	
+			ax1[i].legend()
+			i += 1
 
 
 		if self.hdgChart or self.apparentWindChart or self.trueWindChart:
-			ax2 = ax1[1]
-			
-			plt.setp(ax1[0].get_xticklabels(), visible=False)
+			if i < nplots - 1:
+				plt.setp(ax1[i].get_xticklabels(), visible=False)
+
+			ax2 = ax1[i]
 			
 			if self.apparentWindChart:
-				ax2.plot(x, list(map(lambda x: x.awa if x.awa else 0, y)), color='#feffb3', linewidth=0.6,label='AWA')
+				if self.rwChart:
+					ax2.plot(x, list(map(lambda x: x.awa if x.awa else 0, y)), color='#fe11b3', linewidth=0.3,label='AWA')
+				ax2.plot(x, list(map(lambda x: (x.awa + x.hdg) % 360 if x.awa else 0, y)), color='#feffb3', linewidth=0.6,label='AWD')
 			if self.trueWindChart:
-				ax2.plot(x, list(map(lambda x: x.twa if x.twa else 0, y)), color='#bfbbd9', linewidth=0.6,label='TWA')
+				if self.rwChart:
+					ax2.plot(x, list(map(lambda x: x.twa if x.twa else 0, y)), color='#bf11d9', linewidth=0.3,label='TWA')
+				ax2.plot(x, list(map(lambda x: (x.twa + x.hdg) % 360 if x.twa else 0, y)), color='#bfbbd9', linewidth=0.6,label='TWD')
 			if self.hdgChart:
 				ax2.plot(x, list(map(lambda x: x.hdg if x.hdg else 0, y)), color='#81b1d2', linewidth=0.6,label='HDG')
 
