@@ -24,11 +24,13 @@ import io
 import numpy
 import PIL
 import gi
+from datetime import datetime 
 
 gi.require_version('OsmGpsMap', '1.2')
 gi.require_version('Gtk', '3.0')
+gi.require_version('Dazzle', '1.0')
 
-from gi.repository import Gtk, Gio, GObject, OsmGpsMap, Gdk
+from gi.repository import Gtk, Gio, GLib, GObject, OsmGpsMap, Gdk 
 from threading import Lock
 import logging
 
@@ -156,10 +158,8 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 		self.recordinThread.join()
 
 	def onLogLoadPercentage (self, s):
-		if s % 100 == 0:
-			print ('Loading log file: %d sentences' % s)
-			self.builder.get_object('loading-progress').set_fraction(0.5)
-			self.builder.get_object('loading-progress').set_text("%d points" % s)
+		self.builder.get_object('loading-progress').set_fraction(0.5)
+		self.builder.get_object('loading-progress').set_text("%d points" % s)
 
 	def onLogLoadCompleted (self):
 		self.builder.get_object('loading-progress').set_fraction(1.)
@@ -206,19 +206,21 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 		if not x or not isinstance(x, nt.TrackPoint):
 			return None
 
-		self.data.append(x)
-		
-		Gdk.threads_enter()
-		point = OsmGpsMap.MapPoint.new_degrees(x.lat, x.lon)
-		self.track.add_point(point)
+		self.data.append(x)		
 
-		if len(self.data) % 20 == 1:
-			self.map.set_center_and_zoom (x.lat, x.lon, 12)
-			self.map.queue_draw()
-			logger.debug("Recorded %d points" % len(self.data))
+		if len(self.data) % 150 == 0 or (self.recording or len(self.data) % 5000 == 0):
+			Gdk.threads_enter()
 
-		self.onLogLoadPercentage(len(self.data))
-		Gdk.threads_leave()
+			if len(self.data) % 150 == 0:
+				point = OsmGpsMap.MapPoint.new_degrees(x.lat, x.lon)
+				self.track.add_point(point)
+			
+			if self.recording or len(self.data) % 5000 == 0:
+				self.map.set_center_and_zoom (x.lat, x.lon, 12)
+				logger.debug("Recorded %d points" % len(self.data))
+				self.onLogLoadPercentage(len(self.data))
+			
+			Gdk.threads_leave()
 
 
 	def close(self):
@@ -253,7 +255,7 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 			nt.TrackPointTranslator(),
 			[
 				#nt.SeatalkPipe(),
-				nt.FilterPipe(exclude=["STALK", "AIVDM"]),
+				nt.FilterPipe(exclude=["ALK", "VDM"]),
 				nt.TrueWindPipe()
 			]
 		)
@@ -296,7 +298,7 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 			nt.TrackPointTranslator(),
 			[
 				#nt.SeatalkPipe(),
-				nt.FilterPipe(exclude=["STALK", "AIVDM"]),
+				nt.FilterPipe(exclude=["ALK", "VDM"]),
 				nt.TrueWindPipe()
 			]
 		)
@@ -318,7 +320,8 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 		import matplotlib.pyplot as plt
 		plt.style.use('dark_background')
 		plt.rcParams.update({'font.size': 8})
-		x = numpy.array([x.time for x in self.data[::s]])
+		y = self.data[::s]
+		x = numpy.array([x.time for x in y])
 
 		fig, ax1 = plt.subplots(2 if self.hdgChart or self.apparentWindChart or self.trueWindChart else 1)
 		fig.set_size_inches((a.width / 100), (a.height / 100.))
@@ -327,13 +330,13 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 			ax1 = [ax1]
 
 		if self.speedChart:
-			ax1[0].plot(x, list(map(lambda x: x.speed if x.speed else 0, self.data[::s])), color='#8dd3c7', linewidth=0.6,label='Speed')	
+			ax1[0].plot(x, list(map(lambda x: x.speed if x.speed else 0, y)), color='#8dd3c7', linewidth=0.6,label='Speed')	
 		if self.apparentWindChart:
-			ax1[0].plot(x, list(map(lambda x: x.aws if x.aws else 0, self.data[::s])), color='#feffb3', linewidth=0.6,label='AWS')
+			ax1[0].plot(x, list(map(lambda x: x.aws if x.aws else 0, y)), color='#feffb3', linewidth=0.6,label='AWS')
 		if self.trueWindChart:
-			ax1[0].plot(x, list(map(lambda x: x.tws if x.tws else 0, self.data[::s])), color='#bfbbd9', linewidth=0.6,label='TWS')
+			ax1[0].plot(x, list(map(lambda x: x.tws if x.tws else 0, y)), color='#bfbbd9', linewidth=0.6,label='TWS')
 		if self.depthChart:
-			ax1[0].plot(x, list(map(lambda x: x.depth if x.depth else 0, self.data[::s])), color='#fa8174', linewidth=0.6,label='Depth')	
+			ax1[0].plot(x, list(map(lambda x: x.depth if x.depth else 0, y)), color='#fa8174', linewidth=0.6,label='Depth')	
 		
 		ax1[0].legend()
 
@@ -344,11 +347,11 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 			plt.setp(ax1[0].get_xticklabels(), visible=False)
 			
 			if self.apparentWindChart:
-				ax2.plot(x, list(map(lambda x: x.awa if x.awa else 0, self.data[::s])), color='#feffb3', linewidth=0.6,label='AWA')
+				ax2.plot(x, list(map(lambda x: x.awa if x.awa else 0, y)), color='#feffb3', linewidth=0.6,label='AWA')
 			if self.trueWindChart:
-				ax2.plot(x, list(map(lambda x: x.twa if x.twa else 0, self.data[::s])), color='#bfbbd9', linewidth=0.6,label='TWA')
+				ax2.plot(x, list(map(lambda x: x.twa if x.twa else 0, y)), color='#bfbbd9', linewidth=0.6,label='TWA')
 			if self.hdgChart:
-				ax2.plot(x, list(map(lambda x: x.hdg if x.hdg else 0, self.data[::s])), color='#81b1d2', linewidth=0.6,label='HDG')
+				ax2.plot(x, list(map(lambda x: x.hdg if x.hdg else 0, y)), color='#81b1d2', linewidth=0.6,label='HDG')
 
 			ax2.legend()
 
@@ -357,7 +360,7 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 		buf = io.BytesIO()
 		plt.savefig(buf, dpi=100)
 		buf.seek(0)
-		buf2= PIL.Image.open(buf)
+		buf2 = PIL.Image.open(buf)
 	
 		arr = numpy.array(buf2)
 		height, width, channels = arr.shape
