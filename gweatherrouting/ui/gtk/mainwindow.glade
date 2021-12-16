@@ -361,6 +361,11 @@ loaded to created a routing</property>
                                     <property name="show-expanders">False</property>
                                     <property name="enable-grid-lines">horizontal</property>
                                     <signal name="button-press-event" handler="onTrackClick" swapped="no"/>
+                                    <child internal-child="selection">
+                                      <object class="GtkTreeSelection">
+                                        <signal name="changed" handler="onSelectTrack" swapped="no"/>
+                                      </object>
+                                    </child>
                                     <child>
                                       <object class="GtkTreeViewColumn">
                                         <property name="title" translatable="yes">Name</property>
@@ -441,6 +446,11 @@ loaded to created a routing</property>
                                         <property name="show-expanders">False</property>
                                         <property name="enable-grid-lines">horizontal</property>
                                         <signal name="button-press-event" handler="onTrackItemClick" swapped="no"/>
+                                        <child internal-child="selection">
+                                          <object class="GtkTreeSelection">
+                                            <signal name="changed" handler="onSelectTrackItem" swapped="no"/>
+                                          </object>
+                                        </child>
                                         <child>
                                           <object class="GtkTreeViewColumn" id="#">
                                             <property name="title" translatable="yes"> #</property>
@@ -533,6 +543,11 @@ loaded to created a routing</property>
                                     <property name="model">routing-store</property>
                                     <property name="level-indentation">1</property>
                                     <signal name="button-press-event" handler="onRoutingClick" swapped="no"/>
+                                    <child internal-child="selection">
+                                      <object class="GtkTreeSelection">
+                                        <signal name="changed" handler="onSelectRouting" swapped="no"/>
+                                      </object>
+                                    </child>
                                     <child>
                                       <object class="GtkTreeViewColumn">
                                         <property name="title" translatable="yes">Routing</property>
@@ -656,6 +671,11 @@ loaded to created a routing</property>
                                 <property name="can-focus">True</property>
                                 <property name="model">poi-store</property>
                                 <signal name="button-press-event" handler="onPOIClick" swapped="no"/>
+                                <child internal-child="selection">
+                                  <object class="GtkTreeSelection">
+                                    <signal name="changed" handler="onSelectPOI" swapped="no"/>
+                                  </object>
+                                </child>
                                 <child>
                                   <object class="GtkTreeViewColumn">
                                     <property name="title" translatable="yes">Name</property>

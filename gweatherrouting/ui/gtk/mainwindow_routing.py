@@ -47,13 +47,16 @@ class MainWindowRouting:
 		if not self.core.gribManager.hasGrib():
 			epop = self.builder.get_object('routing-nogrib-error-popover')
 			epop.show_all()
+			print('nogrib')
 			return
 
 		if not self.core.trackManager.activeTrack or len (self.core.trackManager.activeTrack) < 2:
 			epop = self.builder.get_object('routing-2points-error-popover')
 			epop.show_all()
+			print('nopop')
 			return
 
+		print ('here')
 		dialog = RoutingWizardDialog.create (self.core, self.window)
 		response = dialog.run ()
 

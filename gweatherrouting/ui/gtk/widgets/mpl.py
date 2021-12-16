@@ -33,30 +33,24 @@ class MPLWidget(Gtk.DrawingArea):
 		self.par = parent
 		super(MPLWidget, self).__init__()
  
-		self.plotDrawer = None 
 
 		# self.set_size_request(-1, 30)
 		self.connect("draw", self.draw)
 
-	def setPlotDrawer(self, f):
-		self.plotDrawer = f	
+	def plotDrawer(self, w, h, plt, s):
+		pass
 
-	def draw(self, area, ctx):      
-		if not self.plotDrawer:
-			return
-
-		width = self.allocation.width
-		height = self.allocation.height
-	 
-		s = 20
+	def draw(self, area, ctx):     
 		a = self.get_allocation()
+
 		import matplotlib.pyplot as plt
 
 		plt.style.use('dark_background')
 		plt.rcParams.update({'font.size': 8})
 
-		self.plotDrawer(width, height, plt, self)
+		fig = self.plotDrawer(a.width, a.height, plt, self)
 
+		plt.tight_layout()
 		buf = io.BytesIO()
 		plt.savefig(buf, dpi=100)
 		buf.seek(0)
@@ -71,8 +65,9 @@ class MPLWidget(Gtk.DrawingArea):
 		ctx.paint()
 		ctx.restore()
 
-		# fig.clf()
-		# plt.close(fig)
+		if fig:
+			fig.clf()
+			plt.close(fig)
 
 	
 
