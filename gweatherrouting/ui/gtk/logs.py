@@ -69,6 +69,9 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 		self.pack_start(self.builder.get_object("logscontent"), True, True, 0)
 		self.graphArea = self.builder.get_object("grapharea")
 
+
+		self.statusBar = self.builder.get_object("statusbar")
+
 		self.show_all()
 
 		self.map = self.builder.get_object("map")
@@ -85,7 +88,6 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 		self.show_all()
 
 		self.builder.get_object('stop-button').hide()
-		self.builder.get_object('loading-progress').hide()
 
 		self.recordinThread = None 
 		self.loadingThread = None
@@ -126,9 +128,7 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 			dialog.destroy ()
 
 			try:
-				self.builder.get_object('loading-progress').show()
-				self.builder.get_object('loading-progress').set_fraction(0.1)
-				self.builder.get_object('loading-progress').set_text("Loading %s" % filepath)
+				self.statusBar.push(0, "Loading %s" % filepath)
 				self.loading = True
 				self.loadingThread = Thread(target=self.loadFromFile, args=(filepath,))
 				self.loadingThread.start ()
@@ -160,9 +160,7 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 		self.builder.get_object('record-button').hide()
 		self.builder.get_object('stop-button').show()
 
-		self.builder.get_object('loading-progress').show()
-		self.builder.get_object('loading-progress').set_fraction(0.1)
-		self.builder.get_object('loading-progress').set_text("Recording from devices...")
+		self.statusBar.push(0, "Recording from devices...")
 		self.recordinThread = Thread(target=self.startRecording, args=())
 		self.recordinThread.start()
 
@@ -174,18 +172,9 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 
 		self.builder.get_object('record-button').show()
 		self.builder.get_object('stop-button').hide()
-		self.builder.get_object('loading-progress').hide()
+		self.statusBar.push(0, "Recording stopped")
+
 		self.recordinThread.join()
-
-	def onLogLoadPercentage (self, s):
-		self.builder.get_object('loading-progress').set_fraction(0.5)
-		self.builder.get_object('loading-progress').set_text("%d points" % s)
-
-	def onLogLoadCompleted (self):
-		self.builder.get_object('loading-progress').set_fraction(1.)
-		self.builder.get_object('loading-progress').set_text("Load completed!")
-		GObject.timeout_add (3000, self.builder.get_object('loading-progress').hide)
-
 
 	def toggleSpeedChart(self, widget):
 		self.speedChart = not self.speedChart
@@ -243,7 +232,7 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 			if self.recording or len(self.data) % 5000 == 0:
 				self.map.set_center_and_zoom (x.lat, x.lon, 12)
 				logger.debug("Recorded %d points" % len(self.data))
-				self.onLogLoadPercentage(len(self.data))
+				self.statusBar.push(0, "%s track points" % len(self.data))
 			
 			Gdk.threads_leave()
 
@@ -286,7 +275,7 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 			]
 		)
 		pip.run()
-		self.onLogLoadCompleted()
+		# self.statusBar.push(0, "Load completed!")
 
 
 	def saveToFile(self, filepath):
@@ -370,6 +359,7 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 		i = 0
 		ii = -1
 		self.highlightedValues = None 
+		self.statusBar.push(0, "")
 
 		if not self.recording and not self.loading:
 			ii = numpy.where((x > (numpy.datetime64(self.selectedTime))) & (x < (numpy.datetime64(self.selectedTime) + numpy.timedelta64(self.timetravelWidget.getChangeUnit(), 's'))))
@@ -378,6 +368,8 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 				self.highlightedValue = y[ii]
 				self.map.gps_clear()
 				self.map.gps_add(self.highlightedValue.lat, self.highlightedValue.lon, self.highlightedValue.hdg)
+
+				self.statusBar.push(0, "Time: %s, Position: (%.2f, %.2f), Heading: %d, TWS: %.1fkn, TWA: %d, TWD: %d, Depth: %.2f" % (self.selectedTime, self.highlightedValue.lat, self.highlightedValue.lon, self.highlightedValue.hdg, self.highlightedValue.tws, self.highlightedValue.twa, (self.highlightedValue.twa + self.highlightedValue.hdg) % 360, self.highlightedValue.depth))
 			except:
 				ii = -1
 
