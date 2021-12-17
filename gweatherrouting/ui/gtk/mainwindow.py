@@ -21,6 +21,8 @@ import time
 import gi
 import os
 
+from gweatherrouting.ui.gtk.regatta import RegattaWidget
+
 from .logs import LogsWidget
 
 gi.require_version('Gtk', '3.0')
@@ -100,6 +102,9 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting):
 		Gdk.threads_init()
 
 		self.core.connect('boatPosition', self.boatInfoHandler)
+
+		self.regattaWidget = RegattaWidget(self.window, self.chartManager, self.core.conn)
+		self.builder.get_object("regattacontainer").pack_start(self.regattaWidget, True, True, 0)
 
 		self.logsWidget = LogsWidget(self.window, self.chartManager, self.core.conn)
 		self.builder.get_object("logscontainer").pack_start(self.logsWidget, True, True, 0)
