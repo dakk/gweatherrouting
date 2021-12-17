@@ -240,6 +240,3 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting):
 	def onGribManager(self, event):
 		w = GribManagerWindow.create (self.core.gribManager)
 		w.show ()
-
-	def onLogs(self,widget):
-		LogsWindow(self.chartManager, self.core.conn)
