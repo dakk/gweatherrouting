@@ -42,11 +42,11 @@ from ...core import TimeControl
 from .mainwindow_poi import MainWindowPOI
 from .mainwindow_track import MainWindowTrack
 from .mainwindow_routing import MainWindowRouting
-from .mainwindow_time import MainWindowTime
+from .widgets.timetravel import TimeTravelWidget
 
 logger = logging.getLogger ('gweatherrouting')
 
-class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTime):
+class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting):
 	def create (core, conn):
 		return MainWindow(core, conn)
 
@@ -93,7 +93,6 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 
 		self.statusbar = self.builder.get_object("status-bar")
 
-		MainWindowTime.__init__(self)
 		MainWindowRouting.__init__(self)
 		MainWindowTrack.__init__(self)
 		MainWindowPOI.__init__(self)
@@ -104,6 +103,11 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting, MainWindowTi
 
 		self.logsWidget = LogsWidget(self.window, self.chartManager, self.core.conn)
 		self.builder.get_object("logscontainer").pack_start(self.logsWidget, True, True, 0)
+
+
+		self.timetravelWidget = TimeTravelWidget(self.window, self.timeControl, self.map)
+		self.builder.get_object("timetravelcontainer").pack_start(self.timetravelWidget, True, True, 0)
+
 
 		# https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/#Z/#Y/#X
 		# https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/#Z/#Y/#X

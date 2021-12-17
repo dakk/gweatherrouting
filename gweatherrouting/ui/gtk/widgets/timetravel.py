@@ -15,39 +15,67 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 import gi
+import os
+import json
+import math
+import datetime
+import numpy as np
+from threading import Thread
+from ..timepickerdialog import TimePickerDialog
 
+from gweatherrouting.ui.gtk.widgets.mpl import MPLWidget
 gi.require_version('Gtk', '3.0')
-gi.require_version('OsmGpsMap', '1.2')
+from gi.repository import Gtk, Gio, GObject, Gdk
 
-from gi.repository import Gtk, Gio, GObject, OsmGpsMap, Gdk
-from .timepickerdialog import TimePickerDialog
 
 TIME_UNITS = {
-	'15m': 15,
-	'30m': 30,
-	'1h': 60,
-	'3h': 180,
-	'6h': 360,
-	'12h': 720,
-	'1d': 1440
+	'30s': 30,
+	'1m': 1 * 60,
+	'5m': 5 * 60,
+	'15m': 15 * 60,
+	'30m': 30 * 60,
+	'1h': 60 * 60,
+	'3h': 180 * 60,
+	'6h': 360 * 60,
+	'12h': 720 * 60,
+	'1d': 1440 * 60
 }
 
-class MainWindowTime:
-	play = False
+class TimeTravelWidget(Gtk.Box):
+	def __init__(self, parent, timeControl, map, smallerUnit = False):  
+		super(TimeTravelWidget, self).__init__()
+			
+		self.play = False
+		self.par = parent
+		self.timeControl = timeControl
+		self.map = map
 
-	def __init__(self):
+		self.builder = Gtk.Builder()
+		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/timetravel.glade")
+		self.builder.connect_signals(self)
+
+		self.pack_start(self.builder.get_object('timetravel'), True, True, 0)
+
+		self.show_all()
+
 		# self.timeAdjust = self.builder.get_object('time-adjustment')
 		self.timeLabel = self.builder.get_object('time-label')
 		self.timeUnitCombo = self.builder.get_object('time-unit-combo')
 		self.timeControl.connect('time-change', self.onTimeChange)
 		self.onTimeChange(self.timeControl.time)
 
-		self.minutes = 15
-		self.timeUnitCombo.set_active(0)
+		self.seconds = smallerUnit
+		if smallerUnit:
+			self.timeUnitCombo.set_active(0)
+		else:
+			self.timeUnitCombo.set_active(3)
+
+	def getChangeUnit(self):
+		return self.seconds
 
 	def onTimeUnitComboChange(self, widget):
 		u = self.timeUnitCombo.get_active_text()
-		self.minutes = TIME_UNITS[u]
+		self.seconds = TIME_UNITS[u]
 
 
 	def onTimeChange(self, t):
@@ -70,12 +98,12 @@ class MainWindowTime:
 		self.play = False
 
 	def onFowardClick(self, event):
-		self.timeControl.increase(minutes=self.minutes)
+		self.timeControl.increase(seconds=self.seconds)
 		self.map.queue_draw ()
 
 	def onBackwardClick(self, event):
 		# if self.timeControl.time > 0:
-		self.timeControl.decrease(minutes=self.minutes)
+		self.timeControl.decrease(seconds=self.seconds)
 
 	def onTimeSelect(self, event):
 		tp = TimePickerDialog.create(self.window)
@@ -86,7 +114,6 @@ class MainWindowTime:
 			self.timeControl.setTime(tp.getDateTime())
 		
 		tp.destroy()
-
 
 
 	# def updateTimeSlider(self):

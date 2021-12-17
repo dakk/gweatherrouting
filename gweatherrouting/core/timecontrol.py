@@ -28,14 +28,20 @@ class TimeControl(EventDispatcher):
         self.time = datetime.datetime.now().replace(minute=0, second=0, microsecond=0)
         self.dispatch("time-change", self.time)
 
+    def getTime(self):
+        return self.time
+
+    def getTimestamp(self):
+        return datetime.timestamp(self.time)
+
     def setTime(self, v):
         self.time = v
         self.dispatch("time-change", self.time)
 
-    def decrease(self, hours=0, minutes=0):
-        self.time -= datetime.timedelta(hours=hours, minutes=minutes)
+    def decrease(self, hours=0, minutes=0, seconds=0):
+        self.time -= datetime.timedelta(hours=hours, minutes=minutes, seconds=seconds)
         self.dispatch("time-change", self.time)
 
-    def increase(self, hours=0, minutes=0):
-        self.time += datetime.timedelta(hours=hours, minutes=minutes)
+    def increase(self, hours=0, minutes=0, seconds=0):
+        self.time += datetime.timedelta(hours=hours, minutes=minutes, seconds=seconds)
         self.dispatch("time-change", self.time)

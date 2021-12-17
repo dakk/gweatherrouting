@@ -50,7 +50,7 @@ setup(name='gweatherrouting',
 	package_data={
 		'gweatherrouting': [
 			'data/*', 'data/boats/*', 'data/polars/*', 
-			'ui/gtk/*.glade', 'ui/gtk/settings/*.glade', 'ui/gtk/logs/*.glade'
+			'ui/gtk/*.glade', 'ui/gtk/settings/*.glade', 'ui/gtk/widgets/*.glade'
 		]
 	},
 	entry_points={

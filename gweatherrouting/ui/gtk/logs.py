@@ -24,7 +24,10 @@ import io
 import numpy
 import PIL
 import gi
-from datetime import datetime 
+from datetime import datetime
+
+from gweatherrouting.core.timecontrol import TimeControl
+from gweatherrouting.ui.gtk.widgets.timetravel import TimeTravelWidget 
 
 gi.require_version('OsmGpsMap', '1.2')
 gi.require_version('Gtk', '3.0')
@@ -44,6 +47,7 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 		self.parent = parent
 		self.conn = connManager
 		self.recording = False
+		self.loading = False 
 		self.data = []
 		self.track = None
 		self.recordedData = None
@@ -71,6 +75,15 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 		self.map.set_center_and_zoom (39., 9., 6)
 		# self.map.layer_add (chartManager)
 
+
+		self.timeControl = TimeControl()
+		self.selectedTime = self.timeControl.getTime()
+		self.timetravelWidget = TimeTravelWidget(self.parent, self.timeControl, self.map, True)
+		self.timeControl.connect('time-change', self.onTimeChange)
+		self.builder.get_object("timetravelcontainer").pack_start(self.timetravelWidget, True, True, 0)
+
+		self.show_all()
+
 		self.builder.get_object('stop-button').hide()
 		self.builder.get_object('loading-progress').hide()
 
@@ -83,6 +96,11 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 		except:
 			pass 
 
+	def onTimeChange(self, time):
+		self.selectedTime = time
+		if not self.recording and not self.loading:
+			self.graphArea.queue_draw()
+			self.map.queue_draw()
 	
 	def onLoadClick(self, widget):
 		dialog = Gtk.FileChooserDialog ("Please choose a file", self.parent,
@@ -111,6 +129,7 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 				self.builder.get_object('loading-progress').show()
 				self.builder.get_object('loading-progress').set_fraction(0.1)
 				self.builder.get_object('loading-progress').set_text("Loading %s" % filepath)
+				self.loading = True
 				self.loadingThread = Thread(target=self.loadFromFile, args=(filepath,))
 				self.loadingThread.start ()
 			except Exception as e:
@@ -211,10 +230,11 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 		if not x or not isinstance(x, nt.TrackPoint):
 			return None
 
-		self.data.append(x)		
+		self.data.append(x)	
 
 		if len(self.data) % 150 == 0 or (self.recording or len(self.data) % 5000 == 0):
 			Gdk.threads_enter()
+			self.timeControl.setTime(x.time)	
 
 			if len(self.data) % 150 == 0:
 				point = OsmGpsMap.MapPoint.new_degrees(x.lat, x.lon)
@@ -238,6 +258,7 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 		self.map.set_center_and_zoom (self.data[0].lat, self.data[0].lon, 12)
 		self.map.queue_draw()
 		self.graphArea.queue_draw()
+		self.loading = False
 		Gdk.threads_leave()
 
 
@@ -347,12 +368,35 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 		fig.set_size_inches((a.width / 100), (a.height / 100.))
 
 		i = 0
+		ii = -1
+		self.highlightedValues = None 
+
+		if not self.recording and not self.loading:
+			ii = numpy.where((x > (numpy.datetime64(self.selectedTime))) & (x < (numpy.datetime64(self.selectedTime) + numpy.timedelta64(self.timetravelWidget.getChangeUnit(), 's'))))
+			try:
+				ii = ii[0][0]
+				self.highlightedValue = y[ii]
+				self.map.gps_clear()
+				self.map.gps_add(self.highlightedValue.lat, self.highlightedValue.lon, self.highlightedValue.hdg)
+			except:
+				ii = -1
+
+		def highlight(i, data):
+			if(ii != -1):
+				ax1[i].plot(x[ii], data[ii], color='#f00', marker='o', markersize=4)
+				# ax1[i].axvline(x=ii)
+
+			
 
 		if self.speedChart:
 			if i < nplots - 1:
 				plt.setp(ax1[i].get_xticklabels(), visible=False)
 
-			ax1[i].plot(x, list(map(lambda x: x.speed if x.speed else 0, y)), color='#8dd3c7', linewidth=0.6,label='Speed')	
+			data = list(map(lambda x: x.speed if x.speed else 0, y))
+			ax1[i].plot(x, data, color='#8dd3c7', linewidth=0.6,label='Speed')	
+
+			highlight(i, data)
+
 			ax1[i].legend()
 			i+=1
 		if self.apparentWindChart or self.trueWindChart:
@@ -360,19 +404,28 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 				plt.setp(ax1[i].get_xticklabels(), visible=False)
 
 			if self.apparentWindChart:
-				ax1[i].plot(x, list(map(lambda x: x.aws if x.aws else 0, y)), color='#feffb3', linewidth=0.6,label='AWS')
+				data = list(map(lambda x: x.aws if x.aws else 0, y))
+				ax1[i].plot(x, data, color='#feffb3', linewidth=0.6,label='AWS')
 				ax1[i].legend()
+
+				highlight(i, data)
 			if self.trueWindChart:
-				ax1[i].plot(x, list(map(lambda x: x.tws if x.tws else 0, y)), color='#bfbbd9', linewidth=0.6,label='TWS')
+				data = list(map(lambda x: x.tws if x.tws else 0, y))
+				ax1[i].plot(x, data, color='#bfbbd9', linewidth=0.6,label='TWS')
 				ax1[i].legend()
+				
+				highlight(i, data)
 			i+=1
 
 		if self.depthChart:
 			if i < nplots - 1:
 				plt.setp(ax1[i].get_xticklabels(), visible=False)
 
-			ax1[i].plot(x, list(map(lambda x: x.depth if x.depth else 0, y)), color='#fa8174', linewidth=0.6,label='Depth')	
+			data = list(map(lambda x: x.depth if x.depth else 0, y))
+			ax1[i].plot(x, data, color='#fa8174', linewidth=0.6,label='Depth')	
 			ax1[i].legend()
+
+			highlight(i, data)
 			i += 1
 
 
@@ -384,14 +437,28 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 			
 			if self.apparentWindChart:
 				if self.rwChart:
-					ax2.plot(x, list(map(lambda x: x.awa if x.awa else 0, y)), color='#fe11b3', linewidth=0.3,label='AWA')
-				ax2.plot(x, list(map(lambda x: (x.awa + x.hdg) % 360 if x.awa else 0, y)), color='#feffb3', linewidth=0.6,label='AWD')
+					data = list(map(lambda x: x.awa if x.awa else 0, y))
+					ax2.plot(x, data, color='#fe11b3', linewidth=0.3,label='AWA')
+					highlight(i, data)
+
+				data = list(map(lambda x: (x.awa + x.hdg) % 360 if x.awa else 0, y))
+				ax2.plot(x, data, color='#feffb3', linewidth=0.6,label='AWD')
+				highlight(i, data)
 			if self.trueWindChart:
 				if self.rwChart:
-					ax2.plot(x, list(map(lambda x: x.twa if x.twa else 0, y)), color='#bf11d9', linewidth=0.3,label='TWA')
-				ax2.plot(x, list(map(lambda x: (x.twa + x.hdg) % 360 if x.twa else 0, y)), color='#bfbbd9', linewidth=0.6,label='TWD')
+					data = list(map(lambda x: x.twa if x.twa else 0, y))
+					ax2.plot(x, data, color='#bf11d9', linewidth=0.3,label='TWA')
+					highlight(i, data)
+
+				data = list(map(lambda x: (x.twa + x.hdg) % 360 if x.twa else 0, y))
+				ax2.plot(x, data, color='#bfbbd9', linewidth=0.6,label='TWD')
+
+				highlight(i, data)
 			if self.hdgChart:
-				ax2.plot(x, list(map(lambda x: x.hdg if x.hdg else 0, y)), color='#81b1d2', linewidth=0.6,label='HDG')
+				data = list(map(lambda x: x.hdg if x.hdg else 0, y))
+				ax2.plot(x, data, color='#81b1d2', linewidth=0.6,label='HDG')
+
+				highlight(i, data)
 
 			ax2.legend()
 
