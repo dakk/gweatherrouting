@@ -328,6 +328,7 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 	def onGraphDraw(self, widget, ctx):
 		s = 20
 		a = widget.get_allocation()
+		width = a.width
 
 		if self.data == []:
 			return 
@@ -354,7 +355,7 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 			ax1[0] 
 		except:
 			ax1 = [ax1]
-		fig.set_size_inches((a.width / 100), (a.height / 100.))
+		fig.set_size_inches((width / 100), (a.height / 100.))
 
 		i = 0
 		ii = -1
@@ -369,7 +370,7 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 				self.map.gps_clear()
 				self.map.gps_add(self.highlightedValue.lat, self.highlightedValue.lon, self.highlightedValue.hdg)
 
-				self.statusBar.push(0, "Time: %s, Position: (%.2f, %.2f), Heading: %d, TWS: %.1fkn, TWA: %d, TWD: %d, Depth: %.2f" % (self.selectedTime, self.highlightedValue.lat, self.highlightedValue.lon, self.highlightedValue.hdg, self.highlightedValue.tws, self.highlightedValue.twa, (self.highlightedValue.twa + self.highlightedValue.hdg) % 360, self.highlightedValue.depth))
+				self.statusBar.push(0, "Time: %s, Position: (%.2f, %.2f), Speed: %.1fkn, Heading: %d, TWS: %.1fkn, TWA: %d, TWD: %d, Depth: %.2f" % (self.selectedTime, self.highlightedValue.lat, self.highlightedValue.lon, self.highlightedValue.speed, self.highlightedValue.hdg, self.highlightedValue.tws, self.highlightedValue.twa, (self.highlightedValue.twa + self.highlightedValue.hdg) % 360, self.highlightedValue.depth))
 			except:
 				ii = -1
 
