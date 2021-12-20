@@ -21,6 +21,7 @@ import nmeatoolkit as nt
 import cairo
 import matplotlib.pyplot as plt
 import io
+from nmeatoolkit.translators.identity import IdentityTranslator
 import numpy
 import PIL
 import gi
@@ -39,6 +40,7 @@ import logging
 
 logger = logging.getLogger ('gweatherrouting')
 
+LOG_TEMP_FILE = '/tmp/gwr-recording.log'
 
 class LogsWidget(Gtk.Box, nt.Output, nt.Input):		
 	def __init__(self, parent, chartManager, connManager):
@@ -59,6 +61,9 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 		self.trueWindChart = True
 		self.hdgChart = True
 		self.rwChart = False
+
+		self.cropA = None 
+		self.cropB = None 
 
 		self.conn.connect("data", self.dataHandler)
 
@@ -93,7 +98,7 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 		self.loadingThread = None
 
 		try:
-			self.loadingThread = Thread(target=self.loadFromFile, args=('/tmp/gwr-recording.log',))
+			self.loadingThread = Thread(target=self.loadFromFile, args=(LOG_TEMP_FILE,))
 			self.loadingThread.start ()
 		except:
 			pass 
@@ -129,7 +134,6 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 
 			try:
 				self.statusBar.push(0, "Loading %s" % filepath)
-				self.loading = True
 				self.loadingThread = Thread(target=self.loadFromFile, args=(filepath,))
 				self.loadingThread.start ()
 			except Exception as e:
@@ -149,9 +153,44 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 		if self.loadingThread:
 			self.loadingThread.join()
 			
+	def setCropA(self, widget):
+		self.cropA = self.selectedTime
+		self.graphArea.queue_draw()
+			
+	def setCropB(self, widget):
+		self.cropB = self.selectedTime
+		self.graphArea.queue_draw()
+	
+	def cropData(self, widget):
+		if self.cropA == None and self.cropB == None:
+			return
 
-	def clearData(self, widget):
-		self.clearData()
+		if self.cropA == None:
+			self.cropA = self.data[0].time
+
+		if self.cropB == None:
+			self.cropB = self.data[-1].time
+
+		self.data = [d for d in self.data if d.time >= self.cropA and d.time <= self.cropB]
+
+
+		self.rebuildTrack()
+		self.graphArea.queue_draw()
+		
+		if self.recordedData:
+			self.recordedData.flush()
+			self.recordedData.close()
+		os.system('mv %s %s.2' % (LOG_TEMP_FILE, LOG_TEMP_FILE))
+		pip = nt.Pipeline(
+			nt.FileInput(LOG_TEMP_FILE + ".2"),
+			nt.FileOutput(LOG_TEMP_FILE),
+			nt.ToStringTranslator(),
+			[ nt.CropPipe(self.cropA, self.cropB) ]
+		)
+		pip.run()
+		os.system('rm %s.2' % LOG_TEMP_FILE)
+		self.cropA = None
+		self.cropB = None
 
 	def onRecordingClick(self, widget):
 		if self.recording:
@@ -250,8 +289,21 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 		self.loading = False
 		Gdk.threads_leave()
 
+	def onSaveClick(self, widget):
+		dialog = Gtk.FileChooserDialog("Save log", self.parent, Gtk.FileChooserAction.SAVE, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+		dialog.set_do_overwrite_confirmation(True)
+		response = dialog.run()
+		if response == Gtk.ResponseType.OK:
+			filename = dialog.get_filename()
+			dialog.destroy()
+			os.system('cp %s %s' % (LOG_TEMP_FILE, filename))
+
+			self.statusBar.push(0, "Saved to %s" % filename)
+		else:
+			dialog.destroy()
 
 	def loadFromFile(self, filepath):
+		self.loading = True
 		self.data = []
 		ext = filepath.split('.')[-1]
 
@@ -275,6 +327,8 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 			]
 		)
 		pip.run()
+		if filepath != LOG_TEMP_FILE:
+			os.system('cp %s %s' % (filepath, LOG_TEMP_FILE))
 		# self.statusBar.push(0, "Load completed!")
 
 
@@ -286,7 +340,7 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 	
 		if self.recordedData:
 			self.recordedData.close()
-		self.recordedData = open('/tmp/gwr-recording.log', 'w')
+		self.recordedData = open(LOG_TEMP_FILE, 'w')
 		self.toSend = []
 		if self.track:
 			self.map.track_remove(self.track)		
@@ -297,10 +351,21 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 		self.graphArea.queue_draw()
 		logger.debug("Data cleared")
 
+	def rebuildTrack(self):
+		if self.track:
+			self.map.track_remove(self.track)		
+		self.track = OsmGpsMap.MapTrack()
+		self.track.set_property('line-width', 1)
+		self.map.track_add(self.track)
+		for x in self.data[0::150]:
+			point = OsmGpsMap.MapPoint.new_degrees(x.lat, x.lon)
+			self.track.add_point(point)
+		self.map.queue_draw()
+
 	def startRecording(self):
 		logger.debug("Recording started")
 		self.recording = True
-		self.recordedData = open('/tmp/gwr-recording.log', 'w')
+		self.recordedData = open(LOG_TEMP_FILE, 'w')
 
 		if not self.track:
 			self.track = OsmGpsMap.MapTrack()
@@ -454,6 +519,22 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 				highlight(i, data)
 
 			ax2.legend()
+
+		if self.cropA != None:
+			try:
+				ii = numpy.where((x > (numpy.datetime64(self.cropA))) & (x < (numpy.datetime64(self.cropA) + numpy.timedelta64(self.timetravelWidget.getChangeUnit(), 's'))))
+				for axx in ax1:
+					axx.axvline(x=x[ii[0][0]], color='#ffffff', linewidth=0.5)
+			except:
+				pass 
+
+		if self.cropB != None:
+			try:
+				ii = numpy.where((x > (numpy.datetime64(self.cropB))) & (x < (numpy.datetime64(self.cropB) + numpy.timedelta64(self.timetravelWidget.getChangeUnit(), 's'))))
+				for axx in ax1:
+					axx.axvline(x=x[ii[0][0]], color='#ffffff', linewidth=0.5)
+			except:
+				pass
 
 	
 		plt.tight_layout()

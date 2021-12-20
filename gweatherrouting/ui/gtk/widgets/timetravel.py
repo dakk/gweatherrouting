@@ -66,7 +66,7 @@ class TimeTravelWidget(Gtk.Box):
 
 		self.seconds = smallerUnit
 		if smallerUnit:
-			self.timeUnitCombo.set_active(0)
+			self.timeUnitCombo.set_active(2)
 		else:
 			self.timeUnitCombo.set_active(3)
 
