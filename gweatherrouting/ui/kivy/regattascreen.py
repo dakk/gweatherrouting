@@ -13,7 +13,11 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-from .gribscreen import GribScreen
-from .trackscreen import TrackScreen
-from .settingsscreen import SettingsScreen
-from .regattascreen import RegattaScreen
+from kivy.properties import BooleanProperty, ObjectProperty
+from kivymd.uix.screen import MDScreen
+from kivymd.uix.list import IRightBodyTouch, TwoLineIconListItem
+from kivymd.uix.selectioncontrol import MDCheckbox
+
+class RegattaScreen(MDScreen):
+	def on_pre_enter(self, *args):
+		pass

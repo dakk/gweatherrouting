@@ -114,6 +114,10 @@ MDScreen:
                     text: "Screen 2"
                     halign: "center"
 
+            RegattaScreen:
+                name: "Settings Screen"
+                id: regattaScreen
+
             SettingsScreen:
                 name: "Settings Screen"
                 id: settingsScreen
@@ -142,6 +146,16 @@ MDScreen:
                                 icon: "map"
                                 theme_text_color: "Custom"
                                 text_color: app.theme_cls.accent_color
+
+                        OneLineListItem:
+                            text: "Regatta"
+
+                            on_press:
+                                root.ids.navDrawer.set_state("close")
+                                root.ids.screenManager.current = regattaScreen.name
+
+                            IconLeftWidget:
+                                icon: "plus"
 
                         OneLineListItem:
                             text: "Gribs"

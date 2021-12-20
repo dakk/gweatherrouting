@@ -14,33 +14,14 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
-from setuptools import find_packages
 from setuptools import setup
-
-buildOptions = {}
-executables = {}
-W32 = False
-
-if W32:
-	from cx_Freeze import setup, Executable
-
-	buildOptions = {
-		"build_exe": {
-			"packages": ["gi"], 
-			"include_files":[]
-		}
-	}
-	executables = [
-		Executable("main.py") #  icon="evm_bg_KYa_icon.ico")
-	]
-
 
 setup(name='gweatherrouting',
 	version=0.1,
 	description='',
-	author=['Davide Gessa', 'Riccardo Apolloni'],
+	author='Davide Gessa',
 	setup_requires='setuptools',
-	author_email=['gessadavide@gmail.com', 'riccardo.apolloni@gmail.com'],
+	author_email='gessadavide@gmail.com',
 	packages=['gweatherrouting', 'gweatherrouting.conn', 
 		'gweatherrouting.ui.kivy', 'gweatherrouting.ui.kivy.maplayers',
 		'gweatherrouting.ui.common',
@@ -57,7 +38,7 @@ setup(name='gweatherrouting',
 			'gweatherrouting-kivy=gweatherrouting.main:startUIKivy'
 		],
 	},
-	options=buildOptions,
-	executables=executables,
+	options={},
+	executables={},
 	install_requires=open ('requirements.kivy.txt', 'r').read ().split ('\n')
 )

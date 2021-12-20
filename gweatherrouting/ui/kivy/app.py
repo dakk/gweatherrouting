@@ -50,8 +50,9 @@ class GWeatherRoutingApp(MDApp):
 		self.root.ids.trackScreen.poiManager = self.core.poiManager
 
 	def onMapTouchDown(self, k):
-		print (k)
+		# print (k)
 		# TODO: open an menu with add poi / point to track
+		pass 
 
 	def onForwardClick(self, hours):
 		self.timeControl.increase(hours=hours)
