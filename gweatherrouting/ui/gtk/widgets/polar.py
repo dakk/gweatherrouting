@@ -62,7 +62,8 @@ class PolarWidget(Gtk.DrawingArea):
 
 		s = height * 0.8 / 160
 		cr.scale(s,s)
-
+		cr.translate(-80, 0)
+		
 		cr.set_source_rgb (0.3, 0.3, 0.3)
 		cr.paint ()
 

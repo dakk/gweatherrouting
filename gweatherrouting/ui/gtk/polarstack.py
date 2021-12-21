@@ -47,6 +47,7 @@ class PolarStack(Gtk.Box):
 
 		self.polarWidget = PolarWidget(self.parent)
 		self.polarWidget.loadPolar('first317.pol')
+		self.builder.get_object("polar-text").get_buffer().set_text(self.polarWidget.polar.toString())
 		self.builder.get_object('polarwidgetcontainer').pack_start(self.polarWidget, True, True, 0)
 
 		self.show_all()
