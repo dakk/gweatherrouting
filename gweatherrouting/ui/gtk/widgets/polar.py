@@ -18,7 +18,7 @@ import gi
 import os
 import math
 import logging
-import weatherrouting
+from weatherrouting import Polar
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -37,10 +37,10 @@ class PolarWidget(Gtk.DrawingArea):
 	def loadPolar(self, polarFile):
 		polar = None
 		try:
-			polar = weatherrouting.Polar (os.path.abspath(os.path.dirname(__file__)) + '/../../../data/polars/' + polarFile)
+			polar = Polar (os.path.abspath(os.path.dirname(__file__)) + '/../../../data/polars/' + polarFile)
 		except:
 			try:
-				polar = weatherrouting.Polar (polarFile)
+				polar = Polar (polarFile)
 			except:
 				logger.error ('Error loading polar file %s' % polarFile)
 				pass 
@@ -63,7 +63,7 @@ class PolarWidget(Gtk.DrawingArea):
 		s = height * 0.8 / 160
 		cr.scale(s,s)
 		cr.translate(-80, 0)
-		
+
 		cr.set_source_rgb (0.3, 0.3, 0.3)
 		cr.paint ()
 
@@ -74,7 +74,12 @@ class PolarWidget(Gtk.DrawingArea):
 			cr.arc (100.0, 100.0, x * 3, math.radians (-90), math.radians (90.0))
 			cr.stroke ()
 
-		for x in self.polar.tws:
+
+		twsStep = 1  
+		if len(self.polar.tws) > 7:
+			twsStep = 2
+
+		for x in self.polar.tws[::twsStep]:
 			cr.set_source_rgb (1, 1, 1)
 			cr.set_font_size (7)
 			cr.move_to (80.0, 100.0 - x*3)
@@ -82,12 +87,16 @@ class PolarWidget(Gtk.DrawingArea):
 
 		cr.set_source_rgba (1, 1, 1, 0.6)
 
-		for x in self.polar.twa:
+		twaStep = 1  
+		if len(self.polar.twa) > 20:
+			twaStep = int(len(self.polar.twa) / 10)
+		
+		for x in self.polar.twa[::twaStep]:
 			cr.move_to (100.0, 100.0)
 			cr.line_to (100 + math.sin (x) * 100.0, 100 - math.cos (x) * 80.0)
 			cr.stroke ()
 
-		for x in self.polar.twa:
+		for x in self.polar.twa[::twaStep]:
 			cr.set_source_rgb (1, 1, 1)
 			cr.set_font_size (7)
 			cr.move_to (100 + math.sin (x) * 100.0, 100 - math.cos (x) * 90.0)
