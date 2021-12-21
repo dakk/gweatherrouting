@@ -16,20 +16,18 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import gi
 import os
-import nmeatoolkit as nt 
 
 gi.require_version('OsmGpsMap', '1.2')
 gi.require_version('Gtk', '3.0')
 gi.require_version('Dazzle', '1.0')
 
-from gi.repository import Gtk, Gio, GLib, GObject, OsmGpsMap, Gdk 
-from threading import Lock
+from gi.repository import Gtk
 import logging
 
 logger = logging.getLogger ('gweatherrouting')
 
 
-class RegattaWidget(Gtk.Box, nt.Output, nt.Input):		
+class RegattaStack(Gtk.Box):		
 	def __init__(self, parent, chartManager, connManager):
 		Gtk.Widget.__init__(self)
 
@@ -39,7 +37,7 @@ class RegattaWidget(Gtk.Box, nt.Output, nt.Input):
 		# self.conn.connect("data", self.dataHandler)
 
 		self.builder = Gtk.Builder()
-		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/regatta.glade")
+		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/regattastack.glade")
 		self.builder.connect_signals(self)
 		self.pack_start(self.builder.get_object("regattacontent"), True, True, 0)
 

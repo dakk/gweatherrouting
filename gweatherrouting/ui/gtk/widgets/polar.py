@@ -16,15 +16,14 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import gi
 import os
-import json
 import math
-import datetime
-import numpy as np
-from threading import Thread
+import logging
+import weatherrouting
 
-from gweatherrouting.ui.gtk.widgets.mpl import MPLWidget
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gio, GObject, Gdk
+from gi.repository import Gtk
+
+logger = logging.getLogger ('gweatherrouting')
 
 class PolarWidget(Gtk.DrawingArea):
 	def __init__(self, parent):      
@@ -35,6 +34,19 @@ class PolarWidget(Gtk.DrawingArea):
 		self.connect("draw", self.draw)
 		self.polar = None
 	
+	def loadPolar(self, polarFile):
+		polar = None
+		try:
+			polar = weatherrouting.Polar (os.path.abspath(os.path.dirname(__file__)) + '/../../../data/polars/' + polarFile)
+		except:
+			try:
+				polar = weatherrouting.Polar (polarFile)
+			except:
+				logger.error ('Error loading polar file %s' % polarFile)
+				pass 
+
+		self.setPolar(polar)
+
 	def setPolar(self, polar):
 		self.polar = polar
 		self.queue_draw()
@@ -44,8 +56,12 @@ class PolarWidget(Gtk.DrawingArea):
 		if not self.polar:
 			return
 	
-		# width = self.allocation.width
-		# height = self.allocation.height
+		a = self.get_allocation()
+		width = a.width
+		height = a.height
+
+		s = height * 0.8 / 160
+		cr.scale(s,s)
 
 		cr.set_source_rgb (0.3, 0.3, 0.3)
 		cr.paint ()
@@ -99,4 +115,6 @@ class PolarWidget(Gtk.DrawingArea):
 		# 		cr.stroke ()
 		# 		cr.move_to (100 - 5 * self.polar.speedTable [j][i] * math.sin (self.polar.twa[j]), 100 - 5 * self.polar.speedTable [j][i] * math.cos (self.polar.twa[j]))
 
-		cr.scale(0.8, 0.8)
+
+		# 200 : 0.8 = height : x
+		# x = height * 0.8 / 200

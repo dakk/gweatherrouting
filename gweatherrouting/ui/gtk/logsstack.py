@@ -19,13 +19,10 @@ import gi
 import os
 import nmeatoolkit as nt 
 import cairo
-import matplotlib.pyplot as plt
 import io
-from nmeatoolkit.translators.identity import IdentityTranslator
 import numpy
 import PIL
 import gi
-from datetime import datetime
 
 from gweatherrouting.core.timecontrol import TimeControl
 from gweatherrouting.ui.gtk.widgets.timetravel import TimeTravelWidget 
@@ -34,7 +31,7 @@ gi.require_version('OsmGpsMap', '1.2')
 gi.require_version('Gtk', '3.0')
 gi.require_version('Dazzle', '1.0')
 
-from gi.repository import Gtk, Gio, GLib, GObject, OsmGpsMap, Gdk 
+from gi.repository import Gtk, OsmGpsMap, Gdk 
 from threading import Lock
 import logging
 
@@ -42,7 +39,7 @@ logger = logging.getLogger ('gweatherrouting')
 
 LOG_TEMP_FILE = '/tmp/gwr-recording.log'
 
-class LogsWidget(Gtk.Box, nt.Output, nt.Input):		
+class LogsStack(Gtk.Box, nt.Output, nt.Input):		
 	def __init__(self, parent, chartManager, connManager):
 		Gtk.Widget.__init__(self)
 
@@ -68,7 +65,7 @@ class LogsWidget(Gtk.Box, nt.Output, nt.Input):
 		self.conn.connect("data", self.dataHandler)
 
 		self.builder = Gtk.Builder()
-		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/logs.glade")
+		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/logsstack.glade")
 		self.builder.connect_signals(self)
 
 		self.pack_start(self.builder.get_object("logscontent"), True, True, 0)

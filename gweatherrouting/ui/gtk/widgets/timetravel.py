@@ -16,14 +16,8 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import gi
 import os
-import json
-import math
-import datetime
-import numpy as np
-from threading import Thread
 from ..timepickerdialog import TimePickerDialog
 
-from gweatherrouting.ui.gtk.widgets.mpl import MPLWidget
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, GObject, Gdk
 

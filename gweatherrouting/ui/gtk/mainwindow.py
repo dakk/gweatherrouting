@@ -17,13 +17,11 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 # TODO:
 # https://eeperry.wordpress.com/2013/01/05/pygtk-new-style-python-class-using-builder/
 
-import time
 import gi
 import os
-
-from gweatherrouting.ui.gtk.regatta import RegattaWidget
-
-from .logs import LogsWidget
+from .polarstack import PolarStack
+from .regattastack import RegattaStack
+from .logsstack import LogsStack
 
 gi.require_version('Gtk', '3.0')
 gi.require_version('OsmGpsMap', '1.2')
@@ -100,11 +98,16 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting):
 
 		self.core.connect('boatPosition', self.boatInfoHandler)
 
-		self.regattaWidget = RegattaWidget(self.window, self.chartManager, self.core.conn)
-		self.builder.get_object("regattacontainer").pack_start(self.regattaWidget, True, True, 0)
+		self.regattaStack = RegattaStack(self.window, self.chartManager, self.core.conn)
+		self.builder.get_object("regattacontainer").pack_start(self.regattaStack, True, True, 0)
 
-		self.logsWidget = LogsWidget(self.window, self.chartManager, self.core.conn)
-		self.builder.get_object("logscontainer").pack_start(self.logsWidget, True, True, 0)
+		self.logsStack = LogsStack(self.window, self.chartManager, self.core.conn)
+		self.builder.get_object("logscontainer").pack_start(self.logsStack, True, True, 0)
+
+		self.polarStack = PolarStack(self.window, self.core.conn)
+		self.builder.get_object("polarcontainer").pack_start(self.polarStack, True, True, 0)
+
+		
 
 
 		self.timetravelWidget = TimeTravelWidget(self.window, self.timeControl, self.map)
