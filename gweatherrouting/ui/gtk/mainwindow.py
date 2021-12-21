@@ -49,9 +49,6 @@ from .widgets.timetravel import TimeTravelWidget
 logger = logging.getLogger ('gweatherrouting')
 
 class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting):
-	def create (core, conn):
-		return MainWindow(core, conn)
-
 	def __init__(self, core, conn):
 		self.core = core
 		self.conn = conn
@@ -235,13 +232,13 @@ class MainWindow(MainWindowPOI, MainWindowTrack, MainWindowRouting):
 		dialog.hide ()
 
 	def onSettings(self, event):
-		w = SettingsWindow.create (self, self.settingsManager)
+		w = SettingsWindow(self, self.settingsManager)
 		w.show ()
 
 	def onProjectProperties(self, event):
-		w = ProjectPropertiesWindow.create ()
+		w = ProjectPropertiesWindow()
 		w.show ()
 
 	def onGribManager(self, event):
-		w = GribManagerWindow.create (self.core.gribManager)
+		w = GribManagerWindow(self.core.gribManager)
 		w.show ()

@@ -53,7 +53,7 @@ class SettingsWindowConnections:
 		self.connectionListBox.show_all()
 
 	def onAddConnection(self, widget):
-		d = ConnectionEditDialog.create(self.window, None)
+		d = ConnectionEditDialog(self.window, None)
 		d.run()
 		data = d.data
 		d.destroy()
@@ -71,7 +71,7 @@ class SettingsWindowConnections:
 
 
 	def onConnectionEdit(self, widget):
-		d = ConnectionEditDialog.create(self.window)
+		d = ConnectionEditDialog(self.window)
 		d.run()
 		data = d.data
 		d.destroy()

@@ -24,17 +24,6 @@ from threading import Thread
 
 
 class SettingsWindow(SettingsWindowConnections, SettingsWindowCharts):
-	def create(parent, settingsManager):
-		return SettingsWindow(parent, settingsManager)
-
-	def show(self):
-		self.window.show_all()	
-		self.builder.get_object("ais-tab").hide()
-		self.builder.get_object("general-tab").hide()
-
-	def close(self):
-		self.window.hide()
-
 	def __init__(self, mainWindow, settingsManager):
 		self.mainWindow = mainWindow
 		self.settingsManager = settingsManager
@@ -56,6 +45,14 @@ class SettingsWindow(SettingsWindowConnections, SettingsWindowCharts):
 		SettingsWindowConnections.__init__(self, mainWindow, settingsManager)
 		SettingsWindowCharts.__init__(self, mainWindow, settingsManager)
 
+	def show(self):
+		self.window.show_all()	
+		self.builder.get_object("ais-tab").hide()
+		self.builder.get_object("general-tab").hide()
+
+	def close(self):
+		self.window.hide()
+		
 	def onGribArrowOpacityChange(self, v):
 		self.settingsManager.grib.arrowOpacity = v.get_value()
 

@@ -54,7 +54,7 @@ class MainWindowRouting:
 			epop.show_all()
 			return
 
-		dialog = RoutingWizardDialog.create (self.core, self.window)
+		dialog = RoutingWizardDialog(self.core, self.window)
 		response = dialog.run ()
 
 		if response == Gtk.ResponseType.OK:

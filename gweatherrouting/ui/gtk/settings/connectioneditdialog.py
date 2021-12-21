@@ -46,17 +46,7 @@ def lower(s):
 	return s.lower()
 
 class ConnectionEditDialog:
-	def create(parent, data = None):
-		return ConnectionEditDialog(parent, data)
-
-	def run(self):
-		return self.dialog.run()
-
-
-	def destroy(self):
-		return self.dialog.destroy()
-
-	def __init__(self, parent, data):
+	def __init__(self, parent, data = None):
 		self.parent = parent
 		self.data = data
 		self.builder = Gtk.Builder()
@@ -115,6 +105,14 @@ class ConnectionEditDialog:
 			self.directionCombo.set_active(map(lower, directions).index(self.data['direction']))
 
 
+	def run(self):
+		return self.dialog.run()
+
+
+	def destroy(self):
+		return self.dialog.destroy()
+
+		
 	def onTypeChange(self, widget):
 		if self.typeCombo.get_active() == 0:
 			self.builder.get_object('network-frame').show()

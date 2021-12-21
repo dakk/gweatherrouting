@@ -35,15 +35,6 @@ GribFileFilter.add_pattern ('*.grb')
 GribFileFilter.add_pattern ('*.grb2')
 
 class GribManagerWindow:
-	def create(gribManager):
-		return GribManagerWindow(gribManager)
-
-	def show(self):
-		self.window.show_all()
-
-	def close(self):
-		self.window.hide()
-
 	def __init__(self, gribManager):
 		self.gribManager = gribManager
 		self.selectedGrib = None
@@ -63,6 +54,11 @@ class GribManagerWindow:
 
 		Thread(target=self.downloadList, args=()).start()
 
+	def show(self):
+		self.window.show_all()
+
+	def close(self):
+		self.window.hide()
 
 	def downloadList(self):
 		Gdk.threads_enter()

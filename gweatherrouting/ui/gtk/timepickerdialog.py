@@ -24,9 +24,6 @@ from gi.repository import Gtk
 
 
 class TimePickerDialog:
-	def create(parent):
-		return TimePickerDialog(parent)
-
 	def __init__(self, parent):
 		self.builder = Gtk.Builder()
 		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/timepickerdialog.glade")

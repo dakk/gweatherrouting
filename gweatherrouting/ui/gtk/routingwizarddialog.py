@@ -28,18 +28,6 @@ from .timepickerdialog import TimePickerDialog
 from .widgets.polar import PolarWidget
 
 class RoutingWizardDialog:
-	def create(core, parent):
-		return RoutingWizardDialog(core, parent)
-
-	def run(self):
-		return self.dialog.run()
-
-	def responseCancel(self, widget):
-		self.dialog.response(Gtk.ResponseType.CANCEL)
-
-	def destroy(self):
-		return self.dialog.destroy()
-
 	def __init__(self, core, parent):
 		self.core = core
 		self.polar = None
@@ -90,6 +78,15 @@ class RoutingWizardDialog:
 
 		self.dialog.show_all ()
 
+	def run(self):
+		return self.dialog.run()
+
+	def responseCancel(self, widget):
+		self.dialog.response(Gtk.ResponseType.CANCEL)
+
+	def destroy(self):
+		return self.dialog.destroy()
+
 	def onRoutingAlgoSelect(self, widget):
 		ralgo = weatherrouting.listRoutingAlgorithms()[self.builder.get_object('routing-select').get_active ()]['class']
 
@@ -139,7 +136,7 @@ class RoutingWizardDialog:
 		self.polarWidget.setPolar (self.polar)
 
 	def onTimeSelect(self, widget):
-		tp = TimePickerDialog.create(self.dialog)
+		tp = TimePickerDialog(self.dialog)
 		tp.setDateTime(self.builder.get_object('time-entry').get_text())
 		response = tp.run()
 

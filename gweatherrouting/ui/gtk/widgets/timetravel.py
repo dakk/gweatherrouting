@@ -106,7 +106,7 @@ class TimeTravelWidget(Gtk.Box):
 		self.timeControl.decrease(seconds=self.seconds)
 
 	def onTimeSelect(self, event):
-		tp = TimePickerDialog.create(self.parent)
+		tp = TimePickerDialog(self.parent)
 		tp.setFromDateTime(self.timeControl.time)
 		response = tp.run()
 

@@ -48,7 +48,7 @@ def startUIGtk ():
 
     core, conn = initCore()
 
-    MainWindow.create(core, conn)
+    MainWindow(core, conn)
     Gtk.main()
 
 
