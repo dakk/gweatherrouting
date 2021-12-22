@@ -37,7 +37,6 @@ from kivy_garden.mapview.constants import CACHE_DIR
 from kivy_garden.mapview.downloader import Downloader
 from kivy_garden.mapview.view import MapLayer
 
-from ..common import windColor
 
 
 class POIMapLayer(MapLayer):
