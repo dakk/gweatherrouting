@@ -29,13 +29,13 @@ logger = logging.getLogger ('gweatherrouting')
 
 
 class PolarStack(Gtk.Box):		
-	def __init__(self, parent, connManager):
+	def __init__(self, parent, core):
 		Gtk.Widget.__init__(self)
 
 		self.parent = parent
-		self.conn = connManager
+		self.core = core
 
-		# self.conn.connect("data", self.dataHandler)
+		# self.core.connectionManager.connect("data", self.dataHandler)
 
 		self.builder = Gtk.Builder()
 		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/polarstack.glade")

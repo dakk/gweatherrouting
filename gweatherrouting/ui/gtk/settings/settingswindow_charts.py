@@ -22,7 +22,7 @@ from threading import Thread
 
 
 class SettingsWindowCharts:
-	def __init__(self, mainWindow, settingsManager):
+	def __init__(self, parent, settingsManager, core):
 		self.builder.get_object('chart-progress').hide()
 		self.reloadChart()
 
@@ -30,7 +30,7 @@ class SettingsWindowCharts:
 		self.chartStore = self.builder.get_object("chart-store")
 		self.chartStore.clear()
 
-		for p in self.mainWindow.chartManager.charts:
+		for p in self.parent.chartManager.charts:
 			self.chartStore.append ([p.path, p.enabled, p.ctype])
 
 	def registeringChart(self, l, t):
@@ -73,7 +73,7 @@ class SettingsWindowCharts:
 
 		if response == Gtk.ResponseType.OK:
 			path = dialog.get_filename () + '/'
-			l = self.mainWindow.chartManager.loadRasterLayer(path)
+			l = self.parent.chartManager.loadRasterLayer(path)
 			dialog.destroy ()
 
 			Thread(target=self.registeringChart, args=(l, 'raster', )).start()

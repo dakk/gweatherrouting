@@ -18,6 +18,8 @@ import logging
 import gpxpy
 import os
 
+from gweatherrouting.core.connectionmanager import ConnectionManager
+
 from . import utils
 from .poimanager import POI
 from .track import Track
@@ -38,15 +40,18 @@ class BoatInfo:
 
 
 class Core(EventDispatcher):
-    def __init__(self, conn):
-        self.conn = conn
+    def __init__(self):
+        self.connectionManager = ConnectionManager()
         self.trackManager = TrackManager()
         self.gribManager = GribManager()
         self.poiManager = POIManager()
         self.boatInfo = BoatInfo()
 
-        self.conn.connect("data", self.dataHandler)
+        self.connectionManager.connect("data", self.dataHandler)
         logger.info("Initialized")
+
+        self.connectionManager.plugAll()
+        self.connectionManager.startPolling()
 
     def dataHandler(self, dps):
         for x in dps:

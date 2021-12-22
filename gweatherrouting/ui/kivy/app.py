@@ -25,11 +25,10 @@ from .timepickerdialog import TimePickerDialog
 
 
 class GWeatherRoutingApp(MDApp):
-	def __init__(self, core, conn):
+	def __init__(self, core):
 		super(GWeatherRoutingApp, self).__init__()
 		self.timeControl = TimeControl()
 		self.core = core
-		self.conn = conn
 		
 	def build(self):
 		self.root = Builder.load_file(os.path.abspath(os.path.dirname(__file__)) + "/app.kv")

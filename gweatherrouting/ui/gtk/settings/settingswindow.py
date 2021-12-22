@@ -24,8 +24,9 @@ from threading import Thread
 
 
 class SettingsWindow(SettingsWindowConnections, SettingsWindowCharts):
-	def __init__(self, mainWindow, settingsManager):
-		self.mainWindow = mainWindow
+	def __init__(self, parent, settingsManager, core):
+		self.parent = parent
+		self.core = core
 		self.settingsManager = settingsManager
 
 		self.builder = Gtk.Builder()
@@ -42,8 +43,8 @@ class SettingsWindow(SettingsWindowConnections, SettingsWindowCharts):
 
 		self.builder.get_object('grib-arrow-opacity-adjustment').set_value(self.settingsManager.grib.arrowOpacity)
 
-		SettingsWindowConnections.__init__(self, mainWindow, settingsManager)
-		SettingsWindowCharts.__init__(self, mainWindow, settingsManager)
+		SettingsWindowConnections.__init__(self, self.parent, settingsManager, core)
+		SettingsWindowCharts.__init__(self, self.parent, settingsManager, core)
 
 	def show(self):
 		self.window.show_all()	

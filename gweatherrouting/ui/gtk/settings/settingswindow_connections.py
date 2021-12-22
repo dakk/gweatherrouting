@@ -37,7 +37,7 @@ class ConnectionListBoxRow(Gtk.ListBoxRow):
 
 
 class SettingsWindowConnections:
-	def __init__(self, mainWindow, settingsManager):
+	def __init__(self, parent, settingsManager, core):
 		self.selectedConnection = None
 		self.connectionListBox = self.builder.get_object("connections-listbox")
 		self.reloadConnections()
@@ -47,7 +47,7 @@ class SettingsWindowConnections:
 		for x in self.connectionListBox.get_children():
 			self.connectionListBox.remove(x)
 
-		for c in self.mainWindow.conn.connections:
+		for c in self.core.connectionManager.connections:
 			clbr = ConnectionListBoxRow(c)
 			self.connectionListBox.add(clbr)
 		self.connectionListBox.show_all()
@@ -58,12 +58,12 @@ class SettingsWindowConnections:
 		data = d.data
 		d.destroy()
 		if data != None:
-			self.mainWindow.conn.addConnection(data)
+			self.core.connectionManager.addConnection(data)
 		self.reloadConnections()
 
 	def onConnectionRemove(self, widget):
 		if self.selectedConnection != None:	
-			self.mainWindow.conn.removeConnection(self.selectedConnection.data)
+			self.core.connectionManager.removeConnection(self.selectedConnection.data)
 			self.reloadConnections()
 
 	def onConnectionSelected(self, widget, sel):
@@ -76,7 +76,7 @@ class SettingsWindowConnections:
 		data = d.data
 		d.destroy()
 		if data != None:
-			self.mainWindow.conn.editConnection(data)
+			self.core.connectionManager.editConnection(data)
 
 	def onConnectionClick(self, widget, event):
 		if event.button == 3:

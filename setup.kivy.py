@@ -22,11 +22,10 @@ setup(name='gweatherrouting',
 	author='Davide Gessa',
 	setup_requires='setuptools',
 	author_email='gessadavide@gmail.com',
-	packages=['gweatherrouting', 'gweatherrouting.conn', 
+	packages=['gweatherrouting', 'gweatherrouting.core',
 		'gweatherrouting.ui.kivy', 'gweatherrouting.ui.kivy.maplayers',
 		'gweatherrouting.ui.common',
-		'gweatherrouting.ui', 
-		'gweatherrouting.core'],
+		'gweatherrouting.ui'],
 	package_data={
 		'gweatherrouting': [
 			'data/*', 'data/boats/*', 'data/polars/*', 

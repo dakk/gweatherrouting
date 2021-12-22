@@ -43,7 +43,6 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		self.parent = parent
 		self.chartManager = chartManager
 		self.core = core
-		self.conn = self.core.conn
 
 		self.timeControl = TimeControl()
 		self.settingsManager = SettingsManager()

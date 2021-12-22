@@ -17,8 +17,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import logging
 import time
 from threading import Thread
-from . import SerialDataSource, NetworkDataSource
-from ..core import EventDispatcher
+from . import SerialDataSource, NetworkDataSource, EventDispatcher
 from ..storage import Storage
 
 logger = logging.getLogger ('gweatherrouting')
@@ -28,7 +27,7 @@ logger = logging.getLogger ('gweatherrouting')
 # - serial: data port, baudrate, protocol
 # - connection: tcpudp, host, data port, protocol
 
-class ConnManagerStorage(Storage):
+class ConnectionManagerStorage(Storage):
 	def __init__(self):
 		Storage.__init__(self, "conn-manager")
 		self.connections = []
@@ -40,9 +39,9 @@ class ConnManagerStorage(Storage):
 # Network: { network: 'tcp|udp', host: 'localhost', port: '1234' }
 
 
-class ConnManager(EventDispatcher):
+class ConnectionManager(EventDispatcher):
 	def __init__(self):
-		self.storage = ConnManagerStorage()
+		self.storage = ConnectionManagerStorage()
 		self.running = True
 		self.sources = {}
 

@@ -40,11 +40,11 @@ logger = logging.getLogger ('gweatherrouting')
 LOG_TEMP_FILE = '/tmp/gwr-recording.log'
 
 class LogsStack(Gtk.Box, nt.Output, nt.Input):		
-	def __init__(self, parent, chartManager, connManager):
+	def __init__(self, parent, chartManager, core):
 		Gtk.Widget.__init__(self)
 
 		self.parent = parent
-		self.conn = connManager
+		self.core = core
 		self.recording = False
 		self.loading = False 
 		self.data = []
@@ -62,7 +62,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 		self.cropA = None 
 		self.cropB = None 
 
-		self.conn.connect("data", self.dataHandler)
+		self.core.connectionManager.connect("data", self.dataHandler)
 
 		self.builder = Gtk.Builder()
 		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/logsstack.glade")

@@ -43,9 +43,8 @@ from .settings import SettingsManager
 logger = logging.getLogger ('gweatherrouting')
 
 class MainWindow:
-	def __init__(self, core, conn):
+	def __init__(self, core):
 		self.core = core
-		self.conn = conn
 
 		self.settingsManager = SettingsManager()
 
@@ -76,19 +75,18 @@ class MainWindow:
 		self.chartStack = ChartStack(self.window, self.chartManager, self.core)
 		self.builder.get_object("chartcontainer").pack_start(self.chartStack, True, True, 0)
 
-		self.regattaStack = RegattaStack(self.window, self.chartManager, self.core.conn)
+		self.regattaStack = RegattaStack(self.window, self.chartManager, self.core)
 		self.builder.get_object("regattacontainer").pack_start(self.regattaStack, True, True, 0)
 
-		self.logsStack = LogsStack(self.window, self.chartManager, self.core.conn)
+		self.logsStack = LogsStack(self.window, self.chartManager, self.core)
 		self.builder.get_object("logscontainer").pack_start(self.logsStack, True, True, 0)
 
-		self.polarStack = PolarStack(self.window, self.core.conn)
+		self.polarStack = PolarStack(self.window, self.core)
 		self.builder.get_object("polarcontainer").pack_start(self.polarStack, True, True, 0)
 
 
 	def quit(self, a, b):
 		logger.info("Quitting...")
-		self.conn.__del__()
 		Gtk.main_quit()
 
 	def onAbout(self, item):
@@ -97,7 +95,7 @@ class MainWindow:
 		dialog.hide ()
 
 	def onSettings(self, event):
-		w = SettingsWindow(self, self.settingsManager)
+		w = SettingsWindow(self, self.settingsManager, self.core)
 		w.show ()
 
 	def onProjectProperties(self, event):

@@ -22,23 +22,14 @@ sys.path.append("...")
 import logging
 from . import log
 from .core import Core
-from .conn import ConnManager
 
 
 logger = logging.getLogger ('gweatherrouting')
 
 
-def initCore():
-    conn = ConnManager()
-    conn.plugAll()
-    conn.startPolling()
-    core = Core(conn)
-    return core, conn
-
 def startUIKivy ():
     from .ui.kivy.app import GWeatherRoutingApp
-    core, conn = initCore()
-    GWeatherRoutingApp(core, conn).run()
+    GWeatherRoutingApp(Core()).run()
 
 def startUIGtk ():
     import gi
@@ -46,9 +37,7 @@ def startUIGtk ():
     from gi.repository import Gtk
     from .ui.gtk.mainwindow import MainWindow
 
-    core, conn = initCore()
-
-    MainWindow(core, conn)
+    MainWindow(Core())
     Gtk.main()
 
 

@@ -91,10 +91,24 @@
       </packing>
     </child>
     <child>
-      <object class="OsmGpsMap" id="map">
+      <object class="GtkBox">
         <property name="visible">True</property>
-        <property name="can-focus">True</property>
-        <property name="tile-cache">/home/dakk/.cache/osmgpsmap/5d37cea1ee097e9519ceac90ed8b6850</property>
+        <property name="can-focus">False</property>
+        <child>
+          <object class="OsmGpsMap" id="map">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="tile-cache">/home/dakk/.cache/osmgpsmap/5d37cea1ee097e9519ceac90ed8b6850</property>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
       </object>
       <packing>
         <property name="expand">True</property>
