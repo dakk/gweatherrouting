@@ -57,9 +57,13 @@ DATA_DIR = app_data_path (appname=APP_NAME)
 GRIB_DIR = DATA_DIR + '/grib/'
 TEMP_DIR = DATA_DIR + '/temp/'
 
-os.makedirs(DATA_DIR, exist_ok=True)
-os.makedirs(GRIB_DIR, exist_ok=True)
-os.makedirs(TEMP_DIR, exist_ok=True)
+try:
+    os.makedirs(DATA_DIR, exist_ok=True)
+    os.makedirs(GRIB_DIR, exist_ok=True)
+    os.makedirs(TEMP_DIR, exist_ok=True)
+except:
+    print ('Unable to create directories')
+
 
 class Storage(dict):
     __init = False
