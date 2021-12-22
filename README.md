@@ -61,7 +61,7 @@ sudo python setup.py install
 Create an apk:
 
 ```
-buildozer android debug deploy run && buildozer android logcat | grep python
+rm -rf .buildozer/android/platform/build-armeabi-v7a/build/python-installs/gweatherrouting/gweatherrouting* && buildozer android debug deploy run && buildozer android logcat | grep python
 ```
 
 

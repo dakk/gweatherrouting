@@ -14,26 +14,7 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
-from setuptools import find_packages
 from setuptools import setup
-
-buildOptions = {}
-executables = {}
-W32 = False
-
-if W32:
-	from cx_Freeze import setup, Executable
-
-	buildOptions = {
-		"build_exe": {
-			"packages": ["gi"], 
-			"include_files":[]
-		}
-	}
-	executables = [
-		Executable("main.py") #  icon="evm_bg_KYa_icon.ico")
-	]
-
 
 setup(name='gweatherrouting',
 	version=0.1,
@@ -42,24 +23,20 @@ setup(name='gweatherrouting',
 	setup_requires='setuptools',
 	author_email='gessadavide@gmail.com',
 	packages=['gweatherrouting', 'gweatherrouting.core',
-		'gweatherrouting.common',
-		'gweatherrouting.gtk', 'gweatherrouting.gtk.maplayers', 
-		'gweatherrouting.gtk.settings', 'gweatherrouting.gtk.widgets',
-		'gweatherrouting.gtk.charts', 'gweatherrouting.gtk.charts.vectordrawer', 
-	],
+		'gweatherrouting.kivy', 'gweatherrouting.kivy.maplayers',
+		'gweatherrouting.common'],
 	package_data={
 		'gweatherrouting': [
 			'data/*', 'data/boats/*', 'data/polars/*', 
-			'gtk/*.glade', 'gtk/settings/*.glade', 'gtk/widgets/*.glade'
+			'kivy/*.kv'
 		]
 	},
 	entry_points={
 		'console_scripts': [
-			'gweatherrouting=gweatherrouting.main:startUIGtk',
-			# 'gweatherrouting_cli=gweatherrouting.main:startCli'
+			'gweatherrouting-kivy=gweatherrouting.main:startUIKivy'
 		],
 	},
-	options=buildOptions,
-	executables=executables,
-	install_requires=open ('requirements.txt', 'r').read ().split ('\n')
+	options={},
+	executables={},
+	install_requires=open ('requirements.kivy.txt', 'r').read ().split ('\n')
 )
