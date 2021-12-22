@@ -16,7 +16,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 from .utils import uniqueName
 try:
-	from ..storage import Storage
+	from . import Storage
 except:
 	from .dummy_storage import Storage
 

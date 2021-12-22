@@ -18,7 +18,7 @@ from .track import RoutingTrack, Track
 from .utils import uniqueName
 import gpxpy
 try:
-	from ..storage import Storage
+	from . import Storage
 except:
 	from .dummy_storage import Storage
 

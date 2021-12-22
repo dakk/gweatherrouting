@@ -8,7 +8,7 @@ from shutil import copyfile
 from .grib import Grib
 import weatherrouting
 try:
-	from ..storage import Storage, GRIB_DIR, TEMP_DIR
+	from . import Storage, GRIB_DIR, TEMP_DIR
 except:
 	from .dummy_storage import Storage
 

@@ -19,7 +19,7 @@ import sys
 import platform
 import logging
 import json
-from . import log
+from .. import log
 
 logger = logging.getLogger ('gweatherrouting')
 

@@ -14,6 +14,7 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
+from .storage import *
 from .grib import Grib 
 from .track import Track, RoutingTrack
 from .trackmanager import TrackManager
