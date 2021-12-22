@@ -1,20 +1,141 @@
 #:kivy 1.0
 
 #:import name gweatherrouting.kivy.gribscreen
-#:include gweatherrouting/kivy/gribscreen.kv
+##:include gweatherrouting/kivy/gribscreen.kv
+<LocalGribListItem>:
+    IconLeftWidget:
+        icon: root.icon
+
+    RightBody:
+        orientation: 'horizontal'
+
+        MDIconButton:
+            icon: 'delete'
+            margin_right: dp(10)
+            on_release: root.remove()
+
+        MDCheckbox:
+            active: root.active
+            on_active:
+                root.active = self.active
+                root.setEnabled(self.active)
+
+<RemoteGribListItem>:
+    on_press: root.callback(self.url)
+
+    IconLeftWidget:
+        icon: "tailwind"
+
+
+<GribScreen>:
+    MDProgressBar:
+        id: downloadProgress
+        value: 0
+        pos_hint: { 'bottom': 1 }
+
+    ScrollView:            
+        MDList:
+            id: gribList
+
+    MDFloatingActionButton:
+        icon: "cloud-download"
+        elevation_normal: 12
+        pos_hint: {'right': 1, 'bottom': 0.86}
+        md_bg_color: app.theme_cls.primary_color
+        on_release: root.openGribDownloadDialog()
+
+
+    # MDFloatingActionButton:
+    #     icon: "folder-open"
+    #     elevation_normal: 12
+    #     pos_hint: {'center_x': .6, 'bottom': 0.86 }
+    #     md_bg_color: app.theme_cls.primary_color
+    #     on_release: root.openGribDownloadDialog()
+
 
 #:import name gweatherrouting.kivy.trackscreen
-#:include gweatherrouting/kivy/trackscreen.kv
+##:include gweatherrouting/kivy/trackscreen.kv
+<TrackListItem>:
+    IconLeftWidget:
+        icon: 'map-marker-path'
+
+    RightCheckbox:
+        active: root.visible
+        # on_active:
+        #     root.active = self.active
+        #     root.setEnabled(self.active)
+
+<POIListItem>:
+    IconLeftWidget:
+        icon: 'map-marker'
+
+    RightCheckbox:
+        active: root.visible
+        # on_active:
+        #     root.active = self.active
+        #     root.setEnabled(self.active)
+
+<TrackScreen>:
+    ScrollView:
+        MDList:
+            id: trackList
+
 
 #:import name gweatherrouting.kivy.settingsscreen
-#:include gweatherrouting/kivy/settingsscreen.kv
+##:include gweatherrouting/kivy/settingsscreen.kv
+<SettingsScreen>:
+    ScrollView:
 
 #:import name gweatherrouting.kivy.regattascreen
-#:include gweatherrouting/kivy/regattascreen.kv
+##:include gweatherrouting/kivy/regattascreen.kv
+<RegattaScreen>:
+    MDTabs:
+        Tab:
+            title: "Map"
+            content_text: f"This is an example text for {self.title}"
+
+        Tab:
+            title: "Gauges"
+            content_text: f"This is an example text for {self.title}"
+
+        Tab:
+            title: "Logs"
+            content_text: f"This is an example text for {self.title}"
+
+        Tab:
+            title: "Parameters"
+            content_text: f"This is an example text for {self.title}"
+
 
 #:import name gweatherrouting.kivy.timepickerdialog
-#:include gweatherrouting/kivy/timepickerdialog.kv
+##:include gweatherrouting/kivy/timepickerdialog.kv
+<TimePickerDialogContent>:
+    orientation: "vertical"
+    spacing: "12dp"
+    size_hint_y: None
+    height: "120dp"
 
+    MDBoxLayout:
+        orientation: "horizontal"
+
+        MDLabel:
+            id: dateLabel
+            text: root.datetime.strftime("%m/%d/%Y")
+
+        MDRaisedButton:
+            text: "Set date"
+            on_press: root.openDatePicker()
+
+    MDBoxLayout:
+        orientation: "horizontal"
+
+        MDLabel:
+            id: timeLabel
+            text: root.datetime.strftime("%H:%M:%S")
+
+        MDRaisedButton:
+            text: "Set time"
+            on_press: root.openTimePicker()
 
 MDScreen:
     id: mainScreen
