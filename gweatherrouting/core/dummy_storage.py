@@ -16,6 +16,10 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 
 
+APP_NAME = 'gweatherrouting'
+DATA_DIR = '/data'
+GRIB_DIR = DATA_DIR + '/grib/'
+TEMP_DIR = DATA_DIR + '/temp/'
 
 class Storage(dict):
     __init = False
