@@ -31,7 +31,23 @@ class GWeatherRoutingApp(MDApp):
 		self.core = core
 		
 	def build(self):
-		self.root = Builder.load_file(os.path.abspath(os.path.dirname(__file__)) + "/app.kv")
+		strs = [
+			'gribscreen.kv',
+			'trackscreen.kv',
+			'regattascreen.kv',
+			'settingsscreen.kv',
+			'timepickerdialog.kv',
+			'app.kv'
+		]
+
+		ss = ''
+		for x in strs:
+			f = open(os.path.abspath(os.path.dirname(__file__)) + "/" + x, 'r')
+			ss += f.read() +'\n'
+			f.close()
+
+		# self.root = Builder.load_file(os.path.abspath(os.path.dirname(__file__)) + "/app.kv")
+		self.root = Builder.load_string(ss)
 		return self.root
 
 
