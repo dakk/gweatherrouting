@@ -14,7 +14,11 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
-from .storage import *
+try:
+    from .storage import *
+except:
+    from .dummy_storage import *
+    
 from .grib import Grib 
 from .track import Track, RoutingTrack
 from .trackmanager import TrackManager
