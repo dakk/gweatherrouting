@@ -54,7 +54,7 @@ class ChartStackRouting:
 			epop.show_all()
 			return
 
-		dialog = RoutingWizardDialog(self.core, self.window)
+		dialog = RoutingWizardDialog(self.core, self.parent)
 		response = dialog.run ()
 
 		if response == Gtk.ResponseType.OK:
