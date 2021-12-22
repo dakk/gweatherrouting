@@ -10,7 +10,7 @@ package.name = gweatherrouting
 package.domain = org.gweatherrouting
 
 # (str) Source code where the main.py live
-source.dir = ./gweatherrouting
+source.dir = ./gweatherroutingkivy
 
 # (list) Source files to include (let empty to include all the files)
 source.include_exts = py,png,jpg,kv,atlas,geojson,pol
@@ -36,12 +36,12 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy,eccodes,weatherrouting==0.1.2,mapview,LatLon23,pyproj,geojson_utils,PIL,requests,urllib3,chardet,idna,geojson,gpxpy,kivymd,bs4,pyserial,pynmea2
+requirements = python3,kivy,eccodes,weatherrouting==0.1.2,colorlog,mapview,LatLon23,pyproj,geojson_utils,PIL,requests,urllib3,chardet,idna,geojson,gpxpy,kivymd,bs4,pyserial,pynmea2,git+git://github.com/dakk/gweatherrouting@master#egg=gweatherrouting
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
 # requirements.source.kivy = ../../kivy
-#requirements.source.gweatherrouting=./
+# requirements.source.gweatherrouting=../gweatherrouting
 
 # (str) Presplash of the application
 #presplash.filename = %(source.dir)s/data/presplash.png
