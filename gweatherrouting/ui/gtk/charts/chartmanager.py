@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017-2021 Davide Gessa
+# Copyright (C) 2017-2022 Davide Gessa
 '''
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -31,9 +31,8 @@ from gi.repository import Gtk, Gio, GObject, OsmGpsMap
 logger = logging.getLogger ('gweatherrouting')
 
 class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
-	def __init__(self, m):
+	def __init__(self):
 		GObject.GObject.__init__(self)
-		self.map = m
 		self.charts = []
 
 	def loadBaseChart(self):

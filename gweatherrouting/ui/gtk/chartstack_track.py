@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017-2021 Davide Gessa
+# Copyright (C) 2017-2022 Davide Gessa
 '''
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ from .maplayers import TrackMapLayer
 
 from ...core import utils
 
-class MainWindowTrack:
+class ChartStackTrack:
 	selectedTrackItem = None
 
 	def __init__(self):

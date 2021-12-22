@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017-2021 Davide Gessa
+# Copyright (C) 2017-2022 Davide Gessa
 '''
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -313,8 +313,16 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 		self.map.track_add(self.track)
 		self.track.set_property('line-width', 1)
 
+		try:
+			fi = nt.FileInput(filepath)
+		except:
+			logger.error("Error loading file %s" % filepath)
+			self.loading = False
+			return
+
+
 		pip = nt.Pipeline(
-			nt.FileInput(filepath),
+			fi,
 			self,
 			nt.TrackPointTranslator(),
 			[
@@ -324,6 +332,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 			]
 		)
 		pip.run()
+
 		if filepath != LOG_TEMP_FILE:
 			os.system('cp %s %s' % (filepath, LOG_TEMP_FILE))
 		# self.statusBar.push(0, "Load completed!")
