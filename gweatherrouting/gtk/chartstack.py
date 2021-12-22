@@ -28,7 +28,7 @@ from .gribmanagerwindow import GribFileFilter
 from .maplayers import GribMapLayer, AISMapLayer
 
 from .settings import SettingsManager
-from ...core import TimeControl
+from ..core import TimeControl
 from .chartstack_poi import ChartStackPOI
 from .chartstack_track import ChartStackTrack
 from .chartstack_routing import ChartStackRouting

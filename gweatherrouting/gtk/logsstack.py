@@ -25,7 +25,7 @@ import PIL
 import gi
 
 from gweatherrouting.core.timecontrol import TimeControl
-from gweatherrouting.ui.gtk.widgets.timetravel import TimeTravelWidget 
+from gweatherrouting.gtk.widgets.timetravel import TimeTravelWidget 
 
 gi.require_version('OsmGpsMap', '1.2')
 gi.require_version('Gtk', '3.0')

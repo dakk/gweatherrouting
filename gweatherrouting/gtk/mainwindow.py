@@ -20,7 +20,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import gi
 import os
 
-from gweatherrouting.ui.gtk.chartstack import ChartStack
+from gweatherrouting.gtk.chartstack import ChartStack
 from .polarstack import PolarStack
 from .regattastack import RegattaStack
 from .logsstack import LogsStack
@@ -30,7 +30,7 @@ gi.require_version('OsmGpsMap', '1.2')
 
 from gi.repository import Gtk, Gdk
 
-from ... import log
+from .. import log
 import logging
 
 from .settings import SettingsWindow

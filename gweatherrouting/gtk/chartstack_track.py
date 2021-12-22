@@ -22,7 +22,7 @@ gi.require_version('OsmGpsMap', '1.2')
 from gi.repository import Gtk
 from .maplayers import TrackMapLayer
 
-from ...core import utils
+from ..core import utils
 
 class ChartStackTrack:
 	selectedTrackItem = None

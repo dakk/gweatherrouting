@@ -17,7 +17,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import gi
 import os
 
-from .... import log
+from ... import log
 import logging
 from .chartlayer import ChartLayer
 from .gdalvectorchart import GDALVectorChart
@@ -36,7 +36,7 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 		self.charts = []
 
 	def loadBaseChart(self):
-		self.charts += [GDALVectorChart(os.path.abspath(os.path.dirname(__file__)) + "/../../../data/countries.geojson")]
+		self.charts += [GDALVectorChart(os.path.abspath(os.path.dirname(__file__)) + "/../../data/countries.geojson")]
 
 	def loadVectorLayer(self, path, metadata = None):
 		logger.info("Loading vector chart %s" % path)

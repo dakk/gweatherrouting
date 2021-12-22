@@ -14,7 +14,7 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
-from .... import log
+from ... import log
 import logging
 import gi
 import time

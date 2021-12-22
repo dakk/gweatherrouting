@@ -24,7 +24,7 @@ from gi.repository import Gtk, Gdk
 
 from .routingwizarddialog import RoutingWizardDialog
 from .maplayers import IsochronesMapLayer
-from ...core import RoutingTrack, utils
+from ..core import RoutingTrack, utils
 from weatherrouting import RoutingNoWindException
 
 class ChartStackRouting:

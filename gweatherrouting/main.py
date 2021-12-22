@@ -28,14 +28,14 @@ logger = logging.getLogger ('gweatherrouting')
 
 
 def startUIKivy ():
-    from .ui.kivy.app import GWeatherRoutingApp
+    from .kivy.app import GWeatherRoutingApp
     GWeatherRoutingApp(Core()).run()
 
 def startUIGtk ():
     import gi
     gi.require_version('Gtk', '3.0')
     from gi.repository import Gtk
-    from .ui.gtk.mainwindow import MainWindow
+    from .gtk.mainwindow import MainWindow
 
     MainWindow(Core())
     Gtk.main()

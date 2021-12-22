@@ -37,7 +37,7 @@ class PolarWidget(Gtk.DrawingArea):
 	def loadPolar(self, polarFile):
 		polar = None
 		try:
-			polar = Polar (os.path.abspath(os.path.dirname(__file__)) + '/../../../data/polars/' + polarFile)
+			polar = Polar (os.path.abspath(os.path.dirname(__file__)) + '/../../data/polars/' + polarFile)
 		except:
 			try:
 				polar = Polar (polarFile)

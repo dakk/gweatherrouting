@@ -23,7 +23,7 @@ from threading import Thread
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, GObject, Gdk
 
-from ...core import Storage
+from ..core import Storage
 
 GribFileFilter = Gtk.FileFilter ()
 GribFileFilter.set_name ("Grib file")

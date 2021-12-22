@@ -20,7 +20,7 @@ from kivymd.app import MDApp
 from kivymd.uix.list import OneLineIconListItem, TwoLineListItem
 from kivy.app import Builder, StringProperty
 from .maplayers import GribMapLayer, POIMapLayer, TrackMapLayer
-from ...core import TimeControl
+from ..core import TimeControl
 from .timepickerdialog import TimePickerDialog
 
 

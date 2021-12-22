@@ -42,15 +42,15 @@ setup(name='gweatherrouting',
 	setup_requires='setuptools',
 	author_email='gessadavide@gmail.com',
 	packages=['gweatherrouting', 'gweatherrouting.core',
-		'gweatherrouting.ui.common',
-		'gweatherrouting.ui', 'gweatherrouting.ui.gtk', 'gweatherrouting.ui.gtk.maplayers', 
-		'gweatherrouting.ui.gtk.settings', 'gweatherrouting.ui.gtk.widgets',
-		'gweatherrouting.ui.gtk.charts', 'gweatherrouting.ui.gtk.charts.vectordrawer', 
+		'gweatherrouting.common',
+		'gweatherrouting.gtk', 'gweatherrouting.gtk.maplayers', 
+		'gweatherrouting.gtk.settings', 'gweatherrouting.gtk.widgets',
+		'gweatherrouting.gtk.charts', 'gweatherrouting.gtk.charts.vectordrawer', 
 	],
 	package_data={
 		'gweatherrouting': [
 			'data/*', 'data/boats/*', 'data/polars/*', 
-			'ui/gtk/*.glade', 'ui/gtk/settings/*.glade', 'ui/gtk/widgets/*.glade'
+			'gtk/*.glade', 'gtk/settings/*.glade', 'gtk/widgets/*.glade'
 		]
 	},
 	entry_points={

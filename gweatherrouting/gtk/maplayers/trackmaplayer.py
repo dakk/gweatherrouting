@@ -17,8 +17,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import gi
 import math
 import dateutil.parser
-import datetime
-from ....core import utils
+from ...core import utils
 from ..style import *
 
 gi.require_version('Gtk', '3.0')
