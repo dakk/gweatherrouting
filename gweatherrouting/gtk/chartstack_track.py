@@ -53,7 +53,7 @@ class ChartStackTrack:
 		self.map.queue_draw()
 
 	def onTrackExport(self, widget):
-		dialog = Gtk.FileChooserDialog ("Please select a destination", self.window,
+		dialog = Gtk.FileChooserDialog ("Please select a destination", self.parent,
 					Gtk.FileChooserAction.SAVE,
 					(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
 
@@ -74,12 +74,12 @@ class ChartStackTrack:
 			if self.core.trackManager.activeTrack.export (filepath):
 				# self.builder.get_object('header-bar').set_subtitle (filepath)
 				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Saved %d waypoints' % (len (self.core.trackManager.activeTrack)))
-				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Saved")
+				edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Saved")
 				edialog.format_secondary_text ('Saved %d waypoints' % (len (self.core.trackManager.activeTrack)))
 				edialog.run ()
 				edialog.destroy ()
 			else:
-				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
+				edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
 				edialog.format_secondary_text ("Cannot save file: %s" % filepath)
 				edialog.run ()
 				edialog.destroy ()

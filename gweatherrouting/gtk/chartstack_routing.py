@@ -73,7 +73,7 @@ class ChartStackRouting:
 				res = self.currentRouting.step ()
 			except RoutingNoWindException as e:
 				Gdk.threads_enter()
-				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
+				edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
 				edialog.format_secondary_text ('Trying to create a route without wind information')
 				edialog.run ()
 				edialog.destroy ()
@@ -129,7 +129,7 @@ class ChartStackRouting:
 	def onRoutingExport(self, widget):
 		routing = self.core.trackManager.getRouting(self.selectedRouting)
 
-		dialog = Gtk.FileChooserDialog ("Please select a destination", self.window,
+		dialog = Gtk.FileChooserDialog ("Please select a destination", self.parent,
 			Gtk.FileChooserAction.SAVE,
 			(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
 
@@ -149,12 +149,12 @@ class ChartStackRouting:
 
 			if routing.export (filepath):
 				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Saved %d waypoints' % (len (routing)))
-				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Saved")
+				edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Saved")
 				edialog.format_secondary_text ('Saved %d waypoints' % (len (routing)))
 				edialog.run ()
 				edialog.destroy ()
 			else:
-				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
+				edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
 				edialog.format_secondary_text ("Cannot save file: %s" % filepath)
 				edialog.run ()
 				edialog.destroy ()

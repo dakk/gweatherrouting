@@ -79,6 +79,13 @@ class ChartStackPOI:
 	def exportPOIsAsNMEAPFEC(self, widget):
 		dialog = Gtk.FileChooserDialog("Export POIs as NMEA PFEC", self.parent, Gtk.FileChooserAction.SAVE, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
 		dialog.set_do_overwrite_confirmation(True)
+
+		filter_gpx = Gtk.FileFilter()
+		filter_gpx.set_name("NMEA text file")
+		filter_gpx.add_mime_type("text/plain")
+		filter_gpx.add_pattern ('*.nmea')
+		dialog.add_filter(filter_gpx)
+
 		response = dialog.run()
 		if response == Gtk.ResponseType.OK:
 			filename = dialog.get_filename()
