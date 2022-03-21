@@ -120,7 +120,7 @@ class GDALSingleRasterChart:
 		if not min or not max:
 			(min,max) = band.ComputeRasterMinMax(True)
 
-		colors = {}
+		colors = {0: 0x00000000}
 		ct = band.GetRasterColorTable()
 		
 		for x in range(int(min), int(max) + 1):
