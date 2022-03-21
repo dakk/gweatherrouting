@@ -14,5 +14,18 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
-from .chartmanager import ChartManager
-from .cm93driver import CM93Driver
+import gi
+import math
+import json
+from osgeo import ogr, osr, gdal
+
+gi.require_version("Gtk", "3.0")
+gi.require_version('OsmGpsMap', '1.2')
+
+from gi.repository import Gtk, Gio, GObject, OsmGpsMap
+from .vectorchartdrawer import VectorChartDrawer
+
+
+class CM93ChartDrawer(VectorChartDrawer):
+	def draw(self, gpsmap, cr, vectorFile, bounding):
+		pass

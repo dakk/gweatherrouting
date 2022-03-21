@@ -37,6 +37,7 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 
 	def loadBaseChart(self):
 		self.charts += [GDALVectorChart(os.path.abspath(os.path.dirname(__file__)) + "/../../data/countries.geojson")]
+		# self.charts += [GDALVectorChart("/run/media/dakk/e6a53908-e899-475e-8a2c-134c0e394aeb/Maps/Cm93 jan 2011/")]
 
 	def loadVectorLayer(self, path, metadata = None):
 		logger.info("Loading vector chart %s" % path)

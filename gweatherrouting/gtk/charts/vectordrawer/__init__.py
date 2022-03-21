@@ -16,3 +16,4 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 from .geojsonchartdrawer import GeoJSONChartDrawer
 from .s57chartdrawer import S57ChartDrawer
+from .cm93chartdrawer import CM93ChartDrawer

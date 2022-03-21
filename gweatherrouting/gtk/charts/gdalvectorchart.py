@@ -17,8 +17,11 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import gi
 import math
 import json
+
+from gweatherrouting.gtk.charts.cm93driver import CM93Driver
 from .vectordrawer import GeoJSONChartDrawer
 from .vectordrawer import S57ChartDrawer
+from .vectordrawer import CM93ChartDrawer
 from osgeo import ogr, osr, gdal
 
 gi.require_version("Gtk", "3.0")
@@ -42,12 +45,17 @@ class GDALVectorChart(ChartLayer):
 		elif path.find (".000") != -1:
 			drvName = "S57"
 			self.drawer = S57ChartDrawer()
+		elif path.find ("Cm93") != -1:
+			drvName = "CM93"
+			self.drawer = CM93ChartDrawer()
 
-		if drvName == None or self.drawer == None:
+		if drvName == None and self.drawer == None:
 			raise ("Invalid format")
 
-		drv = ogr.GetDriverByName(drvName)
-		
+		if drvName == 'CM93':
+			drv = CM93Driver()
+		else:
+			drv = ogr.GetDriverByName(drvName)			
 		self.vectorFile = drv.Open(path)
 
 		if self.vectorFile == None:
