@@ -75,3 +75,20 @@ class ChartStackPOI:
 			self.core.poiManager.create([float (lat), float (lon)])
 			self.map.queue_draw ()
 			self.updatePOI()
+
+	def exportPOIsAsNMEAPFEC(self, widget):
+		dialog = Gtk.FileChooserDialog("Export POIs as NMEA PFEC", self.parent, Gtk.FileChooserAction.SAVE, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+		dialog.set_do_overwrite_confirmation(True)
+		response = dialog.run()
+		if response == Gtk.ResponseType.OK:
+			filename = dialog.get_filename()
+			dialog.destroy()
+			s = self.core.poiManager.exportAsNMEAPFEC()
+			f = open(filename, 'w')
+			f.write(s)
+			f.close()
+
+			self.statusbar.push(0, "POIs exported as NMEA PFEC to %s" % filename)
+		else:
+			dialog.destroy()
+

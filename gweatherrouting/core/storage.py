@@ -25,31 +25,35 @@ logger = logging.getLogger ('gweatherrouting')
 
 
 def app_data_path (appname, roaming=True):
-	if sys.platform.startswith('java'):
-		os_name = platform.java_ver()[3][0]
-		if os_name.startswith('Windows'):
-			system = 'win32'
-		elif os_name.startswith('Mac'):
-			system = 'darwin'
-		else:
-			system = 'linux2'
-	else:
-		system = sys.platform
+    if sys.platform.startswith('java'):
+        os_name = platform.java_ver()[3][0]
+        if os_name.startswith('Windows'):
+            system = 'win32'
+        elif os_name.startswith('Mac'):
+            system = 'darwin'
+        else:
+            system = 'linux2'
+    else:
+        system = sys.platform
 
-	if system == "win32":
-		const = roaming and "CSIDL_APPDATA" or "CSIDL_LOCAL_APPDATA"
-		path = os.path.normpath(_get_win_folder(const))
-		if appname:
-			path = os.path.join(path, appname)
-	elif system == 'darwin':
-		path = os.path.expanduser('~/Library/Application Support/')
-		if appname:
-			path = os.path.join(path, appname)
-	else:
-		path = os.getenv('XDG_DATA_HOME', os.path.expanduser("~/"))
-		if appname:
-			path = os.path.join(path, '.'+appname)
-	return path
+    if system == "win32":
+        const = roaming and "CSIDL_APPDATA" or "CSIDL_LOCAL_APPDATA"
+        path = os.path.normpath(_get_win_folder(const))
+        if appname:
+            path = os.path.join(path, appname)
+    elif system == 'darwin':
+        path = os.path.expanduser('~/Library/Application Support/')
+        if appname:
+            path = os.path.join(path, appname)
+    elif system == 'android':
+        path = '' 
+    elif system == 'ios':
+        pass
+    else:
+        path = os.getenv('XDG_DATA_HOME', os.path.expanduser("~/"))
+        if appname:
+            path = os.path.join(path, '.'+appname)
+    return path
 
 
 APP_NAME = 'gweatherrouting'

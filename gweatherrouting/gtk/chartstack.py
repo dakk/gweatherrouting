@@ -20,7 +20,7 @@ import os
 gi.require_version('Gtk', '3.0')
 gi.require_version('OsmGpsMap', '1.2')
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 
 import logging
 
@@ -124,6 +124,10 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		self.core.trackManager.create()
 		self.updateTrack ()
 		self.map.queue_draw ()
+
+	def onExport(self, widget):
+		menu = self.builder.get_object("export-menu")
+		menu.popup_at_widget (widget, Gdk.Gravity.SOUTH_WEST, Gdk.Gravity.NORTH_WEST, None)
 
 	def onImport (self, widget):
 		dialog = Gtk.FileChooserDialog ("Please choose a file", self.parent,

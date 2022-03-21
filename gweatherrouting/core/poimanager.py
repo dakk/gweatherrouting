@@ -14,6 +14,10 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
+"""
+FURUNO PFEC NMEA https://www.manualsdir.com/manuals/100982/furuno-gp-1650.html?page=66
+"""
+
 from .utils import uniqueName
 try:
 	from . import Storage
@@ -28,6 +32,18 @@ class POI:
 		self.position = position
 		self.visible = visible
 		self.type = poitype
+
+	""" Export POI as PFEC NMEA sentence """
+	def exportAsNMEAPFEC(self):
+		lat = '{:.2f}'.format(abs(self.position[0]) * 100)
+		latns = 'N' if self.position[0] >= 0 else 'S'
+
+		lon = '{:.2f}'.format(abs(self.position[1]) * 100)
+		lonew = 'E' if self.position[1] >= 0 else 'W'
+
+		name = self.name.ljust(6)[:6]
+
+		return '$PFEC,GPwpl,%s,%s,%s,%s,%s,%d,@x            ,A' % (lat, latns, lon, lonew, name, 3)
 
 
 
@@ -64,6 +80,13 @@ class POIManager():
 			ts.append({'name': x.name, 'position': x.position, 'visible': x.visible, 'type': x.type })
 
 		self.storage.pois = ts
+
+	def exportAsNMEAPFEC(self):
+		s = ''
+		for x in self.pois:
+			s += x.exportAsNMEAPFEC() + '\n'
+		s += '$PFEC,GPxfr,CTL,E'
+		return s
 
 
 	def create(self, position):
