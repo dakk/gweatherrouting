@@ -129,6 +129,28 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		menu = self.builder.get_object("export-menu")
 		menu.popup_at_widget (widget, Gdk.Gravity.SOUTH_WEST, Gdk.Gravity.NORTH_WEST, None)
 
+
+	def exportAsGPX(self, widget):
+		dialog = Gtk.FileChooserDialog("Export as GPX", self.parent, Gtk.FileChooserAction.SAVE, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+		dialog.set_do_overwrite_confirmation(True)
+
+		filter_gpx = Gtk.FileFilter()
+		filter_gpx.set_name("GPX track")
+		filter_gpx.add_mime_type("application/gpx+xml")
+		filter_gpx.add_pattern ('*.gpx')
+		dialog.add_filter(filter_gpx)
+
+		response = dialog.run()
+		if response == Gtk.ResponseType.OK:
+			filename = dialog.get_filename()
+			dialog.destroy()
+			self.core.exportGPX(filename)
+
+			self.statusbar.push(0, "Exported as GPX to %s" % filename)
+		else:
+			dialog.destroy()
+
+
 	def onImport (self, widget):
 		dialog = Gtk.FileChooserDialog ("Please choose a file", self.parent,
 					Gtk.FileChooserAction.OPEN,

@@ -113,3 +113,25 @@ class Core(EventDispatcher):
         except Exception as e:
             logger.error(str(e))
             return False
+
+    def exportGPX(self, path):
+        gpx = gpxpy.gpx.GPX()
+
+        for track in self.trackManager.tracks:
+            gpx_track = track.toGPXTrack()
+            gpx.tracks.append(gpx_track)
+
+        for track in self.trackManager.routings:
+            gpx_track = track.toGPXTrack()
+            gpx.tracks.append(gpx_track)
+
+        for poi in self.poiManager.pois:
+            gpx.waypoints.append(poi.toGPXWaypoint())
+
+        try:
+            f = open(path, "w")
+            f.write(gpx.to_xml())
+        except Exception as e:
+            logger.error(str(e))
+
+        return True

@@ -90,7 +90,7 @@ class ChartStackPOI:
 		if response == Gtk.ResponseType.OK:
 			filename = dialog.get_filename()
 			dialog.destroy()
-			s = self.core.poiManager.exportAsNMEAPFEC()
+			s = self.core.poiManager.toNMEAPFEC()
 			f = open(filename, 'w')
 			f.write(s)
 			f.close()

@@ -18,6 +18,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 FURUNO PFEC NMEA https://www.manualsdir.com/manuals/100982/furuno-gp-1650.html?page=66
 """
 
+import gpxpy
 from .utils import uniqueName
 try:
 	from . import Storage
@@ -34,7 +35,7 @@ class POI:
 		self.type = poitype
 
 	""" Export POI as PFEC NMEA sentence """
-	def exportAsNMEAPFEC(self):
+	def toNMEAPFEC(self):
 		lat = '{:.2f}'.format(abs(self.position[0]) * 100)
 		latns = 'N' if self.position[0] >= 0 else 'S'
 
@@ -46,6 +47,8 @@ class POI:
 		return '$PFEC,GPwpl,%s,%s,%s,%s,%s,%d,@x            ,A' % (lat, latns, lon, lonew, name, 3)
 
 
+	def toGPXWaypoint(self):
+		return gpxpy.gpx.GPXWaypoint(latitude=self.position[0], longitude=self.position[1], name=self.name)
 
 class PoiManagerStorage(Storage):
 	def __init__(self):
@@ -81,10 +84,10 @@ class POIManager():
 
 		self.storage.pois = ts
 
-	def exportAsNMEAPFEC(self):
+	def toNMEAPFEC(self):
 		s = ''
 		for x in self.pois:
-			s += x.exportAsNMEAPFEC() + '\n'
+			s += x.toNMEAPFEC() + '\n'
 		s += '$PFEC,GPxfr,CTL,E'
 		return s
 

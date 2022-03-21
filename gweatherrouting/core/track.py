@@ -56,16 +56,20 @@ class Track:
         self.waypoints = []
         self.trackManager.saveTracks()
 
-    def export(self, path):
-        gpx = gpxpy.gpx.GPX()
+    def toGPXTrack(self):
         gpx_track = gpxpy.gpx.GPXTrack()
-        gpx.tracks.append(gpx_track)
-
         gpx_segment = gpxpy.gpx.GPXTrackSegment()
         gpx_track.segments.append(gpx_segment)
 
         for x in self.waypoints:
             gpx_segment.points.append(gpxpy.gpx.GPXTrackPoint(x[0], x[1]))
+
+        return gpx_track
+
+    def export(self, path):
+        gpx = gpxpy.gpx.GPX()
+        gpx_track = self.asGPXTrack()
+        gpx.tracks.append(gpx_track)
 
         try:
             f = open(path, "w")

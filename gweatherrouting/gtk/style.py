@@ -60,6 +60,6 @@ class Style:
         RoutingBoat = CairoStyle(color=(0, 0.4, 0, 1.0), lineWidth=5)
 
     class Poi:
-        Triangle = CairoStyle(color=(1, 1, 1, 1))
-        Font = CairoStyle(color=(1, 1, 1, 1), fontSize=13)
+        Triangle = CairoStyle(color=(0x88/255, 0x11/255, 0x8c/255, 1))
+        Font = CairoStyle(color=(0x88/255, 0x11/255, 0x8c/255, 1), fontSize=13)
         

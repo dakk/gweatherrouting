@@ -15,6 +15,15 @@
         <signal name="activate" handler="exportPOIsAsNMEAPFEC" swapped="no"/>
       </object>
     </child>
+    <child>
+      <object class="GtkMenuItem">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Export as GPX</property>
+        <property name="use-underline">True</property>
+        <signal name="activate" handler="exportAsGPX" swapped="no"/>
+      </object>
+    </child>
   </object>
   <object class="GtkMenu" id="map-context-menu">
     <property name="visible">True</property>
