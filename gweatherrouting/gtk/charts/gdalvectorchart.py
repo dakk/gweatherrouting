@@ -19,7 +19,7 @@ import math
 import json
 
 from gweatherrouting.gtk.charts.cm93driver import CM93Driver
-from .vectordrawer import GeoJSONChartDrawer
+from .vectordrawer import SimpleChartDrawer
 from .vectordrawer import S57ChartDrawer
 from .vectordrawer import CM93ChartDrawer
 from osgeo import ogr, osr, gdal
@@ -39,9 +39,10 @@ class GDALVectorChart(ChartLayer):
 		drvName = None
 		if path.find("geojson") != -1:
 			drvName = "GeoJSON"
-			self.drawer = GeoJSONChartDrawer()
+			self.drawer = SimpleChartDrawer()
 		elif path.find("shp") != -1:
 			drvName = "ESRI Shapefile"
+			self.drawer = SimpleChartDrawer()
 		elif path.find (".000") != -1:
 			drvName = "S57"
 			self.drawer = S57ChartDrawer()

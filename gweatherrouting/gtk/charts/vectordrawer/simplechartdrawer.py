@@ -27,7 +27,7 @@ from .vectorchartdrawer import VectorChartDrawer
 from ...style import *
 
 
-class GeoJSONChartDrawer(VectorChartDrawer):
+class SimpleChartDrawer(VectorChartDrawer):
 	def draw(self, gpsmap, cr, vectorFile, bounding):
 		self.backgroundRender(gpsmap, cr)
 
