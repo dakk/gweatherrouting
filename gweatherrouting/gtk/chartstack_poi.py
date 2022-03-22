@@ -19,8 +19,9 @@ import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('OsmGpsMap', '1.2')
 	
-from gi.repository import Gtk
+from gi.repository import Gtk, GdkPixbuf
 
+import os
 from ..core import utils
 from .maplayers import POIMapLayer
 
@@ -33,6 +34,12 @@ class ChartStackPOI:
 
 		self.poiStore = self.builder.get_object("poi-store")
 		self.updatePOI()
+
+		poiSymbolStore = self.builder.get_object("poi-symbols-store")
+		basePath = os.path.abspath(os.path.dirname(__file__)) + '/../data/symbols/'
+
+		for x in os.listdir(basePath):
+			poiSymbolStore.append([x.split('.svg')[0], GdkPixbuf.Pixbuf.new_from_file_at_size(basePath + x, 32, 32)])
 
 
 	def onPOINameEdit(self, widget, i, name):
@@ -62,7 +69,7 @@ class ChartStackPOI:
 	def updatePOI (self):
 		self.poiStore.clear()
 		for x in self.core.poiManager.pois:
-			self.poiStore.append([x.name, x.position[0], x.position[1], x.visible, x.type])
+			self.poiStore.append([x.name, x.position[0], x.position[1], x.visible, x.symbol])
 		self.core.poiManager.savePOI()
 		self.map.queue_draw ()
 

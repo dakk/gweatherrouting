@@ -71,8 +71,16 @@
       <column type="gfloat"/>
       <!-- column-name visible -->
       <column type="gboolean"/>
-      <!-- column-name type -->
-      <column type="gint"/>
+      <!-- column-name symbol -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
+  <object class="GtkListStore" id="poi-symbols-store">
+    <columns>
+      <!-- column-name name -->
+      <column type="gchararray"/>
+      <!-- column-name icon -->
+      <column type="GdkPixbuf"/>
     </columns>
   </object>
   <object class="GtkPopover" id="routing-2points-error-popover">
@@ -710,12 +718,11 @@ loaded to created a routing</property>
                         </child>
                         <child>
                           <object class="GtkTreeViewColumn">
-                            <property name="title" translatable="yes">Type</property>
+                            <property name="title" translatable="yes">Symbol</property>
                             <child>
-                              <object class="GtkCellRendererText"/>
-                              <attributes>
-                                <attribute name="text">4</attribute>
-                              </attributes>
+                              <object class="GtkCellRendererCombo">
+                                <property name="model">poi-symbols-store</property>
+                              </object>
                             </child>
                           </object>
                         </child>

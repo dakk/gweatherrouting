@@ -25,14 +25,13 @@ try:
 except:
 	from .dummy_storage import Storage
 
-POI_TYPE_DEFAULT = 1
 
 class POI:
-	def __init__(self, name, position, poitype=POI_TYPE_DEFAULT, visible=True):
+	def __init__(self, name, position, symbol=None, visible=True):
 		self.name = name
 		self.position = position
 		self.visible = visible
-		self.type = poitype
+		self.symbol = symbol
 
 	""" Export POI as PFEC NMEA sentence """
 	def toNMEAPFEC(self):
@@ -44,10 +43,13 @@ class POI:
 
 		name = self.name.ljust(6)[:6]
 
+		# TODO: handle symbol
+
 		return '$PFEC,GPwpl,%s,%s,%s,%s,%s,%d,@x            ,A' % (lat, latns, lon, lonew, name, 3)
 
 
 	def toGPXWaypoint(self):
+		# TODO: add symbol , sym=self.symb
 		return gpxpy.gpx.GPXWaypoint(latitude=self.position[0], longitude=self.position[1], name=self.name)
 
 class PoiManagerStorage(Storage):
@@ -62,7 +64,7 @@ class POIManager():
 		self.pois = []
 
 		for x in self.storage.pois:
-			tr = POI(name=x['name'], position=x['position'], visible=x['visible'], poitype=x['type'])
+			tr = POI(name=x['name'], position=x['position'], visible=x['visible'], symbol=x['symbol'])
 			self.pois.append(tr)
 
 
@@ -80,7 +82,7 @@ class POIManager():
 	def savePOI(self):
 		ts = []
 		for x in self.pois:
-			ts.append({'name': x.name, 'position': x.position, 'visible': x.visible, 'type': x.type })
+			ts.append({'name': x.name, 'position': x.position, 'visible': x.visible, 'symbol': x.symbol })
 
 		self.storage.pois = ts
 
@@ -93,6 +95,6 @@ class POIManager():
 
 
 	def create(self, position):
-		nt = POI(name=uniqueName('poi', self.pois), position=position, poitype=POI_TYPE_DEFAULT)
+		nt = POI(name=uniqueName('poi', self.pois), position=position, symbol=None)
 		self.pois.append (nt)
 		self.savePOI()
