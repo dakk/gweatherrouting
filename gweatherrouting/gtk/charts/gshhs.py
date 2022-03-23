@@ -177,17 +177,17 @@ class GSHHSVectorChart(ChartLayer):
 
 		# Get the correct quality for zoom level
 		scale = gpsmap.get_scale()
-		if scale > 10000:
+		if scale > 5000:
 			q = 'c'
-		elif scale > 1000:
+		elif scale > 500:
 			q = 'l'
-		elif scale > 1800:
+		elif scale > 200:
 			q = 'i'
-		elif scale > 120:
+		elif scale > 30:
 			q = 'h'
-		elif scale <= 120:
-			q = 'f'
-		# print(scale, q)
+		elif scale < 30:
+			q = 'h'
+		print(scale, q)
 		self.drawer.draw(gpsmap, cr, self.vectorFiles[q+'1'], boundingGeometry)
 
 
