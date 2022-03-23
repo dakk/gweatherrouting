@@ -40,8 +40,8 @@ class Style:
         cr.set_dash([])
 
     class GeoJSON:
-        Sea = CairoStyle(color=(0xd3 / 255, 0xdc / 255, 0xa4 / 255, 1.0))
-        LandStroke = CairoStyle(color=(0xe7 / 255., 0xdd / 255., 0x1d / 255., 1.0))
+        Sea = CairoStyle(color=(0x6c / 255, 0x6c / 255, 0xa4 / 255, 1.0))
+        LandStroke = CairoStyle(color=(0xcc / 255., 0x33 / 255., 0x33 / 255., 1.0))
         LandFill = CairoStyle(color=(0xe7 / 255., 0xdd / 255., 0x1d / 255., 0.6))
 
     class Track:

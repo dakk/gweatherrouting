@@ -37,39 +37,39 @@ logger = logging.getLogger ('gweatherrouting')
 # https://gdal.org/tutorials/raster_api_tut.html
 
 def datasetBBox(dataset):
-		old_cs = osr.SpatialReference()
-		old_cs.ImportFromWkt(dataset.GetProjectionRef())
+	old_cs = osr.SpatialReference()
+	old_cs.ImportFromWkt(dataset.GetProjectionRef())
 
-		wgs84_wkt = """
-		GEOGCS["WGS 84",
-			DATUM["WGS_1984",
-				SPHEROID["WGS 84",6378137,298.257223563,
-					AUTHORITY["EPSG","7030"]],
-				AUTHORITY["EPSG","6326"]],
-			PRIMEM["Greenwich",0,
-				AUTHORITY["EPSG","8901"]],
-			UNIT["degree",0.01745329251994328,
-				AUTHORITY["EPSG","9122"]],
-			AUTHORITY["EPSG","4326"]]"""
-		new_cs = osr.SpatialReference()
-		new_cs .ImportFromWkt(wgs84_wkt)
+	wgs84_wkt = """
+	GEOGCS["WGS 84",
+		DATUM["WGS_1984",
+			SPHEROID["WGS 84",6378137,298.257223563,
+				AUTHORITY["EPSG","7030"]],
+			AUTHORITY["EPSG","6326"]],
+		PRIMEM["Greenwich",0,
+			AUTHORITY["EPSG","8901"]],
+		UNIT["degree",0.01745329251994328,
+			AUTHORITY["EPSG","9122"]],
+		AUTHORITY["EPSG","4326"]]"""
+	new_cs = osr.SpatialReference()
+	new_cs .ImportFromWkt(wgs84_wkt)
 
-		transform = osr.CoordinateTransformation(old_cs,new_cs) 
+	transform = osr.CoordinateTransformation(old_cs,new_cs) 
 
-		width = dataset.RasterXSize
-		height = dataset.RasterYSize
-		gt = dataset.GetGeoTransform()
-		minx = gt[0]
-		miny = gt[3]
+	width = dataset.RasterXSize
+	height = dataset.RasterYSize
+	gt = dataset.GetGeoTransform()
+	minx = gt[0]
+	miny = gt[3]
 
-		origin = transform.TransformPoint(minx,miny) 
+	origin = transform.TransformPoint(minx,miny) 
 
-		minx = gt[0] + width*gt[1] + height*gt[2] 
-		miny = gt[3] + width*gt[4] + height*gt[5] 
+	minx = gt[0] + width*gt[1] + height*gt[2] 
+	miny = gt[3] + width*gt[4] + height*gt[5] 
 
-		originbr = transform.TransformPoint(minx,miny) 
+	originbr = transform.TransformPoint(minx,miny) 
 
-		return [origin, originbr]
+	return [origin, originbr]
 	
 class GDALSingleRasterChart:
 	def getFileInfo(path):

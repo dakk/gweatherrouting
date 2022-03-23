@@ -63,30 +63,11 @@ class GDALVectorChart(ChartLayer):
 			raise ("Unable to open vector map %s" % path)
 
 	def onRegister(self, onTickHandler = None):
-		print("Registered!")
+		pass
 
 	def do_draw(self, gpsmap, cr):
-		# Get bounding box
-		p1, p2 = gpsmap.get_bbox()
-
-		## TODO: this is wrong since some countries are not renderized correctly
-		p1lat, p1lon = p1.get_degrees()
-		p2lat, p2lon = p2.get_degrees()
-		wktbb = "POLYGON((%f %f,%f %f,%f %f,%f %f,%f %f))" % (
-			p1lon,
-			p1lat,
-			p1lon,
-			p2lat,
-			p2lon,
-			p2lat,
-			p2lon,
-			p1lat,
-			p1lon,
-			p1lat
-		)
-
-		self.drawer.draw(gpsmap, cr, self.vectorFile, ogr.CreateGeometryFromWkt(wktbb))
-
+		boundingGeometry = self.getBoundingGeometry(gpsmap)
+		self.drawer.draw(gpsmap, cr, self.vectorFile, boundingGeometry)
 
 	def do_render(self, gpsmap):
 		pass

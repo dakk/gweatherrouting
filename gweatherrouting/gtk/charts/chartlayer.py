@@ -1,3 +1,4 @@
+from osgeo import ogr
 
 class ChartLayer:
 	def __init__(self, path, ctype, metadata = None, enabled = True):
@@ -9,3 +10,26 @@ class ChartLayer:
 	def onRegister(self, onTickHandler = None):
 		""" Called when the dataset is registered on the software """
 		pass
+
+	def getBoundingWKT(self, gpsmap):
+		p1, p2 = gpsmap.get_bbox()
+
+		## TODO: this is wrong since some countries are not renderized correctly
+		p1lat, p1lon = p1.get_degrees()
+		p2lat, p2lon = p2.get_degrees()
+		return "POLYGON((%f %f,%f %f,%f %f,%f %f,%f %f))" % (
+			p1lon,
+			p1lat,
+			p1lon,
+			p2lat,
+			p2lon,
+			p2lat,
+			p2lon,
+			p1lat,
+			p1lon,
+			p1lat
+		)
+
+	def getBoundingGeometry(self, gpsmap):
+		wktbb = self.getBoundingWKT(gpsmap)
+		return ogr.CreateGeometryFromWkt(wktbb)

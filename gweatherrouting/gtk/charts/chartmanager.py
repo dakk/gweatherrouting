@@ -17,6 +17,9 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import gi
 import os
 
+from gweatherrouting.core.dummy_storage import DATA_DIR
+from gweatherrouting.gtk.charts.gshhs import GSHHSAskDownloadDialog, GSHHSDownloadDialog, GSHHSVectorChart
+
 from ... import log
 import logging
 from .chartlayer import ChartLayer
@@ -26,7 +29,11 @@ from .gdalrasterchart import GDALRasterChart
 gi.require_version("Gtk", "3.0")
 gi.require_version('OsmGpsMap', '1.2')
 
-from gi.repository import Gtk, Gio, GObject, OsmGpsMap
+from gi.repository import Gtk, Gio, GObject, OsmGpsMap, Gdk
+
+from osgeo import ogr, osr, gdal
+from gweatherrouting.core.storage import DATA_DIR
+
 
 logger = logging.getLogger ('gweatherrouting')
 
@@ -35,10 +42,30 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 		GObject.GObject.__init__(self)
 		self.charts = []
 
-	def loadBaseChart(self):
-		self.charts += [GDALVectorChart(os.path.abspath(os.path.dirname(__file__)) + "/../../data/countries.geojson")]
-		# self.charts += [GDALVectorChart("/home/dakk/shp/GSHHS_shp/l/GSHHS_l_L1.shp")]
-		# self.charts += [GDALVectorChart("/run/media/dakk/e6a53908-e899-475e-8a2c-134c0e394aeb/Maps/Cm93 jan 2011/")]
+	def loadBaseChart(self, parent):
+		if os.path.exists(DATA_DIR + "/gshhs"):
+			self.charts = [GSHHSVectorChart(DATA_DIR + "/gshhs")] + self.charts
+			return True
+
+		logger.info("GSHHS files not found, open a dialog asking for download")
+
+		def f():
+			Gdk.threads_enter()
+			d = GSHHSAskDownloadDialog(parent)
+			r = d.run()
+			d.destroy()
+			if r == Gtk.ResponseType.OK:
+				d = GSHHSDownloadDialog(parent)
+				r = d.run()
+				d.destroy()
+				if r == Gtk.ResponseType.OK:
+					self.loadBaseChart(parent, self)
+			else:
+				self.charts = [GDALVectorChart(os.path.abspath(os.path.dirname(__file__)) + "/../../data/countries.geojson")] + self.charts
+
+			Gdk.threads_leave()
+
+		GObject.timeout_add(10, f)
 
 	def loadVectorLayer(self, path, metadata = None):
 		logger.info("Loading vector chart %s" % path)

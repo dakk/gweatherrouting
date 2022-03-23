@@ -20,7 +20,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import gi
 import os
 
-from gweatherrouting.gtk.chartstack import ChartStack
+from .chartstack import ChartStack
 from .polarstack import PolarStack
 from .regattastack import RegattaStack
 from .logsstack import LogsStack
@@ -28,7 +28,7 @@ from .logsstack import LogsStack
 gi.require_version('Gtk', '3.0')
 gi.require_version('OsmGpsMap', '1.2')
 
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk, Gdk, GObject 
 
 from .. import log
 import logging
@@ -37,10 +37,10 @@ from .settings import SettingsWindow
 from .projectpropertieswindow import ProjectPropertiesWindow
 from .gribmanagerwindow import GribManagerWindow
 from .charts import ChartManager
-
 from .settings import SettingsManager
 
 logger = logging.getLogger ('gweatherrouting')
+
 
 class MainWindow:
 	def __init__(self, core):
@@ -60,8 +60,9 @@ class MainWindow:
 
 		self.builder.get_object("project-properties-button").hide()
 
+		# Initialize chart manager
 		self.chartManager = ChartManager()
-		self.chartManager.loadBaseChart()
+		self.chartManager.loadBaseChart(self.window)
 		
 		for x in self.settingsManager.vectorCharts:
 			l = self.chartManager.loadVectorLayer(x['path'], x['metadata'])
@@ -85,6 +86,7 @@ class MainWindow:
 		self.builder.get_object("polarcontainertop").hide()
 		# self.polarStack = PolarStack(self.window, self.core)
 		# self.builder.get_object("polarcontainer").pack_start(self.polarStack, True, True, 0)
+
 
 
 	def quit(self, a, b):
