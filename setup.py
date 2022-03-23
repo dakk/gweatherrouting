@@ -36,7 +36,7 @@ if W32:
 
 
 setup(name='gweatherrouting',
-	version='0.1.3',
+	version='0.1.4',
 	description='',
 	author='Davide Gessa',
 	setup_requires='setuptools',
