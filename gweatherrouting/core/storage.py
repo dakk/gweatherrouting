@@ -125,7 +125,7 @@ class Storage(dict):
             return
 
         with open(DATA_DIR + '/' + self.__filename + '.json', 'w') as f:
-            f.write(json.dumps(self.to_dict()))
+            f.write(json.dumps(self.to_dict(), sort_keys=True, indent=4))
             # logger.debug ('Configuration saved to %s/%s.json' % (DATA_DIR, self.__filename))
             f.close()
 
