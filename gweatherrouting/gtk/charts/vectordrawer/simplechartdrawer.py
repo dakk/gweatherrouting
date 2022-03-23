@@ -39,12 +39,11 @@ class SimpleChartDrawer(VectorChartDrawer):
 			# Iterate over features
 			feat = layer.GetNextFeature()
 			while feat is not None:
-				feat = layer.GetNextFeature()
-
 				if not feat:
 					continue 
 
 				self.featureRender(gpsmap, cr, feat, layer, strokeStyle, fillStyle)
+				feat = layer.GetNextFeature()
 
 	def backgroundRender(self, gpsmap, cr, seaStyle):
 		width = float(gpsmap.get_allocated_width())
