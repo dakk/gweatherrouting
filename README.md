@@ -1,5 +1,10 @@
 # GWeatherRouting
 
+[![Build Status](https://travis-ci.com/dakk/gweatherrouting.svg?branch=master)](https://travis-ci.com/dakk/gweatherrouting.svg?branch=master)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+<!-- [![PyPI version](https://badge.fury.io/py/gweatherrouting.svg)](https://badge.fury.io/py/gweatherrouting) -->
+
+
 GWeatherRouting is an opensource sailing route calculator written in python and:
 - Gtk3 for the desktop version (Linux/Mac/Windows)
 - Kivy for the mobile version (iOS/Android)

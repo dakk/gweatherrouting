@@ -1,15 +1,37 @@
 language: python
-python:
-  - "3.7"
-  - "3.8"
+
+dist: focal
+
+#arch:
+#  - amd64  # Default
+#  - arm64  # No Python images yet on xenial
+
+matrix:
+  fast_finish: true
+  include:
+    - python:  'pypy3'
+    - python:  '3.10.0'
+    - python:  '3.10.1'
+    - python:  '3.10.2'
+    - python:  '3.10'
+    - python:  '3.10'
+      dist:  bionic
+    - python:  '3.9'
+    - python:  '3.9'
+      dist:  bionic
+    - python:  '3.8'
+    - python:  '3.7'
+
 before_install:
   - sudo apt-get --quiet update
-  - pip install --upgrade setuptools
+  # - sudo pip install --upgrade setuptools
+
 install:
   - git clone https://github.com/dakk/libweatherrouting
   - cd libweatherrouting
   - python setup.py install
   - cd ..
   - pip3 install -r requirements.txt
+  
 script:
   - python setup.py install
