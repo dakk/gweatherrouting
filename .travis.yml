@@ -4,12 +4,12 @@ python:
   - "3.8"
 before_install:
   - sudo apt-get --quiet update
-  - sudo pip3 install --upgrade setuptools
+  - pip install --upgrade setuptools
 install:
   - git clone https://github.com/dakk/libweatherrouting
   - cd libweatherrouting
-  - sudo python3 setup.py install
+  - python setup.py install
   - cd ..
   - pip3 install -r requirements.txt
 script:
-  - sudo python3 setup.py install
+  - python setup.py install
