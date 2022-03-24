@@ -24,7 +24,7 @@ matrix:
 
 before_install:
   - sudo apt-get --quiet update
-  - sudo apt-get install cython -y
+  - sudo apt-get install cython3 -y
   # - sudo pip install --upgrade setuptools
 
 install:
