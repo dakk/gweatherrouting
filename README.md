@@ -19,6 +19,7 @@ GWeatherRouting is an opensource sailing route calculator written in python and:
 - Session manager for storing POIs, tracks and routings
 - Chart rendering: 
     - GeoJSON (coastlines included)
+    - GSHHS basemap (download helper included)
     - KAP, GeoTiff charts and other raster formats
 - Gtk3 interface
 - NMEA interface
@@ -68,9 +69,7 @@ rm -rf .buildozer/android/platform/build-armeabi-v7a/build/python-installs/gweat
 ## Planned features
 
 - Customizable routing calculator
-- Vector Nautical charts CM73
 - Ortodromic track render
-- Sailchart rendering
 - AIS rendering
 - Boat realtime dashboard
 - Mobile version

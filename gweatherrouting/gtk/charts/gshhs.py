@@ -25,7 +25,7 @@ from gweatherrouting.gtk.charts.chartlayer import ChartLayer
 gi.require_version('Gtk', '3.0')
 gi.require_version('OsmGpsMap', '1.2')
 
-from gi.repository import Gtk, Gdk, GObject 
+from gi.repository import Gtk, Gdk, OsmGpsMap
 
 from ... import log
 from .gdalvectorchart import GDALVectorChart
@@ -169,6 +169,11 @@ class GSHHSVectorChart(ChartLayer):
 				if f != None:
 					self.vectorFiles[x+str(y)] = f 
 
+		f = open(os.path.abspath(os.path.dirname(__file__)) + '/../../data/countries_en.txt', 'r')
+		self.countries = list(filter(lambda x: len(x) == 4, map(lambda x: x.split(';'), f.read().split('\n'))))
+		f.close()
+
+
 	def onRegister(self, onTickHandler = None):
 		pass
 
@@ -189,6 +194,19 @@ class GSHHSVectorChart(ChartLayer):
 			q = 'h'
 		#print(scale, q)
 		self.drawer.draw(gpsmap, cr, self.vectorFiles[q+'1'], boundingGeometry)
+
+		if scale < 4500:
+			for c in self.countries:
+				# TODO: check if x[2],x[3] is inside the boundingGeometry
+
+				# render country name
+				cr.set_source_rgba(0, 0, 0, 0.8)
+				cr.set_font_size(9)
+				x, y = gpsmap.convert_geographic_to_screen(
+							OsmGpsMap.MapPoint.new_degrees(float(c[2]), float(c[3]))
+						)
+				cr.move_to(x, y)
+				cr.show_text(c[1])
 
 
 	def do_render(self, gpsmap):
