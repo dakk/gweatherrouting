@@ -48,6 +48,11 @@ class ConnectionManager(EventDispatcher):
 	def __del__(self):
 		self.running = False
 
+	def stopPolling(self):
+		logger.info ('Polling stopped')
+		self.running = False
+		self.thread.join()
+
 	@property
 	def connections(self):
 		return self.storage.connections
