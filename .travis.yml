@@ -27,6 +27,7 @@ before_install:
   # - sudo pip install --upgrade setuptools
 
 install:
+  - pip3 install --upgrade pip
   - pip3 install cython
   - git clone https://github.com/dakk/libweatherrouting
   - cd libweatherrouting
