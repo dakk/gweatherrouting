@@ -61,8 +61,8 @@ class Core(EventDispatcher):
                 self.dispatch("boatPosition", self.boatInfo)
 
     # Simulation
-    def createRouting(self, algorithm, boatModel, track, startDatetime, startPosition):
-        polar = weatherrouting.Polar (os.path.abspath(os.path.dirname(__file__)) + '/../data/boats/' + boatModel + '/polar.pol')
+    def createRouting(self, algorithm, polarFile, track, startDatetime, startPosition):
+        polar = weatherrouting.Polar (os.path.abspath(os.path.dirname(__file__)) + '/../data/polars/' + polarFile)
 
         routing = weatherrouting.Routing(
             algorithm,

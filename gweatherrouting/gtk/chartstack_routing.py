@@ -20,7 +20,7 @@ from threading import Thread
 gi.require_version('Gtk', '3.0')
 gi.require_version('OsmGpsMap', '1.2')
 
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk, Gdk, GObject
 
 from .routingwizarddialog import RoutingWizardDialog
 from .maplayers import IsochronesMapLayer
@@ -58,7 +58,7 @@ class ChartStackRouting:
 		response = dialog.run ()
 
 		if response == Gtk.ResponseType.OK:
-			self.currentRouting = self.core.createRouting (dialog.getSelectedAlgorithm (), dialog.getSelectedBoat (), dialog.getSelectedTrack(), dialog.getStartDateTime(), dialog.getSelectedStartPoint())
+			self.currentRouting = self.core.createRouting (dialog.getSelectedAlgorithm (), dialog.getSelectedPolar (), dialog.getSelectedTrack(), dialog.getStartDateTime(), dialog.getSelectedStartPoint())
 			
 			self.routingThread = Thread(target=self.onRoutingStep, args=())
 			self.routingThread.start()
@@ -66,6 +66,12 @@ class ChartStackRouting:
 		dialog.destroy ()
 		
 	def onRoutingStep (self):
+		Gdk.threads_enter()
+		self.progressBar.set_fraction(0.0)
+		self.progressBar.set_text("0%")
+		self.progressBar.show()
+		Gdk.threads_leave()	
+
 		res = None 
 
 		while not self.currentRouting.end:
@@ -77,11 +83,15 @@ class ChartStackRouting:
 				edialog.format_secondary_text ('Trying to create a route without wind information')
 				edialog.run ()
 				edialog.destroy ()
+				self.progressBar.hide()
 				Gdk.threads_leave()	
 				self.isochronesMapLayer.setIsochrones ([], [])
 				return None
 
 			Gdk.threads_enter()
+			self.progressBar.set_fraction(res.progress / 100.)
+			self.progressBar.set_text(str(res.progress) + "%")
+
 			self.isochronesMapLayer.setIsochrones (res.isochrones, res.path)
 			self.timeControl.setTime(res.time)
 			# self.map.queue_draw ()
@@ -94,6 +104,12 @@ class ChartStackRouting:
 				tr.append((wp[0], wp[1], str(wp[2]), 0, 0, 0, 0))
 			else:
 				tr.append((wp[0], wp[1], str(wp[4]), wp[5], wp[6], wp[7], wp[8]))
+
+		Gdk.threads_enter()
+		self.progressBar.set_fraction(1.0)
+		self.progressBar.set_text("100%")
+		GObject.timeout_add (3000, self.progressBar.hide)
+		Gdk.threads_leave()
 
 		self.core.trackManager.routings.append(RoutingTrack(name=utils.uniqueName('routing', self.core.trackManager.routings), waypoints=tr, trackManager=self.core.trackManager))
 		self.updateRoutings()

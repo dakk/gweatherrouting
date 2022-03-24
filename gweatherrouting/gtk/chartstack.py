@@ -53,6 +53,9 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 
 		self.pack_start(self.builder.get_object("chartcontent"), True, True, 0)
 
+		self.progressBar = self.builder.get_object("progressbar")
+		self.progressBar.hide()
+		
 		self.map = self.builder.get_object("map")
 		self.map.set_center_and_zoom (39., 9., 6)
 

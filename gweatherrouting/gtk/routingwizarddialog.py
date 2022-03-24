@@ -153,9 +153,8 @@ class RoutingWizardDialog:
 	def getSelectedAlgorithm (self):
 		return weatherrouting.listRoutingAlgorithms()[self.builder.get_object('routing-select').get_active ()]['class']
 
-	def getSelectedBoat (self):
-		return self.boats [self.builder.get_object('boat-select').get_active ()]['dir']
-
+	def getSelectedPolar (self):
+		return self.polars [self.builder.get_object('boat-select').get_active ()]
 
 	def getSelectedStartPoint (self):
 		s = self.builder.get_object('start-select').get_active ()
