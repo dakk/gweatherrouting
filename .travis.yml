@@ -9,7 +9,6 @@ dist: focal
 matrix:
   fast_finish: true
   include:
-    - python:  'pypy3'
     - python:  '3.10.0'
     - python:  '3.10.1'
     - python:  '3.10.2'
@@ -24,10 +23,11 @@ matrix:
 
 before_install:
   - sudo apt-get --quiet update
-  - sudo apt-get install cython3 -y
+  # - sudo apt-get install cython3 -y
   # - sudo pip install --upgrade setuptools
 
 install:
+  - pip3 install cython
   - git clone https://github.com/dakk/libweatherrouting
   - cd libweatherrouting
   - python setup.py install
