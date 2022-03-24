@@ -39,7 +39,7 @@ class GribManager(weatherrouting.Grib):
 	def refreshLocalGribs(self):
 		self.localGribs = []
 		for x in os.listdir(GRIB_DIR):
-			if x[-4:] == '.idx' or x[-5:] != '.grib' or x[-4:] != '.grb':
+			if x[-4:] == '.idx' or (x[-5:] != '.grib' and x[-4:] != '.grb'):
 				continue 
 			
 			m = Grib.parseMetadata(GRIB_DIR + "/" + x)
