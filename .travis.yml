@@ -29,9 +29,9 @@ install:
   - pip3 install cython
   - git clone https://github.com/dakk/libweatherrouting
   - cd libweatherrouting
-  - python setup.py install
+  - pip install .
   - cd ..
   - pip3 install -r requirements.txt
   
 script:
-  - python setup.py install
+  - pip install .

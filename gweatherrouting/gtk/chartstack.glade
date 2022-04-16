@@ -249,11 +249,11 @@ loaded to created a routing</property>
       <object class="GtkBox">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
+        <property name="orientation">vertical</property>
         <child>
           <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="orientation">vertical</property>
             <child>
               <object class="GtkToolbar">
                 <property name="visible">True</property>
@@ -318,15 +318,60 @@ loaded to created a routing</property>
                     <property name="homogeneous">True</property>
                   </packing>
                 </child>
+                <child>
+                  <object class="GtkToggleToolButton">
+                    <property name="use-action-appearance">True</property>
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="tooltip-text" translatable="yes">Hide Track / POI tabs</property>
+                    <property name="label" translatable="yes">Toggle Tabs</property>
+                    <property name="use-underline">True</property>
+                    <property name="stock-id">gtk-fullscreen</property>
+                    <property name="active">True</property>
+                    <signal name="toggled" handler="onToggleNotebook" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="homogeneous">True</property>
+                  </packing>
+                </child>
               </object>
               <packing>
-                <property name="expand">False</property>
+                <property name="expand">True</property>
                 <property name="fill">True</property>
                 <property name="position">0</property>
               </packing>
             </child>
             <child>
-              <object class="GtkNotebook">
+              <object class="GtkBox" id="timetravelcontainer">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="margin-top">3</property>
+                <property name="margin-bottom">3</property>
+                <child>
+                  <placeholder/>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="vexpand">True</property>
+            <child>
+              <object class="GtkNotebook" id="notebook">
                 <property name="width-request">373</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
@@ -352,11 +397,6 @@ loaded to created a routing</property>
                             <property name="show-expanders">False</property>
                             <property name="enable-grid-lines">horizontal</property>
                             <signal name="button-press-event" handler="onTrackClick" swapped="no"/>
-                            <child internal-child="selection">
-                              <object class="GtkTreeSelection">
-                                <signal name="changed" handler="onSelectTrack" swapped="no"/>
-                              </object>
-                            </child>
                             <child>
                               <object class="GtkTreeViewColumn">
                                 <property name="title" translatable="yes">Name</property>
@@ -437,11 +477,6 @@ loaded to created a routing</property>
                                 <property name="show-expanders">False</property>
                                 <property name="enable-grid-lines">horizontal</property>
                                 <signal name="button-press-event" handler="onTrackItemClick" swapped="no"/>
-                                <child internal-child="selection">
-                                  <object class="GtkTreeSelection">
-                                    <signal name="changed" handler="onSelectTrackItem" swapped="no"/>
-                                  </object>
-                                </child>
                                 <child>
                                   <object class="GtkTreeViewColumn" id="#">
                                     <property name="title" translatable="yes"> #</property>
@@ -534,11 +569,6 @@ loaded to created a routing</property>
                             <property name="model">routing-store</property>
                             <property name="level-indentation">1</property>
                             <signal name="button-press-event" handler="onRoutingClick" swapped="no"/>
-                            <child internal-child="selection">
-                              <object class="GtkTreeSelection">
-                                <signal name="changed" handler="onSelectRouting" swapped="no"/>
-                              </object>
-                            </child>
                             <child>
                               <object class="GtkTreeViewColumn">
                                 <property name="title" translatable="yes">Routing</property>
@@ -662,11 +692,6 @@ loaded to created a routing</property>
                         <property name="can-focus">True</property>
                         <property name="model">poi-store</property>
                         <signal name="button-press-event" handler="onPOIClick" swapped="no"/>
-                        <child internal-child="selection">
-                          <object class="GtkTreeSelection">
-                            <signal name="changed" handler="onSelectPOI" swapped="no"/>
-                          </object>
-                        </child>
                         <child>
                           <object class="GtkTreeViewColumn">
                             <property name="title" translatable="yes">Name</property>
@@ -744,32 +769,7 @@ loaded to created a routing</property>
                     <property name="tab-fill">False</property>
                   </packing>
                 </child>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkBox">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="orientation">vertical</property>
-            <child>
-              <object class="GtkBox" id="timetravelcontainer">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="margin-top">3</property>
-                <property name="margin-bottom">3</property>
-                <child>
+                <child type="action-end">
                   <placeholder/>
                 </child>
               </object>
@@ -780,30 +780,42 @@ loaded to created a routing</property>
               </packing>
             </child>
             <child>
-              <object class="GtkProgressBar" id="progressbar">
+              <object class="GtkBox">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="show-text">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="OsmGpsMap" id="map">
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="repo-uri">none://</property>
-                <property name="tile-cache">/home/dakk/.cache/osmgpsmap/b487b51738b9962abcc425a3dcb26b4d</property>
-                <signal name="button-press-event" handler="onMapClick" swapped="no"/>
-                <signal name="motion-notify-event" handler="onMapMouseMove" swapped="no"/>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkProgressBar" id="progressbar">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="show-text">True</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="OsmGpsMap" id="map">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="repo-uri">none://</property>
+                    <property name="tile-cache">/home/dakk/.cache/osmgpsmap/b487b51738b9962abcc425a3dcb26b4d</property>
+                    <signal name="button-press-event" handler="onMapClick" swapped="no"/>
+                    <signal name="motion-notify-event" handler="onMapMouseMove" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
-                <property name="position">2</property>
+                <property name="position">1</property>
               </packing>
             </child>
           </object>
