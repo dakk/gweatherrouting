@@ -24,5 +24,6 @@ class SettingsManager(Storage):
 		self.grib.arrowOpacity = 0.4
 		self.vectorCharts = []
 		self.rasterCharts = []
+		self.chartPalette = 'cm93'
 		
 		self.loadOrSaveDefault()

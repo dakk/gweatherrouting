@@ -34,7 +34,7 @@ class SettingsWindow(SettingsWindowConnections, SettingsWindowCharts):
 		self.builder.connect_signals(self)
 
 		self.window = self.builder.get_object('settings-window')
-		self.window.set_default_size (550, 300)
+		self.window.set_default_size (650, 400)
 
 		# self.dialog.add_button("Cancel", Gtk.ResponseType.CANCEL)
 		# self.dialog.add_button("Save", Gtk.ResponseType.OK)

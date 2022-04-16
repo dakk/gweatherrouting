@@ -20,11 +20,23 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gio, GObject, Gdk
 from threading import Thread
 
+PALETTES = {
+	'cm93': 0,
+	'navionics': 1,
+	'dark': 2
+}
 
 class SettingsWindowCharts:
 	def __init__(self, parent, settingsManager, core):
 		self.builder.get_object('chart-progress').hide()
 		self.reloadChart()
+
+		self.chartPalette = self.builder.get_object('chart-color-palette')
+		self.chartPalette.set_active(PALETTES[self.settingsManager['chartPalette']])
+
+	def onPaletteChange(self, widget):
+		self.settingsManager['chartPalette'] = self.chartPalette.get_active_text().lower()
+		self.settingsManager.save()
 
 	def reloadChart(self):
 		self.chartStore = self.builder.get_object("chart-store")

@@ -98,118 +98,236 @@
                         <property name="can-focus">False</property>
                         <property name="orientation">vertical</property>
                         <child>
-                          <object class="GtkScrolledWindow">
+                          <object class="GtkFrame">
                             <property name="visible">True</property>
-                            <property name="can-focus">True</property>
-                            <property name="vscrollbar-policy">always</property>
-                            <property name="shadow-type">in</property>
+                            <property name="can-focus">False</property>
+                            <property name="label-xalign">0</property>
+                            <property name="shadow-type">none</property>
                             <child>
-                              <object class="GtkTreeView" id="chart-treeview">
+                              <object class="GtkAlignment">
                                 <property name="visible">True</property>
-                                <property name="can-focus">True</property>
-                                <property name="model">chart-store</property>
-                                <child internal-child="selection">
-                                  <object class="GtkTreeSelection"/>
-                                </child>
+                                <property name="can-focus">False</property>
+                                <property name="left-padding">12</property>
                                 <child>
-                                  <object class="GtkTreeViewColumn">
-                                    <property name="title" translatable="yes">Path</property>
+                                  <object class="GtkBox">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="margin-start">4</property>
+                                    <property name="margin-end">4</property>
+                                    <property name="margin-top">4</property>
+                                    <property name="margin-bottom">4</property>
+                                    <property name="orientation">vertical</property>
                                     <child>
-                                      <object class="GtkCellRendererText">
-                                        <property name="max-width-chars">32</property>
+                                      <object class="GtkBox">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <child>
+                                          <object class="GtkLabel">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="label" translatable="yes">Color Palette</property>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">True</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">0</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkComboBoxText" id="chart-color-palette">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="active">0</property>
+                                            <items>
+                                              <item translatable="yes">CM93</item>
+                                              <item translatable="yes">Navionics</item>
+                                              <item translatable="yes">Dark</item>
+                                            </items>
+                                            <signal name="changed" handler="onPaletteChange" swapped="no"/>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">True</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">1</property>
+                                          </packing>
+                                        </child>
                                       </object>
-                                      <attributes>
-                                        <attribute name="text">0</attribute>
-                                      </attributes>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
                                     </child>
                                   </object>
                                 </child>
+                              </object>
+                            </child>
+                            <child type="label">
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="xpad">10</property>
+                                <property name="ypad">5</property>
+                                <property name="label" translatable="yes">Rendering</property>
+                              </object>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkFrame">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label-xalign">0</property>
+                            <property name="shadow-type">none</property>
+                            <child>
+                              <object class="GtkAlignment">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="left-padding">12</property>
                                 <child>
-                                  <object class="GtkTreeViewColumn">
-                                    <property name="title" translatable="yes">Type</property>
+                                  <object class="GtkBox">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="margin-start">4</property>
+                                    <property name="margin-end">4</property>
+                                    <property name="margin-top">4</property>
+                                    <property name="margin-bottom">4</property>
+                                    <property name="orientation">vertical</property>
                                     <child>
-                                      <object class="GtkCellRendererText"/>
-                                      <attributes>
-                                        <attribute name="text">2</attribute>
-                                      </attributes>
+                                      <object class="GtkScrolledWindow">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">True</property>
+                                        <property name="vscrollbar-policy">always</property>
+                                        <property name="shadow-type">in</property>
+                                        <child>
+                                          <object class="GtkTreeView" id="chart-treeview">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">True</property>
+                                            <property name="model">chart-store</property>
+                                            <child>
+                                              <object class="GtkTreeViewColumn">
+                                                <property name="title" translatable="yes">Path</property>
+                                                <child>
+                                                  <object class="GtkCellRendererText">
+                                                    <property name="max-width-chars">32</property>
+                                                  </object>
+                                                  <attributes>
+                                                    <attribute name="text">0</attribute>
+                                                  </attributes>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkTreeViewColumn">
+                                                <property name="title" translatable="yes">Type</property>
+                                                <child>
+                                                  <object class="GtkCellRendererText"/>
+                                                  <attributes>
+                                                    <attribute name="text">2</attribute>
+                                                  </attributes>
+                                                </child>
+                                              </object>
+                                            </child>
+                                            <child>
+                                              <object class="GtkTreeViewColumn">
+                                                <property name="title" translatable="yes">Enabled</property>
+                                                <child>
+                                                  <object class="GtkCellRendererToggle"/>
+                                                  <attributes>
+                                                    <attribute name="active">1</attribute>
+                                                  </attributes>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">True</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkProgressBar" id="chart-progress">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="show-text">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkBox">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <child>
+                                          <object class="GtkButton" id="chart-add-vector">
+                                            <property name="label" translatable="yes">Add Vector Chart</property>
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">True</property>
+                                            <property name="receives-default">True</property>
+                                            <property name="margin-end">4</property>
+                                            <property name="margin-top">4</property>
+                                            <property name="margin-bottom">4</property>
+                                            <signal name="clicked" handler="onAddVectorChart" swapped="no"/>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">True</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">0</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkButton" id="chart-add-raster">
+                                            <property name="label" translatable="yes">Add Raster Chart</property>
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">True</property>
+                                            <property name="receives-default">True</property>
+                                            <property name="margin-start">4</property>
+                                            <property name="margin-top">4</property>
+                                            <property name="margin-bottom">4</property>
+                                            <signal name="clicked" handler="onAddRasterChart" swapped="no"/>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">True</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">1</property>
+                                          </packing>
+                                        </child>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">2</property>
+                                      </packing>
                                     </child>
                                   </object>
                                 </child>
-                                <child>
-                                  <object class="GtkTreeViewColumn">
-                                    <property name="title" translatable="yes">Enabled</property>
-                                    <child>
-                                      <object class="GtkCellRendererToggle"/>
-                                      <attributes>
-                                        <attribute name="active">1</attribute>
-                                      </attributes>
-                                    </child>
-                                  </object>
-                                </child>
+                              </object>
+                            </child>
+                            <child type="label">
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="xpad">10</property>
+                                <property name="ypad">5</property>
+                                <property name="label" translatable="yes">Charts</property>
                               </object>
                             </child>
                           </object>
                           <packing>
                             <property name="expand">True</property>
                             <property name="fill">True</property>
-                            <property name="position">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkProgressBar" id="chart-progress">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="show-text">True</property>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
                             <property name="position">1</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkBox">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <child>
-                              <object class="GtkButton" id="chart-add-vector">
-                                <property name="label" translatable="yes">Add Vector Chart</property>
-                                <property name="visible">True</property>
-                                <property name="can-focus">True</property>
-                                <property name="receives-default">True</property>
-                                <property name="margin-end">4</property>
-                                <property name="margin-top">4</property>
-                                <property name="margin-bottom">4</property>
-                                <signal name="clicked" handler="onAddVectorChart" swapped="no"/>
-                              </object>
-                              <packing>
-                                <property name="expand">True</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkButton" id="chart-add-raster">
-                                <property name="label" translatable="yes">Add Raster Chart</property>
-                                <property name="visible">True</property>
-                                <property name="can-focus">True</property>
-                                <property name="receives-default">True</property>
-                                <property name="margin-start">4</property>
-                                <property name="margin-top">4</property>
-                                <property name="margin-bottom">4</property>
-                                <signal name="clicked" handler="onAddRasterChart" swapped="no"/>
-                              </object>
-                              <packing>
-                                <property name="expand">True</property>
-                                <property name="fill">True</property>
-                                <property name="position">1</property>
-                              </packing>
-                            </child>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">2</property>
                           </packing>
                         </child>
                       </object>
