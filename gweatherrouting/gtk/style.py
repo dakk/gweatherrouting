@@ -34,37 +34,52 @@ class CairoStyle:
         if self.color:
             cr.set_source_rgba (self.color[0], self.color[1], self.color[2], self.color[3])
 
+class ChartPalette:
+    def __init__(self, shallow, sea, landstroke, landfill):
+        self.ShallowSea = shallow
+        self.Sea = sea
+        self.LandStroke = landstroke
+        self.LandFill = landfill
+
 
 class Style:
     def resetDash(cr):
         cr.set_dash([])
 
     chartPalettes = {
-        'cm93': {
-            'ShallowSea': CairoStyle(color=(0x73 / 255, 0xb6 / 255, 0xef / 255, 1.0)),
-            'Sea': CairoStyle(color=(0xd4 / 255, 0xea / 255, 0xee / 255, 1.0)),
-            'LandStroke': CairoStyle(color=(0x52 / 255., 0x5a / 255., 0x5c / 255., 1.0)),
-            'LandFill': CairoStyle(color=(0xc9 / 255., 0xb9 / 255., 0x7a / 255., 1.0))
-        },
-        'navionics': {
-            'ShallowSea': CairoStyle(color=(0x20 / 255, 0xb0 / 255, 0xf8 / 255, 1.0)),
-            'Sea': CairoStyle(color=(0xa0 / 255, 0xd8 / 255, 0xf8 / 255, 1.0)),
-            'LandStroke': CairoStyle(color=(0x3e / 255., 0x3a / 255., 0x1c / 255., 1.0)),
-            'LandFill': CairoStyle(color=(0xf8 / 255., 0xe8 / 255., 0x70 / 255., 1.0))
-        },
-        'dark': {
-            'ShallowSea': CairoStyle(color=(0x16 / 255, 0x23 / 255, 0x2f / 255, 1.0)),
-            'Sea': CairoStyle(color=(0x07 / 255, 0x07 / 255, 0x07 / 255, 1.0)),
-            'LandStroke': CairoStyle(color=(0x36 / 255., 0x3c / 255., 0x3d / 255., 1.0)),
-            'LandFill': CairoStyle(color=(0x2c / 255., 0x29 / 255., 0x1b / 255., 1.0))
-        },
-        'default': {
-            'ShallowSea': CairoStyle(color=(0x6c / 255, 0x6c / 255, 0xa4 / 255, 1.0)),
-            'Sea': CairoStyle(color=(0x6c / 255, 0x6c / 255, 0xa4 / 255, 1.0)),
-            'LandStroke': CairoStyle(color=(0xcc / 255., 0x33 / 255., 0x33 / 255., 1.0)),
-            'LandFill': CairoStyle(color=(0xe7 / 255., 0xdd / 255., 0x1d / 255., 1.0))
-        }
+        'cm93': 
+            ChartPalette(
+                CairoStyle(color=(0x73 / 255, 0xb6 / 255, 0xef / 255, 1.0)),
+                CairoStyle(color=(0xd4 / 255, 0xea / 255, 0xee / 255, 1.0)),
+                CairoStyle(color=(0x52 / 255., 0x5a / 255., 0x5c / 255., 1.0)),
+                CairoStyle(color=(0xc9 / 255., 0xb9 / 255., 0x7a / 255., 1.0))
+            ),
+        'navionics': 
+            ChartPalette(
+                CairoStyle(color=(0x20 / 255, 0xb0 / 255, 0xf8 / 255, 1.0)),
+                CairoStyle(color=(0xa0 / 255, 0xd8 / 255, 0xf8 / 255, 1.0)),
+                CairoStyle(color=(0x3e / 255., 0x3a / 255., 0x1c / 255., 1.0)),
+                CairoStyle(color=(0xf8 / 255., 0xe8 / 255., 0x70 / 255., 1.0))
+            ),
+        'dark': 
+            ChartPalette(
+                CairoStyle(color=(0x16 / 255, 0x23 / 255, 0x2f / 255, 1.0)),
+                CairoStyle(color=(0x07 / 255, 0x07 / 255, 0x07 / 255, 1.0)),
+                CairoStyle(color=(0x36 / 255., 0x3c / 255., 0x3d / 255., 1.0)),
+                CairoStyle(color=(0x2c / 255., 0x29 / 255., 0x1b / 255., 1.0))
+            ),
+        'default': 
+            ChartPalette(
+                CairoStyle(color=(0x6c / 255, 0x6c / 255, 0xa4 / 255, 1.0)),
+                CairoStyle(color=(0x6c / 255, 0x6c / 255, 0xa4 / 255, 1.0)),
+                CairoStyle(color=(0xcc / 255., 0x33 / 255., 0x33 / 255., 1.0)),
+                CairoStyle(color=(0xe7 / 255., 0xdd / 255., 0x1d / 255., 1.0))
+            )
     }
+
+    class Measure:
+        Line = CairoStyle(color=(0,0,0,1), lineWidth=0.6)
+        InfoFont = CairoStyle(color=(0,0,0,0), fontSize=10)
 
     class Track:
         RoutingTrack = CairoStyle(color=(1,0,0,1), lineWidth=2)

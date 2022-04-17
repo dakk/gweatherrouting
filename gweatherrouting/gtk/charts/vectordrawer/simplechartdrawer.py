@@ -29,9 +29,9 @@ from ...style import *
 
 class SimpleChartDrawer(VectorChartDrawer):
 	def draw(self, gpsmap, cr, vectorFile, bounding):
-		strokeStyle=Style.chartPalettes[self.palette]['LandStroke']
-		fillStyle=Style.chartPalettes[self.palette]['LandFill']
-		seaStyle=Style.chartPalettes[self.palette]['Sea']
+		strokeStyle=Style.chartPalettes[self.palette].LandStroke
+		fillStyle=Style.chartPalettes[self.palette].LandFill
+		seaStyle=Style.chartPalettes[self.palette].Sea
 
 		self.backgroundRender(gpsmap, cr, seaStyle)
 
