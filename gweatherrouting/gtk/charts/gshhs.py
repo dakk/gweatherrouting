@@ -157,10 +157,10 @@ class GSHHSDownloadDialog(Gtk.Dialog):
 from .vectordrawer.simplechartdrawer import SimpleChartDrawer
 
 class GSHHSVectorChart(ChartLayer):
-	def __init__(self, path, metadata = None):
-		super().__init__(path, 'vector', metadata)
+	def __init__(self, path, settingsManager, metadata = None):
+		super().__init__(path, 'vector', settingsManager, metadata)
 
-		self.drawer = SimpleChartDrawer()
+		self.drawer = SimpleChartDrawer(settingsManager)
 		drv = ogr.GetDriverByName('ESRI Shapefile')
 		self.vectorFiles = {}
 		for x in ['f','h','i','l','c']:
@@ -172,6 +172,7 @@ class GSHHSVectorChart(ChartLayer):
 		f = open(os.path.abspath(os.path.dirname(__file__)) + '/../../data/countries_en.txt', 'r')
 		self.countries = list(filter(lambda x: len(x) == 4, map(lambda x: x.split(';'), f.read().split('\n'))))
 		f.close()
+
 
 
 	def onRegister(self, onTickHandler = None):

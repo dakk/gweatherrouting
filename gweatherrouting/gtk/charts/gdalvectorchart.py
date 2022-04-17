@@ -31,8 +31,8 @@ from gi.repository import Gtk, Gio, GObject, OsmGpsMap
 from .chartlayer import ChartLayer
 
 class GDALVectorChart(ChartLayer):
-	def __init__(self, path, metadata = None):
-		super().__init__(path, 'vector', metadata)
+	def __init__(self, path, settingsManager, metadata = None):
+		super().__init__(path, 'vector', settingsManager, metadata)
 
 		self.drawer = None 
 

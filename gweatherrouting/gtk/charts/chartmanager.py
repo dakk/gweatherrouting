@@ -38,13 +38,21 @@ from gweatherrouting.core.storage import DATA_DIR
 logger = logging.getLogger ('gweatherrouting')
 
 class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
-	def __init__(self):
+	def __init__(self, settingsManager):
 		GObject.GObject.__init__(self)
 		self.charts = []
+		self.settingsManager = settingsManager
+
+		self.settingsManager.register_on_change('chartPalette', self.onChartPaletteChanged)
+
+	def onChartPaletteChanged(self, v):
+		# self.queue_draw ()
+		# TODO QUEUE A DRAW
+		pass
 
 	def loadBaseChart(self, parent):
 		if os.path.exists(DATA_DIR + "/gshhs"):
-			self.charts = [GSHHSVectorChart(DATA_DIR + "/gshhs")] + self.charts
+			self.charts = [GSHHSVectorChart(DATA_DIR + "/gshhs", self.settingsManager)] + self.charts
 			return True
 
 		logger.info("GSHHS files not found, open a dialog asking for download")
@@ -61,7 +69,7 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 				if r == Gtk.ResponseType.OK:
 					self.loadBaseChart(parent, self)
 			else:
-				self.charts = [GDALVectorChart(os.path.abspath(os.path.dirname(__file__)) + "/../../data/countries.geojson")] + self.charts
+				self.charts = [GDALVectorChart(os.path.abspath(os.path.dirname(__file__)) + "/../../data/countries.geojson", self.settingsManager)] + self.charts
 
 			Gdk.threads_leave()
 

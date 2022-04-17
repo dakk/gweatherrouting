@@ -61,7 +61,7 @@ class MainWindow:
 		self.builder.get_object("project-properties-button").hide()
 
 		# Initialize chart manager
-		self.chartManager = ChartManager()
+		self.chartManager = ChartManager(self.settingsManager)
 		self.chartManager.loadBaseChart(self.window)
 		
 		for x in self.settingsManager.vectorCharts:

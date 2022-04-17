@@ -15,5 +15,12 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 class VectorChartDrawer:
+	def __init__(self, settingsManager):
+		self.onChartPaletteChanged(settingsManager.chartPalette)
+		settingsManager.register_on_change('chartPalette', self.onChartPaletteChanged)
+
+	def onChartPaletteChanged(self, v):
+		self.palette = v
+
 	def draw(self, gpsmap, cr, vectorFile, bounding):
 		raise ("Not implemented")
