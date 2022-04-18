@@ -192,7 +192,7 @@ class GSHHSVectorChart(ChartLayer):
 		elif scale > 30:
 			q = 'h'
 		elif scale < 30:
-			q = 'h'
+			q = 'h' #f
 		#print(scale, q)
 		self.drawer.draw(gpsmap, cr, self.vectorFiles[q+'1'], boundingGeometry)
 

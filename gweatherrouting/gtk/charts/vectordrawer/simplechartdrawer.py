@@ -58,6 +58,42 @@ class SimpleChartDrawer(VectorChartDrawer):
 
 	def featureRender(self, gpsmap, cr, feat, layer, strokeStyle, fillStyle):
 		geom = feat.GetGeometryRef()
+
+		# Create a geometry from screen bounds
+		(tlat, tlon) = gpsmap.convert_screen_to_geographic(0, 0).get_degrees()
+		(blat, blon) = gpsmap.convert_screen_to_geographic(gpsmap.get_allocated_width(), gpsmap.get_allocated_height()).get_degrees()
+
+		ring = ogr.Geometry(ogr.wkbLinearRing)
+		ring.AddPoint(tlon, blat)
+		ring.AddPoint(blon, blat)
+		ring.AddPoint(blon, tlat)
+		ring.AddPoint(tlon, tlat)
+		ring.AddPoint(tlon, blat)
+
+		bb = ogr.Geometry(ogr.wkbPolygon)
+		bb.AddGeometry(ring)
+
+		# Get the difference geometry
+		geom = bb.Intersection(geom)
+
+		# for i in range(0, geom.GetGeometryCount()):
+		# 	strokeStyle.apply(cr)
+		# 	g = geom.GetGeometryRef(i)
+		# 	# if g.GetGeometryType() == ogr.wkbLinearRing:
+		# 	# if g.GetGeometryName() == 'LINEARRING':
+		# 	# 	g = g.GetLinearGeometry()
+		# 	# 	print ('tog!')
+
+		# 	for ii in range(0, g.GetPointCount()):
+		# 		pt = g.GetPoint(ii)
+		# 		xx, yy = gpsmap.convert_geographic_to_screen(OsmGpsMap.MapPoint.new_degrees(pt[1], pt[0]))						
+		# 		cr.line_to(xx, yy)
+
+		# 	cr.close_path()
+		# 	cr.stroke_preserve()
+		# 	fillStyle.apply(cr)
+		# 	cr.fill()
+		# return
 		gj = json.loads(geom.ExportToJson())
 
 		cr.set_line_width(1)
@@ -66,9 +102,7 @@ class SimpleChartDrawer(VectorChartDrawer):
 			for l in gj["coordinates"]:
 				strokeStyle.apply(cr)
 				for x in l:
-					xx, yy = gpsmap.convert_geographic_to_screen(
-						OsmGpsMap.MapPoint.new_degrees(x[1], x[0])
-					)
+					xx, yy = gpsmap.convert_geographic_to_screen(OsmGpsMap.MapPoint.new_degrees(x[1], x[0]))						
 					cr.line_to(xx, yy)
 
 				cr.close_path()
@@ -81,9 +115,7 @@ class SimpleChartDrawer(VectorChartDrawer):
 				for y in l:
 					strokeStyle.apply(cr)
 					for x in y:
-						xx, yy = gpsmap.convert_geographic_to_screen(
-							OsmGpsMap.MapPoint.new_degrees(x[1], x[0])
-						)
+						xx, yy = gpsmap.convert_geographic_to_screen(OsmGpsMap.MapPoint.new_degrees(x[1], x[0]))
 						cr.line_to(xx, yy)
 
 					cr.close_path()
@@ -94,9 +126,8 @@ class SimpleChartDrawer(VectorChartDrawer):
 		elif gj["type"] == "LineString":
 			for x in gj["coordinates"]:
 				strokeStyle.apply(cr)
-				xx, yy = gpsmap.convert_geographic_to_screen(
-					OsmGpsMap.MapPoint.new_degrees(x[1], x[0])
-				)
+				xx, yy = gpsmap.convert_geographic_to_screen(OsmGpsMap.MapPoint.new_degrees(x[1], x[0]))
+
 				cr.line_to(xx, yy)
 
 			cr.close_path()
