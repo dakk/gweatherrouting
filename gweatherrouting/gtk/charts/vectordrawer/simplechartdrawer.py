@@ -45,7 +45,9 @@ class SimpleChartDrawer(VectorChartDrawer):
 				if not feat:
 					continue 
 
-				self.featureRender(gpsmap, cr, feat, layer, strokeStyle, fillStyle)
+				geom = feat.GetGeometryRef()
+				geom = bounding.Intersection(geom)
+				self.featureRender(gpsmap, cr, geom, feat, layer, strokeStyle, fillStyle)
 				feat = layer.GetNextFeature()
 
 	def backgroundRender(self, gpsmap, cr, seaStyle):
@@ -56,26 +58,7 @@ class SimpleChartDrawer(VectorChartDrawer):
 		cr.stroke_preserve()
 		cr.fill()
 
-	def featureRender(self, gpsmap, cr, feat, layer, strokeStyle, fillStyle):
-		geom = feat.GetGeometryRef()
-
-		# Create a geometry from screen bounds
-		(tlat, tlon) = gpsmap.convert_screen_to_geographic(0, 0).get_degrees()
-		(blat, blon) = gpsmap.convert_screen_to_geographic(gpsmap.get_allocated_width(), gpsmap.get_allocated_height()).get_degrees()
-
-		ring = ogr.Geometry(ogr.wkbLinearRing)
-		ring.AddPoint(tlon, blat)
-		ring.AddPoint(blon, blat)
-		ring.AddPoint(blon, tlat)
-		ring.AddPoint(tlon, tlat)
-		ring.AddPoint(tlon, blat)
-
-		bb = ogr.Geometry(ogr.wkbPolygon)
-		bb.AddGeometry(ring)
-
-		# Get the difference geometry
-		geom = bb.Intersection(geom)
-
+	def featureRender(self, gpsmap, cr, geom, feat, layer, strokeStyle, fillStyle):
 		# for i in range(0, geom.GetGeometryCount()):
 		# 	strokeStyle.apply(cr)
 		# 	g = geom.GetGeometryRef(i)
