@@ -19,6 +19,7 @@ import math
 import json
 
 from gweatherrouting.gtk.charts.cm93driver import CM93Driver
+from gweatherrouting.gtk.charts.vectordrawer.osmchartdrawer import OSMChartDrawer
 from .vectordrawer import SimpleChartDrawer
 from .vectordrawer import S57ChartDrawer
 from .vectordrawer import CM93ChartDrawer
@@ -49,6 +50,9 @@ class GDALVectorChart(ChartLayer):
 		elif path.find ("Cm93") != -1:
 			drvName = "CM93"
 			self.drawer = CM93ChartDrawer()
+		elif path.find ("osm") != -1:
+			drvName = "OSM"
+			self.drawer = OSMChartDrawer(self.settingsManager)
 
 		if drvName == None and self.drawer == None:
 			raise ("Invalid format")

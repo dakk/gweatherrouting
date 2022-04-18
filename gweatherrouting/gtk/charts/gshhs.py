@@ -34,6 +34,91 @@ import logging
 
 logger = logging.getLogger ('gweatherrouting')
 
+
+class OSMAskDownloadDialog(Gtk.Dialog):
+	def __init__(self, parent):
+		super().__init__(title="OpenSeaMap Download", transient_for=parent, flags=0)
+		self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK)
+		self.set_default_size(250, 100)
+		self.set_border_width(10)
+		label = Gtk.Label(label="OpenSeaMap data is missing,\ndo you want to download them (~140MB)?")
+		box = self.get_content_area()
+		box.add(label)
+		self.show_all()
+
+class OSMDownloadDialog(Gtk.Dialog):
+	def __init__(self, parent):
+		super().__init__(title="OpenSeaMap Download", transient_for=parent, flags=0)
+		self.parent = parent
+		self.set_default_size(250, 60)
+		self.set_border_width(10)
+		self.pb = Gtk.ProgressBar()
+		b = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+		self.l = Gtk.Label(label="Download in progress")
+		b.pack_start(self.l, True, True, 20)
+		b.pack_start(self.pb, True, True, 20)
+		box = self.get_content_area()
+		box.add(b)
+		self.show_all()
+		
+		self.thread = Thread(target=self.download, args=())
+		self.thread.start()
+
+	def percentageCallback(self, percentage, d, t):
+		Gdk.threads_enter()
+		self.pb.set_fraction(percentage / 100)
+		self.l.set_text("Downloading: %d%%" % percentage)
+		Gdk.threads_leave()
+
+	def callback(self, success):
+		Gdk.threads_enter()
+		if success:
+			edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done")
+			edialog.format_secondary_text ("OpenSeaMap downloaded")
+			edialog.run ()
+			edialog.destroy ()
+			self.response(Gtk.ResponseType.OK)
+		else:
+			log.error("Error downloading OpenSeaMap")
+
+			edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
+			edialog.format_secondary_text ("Cannot download OpenSeaMap")
+			edialog.run ()
+			edialog.destroy ()
+			self.response(Gtk.ResponseType.CANCEL)
+		Gdk.threads_leave()
+
+
+	def download(self):
+		uri = "https://github.com/dakk/osm-seamarks/raw/master/seamarks.osm"
+		logger.info("Downloading openseamap")
+
+		response = requests.get(uri, stream=True)
+		total_length = response.headers.get("content-length")
+		last_signal_percent = -1
+		f = open(DATA_DIR + "/seamarks.osm", "wb")
+
+		if total_length is None:
+			pass
+		else:
+			dl = 0
+			total_length = int(total_length)
+			for data in response.iter_content(chunk_size=4096):
+				dl += len(data)
+				f.write(data)
+				done = int(100 * dl / total_length)
+
+				if last_signal_percent != done:
+					self.percentageCallback(done, dl, total_length)
+					last_signal_percent = done
+
+		f.close()
+		logger.info("OpenSeaMap download completed")
+
+		self.callback(True)
+
+
+
 class GSHHSAskDownloadDialog(Gtk.Dialog):
 	def __init__(self, parent):
 		super().__init__(title="Base Map Download", transient_for=parent, flags=0)

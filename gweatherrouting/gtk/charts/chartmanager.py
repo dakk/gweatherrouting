@@ -18,7 +18,7 @@ import gi
 import os
 
 from gweatherrouting.core.dummy_storage import DATA_DIR
-from gweatherrouting.gtk.charts.gshhs import GSHHSAskDownloadDialog, GSHHSDownloadDialog, GSHHSVectorChart
+from gweatherrouting.gtk.charts.gshhs import GSHHSAskDownloadDialog, GSHHSDownloadDialog, GSHHSVectorChart, OSMAskDownloadDialog, OSMDownloadDialog
 
 from ... import log
 import logging
@@ -51,29 +51,56 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 		pass
 
 	def loadBaseChart(self, parent):
+		gshhs = False
+		osm = False 
+
 		if os.path.exists(DATA_DIR + "/gshhs"):
 			self.charts = [GSHHSVectorChart(DATA_DIR + "/gshhs", self.settingsManager)] + self.charts
-			return True
+			gshhs = True
 
-		logger.info("GSHHS files not found, open a dialog asking for download")
+		if os.path.exists(DATA_DIR + "/seamarks.osm"):
+			self.charts = self.charts + [GDALVectorChart(DATA_DIR + "/seamarks.osm", self.settingsManager)]
+			osm = True
 
-		def f():
-			Gdk.threads_enter()
-			d = GSHHSAskDownloadDialog(parent)
-			r = d.run()
-			d.destroy()
-			if r == Gtk.ResponseType.OK:
-				d = GSHHSDownloadDialog(parent)
+		if not gshhs:
+			logger.info("GSHHS files not found, open a dialog asking for download")
+
+			def f():
+				Gdk.threads_enter()
+				d = GSHHSAskDownloadDialog(parent)
 				r = d.run()
 				d.destroy()
 				if r == Gtk.ResponseType.OK:
-					self.loadBaseChart(parent, self)
-			else:
-				self.charts = [GDALVectorChart(os.path.abspath(os.path.dirname(__file__)) + "/../../data/countries.geojson", self.settingsManager)] + self.charts
+					d = GSHHSDownloadDialog(parent)
+					r = d.run()
+					d.destroy()
+					if r == Gtk.ResponseType.OK:
+						self.loadBaseChart(parent)
+				else:
+					self.charts = [GDALVectorChart(os.path.abspath(os.path.dirname(__file__)) + "/../../data/countries.geojson", self.settingsManager)] + self.charts
 
-			Gdk.threads_leave()
+				Gdk.threads_leave()
 
-		GObject.timeout_add(10, f)
+			GObject.timeout_add(10, f)
+
+		if not osm:
+			logger.info("OSM file not found, open a dialog asking for download")
+			
+			def f():
+				Gdk.threads_enter()
+				d = OSMAskDownloadDialog(parent)
+				r = d.run()
+				d.destroy()
+				if r == Gtk.ResponseType.OK:
+					d = OSMDownloadDialog(parent)
+					r = d.run()
+					d.destroy()
+					if r == Gtk.ResponseType.OK:
+						self.loadBaseChart(parent)
+
+				Gdk.threads_leave()
+
+			GObject.timeout_add(10, f)
 
 	def loadVectorLayer(self, path, metadata = None):
 		logger.info("Loading vector chart %s" % path)
