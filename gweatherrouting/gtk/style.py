@@ -79,7 +79,7 @@ class Style:
 
     class Measure:
         Line = CairoStyle(color=(0,0,0,1), lineWidth=0.6)
-        InfoFont = CairoStyle(color=(0,0,0,0), fontSize=10)
+        Font = CairoStyle(color=(0,0,0,1), fontSize=10)
 
     class Track:
         RoutingTrack = CairoStyle(color=(1,0,0,1), lineWidth=2)

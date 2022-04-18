@@ -47,6 +47,21 @@
         <signal name="activate" handler="addPOI" swapped="no"/>
       </object>
     </child>
+    <child>
+      <object class="GtkSeparatorMenuItem">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Measure</property>
+        <property name="use-underline">True</property>
+        <signal name="activate" handler="onMeasure" swapped="no"/>
+      </object>
+    </child>
   </object>
   <object class="GtkMenu" id="poi-menu">
     <property name="visible">True</property>

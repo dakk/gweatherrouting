@@ -20,12 +20,12 @@ import os
 gi.require_version('Gtk', '3.0')
 gi.require_version('OsmGpsMap', '1.2')
 
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk, Gdk, Keybinder
 
 import logging
 
 from .gribmanagerwindow import GribFileFilter
-from .maplayers import GribMapLayer, AISMapLayer
+from .maplayers import GribMapLayer, AISMapLayer, ToolsMapLayer
 
 from .settings import SettingsManager
 from ..core import TimeControl
@@ -39,6 +39,9 @@ logger = logging.getLogger ('gweatherrouting')
 class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 	def __init__(self, parent, chartManager, core):
 		Gtk.Widget.__init__(self)
+
+		Keybinder.init()
+		# Keybinder.bind('m', self.onMeasure)
 
 		self.parent = parent
 		self.chartManager = chartManager
@@ -61,6 +64,9 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 
 		self.gribMapLayer = GribMapLayer (self.core.gribManager, self.timeControl, self.settingsManager)
 		self.map.layer_add (self.gribMapLayer)
+
+		self.toolsMapLayer = ToolsMapLayer ()
+		self.map.layer_add (self.toolsMapLayer)
 		
 		# This causes rendering problem
 		#self.map.layer_add (OsmGpsMap.MapOsd (show_dpad=True, show_zoom=True, show_crosshair=False))
@@ -96,6 +102,14 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		self.progressBar = self.builder.get_object("progressbar")
 		self.progressBar.hide()
 
+	def onMeasure(self, widget):
+		# Set this position as the start point
+		lat = self.builder.get_object("track-add-point-lat").get_text ()
+		lon = self.builder.get_object("track-add-point-lon").get_text ()
+		# Get the current position and draw line and info until the user clicks again
+
+		self.toolsMapLayer.enableMeasure (lat, lon)
+
 	def onToggleNotebook(self, widget):
 		self.builder.get_object("notebook").set_visible(widget.get_active())
 
@@ -114,6 +128,9 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		sstr += "Latitude: %f, Longitude: %f" % (lat, lon)
 
 		self.statusbar.push(self.statusbar.get_context_id ('Info'), sstr)
+
+		if self.toolsMapLayer.onMouseMove(lat, lon, event.x, event.y):
+			self.map.queue_draw()
 
 	def onMapClick(self, map, event):
 		lat, lon = map.get_event_location (event).get_degrees ()
