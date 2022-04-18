@@ -38,6 +38,9 @@ SYMBOL_MAP = {
 	'wreck': [28, 28*12+16, 28, 28],
 	'fuel': [28*10 - 8, 28*17+16, 28, 28],
 
+	'light-minor-red': [28*4-8, 28*27+16, 28, 28],
+	'light-minor-green': [28*5-12, 28*27+16, 28, 28],
+
 	'light-red': [28*9-8, 28*6, 28, 28],
 	'light-green': [28*10-8, 28*7, 28, 28],
 	'light-yellow': [28*10-8, 28*6, 28, 28],
@@ -183,9 +186,9 @@ class OSMChartDrawer(VectorChartDrawer):
 
 			if 'seamark:light:colour' in tags:
 				if tags['seamark:light:colour'] == 'red':
-					ln = 'red'
+					ln = 'minor-red'
 				elif tags['seamark:light:colour'] == 'green':
-					ln = 'green'
+					ln = 'minor-green'
 				elif tags['seamark:light:colour'] == 'yellow':
 					ln = 'yellow'
 
