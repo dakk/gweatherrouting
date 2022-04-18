@@ -28,6 +28,54 @@ from .vectorchartdrawer import VectorChartDrawer
 from ...style import *
 
 
+symbols = GdkPixbuf.Pixbuf.new_from_file(os.path.abspath(os.path.dirname(__file__)) + '/../../../data/rastersymbols-day.png')
+
+SYMBOL_MAP = {
+	# 'name': [x, y, w, h]
+	'cape': [31*28, 28*3, 28, 28],
+	'harbour': [28*33+16, 28*8+16, 28, 28],
+	'anchorage': [28*2, 28*12+16, 28, 28],
+	'wreck': [28, 28*12+16, 28, 28],
+	'fuel': [28*10 - 8, 28*17+16, 28, 28],
+
+	'light-red': [28*9-8, 28*6, 28, 28],
+	'light-green': [28*10-8, 28*7, 28, 28],
+	'light-yellow': [28*10-8, 28*6, 28, 28],
+	'light-generic': [28*9-8, 28*7, 28, 28],
+}
+
+
+def drawSymbol (cr, n, xx, yy):
+	x, y, w, h = SYMBOL_MAP[n]
+	img = symbols.new_subpixbuf(x, y, w, h)
+	Gdk.cairo_set_source_pixbuf(cr, img, xx-14, yy-14)
+	cr.paint()
+
+
+def drawLight (cr, xx, yy, tags, major=False):
+	cr.move_to(xx + 12, yy + 4)
+	try:
+		txt = tags['seamark:light:character'] + '.' + tags['seamark:light:colour'][0].upper() + '.' + tags['seamark:light:period'] + 's'
+		cr.show_text(txt)
+	except:
+		y = yy + 4
+		i = 1
+		while True:
+			try:
+				txt = tags['seamark:light:'+str(i)+':character'] + '.' + tags['seamark:light:'+str(i)+':colour'][0].upper() + '.' + tags['seamark:light:'+str(i)+':period'] + 's'
+			except:
+				break
+			cr.move_to(xx + 12, y)
+			cr.show_text(txt)
+			y += 12
+			i += 1
+	
+	x, y, w, h = SYMBOL_MAP['light-yellow']
+	img = symbols.new_subpixbuf(x, y, w, h)
+	Gdk.cairo_set_source_pixbuf(cr, img, xx-14, yy-14)
+	cr.paint()
+
+
 class OSMChartDrawer(VectorChartDrawer):
 	def __init__(self, settingsManager):
 		super().__init__(settingsManager)
@@ -87,55 +135,69 @@ class OSMChartDrawer(VectorChartDrawer):
 
 		# CAPE
 		if 'natural' in tags and tags['natural'] == 'cape':
-			if scale > 200: 
+			if scale > 100: 
 				return
 
 			cr.move_to(xx + 8, yy + 4)
 			cr.show_text(name)
 
-			img = self.symbols.new_subpixbuf(31*28, 28*3, 28, 28)
-			Gdk.cairo_set_source_pixbuf(cr, img, xx-14, yy-14)
-			cr.paint()
+			drawSymbol(cr, 'cape', xx, yy)
 				
 		# HARBOUR
 		elif 'seamark:type' in tags and tags['seamark:type'] == 'harbour':
-			if scale > 200: 
+			if scale > 100: 
 				return
 			
 			cr.move_to(xx + 8, yy + 4)
 			cr.show_text(name)
 
-			img = self.symbols.new_subpixbuf(0, 0, 28, 28)
-			Gdk.cairo_set_source_pixbuf(cr, img, xx-14, yy-14)
-			cr.paint()
+			drawSymbol(cr, 'harbour', xx, yy)
 
 		# ANCHORAGE
 		elif 'seamark:type' in tags and tags['seamark:type'] == 'anchorage':
-			if scale > 200: 
+			if scale > 100: 
 				return
 
-			img = self.symbols.new_subpixbuf(28*3, 0, 28, 28)
-			Gdk.cairo_set_source_pixbuf(cr, img, xx-14, yy-14)
-			cr.paint()
+			drawSymbol(cr, 'anchorage', xx, yy)
+
+		# WRECK
+		elif 'seamark:type' in tags and tags['seamark:type'] == 'wreck':
+			if scale > 100: 
+				return
+
+			drawSymbol(cr, 'wreck', xx, yy)
+
+		# FUEL
+		elif 'seamark:type' in tags and tags['seamark:type'] == 'small_craft_facility' and 'seamark:small_craft_facility:category' in tags and tags['seamark:small_craft_facility:category'] == 'fuel_station':
+			if scale > 100: 
+				return
+				
+			# drawSymbol(cr, 'fuel', xx, yy)
 
 		# MINOR LIGHT
 		elif 'seamark:type' in tags and tags['seamark:type'] == 'light_minor':
-			if scale > 200: 
+			if scale > 100: 
 				return
+
+			ln = 'generic'
 
 			if 'seamark:light:colour' in tags:
 				if tags['seamark:light:colour'] == 'red':
-					img = self.symbols.new_subpixbuf(28*9, 28*6, 28, 28)
+					ln = 'red'
 				elif tags['seamark:light:colour'] == 'green':
-					img = self.symbols.new_subpixbuf(28*10, 28*7, 28, 28)
-				else:
-					img = self.symbols.new_subpixbuf(28*9, 28*6, 28, 28)
-			else:
-				img = self.symbols.new_subpixbuf(28*9, 28*6, 28, 28)
+					ln = 'green'
+				elif tags['seamark:light:colour'] == 'yellow':
+					ln = 'yellow'
 
-			Gdk.cairo_set_source_pixbuf(cr, img, xx-14, yy-14)
-			cr.paint()
+			drawSymbol(cr, 'light-' + ln, xx, yy)
 
-		else:
-			print (name)
-			print (tags)
+
+		# MAJOR LIGHT
+		elif 'seamark:type' in tags and tags['seamark:type'] == 'light_major':
+			if scale > 400: 
+				return
+
+			drawLight(cr, xx, yy, tags, True)
+		# else:
+		# 	print (name)
+		# 	print (tags)

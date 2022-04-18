@@ -19,6 +19,10 @@ class VectorChartDrawer:
 		self.onChartPaletteChanged(settingsManager.chartPalette)
 		settingsManager.register_on_change('chartPalette', self.onChartPaletteChanged)
 
+	# TODO: this will handle object queries
+	def onQueryPoint(self, lat, lon):
+		raise ("Not implemented")
+
 	def onChartPaletteChanged(self, v):
 		self.palette = v
 
