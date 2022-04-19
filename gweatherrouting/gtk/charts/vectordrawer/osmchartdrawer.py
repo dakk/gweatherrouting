@@ -124,7 +124,7 @@ class OSMChartDrawer(VectorChartDrawer):
 			# drawSymbol(cr, 'fuel', xx, yy)
 
 		# MINOR LIGHT
-		elif 'seamark:type' in tags and tags['seamark:type'] == 'light_minor':
+		elif 'seamark:type' in tags and (tags['seamark:type'] == 'light_minor' or tags['seamark:type'] == 'beacon_special_purpose'):
 			if scale > 100: 
 				return
 
@@ -141,12 +141,36 @@ class OSMChartDrawer(VectorChartDrawer):
 			drawSymbol(cr, 'light-' + ln, xx, yy)
 
 
+		# ROCK
+		# elif 'seamark:type' in tags and tags['seamark:type'] == 'rock':
+		# 	if scale > 400: 
+		# 		return
+
+		# 	if 'seamark:rock:water_level' in tags:
+
+		# 	drawLight(cr, xx, yy, tags, True)
+
+
 		# MAJOR LIGHT
 		elif 'seamark:type' in tags and tags['seamark:type'] == 'light_major':
 			if scale > 400: 
 				return
 
 			drawLight(cr, xx, yy, tags, True)
-		# else:
-		# 	print (name)
-		# 	print (tags)
+
+		# BEACON CARDINAL
+		elif 'seamark:type' in tags and tags['seamark:type'] == 'beacon_cardinal':
+			if scale > 400: 
+				return
+
+			dir = tags['seamark:beacon_cardinal:category'][0].lower()
+
+			if 'seamark:name' in tags:
+				cr.move_to(xx + 8, yy)
+				cr.show_text(tags['seamark:name'])
+			drawSymbol(cr, 'cardinal-' + dir, xx, yy)
+			drawSymbol(cr, 'cardinal-sym-' + dir, xx, yy-8)
+
+		else:
+			print (name)
+			print (tags)
