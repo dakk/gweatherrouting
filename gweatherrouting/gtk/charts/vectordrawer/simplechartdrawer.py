@@ -17,6 +17,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import gi
 import math
 import json
+import cairo
 from osgeo import ogr, osr, gdal
 
 gi.require_version("Gtk", "3.0")
@@ -32,8 +33,10 @@ class SimpleChartDrawer(VectorChartDrawer):
 		strokeStyle=Style.chartPalettes[self.palette].LandStroke
 		fillStyle=Style.chartPalettes[self.palette].LandFill
 		seaStyle=Style.chartPalettes[self.palette].Sea
+		contournStyle=Style.chartPalettes[self.palette].ShallowSea
 
 		self.backgroundRender(gpsmap, cr, seaStyle)
+		cr.set_line_join(cairo.LINE_JOIN_ROUND)
 
 		for i in range(vectorFile.GetLayerCount()):
 			layer = vectorFile.GetLayerByIndex(i)
@@ -47,7 +50,7 @@ class SimpleChartDrawer(VectorChartDrawer):
 
 				geom = feat.GetGeometryRef()
 				geom = bounding.Intersection(geom)
-				self.featureRender(gpsmap, cr, geom, feat, layer, strokeStyle, fillStyle)
+				self.featureRender(gpsmap, cr, geom, feat, layer, strokeStyle, fillStyle, contournStyle)
 				feat = layer.GetNextFeature()
 
 	def backgroundRender(self, gpsmap, cr, seaStyle):
@@ -58,7 +61,7 @@ class SimpleChartDrawer(VectorChartDrawer):
 		cr.stroke_preserve()
 		cr.fill()
 
-	def featureRender(self, gpsmap, cr, geom, feat, layer, strokeStyle, fillStyle):
+	def featureRender(self, gpsmap, cr, geom, feat, layer, strokeStyle, fillStyle, contournStyle):
 		# for i in range(0, geom.GetGeometryCount()):
 		# 	strokeStyle.apply(cr)
 		# 	g = geom.GetGeometryRef(i)
@@ -81,6 +84,17 @@ class SimpleChartDrawer(VectorChartDrawer):
 
 		cr.set_line_width(1)
 
+		def draw_end():
+			cr.close_path()
+			cr.stroke_preserve()
+			# contournStyle.apply(cr)
+			# cr.set_line_width(3)
+			# cr.stroke_preserve()
+
+			fillStyle.apply(cr)
+			cr.fill()
+
+
 		if gj["type"] == "Polygon":
 			for l in gj["coordinates"]:
 				strokeStyle.apply(cr)
@@ -88,10 +102,7 @@ class SimpleChartDrawer(VectorChartDrawer):
 					xx, yy = gpsmap.convert_geographic_to_screen(OsmGpsMap.MapPoint.new_degrees(x[1], x[0]))						
 					cr.line_to(xx, yy)
 
-				cr.close_path()
-				cr.stroke_preserve()
-				fillStyle.apply(cr)
-				cr.fill()
+				draw_end()
 
 		elif gj["type"] == "MultiPolygon":
 			for l in gj["coordinates"]:
@@ -101,10 +112,7 @@ class SimpleChartDrawer(VectorChartDrawer):
 						xx, yy = gpsmap.convert_geographic_to_screen(OsmGpsMap.MapPoint.new_degrees(x[1], x[0]))
 						cr.line_to(xx, yy)
 
-					cr.close_path()
-					cr.stroke_preserve()
-					fillStyle.apply(cr)
-					cr.fill()
+					draw_end()
 
 		elif gj["type"] == "LineString":
 			for x in gj["coordinates"]:
@@ -113,10 +121,7 @@ class SimpleChartDrawer(VectorChartDrawer):
 
 				cr.line_to(xx, yy)
 
-			cr.close_path()
-			cr.stroke_preserve()
-			fillStyle.apply(cr)
-			cr.fill()
+			draw_end()
 
 		else:
 			pass
