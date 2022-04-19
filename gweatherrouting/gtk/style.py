@@ -83,20 +83,22 @@ class Style:
 
     class Track:
         RoutingTrack = CairoStyle(color=(1,0,0,1), lineWidth=2)
-        RoutingTrackFont = CairoStyle(color=(1,1,1,1), fontSize=13)
+        RoutingTrackFont = CairoStyle(color=(0x11/255, 0x11/255, 0x11/255, 0.7), fontSize=10)
         RoutingTrackCircle = CairoStyle(color=(1,1,1,1), lineWidth=2)
 
-        TrackActive = CairoStyle(color=(0x91/255., 0x4a/255., 0x7c/255., 1), lineWidth=2, dash=8.0)
-        TrackActiveFont = CairoStyle(color=(1,1,1,1), fontSize=13)
-        TrackActivePoiFont = CairoStyle(color=(1,1,1,1), fontSize=13)
+        TrackActive = CairoStyle(color=(0x91/255., 0x32/255., 0x1c/255., 1), lineWidth=1, dash=8.0)
+        TrackActiveFont = CairoStyle(color=(0x11/255, 0x11/255, 0x11/255, 0.7), fontSize=10)
+        TrackActivePoiFont = CairoStyle(color=(0x11/255, 0x11/255, 0x11/255, 0.7), fontSize=10)
 
-        TrackInactive = CairoStyle(color=(0x91/255., 0x4a/255., 0x7c/255., 0.6), lineWidth=2, dash=8.0)
-        TrackInactiveFont = CairoStyle(color=(1,1,1,0.6), fontSize=13)
-        TrackInactivePoiFont = CairoStyle(color=(1,1,1,0.7), fontSize=13)
+        TrackInactive = CairoStyle(color=(0x91/255., 0x4a/255., 0x7c/255., 0.6), lineWidth=0.8, dash=8.0)
+        TrackInactiveFont = CairoStyle(color=(0x11/255, 0x11/255, 0x11/255, 0.7), fontSize=10)
+        TrackInactivePoiFont = CairoStyle(color=(0x11/255, 0x11/255, 0x11/255, 0.3), fontSize=10)
 
         RoutingBoat = CairoStyle(color=(0, 0.4, 0, 1.0), lineWidth=5)
 
     class Poi:
-        Triangle = CairoStyle(color=(0x88/255, 0x11/255, 0x8c/255, 1))
-        Font = CairoStyle(color=(0x88/255, 0x11/255, 0x8c/255, 1), fontSize=13)
+        Dot = CairoStyle(color=(0x11/255, 0x11/255, 0x11/255, 1))
+        Quad = CairoStyle(color=(0x11/255, 0x11/255, 0x11/255, 1), lineWidth=0.3)
+        QuadInt = CairoStyle(color=(0xff/255, 0xff/255, 0xff/255, 0.5))
+        Font = CairoStyle(color=(0x11/255, 0x11/255, 0x11/255, 0.7), fontSize=10)
         

@@ -36,19 +36,30 @@ class POIMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 
             x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (tr.position[0], tr.position[1]))
 
+            Style.Poi.Quad.apply(cr)
+            cr.rectangle(x+3, y-5, len(tr.name) * 6.7, 12)
+            cr.stroke_preserve()
+            Style.Poi.QuadInt.apply(cr)
+            cr.fill()
+
             Style.Poi.Font.apply(cr)
-            cr.move_to(x-10, y-10)
+            cr.move_to(x+5, y+5)
             cr.show_text(tr.name)
             cr.stroke()
 
-            Style.Poi.Triangle.apply(cr)
-            cr.move_to(x-5, y-5)
-            cr.line_to(x,y+5)
-            cr.move_to(x+5, y-5)
-            cr.line_to(x,y+5)
-            cr.move_to(x-5, y-5)
-            cr.line_to(x+5,y-5)
-            cr.stroke()
+
+            Style.Poi.Dot.apply(cr)
+            cr.arc(x, y, 2, 0, 2 * math.pi)
+            cr.fill()
+
+            # Triangle
+            # cr.move_to(x-5, y-5)
+            # cr.line_to(x,y+5)
+            # cr.move_to(x+5, y-5)
+            # cr.line_to(x,y+5)
+            # cr.move_to(x-5, y-5)
+            # cr.line_to(x+5,y-5)
+            # cr.stroke()
 
     def do_render (self, gpsmap):
         pass
