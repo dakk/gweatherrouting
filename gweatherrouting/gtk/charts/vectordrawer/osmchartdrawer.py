@@ -45,7 +45,11 @@ class OSMChartDrawer(VectorChartDrawer):
 					continue 
 
 				geom = feat.GetGeometryRef()
-				self.featureRender(gpsmap, cr, geom, feat, layer)
+				try:
+					self.featureRender(gpsmap, cr, geom, feat, layer)
+				except Exception as e:
+					print('Failed to render OSM feature:', e)
+
 				feat = layer.GetNextFeature()
 
 
@@ -171,6 +175,24 @@ class OSMChartDrawer(VectorChartDrawer):
 			drawSymbol(cr, 'cardinal-' + dir, xx, yy)
 			drawSymbol(cr, 'cardinal-sym-' + dir, xx, yy-8)
 
-		else:
-			print (name)
-			print (tags)
+
+		# BEACON LATERAL
+		elif 'seamark:type' in tags and tags['seamark:type'] == 'beacon_lateral':
+			if scale > 100: 
+				return
+
+			ln = 'generic'
+
+			if 'seamark:beacon_lateral:category' in tags:
+				if tags['seamark:beacon_lateral:category'] == 'port':
+					ln = 'minor-red'
+				elif tags['seamark:beacon_lateral:category'] == 'starboard':
+					ln = 'minor-green'
+			elif 'seamark:light:colour' in tags:
+				ln = 'minor-' + tags['seamark:light:colour']
+
+			drawSymbol(cr, 'light-' + ln, xx, yy)
+
+		# else:
+		# 	print (name)
+		# 	print (tags)
