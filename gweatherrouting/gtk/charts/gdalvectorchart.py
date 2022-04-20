@@ -14,21 +14,13 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
-import gi
-import math
-import json
-
 from gweatherrouting.gtk.charts.cm93driver import CM93Driver
 from gweatherrouting.gtk.charts.vectordrawer.osmchartdrawer import OSMChartDrawer
 from .vectordrawer import SimpleChartDrawer
 from .vectordrawer import S57ChartDrawer
 from .vectordrawer import CM93ChartDrawer
-from osgeo import ogr, osr, gdal
+from osgeo import ogr
 
-gi.require_version("Gtk", "3.0")
-gi.require_version('OsmGpsMap', '1.2')
-
-from gi.repository import Gtk, Gio, GObject, OsmGpsMap
 from .chartlayer import ChartLayer
 
 class GDALVectorChart(ChartLayer):

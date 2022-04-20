@@ -15,18 +15,18 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 import gi
-import math
-import os
-import json
-from osgeo import ogr, osr, gdal
+import logging
 
 gi.require_version("Gtk", "3.0")
 gi.require_version('OsmGpsMap', '1.2')
 
-from gi.repository import Gtk, Gdk, Gio, GObject, OsmGpsMap, GdkPixbuf
+from gi.repository import OsmGpsMap
 from .vectorchartdrawer import VectorChartDrawer
 from ...style import *
 
+logger = logging.getLogger ('gweatherrouting')
+
+MIN_ZOOM = 300
 
 class OSMChartDrawer(VectorChartDrawer):
 	def __init__(self, settingsManager):
@@ -34,6 +34,9 @@ class OSMChartDrawer(VectorChartDrawer):
 
 
 	def draw(self, gpsmap, cr, vectorFile, bounding):
+		if gpsmap.get_scale() > MIN_ZOOM:
+			return 
+
 		for i in range(vectorFile.GetLayerCount()):
 			layer = vectorFile.GetLayerByIndex(i)
 			layer.SetSpatialFilter(bounding)
@@ -45,10 +48,10 @@ class OSMChartDrawer(VectorChartDrawer):
 					continue 
 
 				geom = feat.GetGeometryRef()
-				# try:
-				self.featureRender(gpsmap, cr, geom, feat, layer)
-				# except Exception as e:
-				# 	print('Failed to render OSM feature:', e)
+				try:
+					self.featureRender(gpsmap, cr, geom, feat, layer)
+				except Exception as e:
+					logger.debug('Failed to render OSM feature:', e)
 
 				feat = layer.GetNextFeature()
 
@@ -86,8 +89,19 @@ class OSMChartDrawer(VectorChartDrawer):
 		cr.set_font_size(9)
 		cr.move_to(xx, yy)
 
+
+		# MAJOR LIGHT
+		if 'seamark:type' in tags and tags['seamark:type'] == 'light_major':
+			if scale > MIN_ZOOM: 
+				return
+
+			self.symbolProvider.drawLight(cr, xx, yy, tags, True)
+
+		elif scale > 100:
+			return 
+
 		# CAPE
-		if 'natural' in tags and tags['natural'] == 'cape':
+		elif 'natural' in tags and tags['natural'] == 'cape':
 			if scale > 100: 
 				return
 
@@ -173,12 +187,6 @@ class OSMChartDrawer(VectorChartDrawer):
 			self.symbolProvider.draw(cr, 'BOYSPP11', xx, yy)
 
 
-		# MAJOR LIGHT
-		elif 'seamark:type' in tags and tags['seamark:type'] == 'light_major':
-			if scale > 600: 
-				return
-
-			self.symbolProvider.drawLight(cr, xx, yy, tags, True)
 
 		# BEACON CARDINAL / BUOY CARDINAL
 		elif 'seamark:type' in tags and (tags['seamark:type'] == 'beacon_cardinal' or tags['seamark:type'] == 'buoy_cardinal'):

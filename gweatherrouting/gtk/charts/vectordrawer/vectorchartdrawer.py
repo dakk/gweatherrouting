@@ -14,20 +14,7 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
-
-import gi
-import math
-import os
-import json
-from osgeo import ogr, osr, gdal
-
 from .s57symbolprovider import S57SymbolProvider
-
-gi.require_version("Gtk", "3.0")
-gi.require_version('OsmGpsMap', '1.2')
-
-from gi.repository import Gtk, Gdk, Gio, GObject, OsmGpsMap, GdkPixbuf
-
 
 
 class VectorChartDrawer:

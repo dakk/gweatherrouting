@@ -14,18 +14,7 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
-import gi
-import math
-import json
-import os
-from osgeo import ogr, osr, gdal
-
-gi.require_version("Gtk", "3.0")
-gi.require_version('OsmGpsMap', '1.2')
-
-from gi.repository import Gtk, Gio, GObject, OsmGpsMap
 from .vectorchartdrawer import VectorChartDrawer
-
 
 class S57ChartDrawer(VectorChartDrawer):
 	def draw(self, gpsmap, cr, vectorFile, bounding):

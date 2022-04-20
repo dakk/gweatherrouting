@@ -15,15 +15,13 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 import gi
-import math
 import json
 import cairo
-from osgeo import ogr, osr, gdal
 
 gi.require_version("Gtk", "3.0")
 gi.require_version('OsmGpsMap', '1.2')
 
-from gi.repository import Gtk, Gio, GObject, OsmGpsMap
+from gi.repository import OsmGpsMap
 from .vectorchartdrawer import VectorChartDrawer
 from ...style import *
 

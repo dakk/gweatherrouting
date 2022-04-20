@@ -17,9 +17,9 @@ import gi
 import os
 import requests
 from threading import Thread
-from osgeo import ogr, osr, gdal
-from gweatherrouting.core.storage import DATA_DIR, TEMP_DIR
-from gweatherrouting.gtk.charts.chartlayer import ChartLayer
+from osgeo import ogr
+from ...core.storage import DATA_DIR, TEMP_DIR
+from .chartlayer import ChartLayer
 
 
 gi.require_version('Gtk', '3.0')
@@ -28,7 +28,6 @@ gi.require_version('OsmGpsMap', '1.2')
 from gi.repository import Gtk, Gdk, OsmGpsMap
 
 from ... import log
-from .gdalvectorchart import GDALVectorChart
 import logging
 
 

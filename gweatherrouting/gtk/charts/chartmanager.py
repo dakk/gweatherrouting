@@ -17,22 +17,17 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import gi
 import os
 
-from gweatherrouting.core.dummy_storage import DATA_DIR
-from gweatherrouting.gtk.charts.gshhs import GSHHSAskDownloadDialog, GSHHSDownloadDialog, GSHHSVectorChart, OSMAskDownloadDialog, OSMDownloadDialog
+from ...core.storage import DATA_DIR
+from .gshhs import GSHHSAskDownloadDialog, GSHHSDownloadDialog, GSHHSVectorChart, OSMAskDownloadDialog, OSMDownloadDialog
 
-from ... import log
 import logging
-from .chartlayer import ChartLayer
 from .gdalvectorchart import GDALVectorChart
 from .gdalrasterchart import GDALRasterChart
 
 gi.require_version("Gtk", "3.0")
 gi.require_version('OsmGpsMap', '1.2')
 
-from gi.repository import Gtk, Gio, GObject, OsmGpsMap, Gdk
-
-from osgeo import ogr, osr, gdal
-from gweatherrouting.core.storage import DATA_DIR
+from gi.repository import Gtk, GObject, OsmGpsMap, Gdk
 
 
 logger = logging.getLogger ('gweatherrouting')

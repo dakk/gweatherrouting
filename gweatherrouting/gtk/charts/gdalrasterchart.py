@@ -14,7 +14,6 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
-from ... import log
 import logging
 import gi
 import time
@@ -23,13 +22,13 @@ import multiprocessing
 import numpy as np
 from os import listdir
 from os.path import isfile, join
-from osgeo import ogr, osr, gdal
+from osgeo import  osr, gdal
 from threading import Thread, Lock
 
 gi.require_version("Gtk", "3.0")
 gi.require_version('OsmGpsMap', '1.2')
 
-from gi.repository import Gtk, Gio, GObject, OsmGpsMap, Gdk
+from gi.repository import OsmGpsMap, Gdk
 from .chartlayer import ChartLayer
 
 logger = logging.getLogger ('gweatherrouting')

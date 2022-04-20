@@ -17,8 +17,6 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import gi
 import json
 import os
-from osgeo import ogr, osr, gdal
-from .... import log
 import logging
 
 from ....core.storage import DATA_DIR
@@ -26,7 +24,7 @@ from ....core.storage import DATA_DIR
 gi.require_version("Gtk", "3.0")
 gi.require_version('OsmGpsMap', '1.2')
 
-from gi.repository import Gtk, Gio, GObject, OsmGpsMap, GdkPixbuf, Gdk
+from gi.repository import GdkPixbuf, Gdk
 from bs4 import BeautifulSoup
 
 logger = logging.getLogger ('gweatherrouting')
