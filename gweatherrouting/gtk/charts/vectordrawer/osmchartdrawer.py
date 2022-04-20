@@ -146,25 +146,45 @@ class OSMChartDrawer(VectorChartDrawer):
 
 
 		# ROCK
-		# elif 'seamark:type' in tags and tags['seamark:type'] == 'rock':
-		# 	if scale > 400: 
-		# 		return
+		elif 'seamark:type' in tags and tags['seamark:type'] == 'rock':
+			if scale > 400: 
+				return
 
-		# 	if 'seamark:rock:water_level' in tags:
+			s = 'default'
 
-		# 	drawLight(cr, xx, yy, tags, True)
+			if 'seamark:rock:water_level' in tags:
+				if tags['seamark:rock:water_level'] == 'awash':
+					s = 'awash'
+				if tags['seamark:rock:water_level'] == 'covers':
+					s = 'covers'
+
+			drawSymbol(cr, 'rock-' + s, xx, yy)
+
+		# ISOLATE DANGER
+		elif 'seamark:type' in tags and tags['seamark:type'] == 'buoy_isolated_danger':
+			if scale > 100: 
+				return
+
+			drawSymbol(cr, 'isolated-danger', xx, yy)
+
+		# SPECIAL PURPOSE
+		elif 'seamark:type' in tags and tags['seamark:type'] == 'buoy_special_purpose':
+			if scale > 100: 
+				return
+
+			drawSymbol(cr, 'special-purpose', xx, yy)
 
 
 		# MAJOR LIGHT
 		elif 'seamark:type' in tags and tags['seamark:type'] == 'light_major':
-			if scale > 400: 
+			if scale > 600: 
 				return
 
 			drawLight(cr, xx, yy, tags, True)
 
-		# BEACON CARDINAL
-		elif 'seamark:type' in tags and tags['seamark:type'] == 'beacon_cardinal':
-			if scale > 400: 
+		# BEACON CARDINAL / BUOY CARDINAL
+		elif 'seamark:type' in tags and (tags['seamark:type'] == 'beacon_cardinal' or tags['seamark:type'] == 'buoy_cardinal'):
+			if scale > 100: 
 				return
 
 			dir = tags['seamark:beacon_cardinal:category'][0].lower()
@@ -176,8 +196,8 @@ class OSMChartDrawer(VectorChartDrawer):
 			drawSymbol(cr, 'cardinal-sym-' + dir, xx, yy-8)
 
 
-		# BEACON LATERAL
-		elif 'seamark:type' in tags and tags['seamark:type'] == 'beacon_lateral':
+		# BEACON LATERAL / BUOY LATERAL
+		elif 'seamark:type' in tags and (tags['seamark:type'] == 'beacon_lateral' or tags['seamark:type'] == 'buoy_lateral'):
 			if scale > 100: 
 				return
 
@@ -190,9 +210,11 @@ class OSMChartDrawer(VectorChartDrawer):
 					ln = 'minor-green'
 			elif 'seamark:light:colour' in tags:
 				ln = 'minor-' + tags['seamark:light:colour']
+			else:
+				ln = 'minor-default'
 
 			drawSymbol(cr, 'light-' + ln, xx, yy)
 
-		# else:
-		# 	print (name)
-		# 	print (tags)
+		else:
+			print (name)
+			print (tags)
