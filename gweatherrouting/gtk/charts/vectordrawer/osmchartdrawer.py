@@ -94,7 +94,7 @@ class OSMChartDrawer(VectorChartDrawer):
 			cr.move_to(xx + 8, yy + 4)
 			cr.show_text(name)
 
-			self.symbolProvider.draw(cr, 'HILTOP01', xx, yy)
+			# self.symbolProvider.draw(cr, 'HILTOP01', xx, yy)
 				
 		# HARBOUR
 		elif 'seamark:type' in tags and tags['seamark:type'] == 'harbour':
@@ -136,16 +136,16 @@ class OSMChartDrawer(VectorChartDrawer):
 
 			if 'seamark:light:colour' in tags:
 				if tags['seamark:light:colour'].lower() == 'red':
-					ln = 'BOYLAT14'
+					ln = 'BCNLAT21'
 				elif tags['seamark:light:colour'].lower() == 'green':
-					ln = 'BOYLAT13'
+					ln = 'BCNLAT22'
 
 			self.symbolProvider.draw(cr, ln, xx, yy)
 
 
 		# ROCK
 		elif 'seamark:type' in tags and tags['seamark:type'] == 'rock':
-			if scale > 400: 
+			if scale > 100: 
 				return
 
 			s = 'UWTROC03'
@@ -212,14 +212,14 @@ class OSMChartDrawer(VectorChartDrawer):
 
 			if 'seamark:beacon_lateral:category' in tags:
 				if tags['seamark:beacon_lateral:category'] == 'port':
-					ln = 'BOYLAT14'
+					ln = 'BCNLAT21'
 				elif tags['seamark:beacon_lateral:category'] == 'starboard':
-					ln = 'BOYLAT13'
+					ln = 'BCNLAT22'
 			elif 'seamark:light:colour' in tags:
 				if tags['seamark:light:colour'].lower() == 'red':
-					ln = 'BOYLAT14'
+					ln = 'BCNLAT21'
 				elif tags['seamark:light:colour'].lower() == 'green':
-					ln = 'BOYLAT13'
+					ln = 'BCNLAT22'
 
 			self.symbolProvider.draw(cr, ln, xx, yy)
 
