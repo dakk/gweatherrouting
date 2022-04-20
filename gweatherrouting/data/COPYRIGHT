@@ -2,3 +2,9 @@ Files: data/symbols/
 Copyright: 2008-2018 David S Register <bdbcat@yahoo.com>
            2008-2018 Contributors, see src/about.cpp AuthorText[]
 License: GPL-2+
+
+Files: data/s57/
+Copyright: 2000-2001 Sylvain Duclos <sylvain_duclos@yahoo.com>
+           2010 David S. Register <bdbcat@yahoo.com>
+           2010 by Pavel Kalian" <pavel@kalian.cz>
+License: GPL-2.0+

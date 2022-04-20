@@ -26,8 +26,8 @@ gi.require_version('OsmGpsMap', '1.2')
 
 from gi.repository import Gtk, Gdk, Gio, GObject, OsmGpsMap, GdkPixbuf
 
-symbols_day = GdkPixbuf.Pixbuf.new_from_file(os.path.abspath(os.path.dirname(__file__)) + '/../../../data/rastersymbols-day.png')
-symbols_dark = GdkPixbuf.Pixbuf.new_from_file(os.path.abspath(os.path.dirname(__file__)) + '/../../../data/rastersymbols-dark.png')
+symbols_day = GdkPixbuf.Pixbuf.new_from_file(os.path.abspath(os.path.dirname(__file__)) + '/../../../data/s57/rastersymbols-day.png')
+symbols_dark = GdkPixbuf.Pixbuf.new_from_file(os.path.abspath(os.path.dirname(__file__)) + '/../../../data/s57/rastersymbols-dark.png')
 
 symbols = symbols_day
 

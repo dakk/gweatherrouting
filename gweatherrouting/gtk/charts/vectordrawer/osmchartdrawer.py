@@ -215,6 +215,6 @@ class OSMChartDrawer(VectorChartDrawer):
 
 			drawSymbol(cr, 'light-' + ln, xx, yy)
 
-		else:
-			print (name)
-			print (tags)
+		# else:
+		# 	print (name)
+		# 	print (tags)
