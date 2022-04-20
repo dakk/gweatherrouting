@@ -24,7 +24,7 @@ gi.require_version("Gtk", "3.0")
 gi.require_version('OsmGpsMap', '1.2')
 
 from gi.repository import Gtk, Gdk, Gio, GObject, OsmGpsMap, GdkPixbuf
-from .vectorchartdrawer import VectorChartDrawer, drawLight, drawSymbol
+from .vectorchartdrawer import VectorChartDrawer
 from ...style import *
 
 
@@ -45,10 +45,10 @@ class OSMChartDrawer(VectorChartDrawer):
 					continue 
 
 				geom = feat.GetGeometryRef()
-				try:
-					self.featureRender(gpsmap, cr, geom, feat, layer)
-				except Exception as e:
-					print('Failed to render OSM feature:', e)
+				# try:
+				self.featureRender(gpsmap, cr, geom, feat, layer)
+				# except Exception as e:
+				# 	print('Failed to render OSM feature:', e)
 
 				feat = layer.GetNextFeature()
 
@@ -94,7 +94,7 @@ class OSMChartDrawer(VectorChartDrawer):
 			cr.move_to(xx + 8, yy + 4)
 			cr.show_text(name)
 
-			drawSymbol(cr, 'cape', xx, yy)
+			self.symbolProvider.draw(cr, 'HILTOP01', xx, yy)
 				
 		# HARBOUR
 		elif 'seamark:type' in tags and tags['seamark:type'] == 'harbour':
@@ -104,45 +104,43 @@ class OSMChartDrawer(VectorChartDrawer):
 			cr.move_to(xx + 8, yy + 4)
 			cr.show_text(name)
 
-			drawSymbol(cr, 'harbour', xx, yy)
+			self.symbolProvider.draw(cr, 'SMCFAC02', xx, yy)
 
 		# ANCHORAGE
 		elif 'seamark:type' in tags and tags['seamark:type'] == 'anchorage':
 			if scale > 100: 
 				return
 
-			drawSymbol(cr, 'anchorage', xx, yy)
+			self.symbolProvider.draw(cr, 'ACHARE02', xx, yy)
 
 		# WRECK
 		elif 'seamark:type' in tags and tags['seamark:type'] == 'wreck':
 			if scale > 100: 
 				return
 
-			drawSymbol(cr, 'wreck', xx, yy)
+			self.symbolProvider.draw(cr, 'WRECKS01', xx, yy)
 
 		# FUEL
 		elif 'seamark:type' in tags and tags['seamark:type'] == 'small_craft_facility' and 'seamark:small_craft_facility:category' in tags and tags['seamark:small_craft_facility:category'] == 'fuel_station':
 			if scale > 100: 
 				return
 				
-			# drawSymbol(cr, 'fuel', xx, yy)
+			# self.symbolProvider.draw(cr, 'fuel', xx, yy)
 
 		# MINOR LIGHT
 		elif 'seamark:type' in tags and (tags['seamark:type'] == 'light_minor' or tags['seamark:type'] == 'beacon_special_purpose'):
 			if scale > 100: 
 				return
 
-			ln = 'generic'
+			ln = 'BCNSTK62'
 
 			if 'seamark:light:colour' in tags:
-				if tags['seamark:light:colour'] == 'red':
-					ln = 'minor-red'
-				elif tags['seamark:light:colour'] == 'green':
-					ln = 'minor-green'
-				elif tags['seamark:light:colour'] == 'yellow':
-					ln = 'yellow'
+				if tags['seamark:light:colour'].lower() == 'red':
+					ln = 'BOYLAT14'
+				elif tags['seamark:light:colour'].lower() == 'green':
+					ln = 'BOYLAT13'
 
-			drawSymbol(cr, 'light-' + ln, xx, yy)
+			self.symbolProvider.draw(cr, ln, xx, yy)
 
 
 		# ROCK
@@ -150,29 +148,29 @@ class OSMChartDrawer(VectorChartDrawer):
 			if scale > 400: 
 				return
 
-			s = 'default'
+			s = 'UWTROC03'
 
 			if 'seamark:rock:water_level' in tags:
 				if tags['seamark:rock:water_level'] == 'awash':
-					s = 'awash'
+					s = 'UWTROC03'
 				if tags['seamark:rock:water_level'] == 'covers':
-					s = 'covers'
+					s = 'UWTROC04'
 
-			drawSymbol(cr, 'rock-' + s, xx, yy)
+			self.symbolProvider.draw(cr, s, xx, yy)
 
 		# ISOLATE DANGER
 		elif 'seamark:type' in tags and tags['seamark:type'] == 'buoy_isolated_danger':
 			if scale > 100: 
 				return
 
-			drawSymbol(cr, 'isolated-danger', xx, yy)
+			self.symbolProvider.draw(cr, 'BOYCAN76', xx, yy)
 
 		# SPECIAL PURPOSE
 		elif 'seamark:type' in tags and tags['seamark:type'] == 'buoy_special_purpose':
 			if scale > 100: 
 				return
 
-			drawSymbol(cr, 'special-purpose', xx, yy)
+			self.symbolProvider.draw(cr, 'BOYSPP11', xx, yy)
 
 
 		# MAJOR LIGHT
@@ -180,7 +178,7 @@ class OSMChartDrawer(VectorChartDrawer):
 			if scale > 600: 
 				return
 
-			drawLight(cr, xx, yy, tags, True)
+			self.symbolProvider.drawLight(cr, xx, yy, tags, True)
 
 		# BEACON CARDINAL / BUOY CARDINAL
 		elif 'seamark:type' in tags and (tags['seamark:type'] == 'beacon_cardinal' or tags['seamark:type'] == 'buoy_cardinal'):
@@ -189,11 +187,20 @@ class OSMChartDrawer(VectorChartDrawer):
 
 			dir = tags['seamark:beacon_cardinal:category'][0].lower()
 
+			if dir == 'n':
+				c = 'BCNCAR01'
+			elif dir == 's':
+				c = 'BCNCAR03'
+			elif dir == 'e':
+				c = 'BCNCAR02'
+			elif dir == 'w':
+				c = 'BCNCAR04'
+
 			if 'seamark:name' in tags:
 				cr.move_to(xx + 8, yy)
 				cr.show_text(tags['seamark:name'])
-			drawSymbol(cr, 'cardinal-' + dir, xx, yy)
-			drawSymbol(cr, 'cardinal-sym-' + dir, xx, yy-8)
+
+			self.symbolProvider.draw(cr, c, xx, yy)
 
 
 		# BEACON LATERAL / BUOY LATERAL
@@ -201,19 +208,20 @@ class OSMChartDrawer(VectorChartDrawer):
 			if scale > 100: 
 				return
 
-			ln = 'generic'
+			ln = 'BCNSTK62'
 
 			if 'seamark:beacon_lateral:category' in tags:
 				if tags['seamark:beacon_lateral:category'] == 'port':
-					ln = 'minor-red'
+					ln = 'BOYLAT14'
 				elif tags['seamark:beacon_lateral:category'] == 'starboard':
-					ln = 'minor-green'
+					ln = 'BOYLAT13'
 			elif 'seamark:light:colour' in tags:
-				ln = 'minor-' + tags['seamark:light:colour']
-			else:
-				ln = 'minor-default'
+				if tags['seamark:light:colour'].lower() == 'red':
+					ln = 'BOYLAT14'
+				elif tags['seamark:light:colour'].lower() == 'green':
+					ln = 'BOYLAT13'
 
-			drawSymbol(cr, 'light-' + ln, xx, yy)
+			self.symbolProvider.draw(cr, ln, xx, yy)
 
 		# else:
 		# 	print (name)

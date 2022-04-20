@@ -21,79 +21,13 @@ import os
 import json
 from osgeo import ogr, osr, gdal
 
+from .s57symbolprovider import S57SymbolProvider
+
 gi.require_version("Gtk", "3.0")
 gi.require_version('OsmGpsMap', '1.2')
 
 from gi.repository import Gtk, Gdk, Gio, GObject, OsmGpsMap, GdkPixbuf
 
-symbols_day = GdkPixbuf.Pixbuf.new_from_file(os.path.abspath(os.path.dirname(__file__)) + '/../../../data/s57/rastersymbols-day.png')
-symbols_dark = GdkPixbuf.Pixbuf.new_from_file(os.path.abspath(os.path.dirname(__file__)) + '/../../../data/s57/rastersymbols-dark.png')
-
-symbols = symbols_day
-
-SYMBOL_MAP = {
-	# 'name': [x, y, w, h]
-	'cape': [31*28, 28*3, 28, 28],
-	'harbour': [28*33+16, 28*8+16, 28, 28],
-	'anchorage': [28*2, 28*12+16, 28, 28],
-	'wreck': [28, 28*12+16, 28, 28],
-	'fuel': [28*10 - 8, 28*17+16, 28, 28],
-
-	'light-minor-red': [28*4-8, 28*27+16, 28, 28],
-	'light-minor-green': [28*5-12, 28*27+16, 28, 28],
-
-	'light-red': [28*9-8, 28*6, 28, 28],
-	'light-green': [28*10-8, 28*7, 28, 28],
-	'light-yellow': [28*10-8, 28*6, 28, 28],
-	'light-generic': [28*9-8, 28*7, 28, 28],
-
-	'cardinal-n': [6*28+8, 26*28+8, 28, 28],
-	'cardinal-s': [4*28+8, 26*28+8, 28, 28],
-	'cardinal-e': [5*28+8, 26*28+8, 28, 28],
-	'cardinal-w': [6*28+8, 26*28+8, 28, 28],
-	'cardinal-sym-n': [6*28-8, 11*28, 28, 28],
-	'cardinal-sym-s': [7*28-8, 11*28, 28, 28],
-	'cardinal-sym-e': [8*28-8, 11*28, 28, 28],
-	'cardinal-sym-w': [9*28-8, 11*28, 28, 28],
-
-	'special-purpose': [15*28+8, 26*28+8, 28, 28],
-	'isolated-danger': [27*28+16, 26*28+8, 28, 28],
-
-	'rock-default': [34*28-8, 11*28, 28, 28],
-	'rock-awash': [34*28-8, 11*28, 28, 28],
-	'rock-covers': [35*28-16, 11*28, 28, 28],
-}
-
-
-def drawSymbol (cr, n, xx, yy):
-	x, y, w, h = SYMBOL_MAP[n]
-	img = symbols.new_subpixbuf(x, y, w, h)
-	Gdk.cairo_set_source_pixbuf(cr, img, xx-14, yy-14)
-	cr.paint()
-
-
-def drawLight (cr, xx, yy, tags, major=False):
-	cr.move_to(xx + 12, yy + 4)
-	try:
-		txt = tags['seamark:light:character'] + '.' + tags['seamark:light:colour'][0].upper() + '.' + tags['seamark:light:period'] + 's'
-		cr.show_text(txt)
-	except:
-		y = yy + 4
-		i = 1
-		while True:
-			try:
-				txt = tags['seamark:light:'+str(i)+':character'] + '.' + tags['seamark:light:'+str(i)+':colour'][0].upper() + '.' + tags['seamark:light:'+str(i)+':period'] + 's'
-			except:
-				break
-			cr.move_to(xx + 12, y)
-			cr.show_text(txt)
-			y += 12
-			i += 1
-	
-	x, y, w, h = SYMBOL_MAP['light-yellow']
-	img = symbols.new_subpixbuf(x, y, w, h)
-	Gdk.cairo_set_source_pixbuf(cr, img, xx-14, yy-14)
-	cr.paint()
 
 
 class VectorChartDrawer:
@@ -101,16 +35,14 @@ class VectorChartDrawer:
 		self.onChartPaletteChanged(settingsManager.chartPalette)
 		settingsManager.register_on_change('chartPalette', self.onChartPaletteChanged)
 
+		self.symbolProvider = S57SymbolProvider(settingsManager)
+
 	# TODO: this will handle object queries
 	def onQueryPoint(self, lat, lon):
 		raise ("Not implemented")
 
 	def onChartPaletteChanged(self, v):
 		self.palette = v
-		if v == 'dark':
-			symbols = symbols_dark
-		else:
-			symbols = symbols_day
 
 	def draw(self, gpsmap, cr, vectorFile, bounding):
 		raise ("Not implemented")

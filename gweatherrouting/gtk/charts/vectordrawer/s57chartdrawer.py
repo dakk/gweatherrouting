@@ -23,26 +23,8 @@ from osgeo import ogr, osr, gdal
 gi.require_version("Gtk", "3.0")
 gi.require_version('OsmGpsMap', '1.2')
 
-from gi.repository import Gtk, Gio, GObject, OsmGpsMap, GdkPixbuf
+from gi.repository import Gtk, Gio, GObject, OsmGpsMap
 from .vectorchartdrawer import VectorChartDrawer
-
-class S57SymbolProvider:
-	def __init__(self, settingsManager):
-		self.settingsManager = settingsManager
-		self.symbols = {}
-		settingsManager.register_on_change('chartPalette', self.onChartPaletteChanged)
-
-		self.p_day = GdkPixbuf.Pixbuf.new_from_file(os.path.abspath(os.path.dirname(__file__)) + '/../../../data/s57/rastersymbols-day.png')
-		self.p_dark = GdkPixbuf.Pixbuf.new_from_file(os.path.abspath(os.path.dirname(__file__)) + '/../../../data/s57/rastersymbols-dark.png')
-
-		self.p_select = self.p_day
-
-	def onChartPaletteChanged(self, v):
-		self.palette = v
-		if v == 'dark':
-			self.p_select = self.p_dark
-		else:
-			self.p_select = self.p_day
 
 
 class S57ChartDrawer(VectorChartDrawer):
