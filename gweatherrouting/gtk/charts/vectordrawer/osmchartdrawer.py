@@ -79,6 +79,7 @@ class OSMChartDrawer(VectorChartDrawer):
 						continue
 						
 					tags[k] = x
+
 					k = None
 
 		pt = geom.GetPoint(0)
@@ -88,6 +89,10 @@ class OSMChartDrawer(VectorChartDrawer):
 		cr.set_source_rgba(0, 0, 0, 0.8)
 		cr.set_font_size(9)
 		cr.move_to(xx, yy)
+
+		if 'depth' in tags and scale < 100:
+			cr.move_to(xx + 10, yy)
+			cr.show_text(tags['depth'])
 
 
 		# MAJOR LIGHT
