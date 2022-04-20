@@ -14,6 +14,7 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
+from osgeo import ogr
 import gi
 import json
 import cairo
@@ -60,67 +61,20 @@ class SimpleChartDrawer(VectorChartDrawer):
 		cr.fill()
 
 	def featureRender(self, gpsmap, cr, geom, feat, layer, strokeStyle, fillStyle, contournStyle):
-		# for i in range(0, geom.GetGeometryCount()):
-		# 	strokeStyle.apply(cr)
-		# 	g = geom.GetGeometryRef(i)
-		# 	# if g.GetGeometryType() == ogr.wkbLinearRing:
-		# 	# if g.GetGeometryName() == 'LINEARRING':
-		# 	# 	g = g.GetLinearGeometry()
-		# 	# 	print ('tog!')
+		for i in range(0, geom.GetGeometryCount()):
+			strokeStyle.apply(cr)
+			g = geom.GetGeometryRef(i)
 
-		# 	for ii in range(0, g.GetPointCount()):
-		# 		pt = g.GetPoint(ii)
-		# 		xx, yy = gpsmap.convert_geographic_to_screen(OsmGpsMap.MapPoint.new_degrees(pt[1], pt[0]))						
-		# 		cr.line_to(xx, yy)
-
-		# 	cr.close_path()
-		# 	cr.stroke_preserve()
-		# 	fillStyle.apply(cr)
-		# 	cr.fill()
-		# return
-		gj = json.loads(geom.ExportToJson())
-
-		cr.set_line_width(1)
-
-		def draw_end():
-			cr.close_path()
-			cr.stroke_preserve()
-			# contournStyle.apply(cr)
-			# cr.set_line_width(3)
-			# cr.stroke_preserve()
-
-			fillStyle.apply(cr)
-			cr.fill()
+			if g.GetGeometryName() == 'POLYGON':
+				self.featureRender(gpsmap, cr, g, feat, layer, strokeStyle, fillStyle, contournStyle)
 
 
-		if gj["type"] == "Polygon":
-			for l in gj["coordinates"]:
-				strokeStyle.apply(cr)
-				for x in l:
-					xx, yy = gpsmap.convert_geographic_to_screen(OsmGpsMap.MapPoint.new_degrees(x[1], x[0]))						
-					cr.line_to(xx, yy)
-
-				draw_end()
-
-		elif gj["type"] == "MultiPolygon":
-			for l in gj["coordinates"]:
-				for y in l:
-					strokeStyle.apply(cr)
-					for x in y:
-						xx, yy = gpsmap.convert_geographic_to_screen(OsmGpsMap.MapPoint.new_degrees(x[1], x[0]))
-						cr.line_to(xx, yy)
-
-					draw_end()
-
-		elif gj["type"] == "LineString":
-			for x in gj["coordinates"]:
-				strokeStyle.apply(cr)
-				xx, yy = gpsmap.convert_geographic_to_screen(OsmGpsMap.MapPoint.new_degrees(x[1], x[0]))
-
+			for ii in range(0, g.GetPointCount()):
+				pt = g.GetPoint(ii)
+				xx, yy = gpsmap.convert_geographic_to_screen(OsmGpsMap.MapPoint.new_degrees(pt[1], pt[0]))						
 				cr.line_to(xx, yy)
 
-			draw_end()
-
-		else:
-			pass
-			# print (gj['type'])
+			cr.close_path()
+			cr.stroke_preserve()
+			fillStyle.apply(cr)
+			cr.fill()
