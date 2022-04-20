@@ -257,8 +257,6 @@ class GSHHSVectorChart(ChartLayer):
 		self.countries = list(filter(lambda x: len(x) == 4, map(lambda x: x.split(';'), f.read().split('\n'))))
 		f.close()
 
-
-
 	def onRegister(self, onTickHandler = None):
 		pass
 
@@ -273,11 +271,11 @@ class GSHHSVectorChart(ChartLayer):
 			q = 'l'
 		elif scale > 200:
 			q = 'i'
-		elif scale > 30:
+		elif scale >= 15:
 			q = 'h'
-		elif scale < 30:
-			q = 'h' #f
-		#print(scale, q)
+		elif scale < 15:
+			q = 'f'
+			
 		self.drawer.draw(gpsmap, cr, self.vectorFiles[q+'1'], boundingGeometry)
 
 		if scale < 4500:
