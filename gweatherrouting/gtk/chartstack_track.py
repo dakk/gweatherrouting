@@ -119,12 +119,14 @@ class ChartStackTrack:
 			self.updateTrack(onlyActive=True)
 			self.map.queue_draw()
 
+
 	def onSelectTrackItem (self, selection):
 		store, pathlist = selection.get_selected_rows()
 		for path in pathlist:
 			tree_iter = store.get_iter(path)
 			value = store.get_value(tree_iter, 0)
 			self.selectedTrackItem = int(value) - 1
+
 
 	def onTrackItemMoveUp(self, widget):
 		if self.selectedTrackItem != None:
