@@ -44,16 +44,6 @@ class ChartStackRouting:
 			self.currentRouting.end = True
 
 	def onRoutingCreate(self, event):
-		if not self.core.gribManager.hasGrib():
-			epop = self.builder.get_object('routing-nogrib-error-popover')
-			epop.show_all()
-			return
-
-		if not self.core.trackManager.activeTrack or len (self.core.trackManager.activeTrack) < 2:
-			epop = self.builder.get_object('routing-2points-error-popover')
-			epop.show_all()
-			return
-
 		dialog = RoutingWizardDialog(self.core, self.parent)
 		response = dialog.run ()
 
@@ -77,7 +67,11 @@ class ChartStackRouting:
 		while not self.currentRouting.end:
 			try:
 				res = self.currentRouting.step ()
-			except RoutingNoWindException as e:
+
+			# This exception is not raised by the algorithm
+			# except RoutingNoWindException as e:
+			
+			except:
 				Gdk.threads_enter()
 				edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
 				edialog.format_secondary_text ('Trying to create a route without wind information')
@@ -87,6 +81,7 @@ class ChartStackRouting:
 				Gdk.threads_leave()	
 				self.isochronesMapLayer.setIsochrones ([], [])
 				return None
+			
 
 			Gdk.threads_enter()
 			self.progressBar.set_fraction(res.progress / 100.)

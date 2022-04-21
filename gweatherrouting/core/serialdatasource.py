@@ -46,6 +46,7 @@ class SerialDataSource(DataSource):
 				logger.info ('Detected new data source: %s [%s]' % (x.device, x.description))
 			except:
 		 		pass 
+			
 		return devices
 
 	def _read(self):
