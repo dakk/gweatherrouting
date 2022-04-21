@@ -113,6 +113,9 @@ class PolarWidget(Gtk.DrawingArea):
 		cr.move_to (100.0, 100.0)
 		for i in range (0, len (self.polar.tws), 1):
 			for j in range (0, len (self.polar.twa), 1):
+				if len(self.polar.speedTable [j]) <= i:
+					continue 
+
 				cr.line_to (100 + 5 * self.polar.speedTable [j][i] * math.sin (self.polar.twa[j]), 100 - 5 * self.polar.speedTable [j][i] * math.cos (self.polar.twa[j]))
 				cr.stroke ()
 				cr.move_to (100 + 5 * self.polar.speedTable [j][i] * math.sin (self.polar.twa[j]), 100 - 5 * self.polar.speedTable [j][i] * math.cos (self.polar.twa[j]))

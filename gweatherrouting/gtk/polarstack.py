@@ -63,7 +63,7 @@ class PolarStack(Gtk.Box):
 			cc.remove(self.table)
 
 		p = self.polarWidget.polar
-		
+
 		twaStep = 1  
 		if len(p.twa) > 20:
 			twaStep = int(len(p.twa) / 10)
@@ -95,6 +95,9 @@ class PolarStack(Gtk.Box):
 
 		for i in range (0, len (p.tws), 1):
 			for j in range (0, len (p.twa), twaStep):
+				if len(p.speedTable [j]) <= i:
+					continue 
+
 				l = Gtk.Label(str(p.speedTable [j][i]))
 				self.table.attach(l, i+1, i+2, (j/twaStep)+1, (j/twaStep)+2)
 
