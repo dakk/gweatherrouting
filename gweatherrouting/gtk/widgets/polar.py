@@ -21,7 +21,7 @@ import logging
 from weatherrouting import Polar
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 
 logger = logging.getLogger ('gweatherrouting')
 
@@ -33,7 +33,17 @@ class PolarWidget(Gtk.DrawingArea):
 		self.set_size_request(60,180)
 		self.connect("draw", self.draw)
 		self.polar = None
-	
+
+		self.connect("motion-notify-event", self.onMouseMove)
+		self.add_events(Gdk.EventMask.POINTER_MOTION_MASK)
+
+		self.mousePos = None
+
+	def onMouseMove(self, widget, event):
+		p = self.get_pointer()
+		self.mousePos = (p.x,p.y)
+		# self.queue_draw()
+
 	def loadPolar(self, polarFile):
 		polar = None
 		try:
@@ -131,3 +141,11 @@ class PolarWidget(Gtk.DrawingArea):
 
 		# 200 : 0.8 = height : x
 		# x = height * 0.8 / 200
+
+		# if self.mousePos:
+		# 	cr.scale(1,1)
+		# 	cr.translate(0, 0)
+
+		# 	cr.move_to(100.0, 100.0)
+		# 	cr.line_to(self.mousePos[0], self.mousePos[1])
+		# 	cr.stroke()
