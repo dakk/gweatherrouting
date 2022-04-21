@@ -40,7 +40,7 @@ class OSMAskDownloadDialog(Gtk.Dialog):
 		self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OK, Gtk.ResponseType.OK)
 		self.set_default_size(250, 100)
 		self.set_border_width(10)
-		label = Gtk.Label(label="OpenSeaMap data is missing,\ndo you want to download them (~140MB)?")
+		label = Gtk.Label(label="OpenSeaMap data is missing,\ndo you want to download them (~2MB)?")
 		box = self.get_content_area()
 		box.add(label)
 		self.show_all()
@@ -89,13 +89,13 @@ class OSMDownloadDialog(Gtk.Dialog):
 
 
 	def download(self):
-		uri = "https://github.com/dakk/osm-seamarks/raw/master/seamarks.osm"
+		uri = "https://github.com/dakk/osm-seamarks/raw/master/seamarks.pbf"
 		logger.info("Downloading openseamap")
 
 		response = requests.get(uri, stream=True)
 		total_length = response.headers.get("content-length")
 		last_signal_percent = -1
-		f = open(DATA_DIR + "/seamarks.osm", "wb")
+		f = open(DATA_DIR + "/seamarks.pbf", "wb")
 
 		if total_length is None:
 			pass

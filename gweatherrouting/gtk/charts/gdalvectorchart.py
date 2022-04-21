@@ -42,7 +42,7 @@ class GDALVectorChart(ChartLayer):
 		elif path.find ("Cm93") != -1:
 			drvName = "CM93"
 			self.drawer = CM93ChartDrawer()
-		elif path.find ("osm") != -1:
+		elif path.find ("osm") != -1 or path.find ("pbf") != -1:
 			drvName = "OSM"
 			self.drawer = OSMChartDrawer(self.settingsManager)
 

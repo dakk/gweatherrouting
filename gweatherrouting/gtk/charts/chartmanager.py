@@ -53,8 +53,8 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 			self.charts = [GSHHSVectorChart(DATA_DIR + "/gshhs", self.settingsManager)] + self.charts
 			gshhs = True
 
-		if os.path.exists(DATA_DIR + "/seamarks.osm"):
-			self.charts = self.charts + [GDALVectorChart(DATA_DIR + "/seamarks.osm", self.settingsManager)]
+		if os.path.exists(DATA_DIR + "/seamarks.pbf"):
+			self.charts = self.charts + [GDALVectorChart(DATA_DIR + "/seamarks.pbf", self.settingsManager)]
 			osm = True
 
 		if not gshhs:
