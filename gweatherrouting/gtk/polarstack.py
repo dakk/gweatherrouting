@@ -45,42 +45,61 @@ class PolarStack(Gtk.Box):
 
 		self.statusBar = self.builder.get_object("statusbar")
 
+		self.polars = os.listdir(os.path.abspath(os.path.dirname(__file__)) + '/../data/polars/')
+		boatselect = self.builder.get_object('boat-select')
+		for polar in self.polars:
+			boatselect.insert_text (0, polar)
 
 		self.polarWidget = PolarWidget(self.parent)
-		self.polarWidget.loadPolar('first317.pol')
-		# self.builder.get_object("polar-text").get_buffer().set_text(self.polarWidget.polar.toString())
+		self.table = None
+		boatselect.set_active (1)
+
+	def loadPolar(self, pn):
+		self.polarWidget.loadPolar(pn)
 		self.builder.get_object('polarwidgetcontainer').pack_start(self.polarWidget, True, True, 0)
 
 		cc = self.builder.get_object("polartablecontainer")
-		p = self.polarWidget.polar
-		tb = Gtk.Table(n_rows=len(p.tws), n_columns=len(p.twa), homogeneous=False)
-		cc.pack_start(tb, True, True, 0)
+		if self.table:
+			cc.remove(self.table)
 
-		tb.set_col_spacings(5)
-		tb.set_row_spacings(5)
+		p = self.polarWidget.polar
+		
+		twaStep = 1  
+		if len(p.twa) > 20:
+			twaStep = int(len(p.twa) / 10)
+
+		self.table = Gtk.Table(n_rows=len(p.tws), n_columns=len(p.twa)/twaStep, homogeneous=False)
+		cc.pack_start(self.table, False, False, 0)
+
+		self.table.set_col_spacings(5)
+		self.table.set_row_spacings(5)
 
 		l = Gtk.Label(str('TWA/TWS'))
 		l.set_markup('<b>TWA/TWS</b>')
-		tb.attach(l, 0, 1, 0, 1)
+		self.table.attach(l, 0, 1, 0, 1)
 
 		i = 1
 		for x in p.tws:
 			l = Gtk.Label()
 			l.set_markup('<b>' + str(int(x)) + '</b>')
-			tb.attach(l, i, i+1, 0, 1)
+			self.table.attach(l, i, i+1, 0, 1)
 			i += 1
 
 		i = 1
-		for x in p.twa:
+
+		for x in p.twa[::twaStep]:
 			l = Gtk.Label()
 			l.set_markup('<b>' + str(int(math.degrees(x))) + '°</b>')
-			tb.attach(l, 0, 1, i, i+1)
+			self.table.attach(l, 0, 1, i, i+1)
 			i += 1
 
 		for i in range (0, len (p.tws), 1):
-			for j in range (0, len (p.twa), 1):
+			for j in range (0, len (p.twa), twaStep):
 				l = Gtk.Label(str(p.speedTable [j][i]))
-				tb.attach(l, i+1, i+2, j+1, j+2)
+				self.table.attach(l, i+1, i+2, (j/twaStep)+1, (j/twaStep)+2)
 
 
 		self.show_all()
+
+	def onBoatSelect(self, widget):
+		self.loadPolar(self.polars[widget.get_active()])
