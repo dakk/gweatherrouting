@@ -15,7 +15,7 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
-import LatLon23
+import latlon
 import math
 import os
 import json
@@ -107,13 +107,13 @@ EARTH_RADIUS=60.0*360/(2*math.pi)#nm
 
 
 def pointDistance (latA, lonA, latB, lonB):
-	p1 = LatLon23.LatLon(LatLon23.Latitude(latA), LatLon23.Longitude(lonA))
-	p2 = LatLon23.LatLon(LatLon23.Latitude(latB), LatLon23.Longitude(lonB))
+	p1 = latlon.LatLon(latlon.Latitude(latA), latlon.Longitude(lonA))
+	p2 = latlon.LatLon(latlon.Latitude(latB), latlon.Longitude(lonB))
 	return p1.distance (p2)
 	
 
 def routagePointDistance (latA,lonA,Distanza,Rotta):
-	p = LatLon23.LatLon(LatLon23.Latitude(latA), LatLon23.Longitude(lonA))
+	p = latlon.LatLon(latlon.Latitude(latA), latlon.Longitude(lonA))
 	of = p.offset (math.degrees (Rotta), Distanza).to_string('D')
 	return (float (of[0]), float (of[1]))
 

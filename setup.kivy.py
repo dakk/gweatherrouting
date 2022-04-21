@@ -27,7 +27,8 @@ setup(name='gweatherrouting',
 		'gweatherrouting.common'],
 	package_data={
 		'gweatherrouting': [
-			'data/*', 'data/boats/*', 'data/polars/*', 
+			'data/*', 'data/boats/*', 'data/polars/*', 'data/symbols/*',
+			'data/s57/*',
 			'kivy/*.kv'
 		]
 	},

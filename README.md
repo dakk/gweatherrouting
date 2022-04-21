@@ -4,10 +4,9 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 <!-- [![PyPI version](https://badge.fury.io/py/gweatherrouting.svg)](https://badge.fury.io/py/gweatherrouting) -->
 
-
 GWeatherRouting is an opensource sailing route calculator written in python and:
 - Gtk3 for the desktop version (Linux/Mac/Windows)
-- Kivy for the mobile version (iOS/Android)
+- Kivy for the mobile version (iOS/Android) [Read here](README.mobile.md)
 
 ![Routing in progress](https://github.com/dakk/gweatherrouting/raw/master/media/s3.png)
 
@@ -35,6 +34,15 @@ GWeatherRouting is an opensource sailing route calculator written in python and:
 - NMEA / GPX log analysys
 
 
+## Planned features
+
+- Customizable routing calculator
+- Ortodromic track render
+- AIS rendering
+- Boat realtime dashboard
+- Mobile version
+
+
 ## Installation
 
 First, install the following dependencies using your OS package manager:
@@ -54,33 +62,6 @@ Then checkout the repository and run:
 
 Start the software running:
 ```gweatherrouting```
-
-
-## Building for android
-
-Install buildozer:
-
-```
-git clone https://github.com/kivy/buildozer.git
-cd buildozer
-sudo python setup.py install
-```
-
-
-Create an apk:
-
-```
-rm -rf .buildozer/android/platform/build-armeabi-v7a/build/python-installs/gweatherrouting/gweatherrouting* && buildozer android debug deploy run && buildozer android logcat | grep python
-```
-
-
-## Planned features
-
-- Customizable routing calculator
-- Ortodromic track render
-- AIS rendering
-- Boat realtime dashboard
-- Mobile version
 
 
 ## License
