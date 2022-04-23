@@ -62,6 +62,14 @@
         <signal name="activate" handler="onMeasure" swapped="no"/>
       </object>
     </child>
+    <child>
+      <object class="GtkMenuItem">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Map query</property>
+        <property name="use-underline">True</property>
+      </object>
+    </child>
   </object>
   <object class="GtkMenu" id="poi-menu">
     <property name="visible">True</property>
