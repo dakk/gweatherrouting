@@ -114,7 +114,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		self.builder.get_object("notebook").set_visible(widget.get_active())
 
 	def boatInfoHandler(self, bi):
-		self.map.gps_add(bi.latitude, bi.longitude, heading=bi.heading)
+		self.toolsMapLayer.gpsAdd(bi.latitude, bi.longitude, bi.heading, bi.speed)
 		self.map.queue_draw ()
 
 
