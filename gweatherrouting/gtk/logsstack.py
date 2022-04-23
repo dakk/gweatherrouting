@@ -25,6 +25,8 @@ import PIL
 import gi
 
 from gweatherrouting.core.timecontrol import TimeControl
+from gweatherrouting.gtk.maplayers.toolsmaplayer import ToolsMapLayer
+from gweatherrouting.gtk.maplayers.trackmaplayer import TrackMapLayer
 from gweatherrouting.gtk.widgets.timetravel import TimeTravelWidget 
 
 gi.require_version('OsmGpsMap', '1.2')
@@ -45,10 +47,10 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 
 		self.parent = parent
 		self.core = core
+		self.trackManager = self.core.trackManager
 		self.recording = False
 		self.loading = False 
 		self.data = []
-		self.track = None
 		self.recordedData = None
 		self.toSend = []
 
@@ -78,14 +80,19 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 
 		self.map = self.builder.get_object("map")
 		self.map.set_center_and_zoom (39., 9., 6)
-		# self.map.layer_add (chartManager)
+		self.map.layer_add (chartManager)
 
+		self.toolsMapLayer = ToolsMapLayer ()
+		self.map.layer_add (self.toolsMapLayer)
 
 		self.timeControl = TimeControl()
 		self.selectedTime = self.timeControl.getTime()
 		self.timetravelWidget = TimeTravelWidget(self.parent, self.timeControl, self.map, True)
 		self.timeControl.connect('time-change', self.onTimeChange)
 		self.builder.get_object("timetravelcontainer").pack_start(self.timetravelWidget, True, True, 0)
+
+		self.trackMapLayer = TrackMapLayer(self.core.trackManager, self.timeControl)
+		self.map.layer_add (self.trackMapLayer)
 
 		self.show_all()
 
@@ -262,8 +269,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 			self.timeControl.setTime(x.time)	
 
 			if len(self.data) % 150 == 0:
-				point = OsmGpsMap.MapPoint.new_degrees(x.lat, x.lon)
-				self.track.add_point(point)
+				self.trackManager.log.append((x.lat, x.lon))
 			
 			if self.recording or len(self.data) % 5000 == 0:
 				self.map.set_center_and_zoom (x.lat, x.lon, 12)
@@ -305,13 +311,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 		ext = filepath.split('.')[-1]
 
 		# TODO: support for gpx files 
-
-		if self.track:
-			self.map.track_remove(self.track)
-
-		self.track = OsmGpsMap.MapTrack()
-		self.map.track_add(self.track)
-		self.track.set_property('line-width', 1)
+		self.trackManager.log = []
 
 		try:
 			fi = nt.FileInput(filepath)
@@ -348,35 +348,21 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 			self.recordedData.close()
 		self.recordedData = open(LOG_TEMP_FILE, 'w')
 		self.toSend = []
-		if self.track:
-			self.map.track_remove(self.track)		
-		self.track = OsmGpsMap.MapTrack()
-		self.track.set_property('line-width', 1)
-		self.map.track_add(self.track)
+		self.trackManager.log = []
 		self.map.queue_draw()
 		self.graphArea.queue_draw()
 		logger.debug("Data cleared")
 
 	def rebuildTrack(self):
-		if self.track:
-			self.map.track_remove(self.track)		
-		self.track = OsmGpsMap.MapTrack()
-		self.track.set_property('line-width', 1)
-		self.map.track_add(self.track)
+		self.trackManager.log = []
 		for x in self.data[0::150]:
-			point = OsmGpsMap.MapPoint.new_degrees(x.lat, x.lon)
-			self.track.add_point(point)
+			self.trackManager.log.append((x.lat, x.lon))
 		self.map.queue_draw()
 
 	def startRecording(self):
 		logger.debug("Recording started")
 		self.recording = True
 		self.recordedData = open(LOG_TEMP_FILE, 'w')
-
-		if not self.track:
-			self.track = OsmGpsMap.MapTrack()
-			self.track.set_property('line-width', 1)
-			self.map.track_add(self.track)
 
 		pip = nt.Pipeline(
 			self,
@@ -438,8 +424,8 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 			try:
 				ii = ii[0][0]
 				self.highlightedValue = y[ii]
-				self.map.gps_clear()
-				self.map.gps_add(self.highlightedValue.lat, self.highlightedValue.lon, self.highlightedValue.hdg)
+				self.toolsMapLayer.gpsAdd(self.highlightedValue.lat, self.highlightedValue.lon, self.highlightedValue.hdg, self.highlightedValue.speed)
+
 
 				self.statusBar.push(0, "Time: %s, Position: (%.2f, %.2f), Speed: %.1fkn, Heading: %d, TWS: %.1fkn, TWA: %d, TWD: %d, Depth: %.2f" % (self.selectedTime, self.highlightedValue.lat, self.highlightedValue.lon, self.highlightedValue.speed, self.highlightedValue.hdg, self.highlightedValue.tws, self.highlightedValue.twa, (self.highlightedValue.twa + self.highlightedValue.hdg) % 360, self.highlightedValue.depth))
 			except:

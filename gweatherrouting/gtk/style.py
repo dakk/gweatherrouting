@@ -82,6 +82,8 @@ class Style:
         Font = CairoStyle(color=(0,0,0,1), fontSize=10)
 
     class Track:
+        LogTrack = CairoStyle(color=(1,0,0,1), lineWidth=1)
+
         RoutingTrack = CairoStyle(color=(1,0,0,1), lineWidth=2)
         RoutingTrackFont = CairoStyle(color=(0x11/255, 0x11/255, 0x11/255, 0.7), fontSize=10)
         RoutingTrackCircle = CairoStyle(color=(1,1,1,1), lineWidth=2)

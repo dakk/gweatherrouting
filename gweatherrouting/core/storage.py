@@ -155,7 +155,7 @@ class Storage(dict):
             if x.find('Storage') != -1:
                 continue
 
-            if isinstance(self[x], dict):
+            if isinstance(self[x], dict): 
                 d[x] = self[x].to_dict()
             else:
                 d[x] = self[x]

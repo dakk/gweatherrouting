@@ -31,8 +31,26 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         self.trackManager = trackManager
         self.timeControl = timeControl
 
-
     def do_draw (self, gpsmap, cr):
+        if self.trackManager.log:
+            prevx = None
+            prevy = None 
+            prevp = None 
+            
+            for p in self.trackManager.log:
+                x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (p[0], p[1]))
+
+                if prevx != None and prevy != None:
+                    Style.Track.LogTrack.apply(cr)
+                    cr.move_to (prevx, prevy)
+                    cr.line_to (x, y)
+                    cr.stroke()
+
+                prevx = x
+                prevy = y
+                prevp = p
+
+
         for tr in self.trackManager.routings:
             if not tr.visible:
                 continue 

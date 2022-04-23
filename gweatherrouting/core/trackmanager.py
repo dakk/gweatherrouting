@@ -39,6 +39,8 @@ class TrackManager():
 		self.routings = []
 		self.activeTrack = None
 
+		self.log = []
+
 		for x in self.storage.tracks:
 			tr = Track(name=x['name'], waypoints=x['waypoints'], visible=x['visible'], trackManager=self)
 			self.tracks.append(tr)
@@ -80,6 +82,7 @@ class TrackManager():
 		self.tracks.append (nt)
 		self.activeTrack = nt
 		self.saveTracks()
+
 
 	def getRouting(self, routingName):
 		for x in self.routings:
