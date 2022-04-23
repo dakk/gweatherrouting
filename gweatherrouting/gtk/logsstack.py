@@ -82,7 +82,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 		self.map.set_center_and_zoom (39., 9., 6)
 		self.map.layer_add (chartManager)
 
-		self.toolsMapLayer = ToolsMapLayer ()
+		self.toolsMapLayer = ToolsMapLayer (self.core)
 		self.map.layer_add (self.toolsMapLayer)
 
 		self.timeControl = TimeControl()

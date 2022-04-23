@@ -65,7 +65,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		self.gribMapLayer = GribMapLayer (self.core.gribManager, self.timeControl, self.settingsManager)
 		self.map.layer_add (self.gribMapLayer)
 
-		self.toolsMapLayer = ToolsMapLayer ()
+		self.toolsMapLayer = ToolsMapLayer (core)
 		self.map.layer_add (self.toolsMapLayer)
 		
 		# This causes rendering problem
@@ -77,7 +77,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		ChartStackTrack.__init__(self)
 		ChartStackPOI.__init__(self)
 
-		self.core.connect('boatPosition', self.boatInfoHandler)
+		self.core.connect('boatPosition', self.toolsMapLayer.boatInfoHandler)
 
 		self.timetravelWidget = TimeTravelWidget(self.parent, self.timeControl, self.map)
 		self.builder.get_object("timetravelcontainer").pack_start(self.timetravelWidget, True, True, 0)
@@ -109,6 +109,10 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		# Get the current position and draw line and info until the user clicks again
 
 		self.toolsMapLayer.enableMeasure (lat, lon)
+
+	def onToggleDashboard(self, widget):
+		st = widget.get_active()
+		self.toolsMapLayer.toggleDashboard()
 
 	def onToggleNotebook(self, widget):
 		self.builder.get_object("notebook").set_visible(widget.get_active())

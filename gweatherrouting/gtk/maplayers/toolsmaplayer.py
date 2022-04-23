@@ -26,14 +26,23 @@ gi.require_version('OsmGpsMap', '1.2')
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap
 
 class ToolsMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
-    def __init__ (self):
+    def __init__ (self, core):
         GObject.GObject.__init__ (self)
         
         self.measuring = False 
         self.measureStart = None
         self.mousePosition = None
 
+        self.dashboard = None
+        self.boatInfo = None
+
         self.gps = None 
+
+        # TODO: need to create a new class for data
+        core.connect('data', self.dataHandler)
+
+    def dataHandler(self, bi):
+        self.boatInfo = bi
 
     def gpsClear(self):
         self.gps = None
@@ -50,7 +59,13 @@ class ToolsMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 
         return self.measuring
 
+    def toggleDashboard(self):
+        self.dashboard = not self.dashboard
+
     def do_draw (self, gpsmap, cr):
+        if self.dashboard and self.boatInfo:
+            pass 
+
         if self.gps:
             x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (self.gps[0], self.gps[1]))
             hdg = math.radians(self.gps[2])

@@ -34,7 +34,7 @@ class BoatInfo:
     longitude = 0.0
     speed = 0.0
     heading = 0.0
-
+    
     def isValid(self):
         return self.latitude != 0.0 and self.longitude != 0.0
 
