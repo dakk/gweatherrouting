@@ -372,11 +372,28 @@ loaded to created a routing</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="tooltip-text" translatable="yes">Show / Hide Track / POI tabs</property>
+                    <property name="margin-end">2</property>
                     <property name="label" translatable="yes">Toggle Tabs</property>
                     <property name="use-underline">True</property>
                     <property name="stock-id">gtk-fullscreen</property>
                     <property name="active">True</property>
                     <signal name="toggled" handler="onToggleNotebook" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="homogeneous">True</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkToggleToolButton">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="tooltip-text" translatable="yes">Show / Hide gribs</property>
+                    <property name="label" translatable="yes">Toggle Grib</property>
+                    <property name="use-underline">True</property>
+                    <property name="icon-name">weather-windy</property>
+                    <property name="active">True</property>
+                    <signal name="toggled" handler="onToggleGrib" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>

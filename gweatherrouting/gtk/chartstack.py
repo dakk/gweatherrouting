@@ -114,12 +114,17 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 
 		self.toolsMapLayer.enableMeasure (lat, lon)
 
+	def onToggleGrib(self, widget):
+		self.gribMapLayer.setVisible(widget.get_active())
+		self.map.queue_draw()
+
 	def onToggleAIS(self, widget):
 		self.aisMapLayer.setVisible(widget.get_active())
+		self.map.queue_draw()
 
 	def onToggleDashboard(self, widget):
-		st = widget.get_active()
-		self.toolsMapLayer.toggleDashboard()
+		self.toolsMapLayer.setDashboardVisible(widget.get_active())
+		self.map.queue_draw()
 
 	def onToggleNotebook(self, widget):
 		self.builder.get_object("notebook").set_visible(widget.get_active())

@@ -59,8 +59,8 @@ class ToolsMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 
         return self.measuring
 
-    def toggleDashboard(self):
-        self.dashboard = not self.dashboard
+    def setDashboardVisible(self, v):
+        self.dashboard = v
 
     def do_draw (self, gpsmap, cr):
         if self.dashboard and self.boatInfo:

@@ -30,11 +30,15 @@ from ...common import windColor
 class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 	def __init__(self, gribManager, timeControl, settingsManager):
 		GObject.GObject.__init__(self)
+		self.visible = True
 		self.gribManager = gribManager
 		self.timeControl = timeControl
 		self.timeControl.connect("time-change", self.onTimeChange)
 
 		settingsManager.grib.register_on_change('arrowOpacity', self.onArrowOpacityChange)
+
+	def setVisible(self, visible):
+		self.visible = visible
 
 	def onTimeChange(self, t):
 		pass
@@ -68,6 +72,9 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 		cr.stroke()
 
 	def do_draw(self, gpsmap, cr):
+		if not self.visible:
+			return
+			
 		p1, p2 = gpsmap.get_bbox()
 
 		p1lat, p1lon = p1.get_degrees()
