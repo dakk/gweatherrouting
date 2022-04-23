@@ -24,11 +24,17 @@ gi.require_version('OsmGpsMap', '1.2')
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap
 
 class AISMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
-    def __init__ (self):
+    def __init__ (self, core):
         GObject.GObject.__init__ (self)
+        self.visible = True
+
+    def setVisible(self, visible):
+        self.visible = visible
 
     def do_draw (self, gpsmap, cr):
-        pass
+        if not self.visible:
+            return 
+
 
     def do_render (self, gpsmap):
         pass

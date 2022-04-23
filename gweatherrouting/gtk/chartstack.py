@@ -67,6 +67,9 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 
 		self.toolsMapLayer = ToolsMapLayer (core)
 		self.map.layer_add (self.toolsMapLayer)
+
+		self.aisMapLayer = AISMapLayer (core)
+		self.map.layer_add (self.aisMapLayer)
 		
 		# This causes rendering problem
 		#self.map.layer_add (OsmGpsMap.MapOsd (show_dpad=True, show_zoom=True, show_crosshair=False))
@@ -102,6 +105,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		self.progressBar = self.builder.get_object("progressbar")
 		self.progressBar.hide()
 
+
 	def onMeasure(self, widget):
 		# Set this position as the start point
 		lat = self.builder.get_object("track-add-point-lat").get_text ()
@@ -109,6 +113,9 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		# Get the current position and draw line and info until the user clicks again
 
 		self.toolsMapLayer.enableMeasure (lat, lon)
+
+	def onToggleAIS(self, widget):
+		self.aisMapLayer.setVisible(widget.get_active())
 
 	def onToggleDashboard(self, widget):
 		st = widget.get_active()
