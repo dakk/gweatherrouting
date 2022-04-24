@@ -14,6 +14,7 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
+import traceback
 import gi
 from threading import Thread
 
@@ -47,9 +48,10 @@ class ChartStackRouting:
 		dialog = RoutingWizardDialog(self.core, self.parent)
 		response = dialog.run ()
 
+		polarFile = dialog.getSelectedPolar ()
 		if response == Gtk.ResponseType.OK:
-			self.currentRouting = self.core.createRouting (dialog.getSelectedAlgorithm (), dialog.getSelectedPolar (), dialog.getSelectedTrack(), dialog.getStartDateTime(), dialog.getSelectedStartPoint())
-			
+			self.currentRouting = self.core.createRouting (dialog.getSelectedAlgorithm (), polarFile, dialog.getSelectedTrack(), dialog.getStartDateTime(), dialog.getSelectedStartPoint())
+			self.currentRouting.name = 'routing-' + polarFile.split('.')[0]
 			self.routingThread = Thread(target=self.onRoutingStep, args=())
 			self.routingThread.start()
 
@@ -69,9 +71,7 @@ class ChartStackRouting:
 				res = self.currentRouting.step ()
 
 			# This exception is not raised by the algorithm
-			# except RoutingNoWindException as e:
-			
-			except:
+			except RoutingNoWindException as e:
 				Gdk.threads_enter()
 				edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
 				edialog.format_secondary_text ('Trying to create a route without wind information')
@@ -81,7 +81,18 @@ class ChartStackRouting:
 				Gdk.threads_leave()	
 				self.isochronesMapLayer.setIsochrones ([], [])
 				return None
-			
+
+			except Exception as e:			
+				Gdk.threads_enter()
+				edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
+				edialog.format_secondary_text ('Error: ' + str(e))
+				edialog.run ()
+				edialog.destroy ()
+				self.progressBar.hide()
+				Gdk.threads_leave()	
+				self.isochronesMapLayer.setIsochrones ([], [])
+				traceback.print_exc()
+				return None
 
 			Gdk.threads_enter()
 			self.progressBar.set_fraction(res.progress / 100.)
@@ -106,7 +117,7 @@ class ChartStackRouting:
 		GObject.timeout_add (3000, self.progressBar.hide)
 		Gdk.threads_leave()
 
-		self.core.trackManager.routings.append(RoutingTrack(name=utils.uniqueName('routing', self.core.trackManager.routings), waypoints=tr, trackManager=self.core.trackManager))
+		self.core.trackManager.routings.append(RoutingTrack(name=utils.uniqueName(self.currentRouting.name, self.core.trackManager.routings), waypoints=tr, trackManager=self.core.trackManager))
 		self.updateRoutings()
 
 
