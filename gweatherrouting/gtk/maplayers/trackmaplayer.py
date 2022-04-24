@@ -30,6 +30,10 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         GObject.GObject.__init__ (self)
         self.trackManager = trackManager
         self.timeControl = timeControl
+        self.hlRouting = None
+
+    def hightlightRouting (self, name):
+        self.hlRouting = name
 
     def do_draw (self, gpsmap, cr):
         if self.trackManager.log:
@@ -52,8 +56,13 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 
 
         for tr in self.trackManager.routings:
+            highlight = False 
+
             if not tr.visible:
                 continue 
+
+            if tr.name == self.hlRouting:
+                highlight = True 
 
             prevx = None
             prevy = None 
@@ -65,7 +74,10 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
                 x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (p[0], p[1]))
 
                 if prevp == None:
-                    Style.Track.RoutingTrackFont.apply(cr)
+                    if highlight:
+                        Style.Track.RoutingTrackFontHL.apply(cr)
+                    else:
+                        Style.Track.RoutingTrackFont.apply(cr)
                     cr.move_to(x+10, y)
                     cr.show_text(tr.name)
                     cr.stroke()
@@ -87,12 +99,20 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
                         cr.fill()  
 
                 if prevx != None and prevy != None:
-                    Style.Track.RoutingTrack.apply(cr)
+                    if highlight:
+                        Style.Track.RoutingTrackHL.apply(cr)
+                    else:
+                        Style.Track.RoutingTrack.apply(cr)
+
                     cr.move_to (prevx, prevy)
                     cr.line_to (x, y)
                     cr.stroke()
 
-                Style.Track.RoutingTrackCircle.apply(cr)
+                if highlight:
+                    Style.Track.RoutingTrackCircleHL.apply(cr)
+                else:
+                    Style.Track.RoutingTrackCircle.apply(cr)
+                    
                 cr.arc(x, y, 5, 0, 2 * math.pi)
                 cr.stroke()
 

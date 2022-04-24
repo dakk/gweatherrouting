@@ -20,6 +20,10 @@ class CairoStyle:
         self.fontSize = fontSize
         self.dash = dash
 
+    def withLineWidth(self, lineWidth):
+        self.lineWidth
+        return self
+
     def apply(self, cr):
         if self.lineWidth: 
             cr.set_line_width(self.lineWidth)
@@ -84,10 +88,6 @@ class Style:
     class Track:
         LogTrack = CairoStyle(color=(1,0,0,1), lineWidth=1)
 
-        RoutingTrack = CairoStyle(color=(1,0,0,1), lineWidth=2)
-        RoutingTrackFont = CairoStyle(color=(0x11/255, 0x11/255, 0x11/255, 0.7), fontSize=10)
-        RoutingTrackCircle = CairoStyle(color=(1,1,1,1), lineWidth=2)
-
         TrackActive = CairoStyle(color=(0x91/255., 0x32/255., 0x1c/255., 1), lineWidth=1, dash=8.0)
         TrackActiveFont = CairoStyle(color=(0x11/255, 0x11/255, 0x11/255, 0.7), fontSize=10)
         TrackActivePoiFont = CairoStyle(color=(0x11/255, 0x11/255, 0x11/255, 0.7), fontSize=10)
@@ -95,6 +95,14 @@ class Style:
         TrackInactive = CairoStyle(color=(0x91/255., 0x4a/255., 0x7c/255., 0.6), lineWidth=0.8, dash=8.0)
         TrackInactiveFont = CairoStyle(color=(0x11/255, 0x11/255, 0x11/255, 0.7), fontSize=10)
         TrackInactivePoiFont = CairoStyle(color=(0x11/255, 0x11/255, 0x11/255, 0.3), fontSize=10)
+
+        RoutingTrack = CairoStyle(color=(1,0,0,0.8), lineWidth=1)
+        RoutingTrackFont = CairoStyle(color=(0x11/255, 0x11/255, 0x11/255, 0.7), fontSize=10)
+        RoutingTrackCircle = CairoStyle(color=(1,1,1,1), lineWidth=1)
+
+        RoutingTrackHL = CairoStyle(color=(1,0,0,1), lineWidth=2)
+        RoutingTrackFontHL = CairoStyle(color=(0x11/255, 0x11/255, 0x11/255, 0.7), fontSize=10)
+        RoutingTrackCircleHL = CairoStyle(color=(1,1,1,1), lineWidth=2)
 
         RoutingBoat = CairoStyle(color=(0, 0.4, 0, 1.0), lineWidth=5)
 

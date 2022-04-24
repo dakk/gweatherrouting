@@ -653,7 +653,9 @@ loaded to created a routing</property>
                             <property name="level-indentation">1</property>
                             <signal name="button-press-event" handler="onRoutingClick" swapped="no"/>
                             <child internal-child="selection">
-                              <object class="GtkTreeSelection"/>
+                              <object class="GtkTreeSelection">
+                                <signal name="changed" handler="onSelectRouting" swapped="no"/>
+                              </object>
                             </child>
                             <child>
                               <object class="GtkTreeViewColumn">
