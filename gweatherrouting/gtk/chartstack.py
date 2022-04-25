@@ -102,6 +102,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		self.show_all()
 
 
+		self.builder.get_object("stop-routing-button").hide()
 		self.progressBar = self.builder.get_object("progressbar")
 		self.progressBar.hide()
 

@@ -31,6 +31,7 @@ from weatherrouting import RoutingNoWindException
 class ChartStackRouting:
 	routingThread = None
 	selectedRouting = None
+	stopRouting = False
 
 	def __init__(self):
 		self.routingStore = self.builder.get_object("routing-store")
@@ -42,7 +43,7 @@ class ChartStackRouting:
 
 	def __del__(self): 
 		if self.routingThread:
-			self.currentRouting.end = True
+			self.stopRouting = True
 
 	def onRoutingCreate(self, event):
 		dialog = RoutingWizardDialog(self.core, self.parent)
@@ -50,10 +51,12 @@ class ChartStackRouting:
 
 		polarFile = dialog.getSelectedPolar ()
 		if response == Gtk.ResponseType.OK:
+			self.stopRouting = False
 			self.currentRouting = self.core.createRouting (dialog.getSelectedAlgorithm (), polarFile, dialog.getSelectedTrack(), dialog.getStartDateTime(), dialog.getSelectedStartPoint())
 			self.currentRouting.name = 'routing-' + polarFile.split('.')[0]
 			self.routingThread = Thread(target=self.onRoutingStep, args=())
 			self.routingThread.start()
+			self.builder.get_object("stop-routing-button").show()
 
 		dialog.destroy ()
 		
@@ -66,7 +69,7 @@ class ChartStackRouting:
 
 		res = None 
 
-		while not self.currentRouting.end:
+		while (not self.currentRouting.end) and (not self.stopRouting):
 			try:
 				res = self.currentRouting.step ()
 
@@ -104,6 +107,11 @@ class ChartStackRouting:
 			# self.builder.get_object('time-adjustment').set_value (res.time)
 			Gdk.threads_leave()	
 
+		if self.stopRouting:
+			GObject.timeout_add (3000, self.progressBar.hide)
+			self.builder.get_object("stop-routing-button").hide()
+			return
+
 		tr = []
 		for wp in res.path:
 			if len(wp) == 3:
@@ -119,6 +127,7 @@ class ChartStackRouting:
 
 		self.core.trackManager.routings.append(RoutingTrack(name=utils.uniqueName(self.currentRouting.name, self.core.trackManager.routings), waypoints=tr, trackManager=self.core.trackManager))
 		self.updateRoutings()
+		self.builder.get_object("stop-routing-button").hide()
 
 
 	def updateRoutings(self):
@@ -183,6 +192,11 @@ class ChartStackRouting:
 			
 		dialog.destroy ()
 
+
+	def onRoutingStop (self, widget):
+		self.stopRouting = True
+
+
 	def onSelectRouting (self, selection):
 		store, pathlist = selection.get_selected_rows()
 		for path in pathlist:
@@ -191,7 +205,7 @@ class ChartStackRouting:
 			self.trackMapLayer.hightlightRouting(value)
 
 			self.map.queue_draw()
-			
+
 			if path.get_depth() == 1:
 				self.selectedRouting = value
 			else:
