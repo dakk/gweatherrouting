@@ -18,6 +18,10 @@ import os
 import requests
 from threading import Thread
 from osgeo import ogr
+
+from gweatherrouting.core import utils
+
+from ...core.core import LinePointValidityProvider
 from ...core.storage import DATA_DIR, TEMP_DIR
 from .chartlayer import ChartLayer
 
@@ -240,7 +244,7 @@ class GSHHSDownloadDialog(Gtk.Dialog):
 
 from .vectordrawer.simplechartdrawer import SimpleChartDrawer
 
-class GSHHSVectorChart(ChartLayer):
+class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
 	def __init__(self, path, settingsManager, metadata = None):
 		super().__init__(path, 'vector', settingsManager, metadata)
 
@@ -253,12 +257,100 @@ class GSHHSVectorChart(ChartLayer):
 				if f != None:
 					self.vectorFiles[x+str(y)] = f 
 
+		self.lpvFile = drv.Open(path+'/GSHHS_shp/h/GSHHS_h_L1.shp')
+
 		f = open(os.path.abspath(os.path.dirname(__file__)) + '/../../data/countries_en.txt', 'r')
 		self.countries = list(filter(lambda x: len(x) == 4, map(lambda x: x.split(';'), f.read().split('\n'))))
 		f.close()
 
 	def onRegister(self, onTickHandler = None):
 		pass
+
+
+	lcache = utils.DictCache(1024)
+	lgeom = None 
+	def pointValidity(self, lat, lon):
+		ls = "%.2f,%.2f" % (lat, lon)
+		if ls in self.lcache:
+			print ('C', end='', flush=True)
+			return self.lcache[ls]
+
+		print ('.', end='', flush=True)
+		vf = self.lpvFile
+		
+		point = ogr.Geometry(ogr.wkbPoint)
+		point.AddPoint(lon, lat)
+
+		if self.lgeom:
+			if self.lgeom.Boundary().Contains(point):
+				if self.lgeom.Contains(point):
+					print ('L', end='', flush=True)
+					return False 
+				else:
+					print ('.', end='', flush=True)
+					return True
+			elif self.lgeom.Contains(point):
+				print ('L', end='', flush=True)
+				return False 
+
+		boundingGeometry = ogr.CreateGeometryFromWkt(self.getBoundingWKTOfCoords(lat-0.1, lon-0.1, lat+0.1, lon+0.1))
+		for i in range(vf.GetLayerCount()):
+			layer = vf.GetLayerByIndex(i)
+			layer.SetSpatialFilter(boundingGeometry)
+
+			feat = layer.GetNextFeature()
+			while feat is not None:
+				if not feat:
+					continue 
+
+				geom = feat.GetGeometryRef()
+				
+				geom = boundingGeometry.Intersection(geom)
+				if geom.Contains(point):
+					print ('P', end='', flush=True)
+					self.lcache[ls] = False
+					self.lgeom = geom.Clone()
+					del geom
+					return False
+				del geom 
+				del feat
+				feat = layer.GetNextFeature()
+			del layer 
+		
+		self.lcache[ls] = True
+		return True
+
+
+	def lineValidity(self, lat1, lon1, lat2, lon2):
+		return True
+		print (',', end='', flush=True)
+		vf = self.lpvFile
+		
+		line = ogr.Geometry(ogr.wkbLineString)
+		line.AddPoint(lon1, lat1)
+		line.AddPoint(lon2, lat2)
+
+		boundingGeometry = ogr.CreateGeometryFromWkt(self.getBoundingWKTOfCoords(lat1, lon1, lat2, lon2))
+		for i in range(vf.GetLayerCount()):
+			layer = vf.GetLayerByIndex(i)
+			layer.SetSpatialFilter(boundingGeometry)
+
+			feat = layer.GetNextFeature()
+			while feat is not None:
+				if not feat:
+					continue 
+
+				geom = feat.GetGeometryRef()
+				if geom.Intersects(line):
+					print ('I')
+					del geom
+					return False
+				del geom 
+				del feat
+				feat = layer.GetNextFeature()
+			del layer 
+		
+		return True
 
 	def do_draw(self, gpsmap, cr):
 		boundingGeometry = self.getBoundingGeometry(gpsmap)

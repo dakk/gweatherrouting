@@ -17,6 +17,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import gi
 import os
 
+from ...core.core import LinePointValidityProvider
 from ...core.storage import DATA_DIR
 from .gshhs import GSHHSAskDownloadDialog, GSHHSDownloadDialog, GSHHSVectorChart, OSMAskDownloadDialog, OSMDownloadDialog
 
@@ -29,7 +30,6 @@ gi.require_version('OsmGpsMap', '1.2')
 
 from gi.repository import Gtk, GObject, OsmGpsMap, Gdk
 
-
 logger = logging.getLogger ('gweatherrouting')
 
 class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
@@ -39,6 +39,13 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 		self.settingsManager = settingsManager
 
 		self.settingsManager.register_on_change('chartPalette', self.onChartPaletteChanged)
+
+	def getLinePointValidityProviders(self):
+		lpvp = []
+		for x in filter(lambda x: x.enabled, self.charts):
+			if isinstance(x, LinePointValidityProvider):
+				lpvp += [x]
+		return lpvp
 
 	def onChartPaletteChanged(self, v):
 		# self.queue_draw ()

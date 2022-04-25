@@ -15,6 +15,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 from osgeo import ogr
 
+
 class ChartLayer:
 	def __init__(self, path, ctype, settingsManager, metadata = None, enabled = True):
 		self.path = path
@@ -27,11 +28,8 @@ class ChartLayer:
 		""" Called when the dataset is registered on the software """
 		pass
 
-	def getBoundingWKT(self, gpsmap):
-		p1, p2 = gpsmap.get_bbox()
 
-		p1lat, p1lon = p1.get_degrees()
-		p2lat, p2lon = p2.get_degrees()
+	def getBoundingWKTOfCoords(self, p1lat, p1lon, p2lat, p2lon):
 		return "POLYGON((%f %f,%f %f,%f %f,%f %f,%f %f))" % (
 			p1lon,
 			p1lat,
@@ -44,6 +42,15 @@ class ChartLayer:
 			p1lon,
 			p1lat
 		)
+
+
+	def getBoundingWKT(self, gpsmap):
+		p1, p2 = gpsmap.get_bbox()
+
+		p1lat, p1lon = p1.get_degrees()
+		p2lat, p2lon = p2.get_degrees()
+
+		return self.getBoundingWKTOfCoords(p1lat, p1lon, p2lat, p2lon)
 
 	def getBoundingGeometry(self, gpsmap):
 		wktbb = self.getBoundingWKT(gpsmap)
