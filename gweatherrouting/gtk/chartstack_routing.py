@@ -83,6 +83,7 @@ class ChartStackRouting:
 				self.progressBar.hide()
 				Gdk.threads_leave()	
 				self.isochronesMapLayer.setIsochrones ([], [])
+				self.builder.get_object("stop-routing-button").hide()
 				return None
 
 			except Exception as e:			
@@ -94,6 +95,7 @@ class ChartStackRouting:
 				self.progressBar.hide()
 				Gdk.threads_leave()	
 				self.isochronesMapLayer.setIsochrones ([], [])
+				self.builder.get_object("stop-routing-button").hide()
 				traceback.print_exc()
 				return None
 
@@ -114,10 +116,7 @@ class ChartStackRouting:
 
 		tr = []
 		for wp in res.path:
-			if len(wp) == 3:
-				tr.append((wp[0], wp[1], str(wp[2]), 0, 0, 0, 0))
-			else:
-				tr.append((wp[0], wp[1], str(wp[4]), wp[5], wp[6], wp[7], wp[8]))
+			tr.append((wp.pos[0], wp.pos[1], wp.time.strftime("%m/%d/%Y, %H:%M:%S"), wp.twd, wp.tws, wp.speed, wp.brg))
 
 		Gdk.threads_enter()
 		self.progressBar.set_fraction(1.0)
@@ -125,7 +124,8 @@ class ChartStackRouting:
 		GObject.timeout_add (3000, self.progressBar.hide)
 		Gdk.threads_leave()
 
-		self.core.trackManager.routings.append(RoutingTrack(name=utils.uniqueName(self.currentRouting.name, self.core.trackManager.routings), waypoints=tr, trackManager=self.core.trackManager))
+		# TODO: isochrones=res.isochrones
+		self.core.trackManager.routings.append(RoutingTrack(name=utils.uniqueName(self.currentRouting.name, self.core.trackManager.routings), waypoints=tr,trackManager=self.core.trackManager))
 		self.updateRoutings()
 		self.builder.get_object("stop-routing-button").hide()
 
