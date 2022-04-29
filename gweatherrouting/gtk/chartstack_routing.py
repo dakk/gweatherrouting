@@ -62,8 +62,8 @@ class ChartStackRouting:
 		
 	def onRoutingStep (self):
 		Gdk.threads_enter()
-		self.progressBar.set_fraction(0.0)
-		self.progressBar.set_text("0%")
+		self.progressBar.set_fraction(1.0)
+		self.progressBar.set_text("1%")
 		self.progressBar.show()
 		Gdk.threads_leave()	
 

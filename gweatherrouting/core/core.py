@@ -74,11 +74,11 @@ class Core(EventDispatcher):
         pval = utils.pointValidity
         lval = None 
         
-        # if len(validityProviders) > 0:
-        #     # pval is a function that checks all pointValidity of validityProviders
-        #     pval = lambda lat, lon: all([x.pointValidity(lat, lon) for x in validityProviders])
-        #     # lval is a function that checks all lineValidity of validityProviders
-        #     lval = lambda lat1, lon1, lat2, lon2: all([x.lineValidity(lat1, lon1, lat2, lon2) for x in validityProviders])
+        if len(validityProviders) > 0:
+            # pval is a function that checks all pointValidity of validityProviders
+            pval = lambda lat, lon: all([x.pointValidity(lat, lon) for x in validityProviders])
+            # lval is a function that checks all lineValidity of validityProviders
+            lval = lambda lat1, lon1, lat2, lon2: all([x.lineValidity(lat1, lon1, lat2, lon2) for x in validityProviders])
 
 
         routing = weatherrouting.Routing(
