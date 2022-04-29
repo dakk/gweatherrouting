@@ -38,8 +38,21 @@ class ToolsMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 
         self.gps = None 
 
+        self.mob = False 
+        self.mobPosition = None
+
         # TODO: need to create a new class for data
         core.connect('data', self.dataHandler)
+
+
+    def toggleMob(self, lat, lon):
+        if self.mob:
+            self.mob = False
+            self.mobPosition = None
+        else:
+            self.mob = True
+            self.mobPosition = (float(lat), float(lon))
+        
 
     def dataHandler(self, bi):
         self.boatInfo = bi
@@ -65,6 +78,17 @@ class ToolsMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
     def do_draw (self, gpsmap, cr):
         if self.dashboard and self.boatInfo:
             pass 
+
+        if self.mob and self.mobPosition:
+            lat, lon = self.mobPosition
+            x, y = gpsmap.convert_geographic_to_screen(
+                OsmGpsMap.MapPoint.new_degrees(lat, lon)
+            )
+
+            Style.Track.Mob.apply(cr)
+            cr.arc(x, y, 5, 0, 2 * math.pi)
+            cr.stroke()
+
 
         if self.gps:
             x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (self.gps[0], self.gps[1]))

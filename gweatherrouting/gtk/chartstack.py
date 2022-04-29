@@ -101,10 +101,16 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 
 		self.show_all()
 
-
+		self.builder.get_object("mob-button").hide()
 		self.builder.get_object("stop-routing-button").hide()
 		self.progressBar = self.builder.get_object("progressbar")
 		self.progressBar.hide()
+
+
+	def onMob(self, widget):
+		lat = self.builder.get_object("track-add-point-lat").get_text ()
+		lon = self.builder.get_object("track-add-point-lon").get_text ()
+		self.toolsMapLayer.toggleMob (lat, lon)
 
 
 	def onMeasure(self, widget):
