@@ -267,33 +267,28 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
 		pass
 
 
-	lcache = utils.DictCache(1024)
-	lgeom = None 
-	def pointValidity(self, lat, lon):
-		ls = "%.2f,%.2f" % (lat, lon)
-		if ls in self.lcache:
-			print ('C', end='', flush=True)
-			return self.lcache[ls]
-
-		print ('.', end='', flush=True)
+	def pointsValidity(self, latlons):
 		vf = self.lpvFile
-		
-		point = ogr.Geometry(ogr.wkbPoint)
-		point.AddPoint(lon, lat)
 
-		if self.lgeom:
-			if self.lgeom.Boundary().Contains(point):
-				if self.lgeom.Contains(point):
-					print ('L', end='', flush=True)
-					return False 
-				else:
-					print ('.', end='', flush=True)
-					return True
-			elif self.lgeom.Contains(point):
-				print ('L', end='', flush=True)
-				return False 
+		points = ogr.Geometry(ogr.wkbLinearRing)
+		pointsa = [] 
+		res = [True for x in latlons]
 
-		boundingGeometry = ogr.CreateGeometryFromWkt(self.getBoundingWKTOfCoords(lat-0.1, lon-0.1, lat+0.1, lon+0.1))
+		for x in latlons:
+			point = ogr.Geometry(ogr.wkbPoint)
+			point.AddPoint(x[0], x[1])
+			points.AddPoint(x[0], x[1])
+			pointsa.append(point)
+		points.AddPoint(latlons[0][0], latlons[0][1])
+
+		poly = ogr.Geometry(ogr.wkbPolygon)
+		poly.AddGeometry(points)
+
+		ev = points.GetEnvelope()
+		boundingGeometry = ogr.CreateGeometryFromWkt(self.getBoundingWKTOfCoords(ev[0]-0.5, ev[2]-0.5, ev[1]+0.5, ev[3]+0.5))
+		# print(boundingGeometry.ExportToJson())
+		# boundingGeometry = poly.GetBoundary()
+
 		for i in range(vf.GetLayerCount()):
 			layer = vf.GetLayerByIndex(i)
 			layer.SetSpatialFilter(boundingGeometry)
@@ -303,34 +298,49 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
 				if not feat:
 					continue 
 
-				geom = feat.GetGeometryRef()
-				
+				geom = feat.GetGeometryRef()				
 				geom = boundingGeometry.Intersection(geom)
-				if geom.Contains(point):
-					print ('P', end='', flush=True)
-					self.lcache[ls] = False
-					self.lgeom = geom.Clone()
-					del geom
-					return False
+				
+				for i, x in enumerate(pointsa):
+					# print('testing',i,x)
+					if not res[i]:
+						print('already not')
+						continue
+					if geom.Contains(x):
+						print ('contains')
+						res[i] = False
+						
 				del geom 
 				del feat
+
+				if len(list(filter(lambda x: x, res))) == 0:
+					print('allfalse')
+					return res
+
 				feat = layer.GetNextFeature()
 			del layer 
 		
-		self.lcache[ls] = True
-		return True
+		return res
 
 
-	def lineValidity(self, lat1, lon1, lat2, lon2):
-		return True
-		print (',', end='', flush=True)
+	def linesValidity(self, latlons):
 		vf = self.lpvFile
 		
-		line = ogr.Geometry(ogr.wkbLineString)
-		line.AddPoint(lon1, lat1)
-		line.AddPoint(lon2, lat2)
+		lines = ogr.Geometry(ogr.wkbGeometryCollection)
+		linesa = [] 
+		res = [True for x in latlons]
+		return res
 
-		boundingGeometry = ogr.CreateGeometryFromWkt(self.getBoundingWKTOfCoords(lat1, lon1, lat2, lon2))
+		for x in latlons:
+			line = ogr.Geometry(ogr.wkbLineString)
+			line.AddPoint(x[0], x[1])
+			line.AddPoint(x[2], x[3])
+			lines.AddGeometry(line)
+			linesa.append(line)
+
+		ev = lines.GetEnvelope()
+		boundingGeometry = ogr.CreateGeometryFromWkt(self.getBoundingWKTOfCoords(ev[0], ev[2], ev[1], ev[3]))
+
 		for i in range(vf.GetLayerCount()):
 			layer = vf.GetLayerByIndex(i)
 			layer.SetSpatialFilter(boundingGeometry)
@@ -341,16 +351,107 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
 					continue 
 
 				geom = feat.GetGeometryRef()
-				if geom.Intersects(line):
-					print ('I')
-					del geom
-					return False
+
+				for i, x in enumerate(linesa):
+					if not res[i]:
+						continue
+					if geom.Intersects(x):
+						res[i] = False
+
 				del geom 
 				del feat
+
+				if len(list(filter(lambda x: x, res))) == 0:
+					return res
+
 				feat = layer.GetNextFeature()
 			del layer 
 		
-		return True
+		return res
+
+	# lcache = utils.DictCache(1024)
+	# lgeom = None 
+	# def pointValidity(self, lat, lon):
+	# 	ls = "%.2f,%.2f" % (lat, lon)
+	# 	if ls in self.lcache:
+	# 		# print ('C', end='', flush=True)
+	# 		return self.lcache[ls]
+
+	# 	# print ('.', end='', flush=True)
+	# 	vf = self.lpvFile
+		
+	# 	point = ogr.Geometry(ogr.wkbPoint)
+	# 	point.AddPoint(lon, lat)
+
+	# 	if self.lgeom:
+	# 		if self.lgeom.Boundary().Contains(point):
+	# 			if self.lgeom.Contains(point):
+	# 				# print ('L', end='', flush=True)
+	# 				return False 
+	# 			else:
+	# 				# print ('.', end='', flush=True)
+	# 				return True
+	# 		elif self.lgeom.Contains(point):
+	# 			# print ('L', end='', flush=True)
+	# 			return False 
+
+	# 	boundingGeometry = ogr.CreateGeometryFromWkt(self.getBoundingWKTOfCoords(lat-0.1, lon-0.1, lat+0.1, lon+0.1))
+	# 	for i in range(vf.GetLayerCount()):
+	# 		layer = vf.GetLayerByIndex(i)
+	# 		layer.SetSpatialFilter(boundingGeometry)
+
+	# 		feat = layer.GetNextFeature()
+	# 		while feat is not None:
+	# 			if not feat:
+	# 				continue 
+
+	# 			geom = feat.GetGeometryRef()
+				
+	# 			geom = boundingGeometry.Intersection(geom)
+	# 			if geom.Contains(point):
+	# 				# print ('P', end='', flush=True)
+	# 				self.lcache[ls] = False
+	# 				self.lgeom = geom.Clone()
+	# 				del geom
+	# 				return False
+	# 			del geom 
+	# 			del feat
+	# 			feat = layer.GetNextFeature()
+	# 		del layer 
+		
+	# 	self.lcache[ls] = True
+	# 	return True
+
+
+	# def lineValidity(self, lat1, lon1, lat2, lon2):
+	# 	# print (',', end='', flush=True)
+	# 	vf = self.lpvFile
+		
+	# 	line = ogr.Geometry(ogr.wkbLineString)
+	# 	line.AddPoint(lon1, lat1)
+	# 	line.AddPoint(lon2, lat2)
+
+	# 	boundingGeometry = ogr.CreateGeometryFromWkt(self.getBoundingWKTOfCoords(lat1, lon1, lat2, lon2))
+	# 	for i in range(vf.GetLayerCount()):
+	# 		layer = vf.GetLayerByIndex(i)
+	# 		layer.SetSpatialFilter(boundingGeometry)
+
+	# 		feat = layer.GetNextFeature()
+	# 		while feat is not None:
+	# 			if not feat:
+	# 				continue 
+
+	# 			geom = feat.GetGeometryRef()
+	# 			if geom.Intersects(line):
+	# 				# print ('I', end='', flush=True)
+	# 				del geom
+	# 				return False
+	# 			del geom 
+	# 			del feat
+	# 			feat = layer.GetNextFeature()
+	# 		del layer 
+		
+	# 	return True
 
 	def do_draw(self, gpsmap, cr):
 		boundingGeometry = self.getBoundingGeometry(gpsmap)

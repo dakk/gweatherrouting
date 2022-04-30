@@ -30,10 +30,10 @@ logger = logging.getLogger("gweatherrouting")
 
 
 class LinePointValidityProvider:
-	def pointValidity(self, lat, lon):
+	def pointsValidity(self, latlons):
 		raise Exception("Not implemented")
 
-	def lineValidity(self, lat1, lon1, lat2, lon2):
+	def linesValidity(self, latlons):
 		raise Exception("Not implemented")
 
 class BoatInfo:
@@ -71,15 +71,14 @@ class Core(EventDispatcher):
     def createRouting(self, algorithm, polarFile, track, startDatetime, startPosition, validityProviders):
         polar = weatherrouting.Polar (os.path.abspath(os.path.dirname(__file__)) + '/../data/polars/' + polarFile)
 
-        pval = utils.pointValidity
+        pval = utils.pointsValidity
         lval = None 
         
         if len(validityProviders) > 0:
-            # pval is a function that checks all pointValidity of validityProviders
-            pval = lambda lat, lon: all([x.pointValidity(lat, lon) for x in validityProviders])
-            # lval is a function that checks all lineValidity of validityProviders
-            lval = lambda lat1, lon1, lat2, lon2: all([x.lineValidity(lat1, lon1, lat2, lon2) for x in validityProviders])
-
+            # pval is a function that checks all pointsValidity of validityProviders
+            pval = lambda latlons: validityProviders[0].pointsValidity(latlons)
+            # lval is a function that checks all linesValidity of validityProviders
+            lval = lambda latlons: validityProviders[0].linesValidity(latlons)
 
         routing = weatherrouting.Routing(
             algorithm,
@@ -88,8 +87,8 @@ class Core(EventDispatcher):
             self.gribManager,
             startDatetime=startDatetime,
             startPosition=startPosition,
-            pointValidity=pval,
-            lineValidity=lval
+            pointsValidity=pval,
+            linesValidity=lval
         )
         return routing
 

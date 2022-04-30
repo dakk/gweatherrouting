@@ -92,6 +92,9 @@ def pointInCountry (lat, lon):
 def pointValidity (lat, lon):
 	return not pointInCountry(lat, lon)
 
+def pointsValidity (latlons):
+	return list(map(pointValidity, latlons))
+
 def uniqueName(name, collection):
 	names = []
 	for x in collection:
