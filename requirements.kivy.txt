@@ -1,8 +1,6 @@
 requests
 colorlog
-latlon3
 eccodes==1.3.3
-numpy
 geojson_utils
 bs4
 vext
