@@ -27,6 +27,10 @@ from .routingwizarddialog import RoutingWizardDialog
 from .maplayers import IsochronesMapLayer
 from ..core import RoutingTrack, utils
 from weatherrouting import RoutingNoWindException
+from .. import log
+import logging
+
+logger = logging.getLogger ('gweatherrouting')
 
 class ChartStackRouting:
 	routingThread = None
@@ -72,6 +76,8 @@ class ChartStackRouting:
 		while (not self.currentRouting.end) and (not self.stopRouting):
 			try:
 				res = self.currentRouting.step ()
+
+				logger.debug ("Routing step: " + str(res))
 
 			# This exception is not raised by the algorithm
 			except RoutingNoWindException as e:

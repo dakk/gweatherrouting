@@ -276,18 +276,13 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
 
 		for x in latlons:
 			point = ogr.Geometry(ogr.wkbPoint)
-			point.AddPoint(x[0], x[1])
-			points.AddPoint(x[0], x[1])
+			point.AddPoint(x[1], x[0])
+			points.AddPoint(x[1], x[0])
 			pointsa.append(point)
-		points.AddPoint(latlons[0][0], latlons[0][1])
-
-		poly = ogr.Geometry(ogr.wkbPolygon)
-		poly.AddGeometry(points)
+		points.AddPoint(latlons[0][1], latlons[0][0])
 
 		ev = points.GetEnvelope()
-		boundingGeometry = ogr.CreateGeometryFromWkt(self.getBoundingWKTOfCoords(ev[0]-0.5, ev[2]-0.5, ev[1]+0.5, ev[3]+0.5))
-		# print(boundingGeometry.ExportToJson())
-		# boundingGeometry = poly.GetBoundary()
+		boundingGeometry = ogr.CreateGeometryFromWkt(self.getBoundingWKTOfCoords(ev[1]-0.1, ev[0]-0.1, ev[3]+0.1, ev[2]+0.1))
 
 		for i in range(vf.GetLayerCount()):
 			layer = vf.GetLayerByIndex(i)
@@ -302,19 +297,15 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
 				geom = boundingGeometry.Intersection(geom)
 				
 				for i, x in enumerate(pointsa):
-					# print('testing',i,x)
 					if not res[i]:
-						print('already not')
 						continue
 					if geom.Contains(x):
-						print ('contains')
 						res[i] = False
 						
 				del geom 
 				del feat
 
 				if len(list(filter(lambda x: x, res))) == 0:
-					print('allfalse')
 					return res
 
 				feat = layer.GetNextFeature()
@@ -326,20 +317,20 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
 	def linesValidity(self, latlons):
 		vf = self.lpvFile
 		
-		lines = ogr.Geometry(ogr.wkbGeometryCollection)
+		lines = ogr.Geometry(ogr.wkbLinearRing)
 		linesa = [] 
 		res = [True for x in latlons]
-		return res
 
 		for x in latlons:
 			line = ogr.Geometry(ogr.wkbLineString)
-			line.AddPoint(x[0], x[1])
-			line.AddPoint(x[2], x[3])
+			line.AddPoint(x[1], x[0])
+			line.AddPoint(x[3], x[2])
 			lines.AddGeometry(line)
 			linesa.append(line)
+		lines.AddPoint(latlons[0][1], latlons[0][0])
 
 		ev = lines.GetEnvelope()
-		boundingGeometry = ogr.CreateGeometryFromWkt(self.getBoundingWKTOfCoords(ev[0], ev[2], ev[1], ev[3]))
+		boundingGeometry = ogr.CreateGeometryFromWkt(self.getBoundingWKTOfCoords(ev[1]-0.1, ev[0]-0.1, ev[3]+0.1, ev[2]+0.1))
 
 		for i in range(vf.GetLayerCount()):
 			layer = vf.GetLayerByIndex(i)
