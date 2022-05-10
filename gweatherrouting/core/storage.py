@@ -20,8 +20,16 @@ import platform
 import logging
 import json
 from .. import log
+from datetime import date, datetime
 
 logger = logging.getLogger ('gweatherrouting')
+
+def json_serial(obj):
+    """JSON serializer for objects not serializable by default json code"""
+
+    if isinstance(obj, (datetime, date)):
+        return obj.isoformat()
+    raise TypeError ("Type %s not serializable" % type(obj))
 
 
 def app_data_path (appname, roaming=True):
@@ -125,7 +133,7 @@ class Storage(dict):
             return
 
         with open(DATA_DIR + '/' + self.__filename + '.json', 'w') as f:
-            f.write(json.dumps(self.to_dict(), sort_keys=True, indent=4))
+            f.write(json.dumps(self.to_dict(), sort_keys=True, indent=4, default=json_serial))
             # logger.debug ('Configuration saved to %s/%s.json' % (DATA_DIR, self.__filename))
             f.close()
 

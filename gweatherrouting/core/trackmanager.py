@@ -16,6 +16,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 from .track import RoutingTrack, Track 
 from .utils import uniqueName
+from weatherrouting import IsoPoint
 import gpxpy
 try:
 	from . import Storage
@@ -46,7 +47,8 @@ class TrackManager():
 			self.tracks.append(tr)
 
 		for x in self.storage.routings:
-			tr = RoutingTrack(name=x['name'], waypoints=x['waypoints'], visible=x['visible'], trackManager=self)
+			ic = list(map(lambda x: list(map(lambda y: IsoPoint.fromList(y), x)), x['isochrones']))
+			tr = RoutingTrack(name=x['name'], waypoints=x['waypoints'], isochrones=ic, visible=x['visible'], trackManager=self)
 			self.routings.append(tr)
 
 		self.activate(self.storage.activeTrack)
@@ -64,7 +66,8 @@ class TrackManager():
 
 		ts = []
 		for x in self.routings:
-			ts.append({'name': x.name, 'waypoints': x.waypoints, 'visible': x.visible })
+			ic = list(map(lambda x: list(map(lambda y: y.toList(), x)), x.isochrones))
+			ts.append({'name': x.name, 'waypoints': x.waypoints, 'isochrones': ic, 'visible': x.visible })
 
 		self.storage.routings = ts
 

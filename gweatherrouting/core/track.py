@@ -108,8 +108,9 @@ class Track:
 
 
 class RoutingTrack(Track):
-    def __init__(self, name="routing", waypoints=[], visible=True, trackManager=None):
+    def __init__(self, name="routing", waypoints=[], isochrones=[], visible=True, trackManager=None):
         Track.__init__(self, name, waypoints, visible, trackManager)
+        self.isochrones = isochrones
 
     # Returns the boat lat,lon,rot, speed for routing at time t
     def boatPosition(self, routing, t):

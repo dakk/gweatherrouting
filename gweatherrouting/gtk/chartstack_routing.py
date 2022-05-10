@@ -129,8 +129,7 @@ class ChartStackRouting:
 		GObject.timeout_add (3000, self.progressBar.hide)
 		Gdk.threads_leave()
 
-		# TODO: isochrones=res.isochrones
-		self.core.trackManager.routings.append(RoutingTrack(name=utils.uniqueName(self.currentRouting.name, self.core.trackManager.routings), waypoints=tr,trackManager=self.core.trackManager))
+		self.core.trackManager.routings.append(RoutingTrack(name=utils.uniqueName(self.currentRouting.name, self.core.trackManager.routings), waypoints=tr, isochrones=res.isochrones, trackManager=self.core.trackManager))
 		self.updateRoutings()
 		self.builder.get_object("stop-routing-button").hide()
 
@@ -213,6 +212,9 @@ class ChartStackRouting:
 
 			if path.get_depth() == 1:
 				self.selectedRouting = value
+
+				routing = self.core.trackManager.getRouting(self.selectedRouting)
+				self.isochronesMapLayer.setIsochrones(routing.isochrones, None)
 			else:
 				self.selectedRouting = None
 

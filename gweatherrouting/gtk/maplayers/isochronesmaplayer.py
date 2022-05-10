@@ -46,36 +46,38 @@ class IsochronesMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 		prevy = None
 		i = 0
 
-		for p in self.path:
-			p = p.toList()
-			i += 1
-			x, y = gpsmap.convert_geographic_to_screen(
-				OsmGpsMap.MapPoint.new_degrees(p[0], p[1])
-			)
+		if self.path:
+			for p in self.path:
+				if not isinstance(p, list):
+					p = p.toList()
+				i += 1
+				x, y = gpsmap.convert_geographic_to_screen(
+					OsmGpsMap.MapPoint.new_degrees(p[0], p[1])
+				)
 
-			if prevx == None:
-				Style.Track.RoutingTrackFont.apply(cr)
-				cr.move_to(x + 10, y)
+				if prevx == None:
+					Style.Track.RoutingTrackFont.apply(cr)
+					cr.move_to(x + 10, y)
+					cr.stroke()
+
+				# Style.Track.RoutingTrackFont.apply(cr)
+				cr.move_to(x - 4, y + 18)
+				# cr.show_text(str(p[2]))
+				# cr.stroke()
+
+				if prevx != None and prevy != None:
+					Style.Track.RoutingTrack.apply(cr)
+
+					cr.move_to(prevx, prevy)
+					cr.line_to(x, y)
+					cr.stroke()
+
+				Style.Track.RoutingTrackCircle.apply(cr)
+				cr.arc(x, y, 5, 0, 2 * math.pi)
 				cr.stroke()
 
-			# Style.Track.RoutingTrackFont.apply(cr)
-			cr.move_to(x - 4, y + 18)
-			# cr.show_text(str(p[2]))
-			# cr.stroke()
-
-			if prevx != None and prevy != None:
-				Style.Track.RoutingTrack.apply(cr)
-
-				cr.move_to(prevx, prevy)
-				cr.line_to(x, y)
-				cr.stroke()
-
-			Style.Track.RoutingTrackCircle.apply(cr)
-			cr.arc(x, y, 5, 0, 2 * math.pi)
-			cr.stroke()
-
-			prevx = x
-			prevy = y
+				prevx = x
+				prevy = y
 
 		# Render isochrones
 		i = 0
