@@ -56,7 +56,7 @@ class ChartStackRouting:
 		polarFile = dialog.getSelectedPolar ()
 		if response == Gtk.ResponseType.OK:
 			self.stopRouting = False
-			self.currentRouting = self.core.createRouting (dialog.getSelectedAlgorithm (), polarFile, dialog.getSelectedTrack(), dialog.getStartDateTime(), dialog.getSelectedStartPoint(), self.chartManager.getLinePointValidityProviders())
+			self.currentRouting = self.core.createRouting (dialog.getSelectedAlgorithm (), polarFile, dialog.getSelectedTrack(), dialog.getStartDateTime(), dialog.getSelectedStartPoint(), self.chartManager.getLinePointValidityProviders(), not dialog.getCoastlineChecks())
 			self.currentRouting.name = 'routing-' + polarFile.split('.')[0]
 			self.routingThread = Thread(target=self.onRoutingStep, args=())
 			self.routingThread.start()
@@ -76,7 +76,6 @@ class ChartStackRouting:
 		while (not self.currentRouting.end) and (not self.stopRouting):
 			try:
 				res = self.currentRouting.step ()
-
 				logger.debug ("Routing step: " + str(res))
 
 			# This exception is not raised by the algorithm

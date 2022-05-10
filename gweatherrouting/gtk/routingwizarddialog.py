@@ -143,6 +143,8 @@ class RoutingWizardDialog:
 		
 		tp.destroy()
 
+	def getCoastlineChecks(self):
+		return self.builder.get_object('coastline-check').get_active()
 
 	def getStartDateTime(self):
 		return datetime.datetime.strptime(self.builder.get_object('time-entry').get_text(), TimeControl.DFORMAT)

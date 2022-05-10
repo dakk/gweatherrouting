@@ -16,14 +16,14 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import gi
 import os
-import json
-import math
-import datetime
+import logging
+
 from threading import Thread
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gio, GObject, Gdk
+from gi.repository import Gtk, GObject, Gdk
 
 from ..core import Storage
+logger = logging.getLogger ('gweatherrouting')
 
 GribFileFilter = Gtk.FileFilter ()
 GribFileFilter.set_name ("Grib file")
@@ -136,7 +136,8 @@ class GribManagerWindow:
 		self.updateLocalGribs()
 
 	def onGribDownloadPercentage (self, percentage):
-		print ('Downloading grib: %d%% completed' % percentage)
+		if percentage % 10 == 0:
+			logger.info('Downloading grib: %d%% completed' % percentage)
 		self.builder.get_object('download-progress').set_fraction(percentage / 100.)
 		self.builder.get_object('download-progress').set_text("%d%%" % percentage)
 		# self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Downloading grib: %d%% completed' % percentage)

@@ -68,7 +68,7 @@ class Core(EventDispatcher):
                 self.dispatch("boatPosition", self.boatInfo)
 
     # Simulation
-    def createRouting(self, algorithm, polarFile, track, startDatetime, startPosition, validityProviders):
+    def createRouting(self, algorithm, polarFile, track, startDatetime, startPosition, validityProviders, disableCoastlineChecks=False):
         polar = weatherrouting.Polar (os.path.abspath(os.path.dirname(__file__)) + '/../data/polars/' + polarFile)
 
         pval = utils.pointsValidity
@@ -79,6 +79,10 @@ class Core(EventDispatcher):
             pval = lambda latlons: validityProviders[0].pointsValidity(latlons)
             # lval is a function that checks all linesValidity of validityProviders
             lval = lambda latlons: validityProviders[0].linesValidity(latlons)
+
+        if disableCoastlineChecks:
+            lval = None
+            pval = None
 
         routing = weatherrouting.Routing(
             algorithm,
