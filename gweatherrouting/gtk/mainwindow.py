@@ -28,7 +28,7 @@ from .logsstack import LogsStack
 gi.require_version('Gtk', '3.0')
 gi.require_version('OsmGpsMap', '1.2')
 
-from gi.repository import Gtk, Gdk, GObject 
+from gi.repository import Gtk, Gdk
 
 from .. import log
 import logging

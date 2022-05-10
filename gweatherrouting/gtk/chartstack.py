@@ -20,7 +20,7 @@ import os
 gi.require_version('Gtk', '3.0')
 gi.require_version('OsmGpsMap', '1.2')
 
-from gi.repository import Gtk, Gdk, Keybinder
+from gi.repository import Gtk, Gdk, Keybinder, OsmGpsMap
 
 import logging
 
@@ -60,6 +60,12 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		self.map = self.builder.get_object("map")
 		self.map.set_center_and_zoom (39., 9., 6)
 
+		self.map.set_keyboard_shortcut(OsmGpsMap.MapKey_t.FULLSCREEN, Gdk.keyval_from_name("F11"))
+		self.map.set_keyboard_shortcut(OsmGpsMap.MapKey_t.UP, Gdk.keyval_from_name("Up"))
+		self.map.set_keyboard_shortcut(OsmGpsMap.MapKey_t.DOWN, Gdk.keyval_from_name("Down"))
+		self.map.set_keyboard_shortcut(OsmGpsMap.MapKey_t.LEFT, Gdk.keyval_from_name("Left"))
+		self.map.set_keyboard_shortcut(OsmGpsMap.MapKey_t.RIGHT, Gdk.keyval_from_name("Right"))
+
 		self.map.layer_add (self.chartManager)
 
 		self.gribMapLayer = GribMapLayer (self.core.gribManager, self.timeControl, self.settingsManager)
@@ -72,7 +78,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		self.map.layer_add (self.aisMapLayer)
 		
 		# This causes rendering problem
-		#self.map.layer_add (OsmGpsMap.MapOsd (show_dpad=True, show_zoom=True, show_crosshair=False))
+		# self.map.layer_add (OsmGpsMap.MapOsd (show_scale=True, show_dpad=False, show_zoom=False, show_crosshair=False))
 
 		self.statusbar = self.builder.get_object("status-bar")
 
@@ -105,6 +111,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		self.builder.get_object("stop-routing-button").hide()
 		self.progressBar = self.builder.get_object("progressbar")
 		self.progressBar.hide()
+
 
 
 	def onMob(self, widget):
