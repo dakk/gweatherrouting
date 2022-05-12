@@ -91,20 +91,6 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		self.timetravelWidget = TimeTravelWidget(self.parent, self.timeControl, self.map)
 		self.builder.get_object("timetravelcontainer").pack_start(self.timetravelWidget, True, True, 0)
 
-
-		# https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/#Z/#Y/#X
-		# https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/#Z/#Y/#X
-		# https://a.basemaps.cartocdn.com/dark_all/#Z/#X/#Y.png
-
-		# var CartoDB_DarkMatter = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-		# 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-		# 	subdomains: 'abcd',
-		# 	maxZoom: 19
-		# });
-		# var OpenSeaMap = L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
-		# 	attribution: 'Map data: &copy; <a href="http://www.openseamap.org">OpenSeaMap</a> contributors'
-		# });
-
 		self.show_all()
 
 		self.builder.get_object("mob-button").hide()
@@ -113,26 +99,23 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		self.progressBar.hide()
 
 
-	def onMoveBoatHere(self, widget):
+	def getLatLon(self):
 		lat = self.builder.get_object("track-add-point-lat").get_text ()
 		lon = self.builder.get_object("track-add-point-lon").get_text ()
+		return (float(lat), float(lon))
+
+	def onMoveBoatHere(self, widget):
+		lat, lon = self.getLatLon()
 		self.toolsMapLayer.gpsAdd(lat, lon)
 		self.map.queue_draw()
 
-
 	def onMob(self, widget):
-		lat = self.builder.get_object("track-add-point-lat").get_text ()
-		lon = self.builder.get_object("track-add-point-lon").get_text ()
+		lat, lon = self.getLatLon()
 		self.toolsMapLayer.toggleMob (lat, lon)
 		self.map.queue_draw()
 
-
 	def onMeasure(self, widget):
-		# Set this position as the start point
-		lat = self.builder.get_object("track-add-point-lat").get_text ()
-		lon = self.builder.get_object("track-add-point-lon").get_text ()
-		# Get the current position and draw line and info until the user clicks again
-
+		lat, lon = self.getLatLon()
 		self.toolsMapLayer.enableMeasure (lat, lon)
 		self.map.queue_draw()
 
