@@ -60,8 +60,8 @@ class ToolsMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
     def gpsClear(self):
         self.gps = None
 
-    def gpsAdd(self, lat, lon, hdg, speed=None):
-        self.gps = (lat, lon, hdg, speed)
+    def gpsAdd(self, lat, lon, hdg = 0, speed = None):
+        self.gps = (float(lat), float(lon), hdg, speed)
 
     def enableMeasure(self, lat, lon):
         self.measuring = True

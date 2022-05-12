@@ -113,11 +113,18 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		self.progressBar.hide()
 
 
+	def onMoveBoatHere(self, widget):
+		lat = self.builder.get_object("track-add-point-lat").get_text ()
+		lon = self.builder.get_object("track-add-point-lon").get_text ()
+		self.toolsMapLayer.gpsAdd(lat, lon)
+		self.map.queue_draw()
+
 
 	def onMob(self, widget):
 		lat = self.builder.get_object("track-add-point-lat").get_text ()
 		lon = self.builder.get_object("track-add-point-lon").get_text ()
 		self.toolsMapLayer.toggleMob (lat, lon)
+		self.map.queue_draw()
 
 
 	def onMeasure(self, widget):
@@ -127,6 +134,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		# Get the current position and draw line and info until the user clicks again
 
 		self.toolsMapLayer.enableMeasure (lat, lon)
+		self.map.queue_draw()
 
 	def onToggleGrib(self, widget):
 		self.gribMapLayer.setVisible(widget.get_active())
