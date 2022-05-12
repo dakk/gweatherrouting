@@ -33,7 +33,8 @@ class ToolsMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         self.measureStart = None
         self.mousePosition = None
 
-        self.dashboard = None
+        self.dashboard = False
+        self.compass = False
         self.boatInfo = None
 
         self.gps = None 
@@ -72,6 +73,9 @@ class ToolsMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 
         return self.measuring
 
+    def setCompassVisible(self, v):
+        self.compass = v
+
     def setDashboardVisible(self, v):
         self.dashboard = v
 
@@ -88,6 +92,25 @@ class ToolsMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
             Style.Track.Mob.apply(cr)
             cr.arc(x, y, 5, 0, 2 * math.pi)
             cr.stroke()
+
+        if self.compass and self.gps:
+            x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (self.gps[0], self.gps[1]))
+
+            Style.Compass.Font.apply(cr)
+
+            for i in list(range(360))[::45]:
+                ii = math.radians(i)
+                cr.move_to (x + math.sin (ii) * 100.0, y - math.cos (ii) * 90.0)
+                cr.show_text (str (i) + '°')
+
+            Style.Compass.Line.apply(cr)
+
+            for i in list(range(360))[::45]:
+                ii = math.radians(i)
+                cr.move_to (x, y)
+                cr.line_to (x + math.sin (ii) * 60.0, y - math.cos (ii) * 60.0)
+                cr.stroke()
+
 
 
         if self.gps:

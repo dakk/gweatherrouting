@@ -85,6 +85,10 @@ class Style:
         Line = CairoStyle(color=(0,0,0,1), lineWidth=0.6)
         Font = CairoStyle(color=(0,0,0,1), fontSize=10)
 
+    class Compass:
+        Line = CairoStyle(color=(0,0,0,0.3), lineWidth=0.6)
+        Font = CairoStyle(color=(0,0,0,1), fontSize=10)
+
     class Track:
         LogTrack = CairoStyle(color=(1,0,0,1), lineWidth=1)
 

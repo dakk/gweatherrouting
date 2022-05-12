@@ -424,6 +424,21 @@ loaded to created a routing</property>
                   </packing>
                 </child>
                 <child>
+                  <object class="GtkToggleToolButton">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="tooltip-text" translatable="yes">Show / Hide compass</property>
+                    <property name="label" translatable="yes">Compass</property>
+                    <property name="use-underline">True</property>
+                    <property name="icon-name">compass</property>
+                    <signal name="toggled" handler="onToggleCompass" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="homogeneous">True</property>
+                  </packing>
+                </child>
+                <child>
                   <object class="GtkSeparatorToolItem">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>

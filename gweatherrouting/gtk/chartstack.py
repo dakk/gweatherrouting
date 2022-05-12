@@ -119,6 +119,10 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		self.toolsMapLayer.enableMeasure (lat, lon)
 		self.map.queue_draw()
 
+	def onToggleCompass(self, widget):
+		self.toolsMapLayer.setCompassVisible(widget.get_active())
+		self.map.queue_draw()
+
 	def onToggleGrib(self, widget):
 		self.gribMapLayer.setVisible(widget.get_active())
 		self.map.queue_draw()
