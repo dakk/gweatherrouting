@@ -100,16 +100,20 @@ class ToolsMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 
             for i in list(range(360))[::45]:
                 ii = math.radians(i)
-                cr.move_to (x + math.sin (ii) * 100.0, y - math.cos (ii) * 90.0)
+                cr.move_to (x + math.sin (ii) * 80.0, y - math.cos (ii) * 80.0)
                 cr.show_text (str (i) + '°')
 
-            Style.Compass.Line.apply(cr)
-
             for i in list(range(360))[::45]:
-                ii = math.radians(i)
+                radius = 100
+                angle1 = math.radians(i-5)
+                angle2 = math.radians(i+5)
+
+                cr.set_source_rgba (1, 0.2, 0.2, 0.4)
                 cr.move_to (x, y)
-                cr.line_to (x + math.sin (ii) * 60.0, y - math.cos (ii) * 60.0)
-                cr.stroke()
+                cr.set_line_width (1.0)
+                cr.arc (x, y, radius, angle1, angle2)
+                cr.fill ()
+
 
 
 
