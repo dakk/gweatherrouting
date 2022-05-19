@@ -115,8 +115,11 @@ class ChartStackRouting:
 			Gdk.threads_leave()	
 
 		if self.stopRouting:
+			Gdk.threads_enter()
 			GObject.timeout_add (3000, self.progressBar.hide)
 			self.builder.get_object("stop-routing-button").hide()
+			self.isochronesMapLayer.setIsochrones ([], [])
+			Gdk.threads_leave()	
 			return
 
 		tr = []
