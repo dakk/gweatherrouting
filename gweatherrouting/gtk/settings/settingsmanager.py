@@ -22,6 +22,7 @@ class SettingsManager(Storage):
 
 		self.grib = Storage(parent=self)
 		self.grib.arrowOpacity = 0.4
+		self.grib.arrowOnGround = False
 		self.vectorCharts = []
 		self.rasterCharts = []
 		self.chartPalette = 'cm93'

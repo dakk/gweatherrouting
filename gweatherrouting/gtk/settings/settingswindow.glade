@@ -2,6 +2,7 @@
 <!-- Generated with glade 3.38.2 -->
 <interface>
   <requires lib="gtk+" version="3.24"/>
+  <object class="GtkToggleAction"/>
   <object class="GtkListStore" id="chart-store">
     <columns>
       <!-- column-name path -->
@@ -209,6 +210,9 @@
                                             <property name="visible">True</property>
                                             <property name="can-focus">True</property>
                                             <property name="model">chart-store</property>
+                                            <child internal-child="selection">
+                                              <object class="GtkTreeSelection"/>
+                                            </child>
                                             <child>
                                               <object class="GtkTreeViewColumn">
                                                 <property name="title" translatable="yes">Path</property>
@@ -367,7 +371,41 @@
                                 <property name="can-focus">False</property>
                                 <property name="orientation">vertical</property>
                                 <child>
-                                  <placeholder/>
+                                  <object class="GtkBox">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="label" translatable="yes">Arrow on ground</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="padding">5</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkSwitch" id="grib-arrow-onground">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">True</property>
+                                        <signal name="state-set" handler="onGribArrowOnGroundChange" swapped="no"/>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="padding">5</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">True</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
                                 </child>
                                 <child>
                                   <object class="GtkBox">
@@ -383,6 +421,7 @@
                                       <packing>
                                         <property name="expand">False</property>
                                         <property name="fill">True</property>
+                                        <property name="padding">5</property>
                                         <property name="position">0</property>
                                       </packing>
                                     </child>
@@ -399,6 +438,7 @@
                                       <packing>
                                         <property name="expand">True</property>
                                         <property name="fill">True</property>
+                                        <property name="padding">5</property>
                                         <property name="position">1</property>
                                       </packing>
                                     </child>

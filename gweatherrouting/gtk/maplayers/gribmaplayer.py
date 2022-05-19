@@ -16,6 +16,8 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import gi
 import math
+
+from gweatherrouting.core.utils import pointInCountry
 from ..style import *
 
 gi.require_version("Gtk", "3.0")
@@ -36,12 +38,16 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 		self.timeControl.connect("time-change", self.onTimeChange)
 
 		settingsManager.grib.register_on_change('arrowOpacity', self.onArrowOpacityChange)
+		settingsManager.grib.register_on_change('arrowOnGround', self.onArrowOnGroundChange)
 
 	def setVisible(self, visible):
 		self.visible = visible
 
 	def onTimeChange(self, t):
 		pass
+
+	def onArrowOnGroundChange(self, v):
+		self.arrowOnGround = v
 
 	def onArrowOpacityChange(self, v):
 		self.arrowOpacity = v
@@ -106,6 +112,10 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 		# Draw arrows
 		for x in data[::scale]:
 			for y in x[::scale]:
+				if not self.arrowOnGround:
+					if pointInCountry(y[2][0], y[2][1]):
+						continue
+
 				xx, yy = gpsmap.convert_geographic_to_screen(
 					OsmGpsMap.MapPoint.new_degrees(y[2][0], y[2][1])
 				)

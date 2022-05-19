@@ -41,6 +41,7 @@ class SettingsWindow(SettingsWindowConnections, SettingsWindowCharts):
 
 		# self.dialog.show_all ()
 
+		self.builder.get_object('grib-arrow-onground').set_active(self.settingsManager.grib.arrowOnGround)
 		self.builder.get_object('grib-arrow-opacity-adjustment').set_value(self.settingsManager.grib.arrowOpacity)
 
 		SettingsWindowConnections.__init__(self, self.parent, settingsManager, core)
@@ -54,6 +55,9 @@ class SettingsWindow(SettingsWindowConnections, SettingsWindowCharts):
 	def close(self):
 		self.window.hide()
 		
+	def onGribArrowOnGroundChange(self, widget, v):
+		self.settingsManager.grib.arrowOnGround = widget.get_active()
+
 	def onGribArrowOpacityChange(self, v):
 		self.settingsManager.grib.arrowOpacity = v.get_value()
 
