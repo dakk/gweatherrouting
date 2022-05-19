@@ -112,6 +112,12 @@ class POIManager():
 			if x.name == name:
 				return self.pois.remove(x)
 
+	def move(self, name, lat, lon):
+		for x in self.pois:
+			if x.name == name:
+				x.position = (lat, lon)
+				return
+
 	def savePOI(self):
 		ts = []
 		for x in self.pois:

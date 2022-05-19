@@ -14,6 +14,7 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
+from re import S
 import gi
 import math
 from ..style import *
@@ -42,6 +43,9 @@ class ToolsMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         self.mob = False 
         self.mobPosition = None
 
+        self.poiMoving = False 
+        self.poiMovingCallback = None
+
         # TODO: need to create a new class for data
         core.connect('data', self.dataHandler)
 
@@ -64,14 +68,17 @@ class ToolsMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
     def gpsAdd(self, lat, lon, hdg = 0, speed = None):
         self.gps = (float(lat), float(lon), hdg, speed)
 
+    def enablePOIMoving(self, callback):
+        self.poiMoving = True 
+        self.poiMovingCallback = callback
+
     def enableMeasure(self, lat, lon):
         self.measuring = True
         self.measureStart = (float(lat), float(lon))
 
     def onMouseMove(self, lat, lon, x, y):
         self.mousePosition = (float(lat), float(lon), x, y)
-
-        return self.measuring
+        return self.measuring or self.poiMoving
 
     def setCompassVisible(self, v):
         self.compass = v
@@ -80,6 +87,16 @@ class ToolsMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         self.dashboard = v
 
     def do_draw (self, gpsmap, cr):
+        if self.poiMoving:
+            # Draw a black dot with a red circle around
+            cr.set_source_rgb(0, 0, 0)
+            cr.arc(self.mousePosition[2], self.mousePosition[3], 1, 0, 2 * math.pi)
+            cr.stroke()
+            cr.set_source_rgb(1, 0, 0)
+            cr.arc(self.mousePosition[2], self.mousePosition[3], 16, 0, 2 * math.pi)
+            cr.stroke()
+
+
         if self.dashboard and self.boatInfo:
             pass 
 
@@ -185,6 +202,11 @@ class ToolsMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
         if self.measuring and gdkeventbutton.button == 1:
             self.measuring = False
             self.measureStart = None
+            return True
+
+        if self.poiMoving and gdkeventbutton.button == 1:
+            self.poiMoving = False
+            self.poiMovingCallback(self.mousePosition[0], self.mousePosition[1])
             return True
 
         return False

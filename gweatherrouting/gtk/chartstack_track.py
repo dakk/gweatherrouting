@@ -128,6 +128,12 @@ class ChartStackTrack:
 			self.selectedTrackItem = int(value) - 1
 
 
+	def onTrackItemMove(self, widget):
+		if self.selectedTrackItem != None:
+			self.toolsMapLayer.enablePOIMoving(
+				lambda x,y: self.core.trackManager.activeTrack.move(self.selectedTrackItem, x, y))
+
+
 	def onTrackItemMoveUp(self, widget):
 		if self.selectedTrackItem != None:
 			self.core.trackManager.activeTrack.moveUp(self.selectedTrackItem)

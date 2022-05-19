@@ -98,7 +98,6 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		self.progressBar = self.builder.get_object("progressbar")
 		self.progressBar.hide()
 
-
 	def getLatLon(self):
 		lat = self.builder.get_object("track-add-point-lat").get_text ()
 		lon = self.builder.get_object("track-add-point-lon").get_text ()
