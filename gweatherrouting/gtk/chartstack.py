@@ -106,8 +106,9 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 
 	def onMoveBoatHere(self, widget):
 		lat, lon = self.getLatLon()
-		self.toolsMapLayer.gpsAdd(lat, lon)
-		self.map.queue_draw()
+		self.core.setBoatPosition(lat, lon)
+		# self.toolsMapLayer.gpsAdd(lat, lon)
+		# self.map.queue_draw()
 
 	def onMob(self, widget):
 		lat, lon = self.getLatLon()

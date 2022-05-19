@@ -19,6 +19,7 @@ import gpxpy
 import os
 
 from gweatherrouting.core.connectionmanager import ConnectionManager
+from gweatherrouting.core.datasource import DataPacket
 
 from . import utils
 from .poimanager import POI
@@ -59,6 +60,14 @@ class Core(EventDispatcher):
 
         self.connectionManager.plugAll()
         self.connectionManager.startPolling()
+
+    def setBoatPosition(self, lat, lon):
+        self.connectionManager.dispatch('data', [
+            DataPacket('position', utils.dotdict({
+                'latitude': lat,
+                'longitude': lon,
+            }))
+        ])
 
     def dataHandler(self, dps):
         for x in dps:

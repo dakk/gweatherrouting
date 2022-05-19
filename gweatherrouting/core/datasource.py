@@ -25,7 +25,7 @@ class DataPacket:
         self.data = sentence
         
     def isPosition(self):
-        return False
+        return 'latitude' in self.data and 'longitude' in self.data
 
     def parse(data):
         raise NotImplementedError

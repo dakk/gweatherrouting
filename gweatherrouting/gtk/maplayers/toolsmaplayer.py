@@ -115,8 +115,6 @@ class ToolsMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
                 cr.fill ()
 
 
-
-
         if self.gps:
             x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (self.gps[0], self.gps[1]))
             hdg = math.radians(self.gps[2])
