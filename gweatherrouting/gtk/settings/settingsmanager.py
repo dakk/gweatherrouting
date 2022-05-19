@@ -20,9 +20,8 @@ class SettingsManager(Storage):
 	def __init__(self):
 		Storage.__init__(self, "settings")
 
-		self.grib = Storage(parent=self)
-		self.grib.arrowOpacity = 0.4
-		self.grib.arrowOnGround = False
+		self.gribArrowOpacity = 0.4
+		self.gribArrowOnGround = False
 		self.vectorCharts = []
 		self.rasterCharts = []
 		self.chartPalette = 'cm93'

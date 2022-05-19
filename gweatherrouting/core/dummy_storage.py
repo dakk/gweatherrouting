@@ -118,6 +118,7 @@ class Storage(dict):
         handler(self[k])
 
     def notify_change(self, k, v):
+        print('notify change', k, v)
         if not self.__init:
             return 
 

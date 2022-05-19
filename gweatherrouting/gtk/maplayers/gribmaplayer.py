@@ -36,9 +36,10 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 		self.gribManager = gribManager
 		self.timeControl = timeControl
 		self.timeControl.connect("time-change", self.onTimeChange)
+		self.settingsManager = settingsManager
 
-		settingsManager.grib.register_on_change('arrowOpacity', self.onArrowOpacityChange)
-		settingsManager.grib.register_on_change('arrowOnGround', self.onArrowOnGroundChange)
+		# settingsManager.register_on_change('gribArrowOpacity', self.onArrowOpacityChange)
+		# settingsManager.register_on_change('gribArrowOnGround', self.onArrowOnGroundChange)
 
 	def setVisible(self, visible):
 		self.visible = visible
@@ -46,17 +47,11 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 	def onTimeChange(self, t):
 		pass
 
-	def onArrowOnGroundChange(self, v):
-		self.arrowOnGround = v
-
-	def onArrowOpacityChange(self, v):
-		self.arrowOpacity = v
-
 	def drawWindArrow(self, cr, x, y, wdir, wspeed):
 		wdir = -math.radians(wdir)
 
 		a, b, c = windColor(wspeed)
-		cr.set_source_rgba(a, b, c, self.arrowOpacity)
+		cr.set_source_rgba(a, b, c, self.settingsManager.gribArrowOpacity)
 
 		length = 15
 
@@ -112,7 +107,7 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 		# Draw arrows
 		for x in data[::scale]:
 			for y in x[::scale]:
-				if not self.arrowOnGround:
+				if not self.settingsManager.gribArrowOnGround:
 					if pointInCountry(y[2][0], y[2][1]):
 						continue
 

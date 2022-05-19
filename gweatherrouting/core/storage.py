@@ -180,6 +180,9 @@ class Storage(dict):
     def notify_change(self, k, v):
         if not self.__init:
             return 
+            
+        if not self.__handlers:
+            return 
 
         if not (k in self.__handlers):
             return
