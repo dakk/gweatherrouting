@@ -38,9 +38,6 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 		self.timeControl.connect("time-change", self.onTimeChange)
 		self.settingsManager = settingsManager
 
-		# settingsManager.register_on_change('gribArrowOpacity', self.onArrowOpacityChange)
-		# settingsManager.register_on_change('gribArrowOnGround', self.onArrowOnGroundChange)
-
 	def setVisible(self, visible):
 		self.visible = visible
 

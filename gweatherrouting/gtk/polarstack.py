@@ -30,7 +30,7 @@ logger = logging.getLogger ('gweatherrouting')
 
 
 class PolarStack(Gtk.Box):		
-	def __init__(self, parent, core):
+	def __init__(self, parent, core, settingsManager):
 		Gtk.Widget.__init__(self)
 
 		self.parent = parent

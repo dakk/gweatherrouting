@@ -42,7 +42,7 @@ logger = logging.getLogger ('gweatherrouting')
 LOG_TEMP_FILE = '/tmp/gwr-recording.log'
 
 class LogsStack(Gtk.Box, nt.Output, nt.Input):		
-	def __init__(self, parent, chartManager, core):
+	def __init__(self, parent, chartManager, core, settingsManager):
 		Gtk.Widget.__init__(self)
 
 		self.parent = parent

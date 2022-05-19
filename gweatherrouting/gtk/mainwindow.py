@@ -73,10 +73,10 @@ class MainWindow:
 
 		Gdk.threads_init()
 
-		self.chartStack = ChartStack(self.window, self.chartManager, self.core)
+		self.chartStack = ChartStack(self.window, self.chartManager, self.core, self.settingsManager)
 		self.builder.get_object("chartcontainer").pack_start(self.chartStack, True, True, 0)
 
-		self.logsStack = LogsStack(self.window, self.chartManager, self.core)
+		self.logsStack = LogsStack(self.window, self.chartManager, self.core, self.settingsManager)
 		self.builder.get_object("logscontainer").pack_start(self.logsStack, True, True, 0)
 
 		self.builder.get_object("regattacontainertop").hide()
@@ -84,7 +84,7 @@ class MainWindow:
 		# self.builder.get_object("regattacontainer").pack_start(self.regattaStack, True, True, 0)
 
 		# self.builder.get_object("polarcontainertop").hide()
-		self.polarStack = PolarStack(self.window, self.core)
+		self.polarStack = PolarStack(self.window, self.core, self.settingsManager)
 		self.builder.get_object("polarcontainer").pack_start(self.polarStack, True, True, 0)
 
 

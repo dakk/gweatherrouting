@@ -37,7 +37,7 @@ from .widgets.timetravel import TimeTravelWidget
 logger = logging.getLogger ('gweatherrouting')
 
 class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
-	def __init__(self, parent, chartManager, core):
+	def __init__(self, parent, chartManager, core, settingsManager):
 		Gtk.Widget.__init__(self)
 
 		Keybinder.init()
@@ -48,7 +48,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		self.core = core
 
 		self.timeControl = TimeControl()
-		self.settingsManager = SettingsManager()
+		self.settingsManager = settingsManager
 
 		self.builder = Gtk.Builder()
 		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/chartstack.glade")
