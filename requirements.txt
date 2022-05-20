@@ -12,3 +12,4 @@ numpy
 nmeatoolkit
 matplotlib
 weatherrouting
+gdal
