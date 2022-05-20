@@ -19,7 +19,7 @@ import gi
 from threading import Thread
 
 gi.require_version('Gtk', '3.0')
-gi.require_version('OsmGpsMap', '1.2')
+# gi.require_version('OsmGpsMap', '1.2')
 
 from gi.repository import Gtk, Gdk, GObject
 
