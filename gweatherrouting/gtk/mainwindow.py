@@ -47,7 +47,14 @@ class MainWindow:
 		self.core = core
 		self.settingsManager = SettingsManager()
 
+		# Add custom icon path
 		Gtk.IconTheme.get_default().append_search_path(os.path.abspath(os.path.dirname(__file__)) + "/../data/icons")
+		
+		# Force dark theme
+		settings = Gtk.Settings.get_default()
+		#settings.set_property("gtk-theme-name", "")
+		settings.set_property("gtk-application-prefer-dark-theme", True)
+	
 
 		self.builder = Gtk.Builder()
 		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/mainwindow.glade")
