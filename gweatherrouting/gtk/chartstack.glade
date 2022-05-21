@@ -333,7 +333,7 @@ loaded to created a routing</property>
                     <property name="tooltip-text" translatable="yes">Import</property>
                     <property name="label" translatable="yes">Import</property>
                     <property name="use-underline">True</property>
-                    <property name="stock-id">gtk-add</property>
+                    <property name="icon-name">gtk-add</property>
                     <signal name="clicked" handler="onImport" swapped="no"/>
                   </object>
                   <packing>
@@ -348,7 +348,7 @@ loaded to created a routing</property>
                     <property name="tooltip-text" translatable="yes">New Track</property>
                     <property name="label" translatable="yes">New</property>
                     <property name="use-underline">True</property>
-                    <property name="stock-id">gtk-new</property>
+                    <property name="icon-name">gtk-new</property>
                     <signal name="clicked" handler="onNew" swapped="no"/>
                   </object>
                   <packing>
@@ -363,7 +363,7 @@ loaded to created a routing</property>
                     <property name="tooltip-text" translatable="yes">Routing...</property>
                     <property name="label" translatable="yes">Route...</property>
                     <property name="use-underline">True</property>
-                    <property name="stock-id">gtk-execute</property>
+                    <property name="icon-name">gtk-execute</property>
                     <signal name="clicked" handler="onRoutingCreate" swapped="no"/>
                   </object>
                   <packing>
@@ -378,7 +378,7 @@ loaded to created a routing</property>
                     <property name="tooltip-text" translatable="yes">Export</property>
                     <property name="label" translatable="yes">Export</property>
                     <property name="use-underline">True</property>
-                    <property name="stock-id">gtk-save</property>
+                    <property name="icon-name">gtk-save</property>
                     <signal name="clicked" handler="onExport" swapped="no"/>
                   </object>
                   <packing>
@@ -428,7 +428,7 @@ loaded to created a routing</property>
                     <property name="margin-end">2</property>
                     <property name="label" translatable="yes">Toggle Tabs</property>
                     <property name="use-underline">True</property>
-                    <property name="stock-id">gtk-fullscreen</property>
+                    <property name="icon-name">gtk-fullscreen</property>
                     <property name="active">True</property>
                     <signal name="toggled" handler="onToggleNotebook" swapped="no"/>
                   </object>
@@ -484,7 +484,7 @@ loaded to created a routing</property>
                     <property name="tooltip-text" translatable="yes">Stop routing calculation</property>
                     <property name="label" translatable="yes">Stop Routing</property>
                     <property name="use-underline">True</property>
-                    <property name="stock-id">gtk-stop</property>
+                    <property name="icon-name">gtk-stop</property>
                     <signal name="clicked" handler="onRoutingStop" swapped="no"/>
                   </object>
                   <packing>

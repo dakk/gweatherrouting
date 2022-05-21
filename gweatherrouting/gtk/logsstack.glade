@@ -25,7 +25,7 @@
                 <property name="can-focus">False</property>
                 <property name="label" translatable="yes">Record</property>
                 <property name="use-underline">True</property>
-                <property name="stock-id">gtk-media-record</property>
+                <property name="icon-name">gtk-media-record</property>
                 <signal name="clicked" handler="onRecordingClick" swapped="no"/>
               </object>
               <packing>
@@ -38,7 +38,7 @@
                 <property name="can-focus">False</property>
                 <property name="label" translatable="yes">Stop</property>
                 <property name="use-underline">True</property>
-                <property name="stock-id">gtk-stop</property>
+                <property name="icon-name">gtk-stop</property>
                 <signal name="clicked" handler="onStopRecordingClick" swapped="no"/>
               </object>
               <packing>
@@ -52,7 +52,7 @@
                 <property name="can-focus">False</property>
                 <property name="label" translatable="yes">Load</property>
                 <property name="use-underline">True</property>
-                <property name="stock-id">gtk-open</property>
+                <property name="icon-name">gtk-open</property>
                 <signal name="clicked" handler="onLoadClick" swapped="no"/>
               </object>
               <packing>
@@ -66,7 +66,7 @@
                 <property name="can-focus">False</property>
                 <property name="label" translatable="yes">Save</property>
                 <property name="use-underline">True</property>
-                <property name="stock-id">gtk-save</property>
+                <property name="icon-name">gtk-save</property>
                 <signal name="clicked" handler="onSaveClick" swapped="no"/>
               </object>
               <packing>
@@ -80,7 +80,7 @@
                 <property name="can-focus">False</property>
                 <property name="label" translatable="yes">Clear</property>
                 <property name="use-underline">True</property>
-                <property name="stock-id">gtk-delete</property>
+                <property name="icon-name">gtk-delete</property>
                 <signal name="clicked" handler="clearData" swapped="no"/>
               </object>
               <packing>
@@ -105,7 +105,7 @@
                 <property name="tooltip-text" translatable="yes">Crop between start and end</property>
                 <property name="label" translatable="yes">Crop</property>
                 <property name="use-underline">True</property>
-                <property name="stock-id">gtk-cut</property>
+                <property name="icon-name">gtk-cut</property>
                 <signal name="clicked" handler="cropData" swapped="no"/>
               </object>
               <packing>
