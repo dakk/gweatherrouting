@@ -17,7 +17,10 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import gi
 
 gi.require_version('Gtk', '3.0')
-# gi.require_version('OsmGpsMap', '1.2')
+try:
+	gi.require_version('OsmGpsMap', '1.2')
+except:
+	gi.require_version('OsmGpsMap', '1.0')
 
 from gi.repository import Gtk
 from .maplayers import TrackMapLayer

@@ -29,9 +29,11 @@ from gweatherrouting.gtk.maplayers.toolsmaplayer import ToolsMapLayer
 from gweatherrouting.gtk.maplayers.trackmaplayer import TrackMapLayer
 from gweatherrouting.gtk.widgets.timetravel import TimeTravelWidget 
 
-# gi.require_version('OsmGpsMap', '1.2')
 gi.require_version('Gtk', '3.0')
-# gi.require_version('Dazzle', '1.0')
+try:
+	gi.require_version('OsmGpsMap', '1.2')
+except:
+	gi.require_version('OsmGpsMap', '1.0')
 
 from gi.repository import Gtk, OsmGpsMap, Gdk 
 from threading import Lock
