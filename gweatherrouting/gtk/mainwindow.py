@@ -45,8 +45,9 @@ logger = logging.getLogger ('gweatherrouting')
 class MainWindow:
 	def __init__(self, core):
 		self.core = core
-
 		self.settingsManager = SettingsManager()
+
+		Gtk.IconTheme.get_default().append_search_path(os.path.abspath(os.path.dirname(__file__)) + "/../data/icons")
 
 		self.builder = Gtk.Builder()
 		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/mainwindow.glade")

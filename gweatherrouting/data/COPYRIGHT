@@ -3,6 +3,18 @@ Copyright: 2008-2018 David S Register <bdbcat@yahoo.com>
            2008-2018 Contributors, see src/about.cpp AuthorText[]
 License: GPL-2+
 
+Files: data/icons/
+------------------------ WHITESUR ICON THEME ------------------------
+SOURCES:
+OSX_ONE: https://github.com/unc926/OSX_ONE
+zayronxio: https://github.com/zayronxio/Os-Catalina-icons
+
+CUSTOMIZER:
+Vince Liuice <vinceliuice@hotmail.com>: https://github.com/vinceliuice/WhiteSur-icon-theme
+------------------------ WHITESUR ICON THEME ------------------------
+License: GPL-3.0+
+
+
 Files: data/s57/
 Copyright: 2000-2001 Sylvain Duclos <sylvain_duclos@yahoo.com>
            2010 David S. Register <bdbcat@yahoo.com>
