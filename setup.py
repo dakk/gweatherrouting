@@ -64,5 +64,5 @@ setup(name='gweatherrouting',
 	},
 	options=buildOptions,
 	executables=executables,
-	# install_requires=open ('requirements.txt', 'r').read ().split ('\n')
+	install_requires=open ('requirements.txt', 'r').read ().split ('\n')
 )

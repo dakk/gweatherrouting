@@ -48,14 +48,8 @@ GWeatherRouting is an opensource sailing route calculator written in python and:
 First, install the following dependencies using your OS package manager:
 - osm-gps-map (version 1.2.0)
 - eccodes
-
-Install libweatherrouting:
-
-```bash
-git clone https://github.com/dakk/libweatherrouting
-cd libweatherrouting
-sudo python3 setup.py install
-```
+- python3
+- python3-pip
 
 Then checkout the repository and run:
 ```sudo python3 setup.py install```
