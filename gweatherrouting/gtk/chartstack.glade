@@ -348,7 +348,7 @@ loaded to created a routing</property>
                     <property name="tooltip-text" translatable="yes">New Track</property>
                     <property name="label" translatable="yes">New</property>
                     <property name="use-underline">True</property>
-                    <property name="icon-name">gtk-new</property>
+                    <property name="icon-name">gtk-file</property>
                     <signal name="clicked" handler="onNew" swapped="no"/>
                   </object>
                   <packing>
