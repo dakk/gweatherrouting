@@ -110,19 +110,19 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 
 	def loadVectorLayer(self, path, metadata = None):
 		logger.info("Loading vector chart %s" % path)
-		l = GDALVectorChart(path, metadata)
+		l = GDALVectorChart(path, self.settingsManager, metadata)
 		self.charts += [l]
 
 		if self.osmLayer:
 			self.osmLayer.enabled = False 
 		if self.gshhsLayer:
 			self.gshhsLayer.forceDownscale = True
-			
+
 		return l
 
 	def loadRasterLayer(self, path, metadata = None):
 		logger.info("Loading raster chart %s" % path)
-		l = GDALRasterChart(path, metadata)
+		l = GDALRasterChart(path, self.settingsManager, metadata)
 		self.charts += [l]
 
 		if self.osmLayer:
