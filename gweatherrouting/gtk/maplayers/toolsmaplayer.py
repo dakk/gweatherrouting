@@ -92,6 +92,7 @@ class ToolsMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
     def do_draw (self, gpsmap, cr):
         if self.poiMoving:
             # Draw a black dot with a red circle around
+            cr.move_to(self.mousePosition[2], self.mousePosition[3])
             cr.set_source_rgb(0, 0, 0)
             cr.arc(self.mousePosition[2], self.mousePosition[3], 1, 0, 2 * math.pi)
             cr.stroke()
