@@ -375,9 +375,9 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
 		scale = gpsmap.get_scale()
 		if scale > 5000:
 			q = 'c'
-		elif scale > 500 or self.lastTime['i'] > 0.25:
+		elif scale > 500: #or self.lastTime['i'] > 1.0:
 			q = 'l'
-		elif scale > 200 or self.lastTime['h'] > 0.25 or self.forceDownscale:
+		elif scale > 200 or self.forceDownscale: #or self.lastTime['h'] > 1.0 
 			q = 'i'
 		elif scale >= 15 or self.lastTime['f'] > 0.25:
 			q = 'h'
