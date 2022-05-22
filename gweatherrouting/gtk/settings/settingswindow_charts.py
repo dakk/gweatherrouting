@@ -76,6 +76,21 @@ class SettingsWindowCharts:
 		self.builder.get_object('chart-progress').hide()
 		Gdk.threads_leave()
 
+	def onChartToggleEnabler(self, widget, i):
+		i = int(i)
+		chart = self.parent.chartManager.charts[i]
+		chart.enabled = not widget.get_active()
+
+		for x in self.settingsManager[chart.ctype + 'Charts']:
+			if x['path'] == chart.path:
+				x['enabled'] = chart.enabled
+
+		self.reloadChart()
+
+
+	def onRemoveChart(self, widget):
+		pass
+
 	def onAddRasterChart(self, widget):
 		dialog = Gtk.FileChooserDialog ("Please select a directory", self.window,
 			Gtk.FileChooserAction.SELECT_FOLDER,

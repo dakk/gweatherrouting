@@ -155,8 +155,8 @@ class GDALSingleRasterChart:
 
 
 class GDALRasterChart(ChartLayer):
-	def __init__(self, path, settingsManager, metadata = None):
-		super().__init__(path, 'raster', settingsManager, metadata)
+	def __init__(self, path, settingsManager, metadata = None, enabled = True):
+		super().__init__(path, 'raster', settingsManager, metadata, enabled)
 		self.cached = {}
 		self.loadLock = Lock()
 

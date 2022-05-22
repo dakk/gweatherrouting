@@ -76,10 +76,10 @@ class MainWindow:
 		self.chartManager.loadBaseChart(self.window)
 		
 		for x in self.settingsManager.vectorCharts:
-			l = self.chartManager.loadVectorLayer(x['path'], x['metadata'])
+			l = self.chartManager.loadVectorLayer(x['path'], x['metadata'], x['enabled'])
 
 		for x in self.settingsManager.rasterCharts:
-			l = self.chartManager.loadRasterLayer(x['path'], x['metadata'])
+			l = self.chartManager.loadRasterLayer(x['path'], x['metadata'], x['enabled'])
 
 
 		Gdk.threads_init()

@@ -241,7 +241,9 @@
                                               <object class="GtkTreeViewColumn">
                                                 <property name="title" translatable="yes">Enabled</property>
                                                 <child>
-                                                  <object class="GtkCellRendererToggle"/>
+                                                  <object class="GtkCellRendererToggle">
+                                                    <signal name="toggled" handler="onChartToggleEnabler" swapped="no"/>
+                                                  </object>
                                                   <attributes>
                                                     <attribute name="active">1</attribute>
                                                   </attributes>

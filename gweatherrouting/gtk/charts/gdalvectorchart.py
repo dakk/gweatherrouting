@@ -24,8 +24,8 @@ from osgeo import ogr
 from .chartlayer import ChartLayer
 
 class GDALVectorChart(ChartLayer):
-	def __init__(self, path, settingsManager, metadata = None):
-		super().__init__(path, 'vector', settingsManager, metadata)
+	def __init__(self, path, settingsManager, metadata = None, enabled = True):
+		super().__init__(path, 'vector', settingsManager, metadata, enabled)
 
 		self.drawer = None 
 
