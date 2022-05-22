@@ -31,6 +31,8 @@ class SettingsWindowCharts:
 		self.builder.get_object('chart-progress').hide()
 		self.reloadChart()
 
+		self.selectedChart = None
+
 		self.chartPalette = self.builder.get_object('chart-color-palette')
 		self.chartPalette.set_active(PALETTES[self.settingsManager['chartPalette']])
 
@@ -87,9 +89,23 @@ class SettingsWindowCharts:
 
 		self.reloadChart()
 
+	def onChartSelect(self, selection):
+		store, pathlist = selection.get_selected_rows()
+		for path in pathlist:
+			tree_iter = store.get_iter(path)
+			self.selectedChart = store.get_value(tree_iter, 0)
+
+	def onChartClick(self, widget, event):
+		if event.button == 3:
+			menu = self.builder.get_object("chart-menu")
+			menu.popup (None, None, None, None, event.button, event.time)
 
 	def onRemoveChart(self, widget):
-		pass
+		for ctype in ['vector', 'raster']:		
+			self.settingsManager[ctype + 'Charts'] = list(filter(lambda x: x['path'] != self.selectedChart, self.settingsManager[ctype + 'Charts']))
+
+		self.parent.chartManager.charts = list(filter(lambda x: x.path != self.selectedChart, self.parent.chartManager.charts))
+		self.reloadChart()
 
 	def onAddRasterChart(self, widget):
 		dialog = Gtk.FileChooserDialog ("Please select a directory", self.window,

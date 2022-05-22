@@ -3,6 +3,19 @@
 <interface>
   <requires lib="gtk+" version="3.24"/>
   <object class="GtkToggleAction"/>
+  <object class="GtkMenu" id="chart-menu">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <child>
+      <object class="GtkMenuItem">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Remove</property>
+        <property name="use-underline">True</property>
+        <signal name="activate" handler="onRemoveChart" swapped="no"/>
+      </object>
+    </child>
+  </object>
   <object class="GtkListStore" id="chart-store">
     <columns>
       <!-- column-name path -->
@@ -210,8 +223,11 @@
                                             <property name="visible">True</property>
                                             <property name="can-focus">True</property>
                                             <property name="model">chart-store</property>
+                                            <signal name="button-press-event" handler="onChartClick" swapped="no"/>
                                             <child internal-child="selection">
-                                              <object class="GtkTreeSelection"/>
+                                              <object class="GtkTreeSelection">
+                                                <signal name="changed" handler="onChartSelect" swapped="no"/>
+                                              </object>
                                             </child>
                                             <child>
                                               <object class="GtkTreeViewColumn">
