@@ -34,6 +34,7 @@ MIN_ZOOM = 300
 class OSMChartDrawer(VectorChartDrawer):
 	def __init__(self, settingsManager):
 		super().__init__(settingsManager)
+		self.featureCache = {}
 
 
 	def draw(self, gpsmap, cr, vectorFile, bounding):
@@ -59,16 +60,24 @@ class OSMChartDrawer(VectorChartDrawer):
 				feat = layer.GetNextFeature()
 
 
+
 	def featureRender(self, gpsmap, cr, geom, feat, layer):
 		tags = {}
 		name = None 
+		id = None
 
 		for i in range (feat.GetFieldCount()):
 			f = feat.GetFieldDefnRef(i)
 
-			if f.GetNameRef() == 'name':
+			nameref = f.GetNameRef()
+			if nameref == 'osm_id':
+				id = feat.GetFieldAsString(i)
+				if id in self.featureCache:
+					name, tags = self.featureCache[id]
+					break
+			elif nameref == 'name':
 				name = feat.GetFieldAsString(i)
-			if f.GetNameRef() == 'other_tags':
+			elif nameref == 'other_tags':
 				tt = feat.GetFieldAsString(i).split('"')
 
 				k = None 
@@ -84,6 +93,13 @@ class OSMChartDrawer(VectorChartDrawer):
 					tags[k] = x
 
 					k = None
+
+			if name and tags != {}:
+				break
+
+
+		if not id in self.featureCache:
+			self.featureCache[id] = (name, tags)
 
 		pt = geom.GetPoint(0)
 		xx, yy = gpsmap.convert_geographic_to_screen(OsmGpsMap.MapPoint.new_degrees(pt[1], pt[0]))	
@@ -199,6 +215,9 @@ class OSMChartDrawer(VectorChartDrawer):
 		# BEACON CARDINAL / BUOY CARDINAL
 		elif 'seamark:type' in tags and (tags['seamark:type'] == 'beacon_cardinal' or tags['seamark:type'] == 'buoy_cardinal'):
 			if scale > 100: 
+				return
+
+			if not ('seamark:beacon_cardinal:orientation' in tags):
 				return
 
 			dir = tags['seamark:beacon_cardinal:category'][0].lower()

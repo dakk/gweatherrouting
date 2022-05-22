@@ -18,7 +18,7 @@ import os
 import requests
 from threading import Thread
 from osgeo import ogr
-
+import time 
 from gweatherrouting.core import utils
 
 from ...core.core import LinePointValidityProvider
@@ -251,6 +251,9 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
 	def __init__(self, path, settingsManager, metadata = None):
 		super().__init__(path, 'vector', settingsManager, metadata)
 
+		self.lastTime = { 'c': 0, 'l': 0, 'i': 0, 'h': 0, 'f': 0 }
+		self.forceDownscale = False
+
 		self.drawer = SimpleChartDrawer(settingsManager)
 		drv = ogr.GetDriverByName('ESRI Shapefile')
 		self.vectorFiles = {}
@@ -363,89 +366,7 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
 		
 		return res
 
-	# lcache = utils.DictCache(1024)
-	# lgeom = None 
-	# def pointValidity(self, lat, lon):
-	# 	ls = "%.2f,%.2f" % (lat, lon)
-	# 	if ls in self.lcache:
-	# 		# print ('C', end='', flush=True)
-	# 		return self.lcache[ls]
 
-	# 	# print ('.', end='', flush=True)
-	# 	vf = self.lpvFile
-		
-	# 	point = ogr.Geometry(ogr.wkbPoint)
-	# 	point.AddPoint(lon, lat)
-
-	# 	if self.lgeom:
-	# 		if self.lgeom.Boundary().Contains(point):
-	# 			if self.lgeom.Contains(point):
-	# 				# print ('L', end='', flush=True)
-	# 				return False 
-	# 			else:
-	# 				# print ('.', end='', flush=True)
-	# 				return True
-	# 		elif self.lgeom.Contains(point):
-	# 			# print ('L', end='', flush=True)
-	# 			return False 
-
-	# 	boundingGeometry = ogr.CreateGeometryFromWkt(self.getBoundingWKTOfCoords(lat-0.1, lon-0.1, lat+0.1, lon+0.1))
-	# 	for i in range(vf.GetLayerCount()):
-	# 		layer = vf.GetLayerByIndex(i)
-	# 		layer.SetSpatialFilter(boundingGeometry)
-
-	# 		feat = layer.GetNextFeature()
-	# 		while feat is not None:
-	# 			if not feat:
-	# 				continue 
-
-	# 			geom = feat.GetGeometryRef()
-				
-	# 			geom = boundingGeometry.Intersection(geom)
-	# 			if geom.Contains(point):
-	# 				# print ('P', end='', flush=True)
-	# 				self.lcache[ls] = False
-	# 				self.lgeom = geom.Clone()
-	# 				del geom
-	# 				return False
-	# 			del geom 
-	# 			del feat
-	# 			feat = layer.GetNextFeature()
-	# 		del layer 
-		
-	# 	self.lcache[ls] = True
-	# 	return True
-
-
-	# def lineValidity(self, lat1, lon1, lat2, lon2):
-	# 	# print (',', end='', flush=True)
-	# 	vf = self.lpvFile
-		
-	# 	line = ogr.Geometry(ogr.wkbLineString)
-	# 	line.AddPoint(lon1, lat1)
-	# 	line.AddPoint(lon2, lat2)
-
-	# 	boundingGeometry = ogr.CreateGeometryFromWkt(self.getBoundingWKTOfCoords(lat1, lon1, lat2, lon2))
-	# 	for i in range(vf.GetLayerCount()):
-	# 		layer = vf.GetLayerByIndex(i)
-	# 		layer.SetSpatialFilter(boundingGeometry)
-
-	# 		feat = layer.GetNextFeature()
-	# 		while feat is not None:
-	# 			if not feat:
-	# 				continue 
-
-	# 			geom = feat.GetGeometryRef()
-	# 			if geom.Intersects(line):
-	# 				# print ('I', end='', flush=True)
-	# 				del geom
-	# 				return False
-	# 			del geom 
-	# 			del feat
-	# 			feat = layer.GetNextFeature()
-	# 		del layer 
-		
-	# 	return True
 
 	def do_draw(self, gpsmap, cr):
 		boundingGeometry = self.getBoundingGeometry(gpsmap)
@@ -454,16 +375,18 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
 		scale = gpsmap.get_scale()
 		if scale > 5000:
 			q = 'c'
-		elif scale > 500:
+		elif scale > 500 or self.lastTime['i'] > 0.25:
 			q = 'l'
-		elif scale > 200:
+		elif scale > 200 or self.lastTime['h'] > 0.25 or self.forceDownscale:
 			q = 'i'
-		elif scale >= 15:
+		elif scale >= 15 or self.lastTime['f'] > 0.25:
 			q = 'h'
 		elif scale < 15:
 			q = 'f'
-			
+				
+		t = time.time()
 		self.drawer.draw(gpsmap, cr, self.vectorFiles[q+'1'], boundingGeometry)
+		self.lastTime[q] = time.time() - t
 
 		if scale < 4500:
 			for c in self.countries:

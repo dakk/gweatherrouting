@@ -39,6 +39,8 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 	def __init__(self, settingsManager):
 		GObject.GObject.__init__(self)
 		self.charts = []
+		self.gshhsLayer = None
+		self.osmLayer = None
 		self.settingsManager = settingsManager
 
 		self.settingsManager.register_on_change('chartPalette', self.onChartPaletteChanged)
@@ -56,18 +58,17 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 		pass
 
 	def loadBaseChart(self, parent):
-		gshhs = False
-		osm = False 
-
 		if os.path.exists(DATA_DIR + "/gshhs"):
-			self.charts = [GSHHSVectorChart(DATA_DIR + "/gshhs", self.settingsManager)] + self.charts
+			self.gshhsLayer = GSHHSVectorChart(DATA_DIR + "/gshhs", self.settingsManager)
+			self.charts = [self.gshhsLayer] + self.charts
 			gshhs = True
 
 		if os.path.exists(DATA_DIR + "/seamarks.pbf"):
-			self.charts = self.charts + [GDALVectorChart(DATA_DIR + "/seamarks.pbf", self.settingsManager)]
+			self.osmLayer = GDALVectorChart(DATA_DIR + "/seamarks.pbf", self.settingsManager)
+			self.charts = self.charts + [self.osmLayer]
 			osm = True
 
-		if not gshhs:
+		if not self.gshhsLayer:
 			logger.info("GSHHS files not found, open a dialog asking for download")
 
 			def f():
@@ -88,7 +89,7 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 
 			GObject.timeout_add(10, f)
 
-		if not osm:
+		if not self.osmLayer:
 			logger.info("OSM file not found, open a dialog asking for download")
 			
 			def f():
@@ -111,12 +112,23 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 		logger.info("Loading vector chart %s" % path)
 		l = GDALVectorChart(path, metadata)
 		self.charts += [l]
+
+		if self.osmLayer:
+			self.osmLayer.enabled = False 
+		if self.gshhsLayer:
+			self.gshhsLayer.forceDownscale = True
+			
 		return l
 
 	def loadRasterLayer(self, path, metadata = None):
 		logger.info("Loading raster chart %s" % path)
 		l = GDALRasterChart(path, metadata)
 		self.charts += [l]
+
+		if self.osmLayer:
+			self.osmLayer.enabled = False 
+		if self.gshhsLayer:
+			self.gshhsLayer.forceDownscale = True
 		return l
 
 	def do_draw(self, gpsmap, cr):
