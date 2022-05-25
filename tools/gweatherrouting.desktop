@@ -1,6 +1,10 @@
 [Desktop Entry]
+Version=1.0
 Name=GWeatherRouting
 Exec=/usr/bin/gweatherrouting
 Icon=
+StartupNotify=true
+Terminal=true
 Type=Application
-Categories=
+Categories=Education;Science;Geography
+Keywords=GPS;Navigation;Chart
