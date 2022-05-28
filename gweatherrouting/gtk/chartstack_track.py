@@ -132,34 +132,34 @@ class ChartStackTrack:
 
 
 	def onTrackItemMove(self, widget):
-		if self.selectedTrackItem != None:
+		if self.selectedTrackItem is not None:
 			self.toolsMapLayer.enablePOIMoving(
 				lambda x,y: self.core.trackManager.activeTrack.move(self.selectedTrackItem, x, y))
 
 
 	def onTrackItemMoveUp(self, widget):
-		if self.selectedTrackItem != None:
+		if self.selectedTrackItem is not None:
 			self.core.trackManager.activeTrack.moveUp(self.selectedTrackItem)
 			self.updateTrack()
 			self.map.queue_draw ()
 
 	def onTrackItemMoveDown(self, widget):
-		if self.selectedTrackItem != None:
+		if self.selectedTrackItem is not None:
 			self.core.trackManager.activeTrack.moveDown(self.selectedTrackItem)
 			self.updateTrack()
 			self.map.queue_draw ()
 
 	def onTrackItemRemove(self, widget):
-		if self.selectedTrackItem != None:
+		if self.selectedTrackItem is not None:
 			self.core.trackManager.activeTrack.remove(self.selectedTrackItem)
 			self.updateTrack()
 			self.map.queue_draw ()
 
 	def onTrackItemDuplicate(self, widget):
-		if self.selectedTrackItem != None:
+		if self.selectedTrackItem is not None:
 			self.core.trackManager.activeTrack.duplicate(self.selectedTrackItem)
 			self.updateTrack()
-			self.map.queue_draw ()	
+			self.map.queue_draw ()
 
 	def showTrackPointPopover(self, event):
 		popover = self.builder.get_object("track-add-point-popover")
@@ -181,6 +181,3 @@ class ChartStackTrack:
 			self.builder.get_object("track-add-point-lon").set_text ('')
 			self.builder.get_object("track-add-point-popover").hide()
 		self.map.queue_draw ()
-
-
-

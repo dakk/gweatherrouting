@@ -195,7 +195,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 			dialog.destroy()
 			self.core.exportGPX(filename)
 
-			self.statusbar.push(0, "Exported as GPX to %s" % filename)
+			self.statusbar.push(0, f"Exported as GPX to {filename}")
 		else:
 			dialog.destroy()
 
@@ -205,7 +205,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 					Gtk.FileChooserAction.OPEN,
 					(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
 			
-		filter_gpx = Gtk.FileFilter ()		
+		filter_gpx = Gtk.FileFilter ()
 		filter_gpx.set_name ("GPX track")
 		filter_gpx.add_mime_type ("application/gpx+xml")
 		filter_gpx.add_pattern ('*.gpx')
@@ -231,7 +231,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 					edialog.format_secondary_text ("GPX file opened and loaded")
 					edialog.run ()
 					edialog.destroy ()	
-					self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Loaded %s with %d waypoints' % (filepath, len (self.core.trackManager.activeTrack)))					
+					self.statusbar.push (self.statusbar.get_context_id ('Info'), f'Loaded {filepath} with {len (self.core.trackManager.activeTrack)} waypoints')
 					
 				else:
 					edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
