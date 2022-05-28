@@ -1,7 +1,7 @@
 [Desktop Entry]
 Version=1.0
 Name=GWeatherRouting
-Exec=/usr/bin/gweatherrouting
+Exec=/usr/local/bin/gweatherrouting
 Icon=
 StartupNotify=true
 Terminal=true

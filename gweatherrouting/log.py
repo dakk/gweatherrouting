@@ -13,10 +13,8 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
-from colorlog import ColoredFormatter
 import logging
-
+from colorlog import ColoredFormatter
 
 formatter = ColoredFormatter(
 	'%(log_color)s[%(asctime)-8s] %(module)s: %(message_log_color)s%(message)s',
@@ -49,4 +47,3 @@ stream.setFormatter (formatter)
 logger = logging.getLogger ('gweatherrouting')
 logger.addHandler (stream)
 logger.setLevel (10)
-

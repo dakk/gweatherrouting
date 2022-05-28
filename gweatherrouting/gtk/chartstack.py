@@ -13,9 +13,9 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
-import gi
+import logging
 import os
+import gi
 
 gi.require_version('Gtk', '3.0')
 try:
@@ -25,12 +25,9 @@ except:
 
 from gi.repository import Gtk, Gdk, OsmGpsMap #Keybinder
 
-import logging
-
 from .gribmanagerwindow import GribFileFilter
 from .maplayers import GribMapLayer, AISMapLayer, ToolsMapLayer
 
-from .settings import SettingsManager
 from ..core import TimeControl
 from .chartstack_poi import ChartStackPOI
 from .chartstack_track import ChartStackTrack
@@ -59,7 +56,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 
 		self.pack_start(self.builder.get_object("chartcontent"), True, True, 0)
 
-		
+
 		self.map = self.builder.get_object("map")
 		self.map.set_center_and_zoom (39., 9., 6)
 
@@ -79,7 +76,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 
 		self.aisMapLayer = AISMapLayer (core)
 		self.map.layer_add (self.aisMapLayer)
-		
+
 		# This causes rendering problem
 		# self.map.layer_add (OsmGpsMap.MapOsd (show_scale=True, show_dpad=False, show_zoom=False, show_crosshair=False))
 
@@ -149,7 +146,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 	def onMapMouseMove(self, map, event):
 		lat, lon = map.convert_screen_to_geographic(event.x, event.y).get_degrees ()
 		w = self.core.gribManager.getWindAt(self.timeControl.time, lat, lon)
-		
+
 		sstr = ""
 		if w:
 			sstr += "Wind %.1f°, %.1f kts - " % (w[0], w[1])
@@ -238,7 +235,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 					
 				else:
 					edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
-					edialog.format_secondary_text ("Cannot open file: %s" % filepath)
+					edialog.format_secondary_text (f"Cannot open file: {filepath}")
 					edialog.run ()
 					edialog.destroy ()
 
@@ -248,17 +245,17 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 					edialog.format_secondary_text ("File opened, loaded grib")
 					edialog.run ()
 					edialog.destroy ()	
-					self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Loaded grib %s' % (filepath))					
+					self.statusbar.push (self.statusbar.get_context_id ('Info'), f'Loaded grib {filepath}')		
 
 				else:
 					edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
-					edialog.format_secondary_text ("Cannot open grib file: %s" % filepath)
+					edialog.format_secondary_text (f"Cannot open grib file: {filepath}")
 					edialog.run ()
 					edialog.destroy ()
 
 			else:
 				edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
-				edialog.format_secondary_text ("Unrecognize file format: %s" % filepath)
+				edialog.format_secondary_text (f"Unrecognize file format: {filepath}")
 				edialog.run ()
 				edialog.destroy ()
 
