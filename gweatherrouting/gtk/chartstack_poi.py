@@ -56,13 +56,13 @@ class ChartStackPOI:
 
 
 	def onPOIMove(self, widget):
-		if self.selectedPOI != None:
+		if self.selectedPOI is not None:
 			self.toolsMapLayer.enablePOIMoving(
 				lambda x,y: self.core.poiManager.move(self.selectedPOI, x, y))
 
 
 	def onPOIRemove(self, widget):
-		if self.selectedPOI != None:
+		if self.selectedPOI is not None:
 			self.core.poiManager.remove(self.core.poiManager.remove(self.selectedPOI))
 			self.updatePOI()
 

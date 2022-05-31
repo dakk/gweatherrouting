@@ -1,12 +1,9 @@
-import tempfile
-import json
-# import bz2
+from shutil import copyfile
 import os
 import logging
 import requests
-from shutil import copyfile
-from .grib import Grib
 import weatherrouting
+from .grib import Grib
 try:
 	from . import Storage, GRIB_DIR, TEMP_DIR
 except:
@@ -40,8 +37,8 @@ class GribManager(weatherrouting.Grib):
 		self.localGribs = []
 		for x in os.listdir(GRIB_DIR):
 			if x[-4:] == '.idx' or (x[-5:] != '.grib' and x[-4:] != '.grb'):
-				continue 
-			
+				continue
+
 			m = Grib.parseMetadata(GRIB_DIR + "/" + x)
 			self.localGribs.append(m)
 
@@ -109,13 +106,13 @@ class GribManager(weatherrouting.Grib):
 
 		ddict = {}
 		for x in dd:
-			if not (x[2][1] in ddict):
+			if x[2][1] not in ddict:
 				ddict[x[2][1]] = []
 			ddict[x[2][1]].append(x)
 
 		ddlist = []
-		for x in ddict:
-			ddlist.append(sorted(ddict[x], key=lambda x: x[2][0]))
+		for x, v in ddict.items():
+			ddlist.append(sorted(v, key=lambda x: x[2][0]))
 
 		return ddlist
 

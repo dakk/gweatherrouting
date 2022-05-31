@@ -86,7 +86,7 @@ class OSMChartDrawer(VectorChartDrawer):
 					if x == '=>' or x == '' or x == ',':
 						continue
 
-					if k == None:
+					if k is None:
 						k = x 
 						continue
 						

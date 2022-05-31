@@ -80,14 +80,14 @@ class TrackMapLayer(MapLayer):
 				i += 1
 				x, y = view.get_window_xy_from(p[0], p[1], zoom)
 
-				# if prevp == None:
+				# if prevp is None:
 				# 	Style.Track.RoutingTrackFont.apply(cr)
 				# 	cr.move_to(x+10, y)
 				# 	cr.show_text(tr.name)
 				# 	cr.stroke()
 
 				# # Draw boat
-				# if prevp != None:    
+				# if prevp is not None:    
 				# 	tprev = dateutil.parser.parse(prevp[2])
 				# 	tcurr = dateutil.parser.parse(p[2])
 
@@ -102,7 +102,7 @@ class TrackMapLayer(MapLayer):
 				# 		cr.arc(xx, yy, 7, 0, 2 * math.pi)
 				# 		cr.fill()  
 
-				# if prevx != None and prevy != None:
+				# if prevx is not None and prevy is not None:
 				# 	Style.Track.RoutingTrack.apply(cr)
 				# 	cr.move_to (prevx, prevy)
 				# 	cr.line_to (x, y)
@@ -132,7 +132,7 @@ class TrackMapLayer(MapLayer):
 				i += 1
 				x, y = view.get_window_xy_from(p[0], p[1], zoom)
 
-				# if prevx == None:
+				# if prevx is None:
 				# 	if active:
 				# 		Style.Track.TrackActiveFont.apply(cr)
 				# 	else:
@@ -152,7 +152,7 @@ class TrackMapLayer(MapLayer):
 				# cr.show_text(str(i))
 				# cr.stroke()
 
-				# if prevx != None and prevy != None:
+				# if prevx is not None and prevy is not None:
 				# 	if active:
 				# 		Style.Track.TrackActive.apply(cr)
 				# 	else:

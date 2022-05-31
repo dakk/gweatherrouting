@@ -30,9 +30,9 @@ class CairoStyle:
         if self.fontSize:
             cr.set_font_size(self.fontSize)
 
-        if self.dash != None and type(self.dash) == float:
+        if self.dash is not None and type(self.dash) == float:
             cr.set_dash([self.dash])
-        elif self.dash != None and type(self.dash) != float:
+        elif self.dash is not None and type(self.dash) != float:
             cr.set_dash(self.dash)
             
         if self.color:

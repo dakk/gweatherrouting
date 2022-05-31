@@ -13,11 +13,9 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
-from .track import RoutingTrack, Track 
-from .utils import uniqueName
 from weatherrouting import IsoPoint
-import gpxpy
+from .track import RoutingTrack, Track
+from .utils import uniqueName
 try:
 	from . import Storage
 except:
@@ -47,7 +45,7 @@ class TrackManager():
 			self.tracks.append(tr)
 
 		for x in self.storage.routings:
-			ic = list(map(lambda x: list(map(lambda y: IsoPoint.fromList(y), x)), x['isochrones']))
+			ic = list(map(lambda x: list(map(IsoPoint.fromList(y), x)), x['isochrones']))
 			tr = RoutingTrack(name=x['name'], waypoints=x['waypoints'], isochrones=ic, visible=x['visible'], trackManager=self)
 			self.routings.append(tr)
 
@@ -101,7 +99,7 @@ class TrackManager():
 				return
 
 	def remove(self, track):
-		actTremove = False 
+		actTremove = False
 
 		if track == self.activeTrack:
 			self.activeTrack = None

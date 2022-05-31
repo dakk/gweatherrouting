@@ -19,49 +19,49 @@ import sys
 import platform
 import logging
 import json
-from .. import log
 from datetime import date, datetime
+from .. import log
 
 logger = logging.getLogger ('gweatherrouting')
 
 def json_serial(obj):
-    """JSON serializer for objects not serializable by default json code"""
+	"""JSON serializer for objects not serializable by default json code"""
 
-    if isinstance(obj, (datetime, date)):
-        return obj.isoformat()
-    raise TypeError ("Type %s not serializable" % type(obj))
+	if isinstance(obj, (datetime, date)):
+		return obj.isoformat()
+	raise TypeError ("Type %s not serializable" % type(obj))
 
 
 def app_data_path (appname, roaming=True):
-    if sys.platform.startswith('java'):
-        os_name = platform.java_ver()[3][0]
-        if os_name.startswith('Windows'):
-            system = 'win32'
-        elif os_name.startswith('Mac'):
-            system = 'darwin'
-        else:
-            system = 'linux2'
-    else:
-        system = sys.platform
+	if sys.platform.startswith('java'):
+		os_name = platform.java_ver()[3][0]
+		if os_name.startswith('Windows'):
+			system = 'win32'
+		elif os_name.startswith('Mac'):
+			system = 'darwin'
+		else:
+			system = 'linux2'
+	else:
+		system = sys.platform
 
-    if system == "win32":
-        const = roaming and "CSIDL_APPDATA" or "CSIDL_LOCAL_APPDATA"
-        path = os.path.normpath(_get_win_folder(const))
-        if appname:
-            path = os.path.join(path, appname)
-    elif system == 'darwin':
-        path = os.path.expanduser('~/Library/Application Support/')
-        if appname:
-            path = os.path.join(path, appname)
-    elif system == 'android':
-        path = '' 
-    elif system == 'ios':
-        pass
-    else:
-        path = os.getenv('XDG_DATA_HOME', os.path.expanduser("~/"))
-        if appname:
-            path = os.path.join(path, '.'+appname)
-    return path
+	if system == "win32":
+		const = roaming and "CSIDL_APPDATA" or "CSIDL_LOCAL_APPDATA"
+		path = os.path.normpath(_get_win_folder(const))
+		if appname:
+			path = os.path.join(path, appname)
+	elif system == 'darwin':
+		path = os.path.expanduser('~/Library/Application Support/')
+		if appname:
+			path = os.path.join(path, appname)
+	elif system == 'android':
+		path = '' 
+	elif system == 'ios':
+		pass
+	else:
+		path = os.getenv('XDG_DATA_HOME', os.path.expanduser("~/"))
+		if appname:
+			path = os.path.join(path, '.'+appname)
+	return path
 
 
 APP_NAME = 'gweatherrouting'
@@ -74,119 +74,118 @@ os.makedirs(GRIB_DIR, exist_ok=True)
 os.makedirs(TEMP_DIR, exist_ok=True)
 
 class Storage(dict):
-    __init = False
-    
-    def __init__(self, filename = None, parent = None, *args, **kwargs):
-        super(Storage, self).__init__(*args, **kwargs)
+	__init = False
 
-        self.__parent = parent
-        self.__filename = filename
-        self.__handlers = {}
+	def __init__(self, filename = None, parent = None, *args, **kwargs):
+		super(Storage, self).__init__(*args, **kwargs)
 
-        for arg in args:
-            if isinstance(arg, dict):
-                for k, v in arg.iteritems():
-                    self[k] = v
+		self.__parent = parent
+		self.__filename = filename
+		self.__handlers = {}
 
-        if kwargs:
-            for k, v in kwargs.iteritems():
-                self[k] = v
+		for arg in args:
+			if isinstance(arg, dict):
+				for k, v in arg.iteritems():
+					self[k] = v
 
-        if parent != None:
-            self.__init = True
+		if kwargs:
+			for k, v in kwargs.iteritems():
+				self[k] = v
 
-    def __getattr__(self, attr):
-        return self.get(attr)
+		if parent is not None:
+			self.__init = True
 
-    def __setattr__(self, key, value):
-        self.__setitem__(key, value)
-        self.save()
-        self.notify_change(key, value)
+	def __getattr__(self, attr):
+		return self.get(attr)
 
-    def __setitem__(self, key, value):
-        super(Storage, self).__setitem__(key, value)
-        self.__dict__.update({key: value})
-        self.save()
-        self.notify_change(key, value)
+	def __setattr__(self, key, value):
+		self.__setitem__(key, value)
+		self.save()
+		self.notify_change(key, value)
 
-    def __delattr__(self, item):
-        self.__delitem__(item)
-        self.save()
+	def __setitem__(self, key, value):
+		super(Storage, self).__setitem__(key, value)
+		self.__dict__.update({key: value})
+		self.save()
+		self.notify_change(key, value)
 
-    def __delitem__(self, key):
-        super(Storage, self).__delitem__(key)
-        del self.__dict__[key]
-        self.save()
+	def __delattr__(self, item):
+		self.__delitem__(item)
+		self.save()
 
-    def loadData(self, data):
-        for x in data:
-            if isinstance(data[x], dict):
-                self[x].loadData(data[x])
-            else:
-                self[x] = data[x]
+	def __delitem__(self, key):
+		super(Storage, self).__delitem__(key)
+		del self.__dict__[key]
+		self.save()
 
-    def save(self):
-        if self.__parent:
-            return self.__parent.save()
-        
-        if not self.__filename or not self.__init:
-            return
+	def loadData(self, data):
+		for x in data:
+			if isinstance(data[x], dict):
+				self[x].loadData(data[x])
+			else:
+				self[x] = data[x]
 
-        with open(DATA_DIR + '/' + self.__filename + '.json', 'w') as f:
-            f.write(json.dumps(self.to_dict(), sort_keys=True, indent=4, default=json_serial))
-            # logger.debug ('Configuration saved to %s/%s.json' % (DATA_DIR, self.__filename))
-            f.close()
+	def save(self):
+		if self.__parent:
+			return self.__parent.save()
 
-    def load(self):
-        if self.__parent:
-            return
-            
-        if not self.__filename:
-            return
+		if not self.__filename or not self.__init:
+			return
 
-        with open(DATA_DIR + '/' + self.__filename + '.json', 'r') as f:
-            j = json.loads(f.read())
-            self.loadData(j)            
-            logger.debug ('Load configuration from %s/%s.json' % (DATA_DIR, self.__filename))
-            
-    def loadOrSaveDefault(self):
-        try:
-            self.load()
-            self.__init = True
-        except:
-            self.__init = True
-            self.save()
+		with open(DATA_DIR + '/' + self.__filename + '.json', 'w') as f:
+			f.write(json.dumps(self.to_dict(), sort_keys=True, indent=4, default=json_serial))
+			# logger.debug ('Configuration saved to %s/%s.json' % (DATA_DIR, self.__filename))
+			f.close()
 
-    def to_dict(self):
-        d = {}
-        for x in self:
-            if x.find('Storage') != -1:
-                continue
+	def load(self):
+		if self.__parent:
+			return
 
-            if isinstance(self[x], dict): 
-                d[x] = self[x].to_dict()
-            else:
-                d[x] = self[x]
+		if not self.__filename:
+			return
 
-        return d
+		with open(DATA_DIR + '/' + self.__filename + '.json', 'r') as f:
+			j = json.loads(f.read())
+			self.loadData(j)            
+			logger.debug ('Load configuration from %s/%s.json' % (DATA_DIR, self.__filename))
 
-    def register_on_change(self, k, handler):
-        if not (k in self.__handlers):
-            self.__handlers[k] = []
+	def loadOrSaveDefault(self):
+		try:
+			self.load()
+			self.__init = True
+		except:
+			self.__init = True
+			self.save()
 
-        self.__handlers[k].append(handler)
-        handler(self[k])
+	def to_dict(self):
+		d = {}
+		for x in self:
+			if x.find('Storage') != -1:
+				continue
 
-    def notify_change(self, k, v):
-        if not self.__init:
-            return 
-            
-        if not self.__handlers:
-            return 
+			if isinstance(self[x], dict):
+				d[x] = self[x].to_dict()
+			else:
+				d[x] = self[x]
 
-        if not (k in self.__handlers):
-            return
+		return d
 
-        for x in self.__handlers[k]:
-            x(v)
+	def register_on_change(self, k, handler):
+		if k not in self.__handlers:
+			self.__handlers[k] = []
 
+		self.__handlers[k].append(handler)
+		handler(self[k])
+
+	def notify_change(self, k, v):
+		if not self.__init:
+			return
+
+		if not self.__handlers:
+			return
+
+		if k not in self.__handlers:
+			return
+
+		for x in self.__handlers[k]:
+			x(v)

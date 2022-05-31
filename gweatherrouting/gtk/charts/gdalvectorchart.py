@@ -46,7 +46,7 @@ class GDALVectorChart(ChartLayer):
 			drvName = "OSM"
 			self.drawer = OSMChartDrawer(self.settingsManager)
 
-		if drvName == None and self.drawer == None:
+		if drvName is None and self.drawer is None:
 			raise ("Invalid format")
 
 		if drvName == 'CM93':
@@ -55,7 +55,7 @@ class GDALVectorChart(ChartLayer):
 			drv = ogr.GetDriverByName(drvName)			
 		self.vectorFile = drv.Open(path)
 
-		if self.vectorFile == None:
+		if self.vectorFile is None:
 			raise ("Unable to open vector map %s" % path)
 
 	def onRegister(self, onTickHandler = None):

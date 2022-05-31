@@ -14,11 +14,10 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
-import latlon
 import math
 import os
 import json
+import latlon
 from geojson_utils import point_in_polygon
 
 
@@ -29,7 +28,7 @@ COUNTRY_SHAPES = []
 def extractCoordinates(coord):
 	c = []
 	for x in coord:
-		if type(x[0]) == float:
+		if isinstance(x[0], float):
 			return coord 
 		else:
 			for xx in extractCoordinates(x):
@@ -102,7 +101,7 @@ def uniqueName(name, collection):
 	if name in names:
 		for i in range(1,1000):
 			nname = name + '-' + str(i)
-			if not (nname in names):
+			if nname not in names:
 				return nname
 	return name
 
@@ -113,7 +112,7 @@ def pointDistance (latA, lonA, latB, lonB):
 	p1 = latlon.LatLon(latlon.Latitude(latA), latlon.Longitude(lonA))
 	p2 = latlon.LatLon(latlon.Latitude(latB), latlon.Longitude(lonB))
 	return p1.distance (p2)
-	
+
 
 def routagePointDistance (latA,lonA,Distanza,Rotta):
 	p = latlon.LatLon(latlon.Latitude(latA), latlon.Longitude(lonA))
@@ -124,7 +123,7 @@ def routagePointDistance (latA,lonA,Distanza,Rotta):
 def reduce360 (alfa):
 	if math.isnan (alfa):
 		return 0.0
-		
+
 	n=int(alfa*0.5/math.pi)
 	n=math.copysign(n,1)
 	if alfa>2.0*math.pi:
@@ -146,7 +145,7 @@ class DictCache(dict):
 		super(DictCache, self).__setitem__(key, value)
 		self.__dict__.update({key: value})
 		self.entries.append(key)
-		
+
 		if len(self.entries) > self.max_entries:
 			td = self.entries[0]
 			self.entries = self.entries[1::]
@@ -156,13 +155,12 @@ class DictCache(dict):
 		del self.__dict__[key]
 		self.entries.remove(key)
 
-	
 
 class EventDispatcher:
 	handlers = {}
 
 	def connect(self, evt, f):
-		if not (evt in self.handlers):
+		if evt not in self.handlers:
 			self.handlers[evt] = []
 		self.handlers[evt].append(f)
 
@@ -170,16 +168,15 @@ class EventDispatcher:
 		self.handlers[evt].remove(f)
 
 	def dispatch(self, evt, e):
-		if not (evt in self.handlers):
-			return 
-			
+		if evt not in self.handlers:
+			return
+
 		for x in self.handlers[evt]:
 			x(e)
 
-	
 
 class dotdict(dict):
-    """dot.notation access to dictionary attributes"""
-    __getattr__ = dict.get
-    __setattr__ = dict.__setitem__
-    __delattr__ = dict.__delitem__
+	"""dot.notation access to dictionary attributes"""
+	__getattr__ = dict.get
+	__setattr__ = dict.__setitem__
+	__delattr__ = dict.__delitem__

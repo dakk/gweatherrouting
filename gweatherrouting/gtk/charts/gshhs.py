@@ -260,7 +260,7 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
 		for x in ['f','h','i','l','c']:
 			for y in [1]: #,2,3,4,5,6]:
 				f = drv.Open(path+'/GSHHS_shp/'+x+'/GSHHS_'+x+'_L'+str(y)+'.shp')
-				if f != None:
+				if f is not None:
 					self.vectorFiles[x+str(y)] = f 
 
 		self.lpvFile = drv.Open(path+'/GSHHS_shp/h/GSHHS_h_L1.shp')

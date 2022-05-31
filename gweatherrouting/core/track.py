@@ -108,7 +108,7 @@ class Track:
 
 	def move(self, i, lat, lon):
 		self.waypoints[i] = (lat, lon, None)
-		
+
 
 class RoutingTrack(Track):
 	def __init__(self, name="routing", waypoints=[], isochrones=[], visible=True, trackManager=None):

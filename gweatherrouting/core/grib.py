@@ -14,7 +14,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
 import logging
 import math
 import datetime
@@ -54,16 +53,16 @@ class Grib(weatherrouting.Grib):
 			return self.rindex_data[t]
 
 		iid = eccodes.codes_index_read(self.path + '.idx')
-		eccodes.codes_index_select(iid, 'name', '10 metre U wind component')	
-		eccodes.codes_index_select(iid, self.timeKey, t)	
+		eccodes.codes_index_select(iid, 'name', '10 metre U wind component')
+		eccodes.codes_index_select(iid, self.timeKey, t)
 		gid = eccodes.codes_new_from_index(iid)
 		u = eccodes.codes_grib_get_data(gid)
-		
-		eccodes.codes_index_select(iid, 'name', '10 metre V wind component')	
+
+		eccodes.codes_index_select(iid, 'name', '10 metre V wind component')
 		eccodes.codes_index_select(iid, self.timeKey, t)
 		gid = eccodes.codes_new_from_index(iid)
 		v = eccodes.codes_grib_get_data(gid)
-		
+
 		self.rindex_data[t] = (u,v)
 		return u,v
 
@@ -77,12 +76,12 @@ class Grib(weatherrouting.Grib):
 		else:
 			try:
 				u, v = self.getRIndexData (t)
-			except Exception as e:
+			except Exception as _:
 				pass #print('Get wind data cached exception: ', e)
 
 			uu1, latuu, lonuu = [],[],[]
 			vv1, latvv, lonvv = [],[],[]
-			
+
 			for x in u:
 				if x['lat'] >= bounds[0][0] and x['lat'] <= bounds[1][0] and x['lon'] >= bounds[0][1] and x['lon'] <= bounds[1][1]: 
 					uu1.append(x['value'])
@@ -103,13 +102,14 @@ class Grib(weatherrouting.Grib):
 	def getWind (self, tt, bounds):
 		t = self._transformTime(tt)
 
-		if t == None:
+		if t is None:
 			return
 
 		t1 = int (int (round (t)) / 3) * 3
 		t2 = int (int (round (t+6)) / 3) * 3
 
-		if t2 == t1: t1 -= 3
+		if t2 == t1: 
+			t1 -= 3
 
 		lon1 = min (bounds[0][1], bounds[1][1])
 		lon2 = max (bounds[0][1], bounds[1][1])
@@ -134,7 +134,7 @@ class Grib(weatherrouting.Grib):
 		else:
 			dataotherside = []
 
-		data = []		
+		data = []
 
 		for j in range (0, len (uu1)):
 			lon = lonuu[j]
@@ -148,20 +148,18 @@ class Grib(weatherrouting.Grib):
 
 			uu = uu1[j] + (uu2[j] - uu1[j]) * (t - t1) * 1.0 / (t2 - t1)
 			vv = vv1[j] + (vv2[j] - vv1[j]) * (t - t1) * 1.0 / (t2 - t1)
-			
+
 			tws = (uu**2+vv**2)/2.
 			twd = math.degrees(utils.reduce360(math.atan2(uu,vv)+math.pi))
 
 			data.append ((twd, tws, (lat, lon)))
-		
+
 		return data + dataotherside
-
-
 
 
 	def _transformTime(self, t):
 		if (self.startTime + datetime.timedelta(hours=self.lastForecast)) < t:
-			return None 
+			return None
 
 		if t > self.startTime + datetime.timedelta(hours=self.lastForecast):
 			return None
@@ -169,14 +167,17 @@ class Grib(weatherrouting.Grib):
 		return math.floor((t - self.startTime).total_seconds() / 60 / 60)
 
 	# Get wind direction and speed in a point, used by simulator
-	def getWindAt (self, tt, lat, lon):	
-		bounds = [(math.floor (lat * 2) / 2., math.floor (lon * 2) / 2.), (math.ceil (lat * 2) / 2., math.ceil (lon * 2) / 2.)]
-		data = self.getWind (tt, bounds)
+	def getWindAt (self, t, lat, lon):
+		bounds = [
+			(math.floor (lat * 2) / 2., math.floor (lon * 2) / 2.), 
+			(math.ceil (lat * 2) / 2., math.ceil (lon * 2) / 2.)
+		]
+		data = self.getWind (t, bounds)
 
 		wind = (data[0][0], data[0][1])
 		return wind
 
-
+	@staticmethod
 	def parseMetadata(path):
 		import eccodes
 		f = open(path, 'rb')
@@ -190,7 +191,7 @@ class Grib(weatherrouting.Grib):
 		while True:
 			msgid = eccodes.codes_grib_new_from_file(f)
 
-			if msgid == None:
+			if msgid is None:
 				break
 
 			name = eccodes.codes_get(msgid, 'name')
@@ -206,9 +207,14 @@ class Grib(weatherrouting.Grib):
 			except:
 				ft = eccodes.codes_get(msgid, 'P1')
 
-			startTime = datetime.datetime(int(eccodes.codes_get(msgid, 'year')), int(eccodes.codes_get(msgid, 'month')), int(eccodes.codes_get(msgid, 'day')), int(eccodes.codes_get(msgid, 'hour')), int(eccodes.codes_get(msgid, 'minute')))
+			startTime = datetime.datetime(
+				int(eccodes.codes_get(msgid, 'year')),
+				int(eccodes.codes_get(msgid, 'month')),
+				int(eccodes.codes_get(msgid, 'day')),
+				int(eccodes.codes_get(msgid, 'hour')),
+				int(eccodes.codes_get(msgid, 'minute')))
 
-			if hoursForecasted == None or hoursForecasted < int(ft):
+			if hoursForecasted is None or hoursForecasted < int(ft):
 				hoursForecasted = int(ft)
 
 			eccodes.codes_release(msgid)
@@ -216,7 +222,7 @@ class Grib(weatherrouting.Grib):
 		f.close()
 		return MetaGrib(path, path.split('/')[-1], centre, bounds, startTime, hoursForecasted)
 
-
+	@staticmethod
 	def parse (path):
 		import eccodes
 		f = open(path, 'rb')
@@ -232,7 +238,7 @@ class Grib(weatherrouting.Grib):
 		while True:
 			msgid = eccodes.codes_grib_new_from_file(f)
 
-			if msgid == None:
+			if msgid is None:
 				break
 
 			name = eccodes.codes_get(msgid, 'name')
@@ -248,16 +254,21 @@ class Grib(weatherrouting.Grib):
 				ft = eccodes.codes_get(msgid, 'P1')
 				timeKey = "P1"
 
-			startTime = datetime.datetime(int(eccodes.codes_get(msgid, 'year')), int(eccodes.codes_get(msgid, 'month')), int(eccodes.codes_get(msgid, 'day')), int(eccodes.codes_get(msgid, 'hour')), int(eccodes.codes_get(msgid, 'minute')))
+			startTime = datetime.datetime(
+				int(eccodes.codes_get(msgid, 'year')),
+				int(eccodes.codes_get(msgid, 'month')),
+				int(eccodes.codes_get(msgid, 'day')),
+				int(eccodes.codes_get(msgid, 'hour')),
+				int(eccodes.codes_get(msgid, 'minute')))
 
-			if hoursForecasted == None or hoursForecasted < int(ft):
+			if hoursForecasted is None or hoursForecasted < int(ft):
 				hoursForecasted = int(ft)
 
 			# timeIndex = str(r['dataDate'])+str(r['dataTime'])
 			if name == '10 metre U wind component':
-				rindex [hoursForecasted] = { 'u': msgid } 
+				rindex [hoursForecasted] = { 'u': msgid }
 			elif name == '10 metre V wind component':
-				rindex [hoursForecasted]['v'] = msgid 
+				rindex [hoursForecasted]['v'] = msgid
 
 			eccodes.codes_release(msgid)
 
@@ -268,4 +279,3 @@ class Grib(weatherrouting.Grib):
 		f.close()
 
 		return Grib(path, path.split('/')[-1], centre, bounds, rindex, startTime, hoursForecasted, timeKey)
-			

@@ -58,7 +58,7 @@ class IsochronesMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 					OsmGpsMap.MapPoint.new_degrees(p[0], p[1])
 				)
 
-				if prevx == None:
+				if prevx is None:
 					Style.Track.RoutingTrackFont.apply(cr)
 					cr.move_to(x + 10, y)
 					cr.stroke()
@@ -68,7 +68,7 @@ class IsochronesMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 				# cr.show_text(str(p[2]))
 				# cr.stroke()
 
-				if prevx != None and prevy != None:
+				if prevx is not None and prevy is not None:
 					Style.Track.RoutingTrack.apply(cr)
 
 					cr.move_to(prevx, prevy)

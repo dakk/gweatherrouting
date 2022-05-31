@@ -57,12 +57,12 @@ class SettingsWindowConnections:
 		d.run()
 		data = d.data
 		d.destroy()
-		if data != None:
+		if data is not None:
 			self.core.connectionManager.addConnection(data)
 		self.reloadConnections()
 
 	def onConnectionRemove(self, widget):
-		if self.selectedConnection != None:	
+		if self.selectedConnection is not None:	
 			self.core.connectionManager.removeConnection(self.selectedConnection.data)
 			self.reloadConnections()
 
@@ -75,7 +75,7 @@ class SettingsWindowConnections:
 		d.run()
 		data = d.data
 		d.destroy()
-		if data != None:
+		if data is not None:
 			self.core.connectionManager.editConnection(data)
 
 	def onConnectionClick(self, widget, event):

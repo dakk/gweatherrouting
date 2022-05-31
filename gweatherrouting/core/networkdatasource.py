@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
 import logging
 import socket
 
@@ -57,7 +56,7 @@ class NetworkDataSource(DataSource):
 					self.cached = cc[-1]
 					return cc[0:-1]
 			except:
-				pass 
+				pass
 
 	def _write(self, msg):
 		self.s.send(msg.encode('ascii'))

@@ -13,10 +13,9 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
+import logging
 import serial
 from serial.tools import list_ports
-import logging
 
 from . import DataSource
 
@@ -38,6 +37,7 @@ class SerialDataSource(DataSource):
 			logger.error ('Error connecting to serial port %s' % self.port)
 			return False
 
+	@staticmethod
 	def detect():
 		devices = []
 		for x in list_ports.comports():
@@ -45,14 +45,14 @@ class SerialDataSource(DataSource):
 				devices.append(x.device)
 				logger.info ('Detected new data source: %s [%s]' % (x.device, x.description))
 			except:
-		 		pass 
-			
+				pass
+
 		return devices
 
 	def _read(self):
-		if (self.s.inWaiting() > 0):
+		if self.s.inWaiting() > 0:
 			return self.s.read(self.s.inWaiting()).decode('ascii').split('\n')
-		
+
 		return []
 
 	def _write(self, msg):

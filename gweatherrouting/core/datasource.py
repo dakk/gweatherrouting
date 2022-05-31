@@ -13,86 +13,86 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
-import serial
 import pynmea2
 from pynmea2.nmea_utils import LatLonFix
 
 
 class DataPacket:
-    def __init__(self, t, sentence):
-        self.t = t
-        self.data = sentence
-        
-    def isPosition(self):
-        return 'latitude' in self.data and 'longitude' in self.data
+	def __init__(self, t, sentence):
+		self.t = t
+		self.data = sentence
 
-    def parse(data):
-        raise NotImplementedError
+	def isPosition(self):
+		return 'latitude' in self.data and 'longitude' in self.data
 
-    def serialize(self):
-        raise NotImplementedError
+	@staticmethod
+	def parse(data):
+		raise NotImplementedError
+
+	def serialize(self):
+		raise NotImplementedError
 
 
 class NMEADataPacket(DataPacket):
-    PROTOCOL = "nmea0183"
+	PROTOCOL = "nmea0183"
 
-    def __init__(self, sentence):
-        DataPacket.__init__(self, 'nmea', sentence)
+	def __init__(self, sentence):
+		DataPacket.__init__(self, 'nmea', sentence)
 
-    def isPosition(self):
-        return isinstance(self.data, LatLonFix) and self.data.latitude != 0.0 and self.data.longitude != 0.0       
+	def isPosition(self):
+		return isinstance(self.data, LatLonFix) and self.data.latitude != 0.0 and self.data.longitude != 0.0       
 
-    def parse(data):
-        return NMEADataPacket(pynmea2.parse(data))
+	@staticmethod
+	def parse(data):
+		return NMEADataPacket(pynmea2.parse(data))
 
-    def serialize(self):
-        return str(self.data)
+	def serialize(self):
+		return str(self.data)
 
 
 
 class DataSource:
-    def __init__(self, protocol, direction):
-        self.protocol = protocol
-        self.direction = direction
-        self.connected = False
+	def __init__(self, protocol, direction):
+		self.protocol = protocol
+		self.direction = direction
+		self.connected = False
 
-        if self.protocol == 'nmea0183':
-            self.parser = NMEADataPacket
-        else:
-            raise NotImplementedError
+		if self.protocol == 'nmea0183':
+			self.parser = NMEADataPacket
+		else:
+			raise NotImplementedError
 
-    def write(self, packet):
-        if not self.connected:
-            return False 
+	def write(self, packet):
+		if not self.connected:
+			return False 
 
-        if self.direction == 'in':
-            return False
-        
-        return self._write(packet.serialize())
+		if self.direction == 'in':
+			return False
 
-    def read(self):
-        if not self.connected:
-            return None 
-            
-        if self.direction == 'out':
-            return []
+		return self._write(packet.serialize())
 
-        data = self._read()
-        
-        if data == None:
-            return []
-            
-        msgs = []
-        for msg in data:
-            try:
-                msgs.append(self.parser.parse(msg))
-            except Exception as e:
-                print(e)
-        return msgs
+	def read(self):
+		if not self.connected:
+			return None
 
-    def _read(self):
-        raise NotImplementedError
+		if self.direction == 'out':
+			return []
 
-    def _write(self):
-        raise NotImplementedError
+		data = self._read()
+
+		if data is None:
+			return []
+
+		msgs = []
+		for msg in data:
+			try:
+				msgs.append(self.parser.parse(msg))
+			except Exception as e:
+				print(e)
+		return msgs
+
+	def _read(self):
+		raise NotImplementedError
+
+	def _write(self, data):
+		raise NotImplementedError

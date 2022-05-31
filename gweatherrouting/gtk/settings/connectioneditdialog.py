@@ -90,7 +90,7 @@ class ConnectionEditDialog:
 			self.serialBaudrateCombo.append_text(str(x))
 		self.serialBaudrateCombo.set_active(0)
 
-		if self.data != None:
+		if self.data is not None:
 			# Set data
 			if self.data['type'] == 'serial':
 				self.typeCombo.set_active(0)

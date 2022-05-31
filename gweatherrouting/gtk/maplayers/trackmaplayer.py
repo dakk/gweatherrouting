@@ -47,7 +47,7 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
             for p in self.trackManager.log:
                 x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (p[0], p[1]))
 
-                if prevx != None and prevy != None:
+                if prevx is not None and prevy is not None:
                     Style.Track.LogTrack.apply(cr)
                     cr.move_to (prevx, prevy)
                     cr.line_to (x, y)
@@ -76,7 +76,7 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
                 i += 1
                 x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (p[0], p[1]))
 
-                if prevp == None:
+                if prevp is None:
                     if highlight:
                         Style.Track.RoutingTrackFontHL.apply(cr)
                     else:
@@ -86,7 +86,7 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
                     cr.stroke()
 
                 # Draw boat
-                if prevp != None:    
+                if prevp is not None:    
                     tprev = dateutil.parser.parse(prevp[2])
                     tcurr = dateutil.parser.parse(p[2])
 
@@ -101,7 +101,7 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
                         cr.arc(xx, yy, 7, 0, 2 * math.pi)
                         cr.fill()  
 
-                if prevx != None and prevy != None:
+                if prevx is not None and prevy is not None:
                     if highlight:
                         Style.Track.RoutingTrackHL.apply(cr)
                     else:
@@ -139,7 +139,7 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
                 i += 1
                 x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (p[0], p[1]))
 
-                if prevx == None:
+                if prevx is None:
                     if active:
                         Style.Track.TrackActiveFont.apply(cr)
                     else:
@@ -159,7 +159,7 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
                 cr.show_text(str(i))
                 cr.stroke()
 
-                if prevx != None and prevy != None:
+                if prevx is not None and prevy is not None:
                     if active:
                         Style.Track.TrackActive.apply(cr)
                     else:

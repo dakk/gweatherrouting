@@ -44,6 +44,7 @@ class ConnectionManager(EventDispatcher):
 		self.storage = ConnectionManagerStorage()
 		self.running = True
 		self.sources = {}
+		self.thread = None
 
 	def __del__(self):
 		self.running = False
@@ -93,8 +94,7 @@ class ConnectionManager(EventDispatcher):
 		dd = []
 		rf = 0
 
-		for x in self.sources:
-			ds = self.sources[x]
+		for x, ds in self.sources.items():
 			if not ds.connected:
 				continue
 

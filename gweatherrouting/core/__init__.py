@@ -13,13 +13,12 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
 try:
-    from .storage import *
+	from .storage import *
 except:
-    from .dummy_storage import *
-    
-from .grib import Grib 
+	from .dummy_storage import *
+
+from .grib import Grib
 from .track import Track, RoutingTrack
 from .trackmanager import TrackManager
 from .utils import DictCache, EventDispatcher

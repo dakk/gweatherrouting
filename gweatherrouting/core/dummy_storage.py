@@ -13,118 +13,114 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
-
-
 APP_NAME = 'gweatherrouting'
 DATA_DIR = '/storage'
 GRIB_DIR = DATA_DIR
 TEMP_DIR = DATA_DIR
 
 class Storage(dict):
-    __init = False
-    
-    def __init__(self, filename = None, parent = None, *args, **kwargs):
-        super(Storage, self).__init__(*args, **kwargs)
+	__init = False
 
-        self.__parent = parent
-        self.__filename = filename
-        self.__handlers = {}
+	def __init__(self, filename = None, parent = None, *args, **kwargs):
+		super(Storage, self).__init__(*args, **kwargs)
 
-        for arg in args:
-            if isinstance(arg, dict):
-                for k, v in arg.iteritems():
-                    self[k] = v
+		self.__parent = parent
+		self.__filename = filename
+		self.__handlers = {}
 
-        if kwargs:
-            for k, v in kwargs.iteritems():
-                self[k] = v
+		for arg in args:
+			if isinstance(arg, dict):
+				for k, v in arg.iteritems():
+					self[k] = v
 
-        if parent != None:
-            self.__init = True
+		if kwargs:
+			for k, v in kwargs.iteritems():
+				self[k] = v
 
-    def __getattr__(self, attr):
-        return self.get(attr)
+		if parent is not None:
+			self.__init = True
 
-    def __setattr__(self, key, value):
-        self.__setitem__(key, value)
-        self.save()
-        self.notify_change(key, value)
+	def __getattr__(self, attr):
+		return self.get(attr)
 
-    def __setitem__(self, key, value):
-        super(Storage, self).__setitem__(key, value)
-        self.__dict__.update({key: value})
-        self.save()
-        self.notify_change(key, value)
+	def __setattr__(self, key, value):
+		self.__setitem__(key, value)
+		self.save()
+		self.notify_change(key, value)
 
-    def __delattr__(self, item):
-        self.__delitem__(item)
-        self.save()
+	def __setitem__(self, key, value):
+		super(Storage, self).__setitem__(key, value)
+		self.__dict__.update({key: value})
+		self.save()
+		self.notify_change(key, value)
 
-    def __delitem__(self, key):
-        super(Storage, self).__delitem__(key)
-        del self.__dict__[key]
-        self.save()
+	def __delattr__(self, item):
+		self.__delitem__(item)
+		self.save()
 
-    def loadData(self, data):
-        for x in data:
-            if isinstance(data[x], dict):
-                self[x].loadData(data[x])
-            else:
-                self[x] = data[x]
+	def __delitem__(self, key):
+		super(Storage, self).__delitem__(key)
+		del self.__dict__[key]
+		self.save()
 
-    def save(self):
-        if self.__parent:
-            return self.__parent.save()
-        
-        if not self.__filename or not self.__init:
-            return
+	def loadData(self, data):
+		for x in data:
+			if isinstance(data[x], dict):
+				self[x].loadData(data[x])
+			else:
+				self[x] = data[x]
 
-    def load(self):
-        if self.__parent:
-            return
-            
-        if not self.__filename:
-            return
+	def save(self):
+		if self.__parent:
+			return self.__parent.save()
 
-        return
-            
-    def loadOrSaveDefault(self):
-        try:
-            self.load()
-            self.__init = True
-        except:
-            self.__init = True
-            self.save()
+		if not self.__filename or not self.__init:
+			return
 
-    def to_dict(self):
-        d = {}
-        for x in self:
-            if x.find('Storage') != -1:
-                continue
+	def load(self):
+		if self.__parent:
+			return
 
-            if isinstance(self[x], dict):
-                d[x] = self[x].to_dict()
-            else:
-                d[x] = self[x]
+		if not self.__filename:
+			return
 
-        return d
+		return
 
-    def register_on_change(self, k, handler):
-        if not (k in self.__handlers):
-            self.__handlers[k] = []
+	def loadOrSaveDefault(self):
+		try:
+			self.load()
+			self.__init = True
+		except:
+			self.__init = True
+			self.save()
 
-        self.__handlers[k].append(handler)
-        handler(self[k])
+	def to_dict(self):
+		d = {}
+		for x in self:
+			if x.find('Storage') != -1:
+				continue
 
-    def notify_change(self, k, v):
-        print('notify change', k, v)
-        if not self.__init:
-            return 
+			if isinstance(self[x], dict):
+				d[x] = self[x].to_dict()
+			else:
+				d[x] = self[x]
 
-        if not (k in self.__handlers):
-            return
+		return d
 
-        for x in self.__handlers[k]:
-            x(v)
+	def register_on_change(self, k, handler):
+		if k not in self.__handlers:
+			self.__handlers[k] = []
 
+		self.__handlers[k].append(handler)
+		handler(self[k])
+
+	def notify_change(self, k, v):
+		print('notify change', k, v)
+		if not self.__init:
+			return
+
+		if k not in self.__handlers:
+			return
+
+		for x in self.__handlers[k]:
+			x(v)

@@ -168,13 +168,13 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 		self.graphArea.queue_draw()
 	
 	def cropData(self, widget):
-		if self.cropA == None and self.cropB == None:
+		if self.cropA is None and self.cropB is None:
 			return
 
-		if self.cropA == None:
+		if self.cropA is None:
 			self.cropA = self.data[0].time
 
-		if self.cropB == None:
+		if self.cropB is None:
 			self.cropB = self.data[-1].time
 
 		self.data = [d for d in self.data if d.time >= self.cropA and d.time <= self.cropB]
@@ -514,7 +514,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 
 			ax2.legend()
 
-		if self.cropA != None:
+		if self.cropA is not None:
 			try:
 				ii = numpy.where((x > (numpy.datetime64(self.cropA))) & (x < (numpy.datetime64(self.cropA) + numpy.timedelta64(self.timetravelWidget.getChangeUnit(), 's'))))
 				for axx in ax1:
@@ -522,7 +522,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 			except:
 				pass 
 
-		if self.cropB != None:
+		if self.cropB is not None:
 			try:
 				ii = numpy.where((x > (numpy.datetime64(self.cropB))) & (x < (numpy.datetime64(self.cropB) + numpy.timedelta64(self.timetravelWidget.getChangeUnit(), 's'))))
 				for axx in ax1:

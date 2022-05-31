@@ -225,6 +225,6 @@ class ChartStackRouting:
 				self.selectedRouting = None
 
 	def onRoutingClick(self, item, event):		
-		if self.selectedRouting != None and event.button == 3 and len(self.core.trackManager.routings) > 0:
+		if self.selectedRouting is not None and event.button == 3 and len(self.core.trackManager.routings) > 0:
 			menu = self.builder.get_object("routing-item-menu")
 			menu.popup (None, None, None, None, event.button, event.time)
