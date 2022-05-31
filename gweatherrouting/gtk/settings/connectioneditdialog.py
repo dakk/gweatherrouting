@@ -13,11 +13,10 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
-import gi
 import os
+import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gio, GObject
+from gi.repository import Gtk
 from ...core import SerialDataSource
 
 ctypes = [
@@ -42,7 +41,7 @@ protocols = [
 
 baudrates = [9600, 19200, 38400, 57600, 115200]
 
-def lower(s): 
+def lower(s):
 	return s.lower()
 
 class ConnectionEditDialog:
@@ -112,7 +111,6 @@ class ConnectionEditDialog:
 	def destroy(self):
 		return self.dialog.destroy()
 
-		
 	def onTypeChange(self, widget):
 		if self.typeCombo.get_active() == 0:
 			self.builder.get_object('network-frame').show()
@@ -140,7 +138,7 @@ class ConnectionEditDialog:
 		try:
 			self.saveData()
 			self.dialog.response(Gtk.ResponseType.OK)
-		except Exception as e:
+		except Exception as _:
 			dialog = Gtk.MessageDialog(self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
 			dialog.format_secondary_text("Invalid data")
 			dialog.run()

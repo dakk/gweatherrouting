@@ -14,18 +14,18 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
-import gi
 import os
 import math
+import logging
+import gi
 
 gi.require_version('Gtk', '3.0')
 try:
 	gi.require_version('OsmGpsMap', '1.2')
 except:
 	gi.require_version('OsmGpsMap', '1.0')
-	
+
 from gi.repository import Gtk
-import logging
 from .widgets.polar import PolarWidget
 
 logger = logging.getLogger ('gweatherrouting')

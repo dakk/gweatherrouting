@@ -13,12 +13,11 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
+from threading import Thread
 import gi
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gio, GObject, Gdk
-from threading import Thread
+from gi.repository import Gtk, Gdk
 
 PALETTES = {
 	'cm93': 0,
@@ -122,7 +121,6 @@ class SettingsWindowCharts:
 			Thread(target=self.registeringChart, args=(l, 'raster', )).start()
 		else:
 			dialog.destroy ()
-			
 
 	def onAddVectorChart(self, widget):
 		pass

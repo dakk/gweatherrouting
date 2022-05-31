@@ -13,10 +13,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
 import gi
-import math
-from ..style import *
 
 gi.require_version('Gtk', '3.0')
 try:
@@ -24,28 +21,28 @@ try:
 except:
 	gi.require_version('OsmGpsMap', '1.0')
 
-from gi.repository import Gtk, Gio, GObject, OsmGpsMap
+from gi.repository import GObject, OsmGpsMap
+from ..style import *
 
 class AISMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
-    def __init__ (self, core):
-        GObject.GObject.__init__ (self)
-        self.visible = True
+	def __init__ (self, core):
+		GObject.GObject.__init__ (self)
+		self.visible = True
 
-    def setVisible(self, visible):
-        self.visible = visible
+	def setVisible(self, visible):
+		self.visible = visible
 
-    def do_draw (self, gpsmap, cr):
-        if not self.visible:
-            return 
+	def do_draw (self, gpsmap, cr):
+		if not self.visible:
+			return
 
+	def do_render (self, gpsmap):
+		pass
 
-    def do_render (self, gpsmap):
-        pass
+	def do_busy (self):
+		return False
 
-    def do_busy (self):
-        return False
-
-    def do_button_press (self, gpsmap, gdkeventbutton):
-        return False
+	def do_button_press (self, gpsmap, gdkeventbutton):
+		return False
 
 GObject.type_register (AISMapLayer)

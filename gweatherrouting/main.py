@@ -13,8 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-import sys
-import os
 import logging
 from . import log
 from .core import Core
@@ -22,17 +20,17 @@ from .core import Core
 logger = logging.getLogger ('gweatherrouting')
 
 def startUIKivy ():
-    from .kivy.app import GWeatherRoutingApp
-    GWeatherRoutingApp(Core()).run()
+	from .kivy.app import GWeatherRoutingApp
+	GWeatherRoutingApp(Core()).run()
 
 def startUIGtk ():
-    import gi
-    gi.require_version('Gtk', '3.0')
-    from gi.repository import Gtk
-    from .gtk.mainwindow import MainWindow
+	import gi
+	gi.require_version('Gtk', '3.0')
+	from gi.repository import Gtk
+	from .gtk.mainwindow import MainWindow
 
-    MainWindow(Core())
-    Gtk.main()
+	MainWindow(Core())
+	Gtk.main()
 
 # if __name__ == "__main__":
 #     startUIKivy()

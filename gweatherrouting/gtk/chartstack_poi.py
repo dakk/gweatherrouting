@@ -114,4 +114,3 @@ class ChartStackPOI:
 			self.statusbar.push(0, "POIs exported as NMEA PFEC to %s" % filename)
 		else:
 			dialog.destroy()
-

@@ -13,12 +13,9 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
-import gi
 import math
 import dateutil.parser
-from ...core import utils
-from ..style import *
+import gi
 
 gi.require_version('Gtk', '3.0')
 try:
@@ -26,169 +23,171 @@ try:
 except:
 	gi.require_version('OsmGpsMap', '1.0')
 
-from gi.repository import Gtk, Gio, GObject, OsmGpsMap
+from gi.repository import GObject, OsmGpsMap
+from ...core import utils
+from ..style import *
+
 
 class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
-    def __init__ (self, trackManager, timeControl):
-        GObject.GObject.__init__ (self)
-        self.trackManager = trackManager
-        self.timeControl = timeControl
-        self.hlRouting = None
+	def __init__ (self, trackManager, timeControl):
+		GObject.GObject.__init__ (self)
+		self.trackManager = trackManager
+		self.timeControl = timeControl
+		self.hlRouting = None
 
-    def hightlightRouting (self, name):
-        self.hlRouting = name
+	def hightlightRouting (self, name):
+		self.hlRouting = name
 
-    def do_draw (self, gpsmap, cr):
-        if self.trackManager.log:
-            prevx = None
-            prevy = None 
-            prevp = None 
-            
-            for p in self.trackManager.log:
-                x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (p[0], p[1]))
+	def do_draw (self, gpsmap, cr):
+		if self.trackManager.log:
+			prevx = None
+			prevy = None
+			prevp = None
 
-                if prevx is not None and prevy is not None:
-                    Style.Track.LogTrack.apply(cr)
-                    cr.move_to (prevx, prevy)
-                    cr.line_to (x, y)
-                    cr.stroke()
+			for p in self.trackManager.log:
+				x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (p[0], p[1]))
 
-                prevx = x
-                prevy = y
-                prevp = p
+				if prevx is not None and prevy is not None:
+					Style.Track.LogTrack.apply(cr)
+					cr.move_to (prevx, prevy)
+					cr.line_to (x, y)
+					cr.stroke()
+
+				prevx = x
+				prevy = y
+				prevp = p
 
 
-        for tr in self.trackManager.routings:
-            highlight = False 
+		for tr in self.trackManager.routings:
+			highlight = False
 
-            if not tr.visible:
-                continue 
+			if not tr.visible:
+				continue
 
-            if tr.name == self.hlRouting:
-                highlight = True 
+			if tr.name == self.hlRouting:
+				highlight = True
 
-            prevx = None
-            prevy = None 
-            prevp = None 
-            i = 0
+			prevx = None
+			prevy = None
+			prevp = None
+			i = 0
 
-            for p in tr.waypoints:
-                i += 1
-                x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (p[0], p[1]))
+			for p in tr.waypoints:
+				i += 1
+				x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (p[0], p[1]))
 
-                if prevp is None:
-                    if highlight:
-                        Style.Track.RoutingTrackFontHL.apply(cr)
-                    else:
-                        Style.Track.RoutingTrackFont.apply(cr)
-                    cr.move_to(x+10, y)
-                    cr.show_text(tr.name)
-                    cr.stroke()
+				if prevp is None:
+					if highlight:
+						Style.Track.RoutingTrackFontHL.apply(cr)
+					else:
+						Style.Track.RoutingTrackFont.apply(cr)
+					cr.move_to(x+10, y)
+					cr.show_text(tr.name)
+					cr.stroke()
 
-                # Draw boat
-                if prevp is not None:    
-                    tprev = dateutil.parser.parse(prevp[2])
-                    tcurr = dateutil.parser.parse(p[2])
+				# Draw boat
+				if prevp is not None:    
+					tprev = dateutil.parser.parse(prevp[2])
+					tcurr = dateutil.parser.parse(p[2])
 
-                    if tcurr >= self.timeControl.time and tprev < self.timeControl.time:
-                        dt = (tcurr-tprev).total_seconds()
-                        dl = utils.pointDistance(prevp[0], prevp[1], p[0], p[1]) / dt * (self.timeControl.time - tprev).total_seconds()
-                        
-                        rp = utils.routagePointDistance (prevp[0], prevp[1], dl, math.radians(p[6]))
+					if tcurr >= self.timeControl.time and tprev < self.timeControl.time:
+						dt = (tcurr-tprev).total_seconds()
+						dl = utils.pointDistance(prevp[0], prevp[1], p[0], p[1]) / dt * (self.timeControl.time - tprev).total_seconds()
 
-                        Style.Track.RoutingBoat.apply(cr)
-                        xx, yy = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (rp[0], rp[1]))
-                        cr.arc(xx, yy, 7, 0, 2 * math.pi)
-                        cr.fill()  
+						rp = utils.routagePointDistance (prevp[0], prevp[1], dl, math.radians(p[6]))
 
-                if prevx is not None and prevy is not None:
-                    if highlight:
-                        Style.Track.RoutingTrackHL.apply(cr)
-                    else:
-                        Style.Track.RoutingTrack.apply(cr)
+						Style.Track.RoutingBoat.apply(cr)
+						xx, yy = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (rp[0], rp[1]))
+						cr.arc(xx, yy, 7, 0, 2 * math.pi)
+						cr.fill()  
 
-                    cr.move_to (prevx, prevy)
-                    cr.line_to (x, y)
-                    cr.stroke()
+				if prevx is not None and prevy is not None:
+					if highlight:
+						Style.Track.RoutingTrackHL.apply(cr)
+					else:
+						Style.Track.RoutingTrack.apply(cr)
 
-                if highlight:
-                    Style.Track.RoutingTrackCircleHL.apply(cr)
-                else:
-                    Style.Track.RoutingTrackCircle.apply(cr)
-                    
-                cr.arc(x, y, 5, 0, 2 * math.pi)
-                cr.stroke()
+					cr.move_to (prevx, prevy)
+					cr.line_to (x, y)
+					cr.stroke()
 
-                prevx = x
-                prevy = y
-                prevp = p
+				if highlight:
+					Style.Track.RoutingTrackCircleHL.apply(cr)
+				else:
+					Style.Track.RoutingTrackCircle.apply(cr)
 
-        for tr in self.trackManager.tracks:
-            if not tr.visible:
-                continue 
+				cr.arc(x, y, 5, 0, 2 * math.pi)
+				cr.stroke()
 
-            active = False
-            if self.trackManager.activeTrack and self.trackManager.activeTrack.name == tr.name:
-                active = True
+				prevx = x
+				prevy = y
+				prevp = p
 
-            prevx = None
-            prevy = None 
-            i = 0
+		for tr in self.trackManager.tracks:
+			if not tr.visible:
+				continue
 
-            for p in tr.waypoints:
-                i += 1
-                x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (p[0], p[1]))
+			active = False
+			if self.trackManager.activeTrack and self.trackManager.activeTrack.name == tr.name:
+				active = True
 
-                if prevx is None:
-                    if active:
-                        Style.Track.TrackActiveFont.apply(cr)
-                    else:
-                        Style.Track.TrackInactiveFont.apply(cr)
+			prevx = None
+			prevy = None
+			i = 0
 
-                    cr.move_to(x-10, y-10)
-                    cr.show_text(tr.name)
-                    cr.stroke()
+			for p in tr.waypoints:
+				i += 1
+				x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (p[0], p[1]))
 
-                
-                if active:
-                    Style.Track.TrackActivePoiFont.apply(cr)
-                else:
-                    Style.Track.TrackInactivePoiFont.apply(cr)
-                    
-                cr.move_to(x-4, y+18)
-                cr.show_text(str(i))
-                cr.stroke()
+				if prevx is None:
+					if active:
+						Style.Track.TrackActiveFont.apply(cr)
+					else:
+						Style.Track.TrackInactiveFont.apply(cr)
 
-                if prevx is not None and prevy is not None:
-                    if active:
-                        Style.Track.TrackActive.apply(cr)
-                    else:
-                        Style.Track.TrackInactive.apply(cr)
+					cr.move_to(x-10, y-10)
+					cr.show_text(tr.name)
+					cr.stroke()
 
-                    cr.move_to (prevx, prevy)
-                    cr.line_to (x, y)
-                    cr.stroke()
+				if active:
+					Style.Track.TrackActivePoiFont.apply(cr)
+				else:
+					Style.Track.TrackInactivePoiFont.apply(cr)
 
-                if active:
-                    Style.Track.TrackActive.apply(cr)
-                else:
-                    Style.Track.TrackInactive.apply(cr)
+				cr.move_to(x-4, y+18)
+				cr.show_text(str(i))
+				cr.stroke()
 
-                Style.resetDash(cr)
+				if prevx is not None and prevy is not None:
+					if active:
+						Style.Track.TrackActive.apply(cr)
+					else:
+						Style.Track.TrackInactive.apply(cr)
 
-                cr.arc(x, y, 5, 0, 2 * math.pi)
-                cr.stroke()
+					cr.move_to (prevx, prevy)
+					cr.line_to (x, y)
+					cr.stroke()
 
-                prevx = x
-                prevy = y
+				if active:
+					Style.Track.TrackActive.apply(cr)
+				else:
+					Style.Track.TrackInactive.apply(cr)
 
-    def do_render (self, gpsmap):
-        pass
+				Style.resetDash(cr)
 
-    def do_busy (self):
-        return False
+				cr.arc(x, y, 5, 0, 2 * math.pi)
+				cr.stroke()
 
-    def do_button_press (self, gpsmap, gdkeventbutton):
-        return False
+				prevx = x
+				prevy = y
+
+	def do_render (self, gpsmap):
+		pass
+
+	def do_busy (self):
+		return False
+
+	def do_button_press (self, gpsmap, gdkeventbutton):
+		return False
 
 GObject.type_register (TrackMapLayer)

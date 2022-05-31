@@ -23,8 +23,8 @@ except:
 	gi.require_version('OsmGpsMap', '1.0')
 
 from gi.repository import Gtk
-from .maplayers import TrackMapLayer
 
+from .maplayers import TrackMapLayer
 from ..core import utils
 
 class ChartStackTrack:
@@ -70,7 +70,7 @@ class ChartStackTrack:
 
 		if response == Gtk.ResponseType.OK:
 			filepath = dialog.get_filename ()
-			
+
 			if not filepath.endswith('.gpx'):
 				filepath += '.gpx'
 
@@ -86,14 +86,14 @@ class ChartStackTrack:
 				edialog.format_secondary_text ("Cannot save file: %s" % filepath)
 				edialog.run ()
 				edialog.destroy ()
-			
+
 		dialog.destroy ()
 
 
 	def onTrackNameEdit(self, widget, i, name):
 		self.core.trackManager.tracks[int(i)].name = utils.uniqueName(name, self.core.trackManager.tracks)
 		self.updateTrack()
-		
+
 	def onTrackToggle(self, widget, i):
 		self.core.trackManager.tracks[int(i)].visible = not self.core.trackManager.tracks[int(i)].visible
 		self.updateTrack()

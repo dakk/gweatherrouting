@@ -13,10 +13,9 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
-import gi
 import os
 import datetime
+import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
@@ -30,6 +29,7 @@ class RoutingWizardDialog:
 		self.core = core
 		self.polar = None
 
+		self.paramWidgets = {}
 		self.polars = os.listdir(os.path.abspath(os.path.dirname(__file__)) + '/../data/polars/')
 
 		self.builder = Gtk.Builder()
@@ -90,10 +90,10 @@ class RoutingWizardDialog:
 
 		if len(ralgo.PARAMS.keys()) == 0:
 			self.builder.get_object('router-params').hide()
-			return 
-		
+			return
+
 		cont = self.builder.get_object('router-params-container')
-		
+
 		for x in cont.get_children():
 			cont.remove(x)
 
@@ -105,7 +105,7 @@ class RoutingWizardDialog:
 		for x in ralgo.PARAMS:
 			p = ralgo.PARAMS[x]
 			cb = Gtk.HBox()
-			
+
 			cb.add(Gtk.Label(p.name))
 
 			if p.ttype == 'float':
@@ -114,7 +114,7 @@ class RoutingWizardDialog:
 			elif p.ttype == 'int':
 				adj = Gtk.Adjustment(value=p.value, step_incr=p.step, page_incr=p.step*10.0, lower=p.lower, upper=p.upper)
 				e = Gtk.SpinButton(adjustment=adj, digits=0)
-				
+
 			e.set_tooltip_text(p.tooltip)
 			e.connect('changed', self.onParamChange)
 			self.paramWidgets[e] = p
@@ -140,7 +140,7 @@ class RoutingWizardDialog:
 
 		if response == Gtk.ResponseType.OK:
 			self.builder.get_object('time-entry').set_text(tp.getDateTime().strftime(TimeControl.DFORMAT))
-		
+
 		tp.destroy()
 
 	def getCoastlineChecks(self):

@@ -13,10 +13,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
-from osgeo import ogr
 import gi
-import json
 import cairo
 
 gi.require_version("Gtk", "3.0")
@@ -48,7 +45,7 @@ class SimpleChartDrawer(VectorChartDrawer):
 			feat = layer.GetNextFeature()
 			while feat is not None:
 				if not feat:
-					continue 
+					continue
 
 				geom = feat.GetGeometryRef()
 				geom = bounding.Intersection(geom)

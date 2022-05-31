@@ -13,17 +13,13 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-import gi
 import os
-import requests
+import time
+import logging
 from threading import Thread
 from osgeo import ogr
-import time 
-from gweatherrouting.core import utils
-
-from ...core.core import LinePointValidityProvider
-from ...core.storage import DATA_DIR, TEMP_DIR
-from .chartlayer import ChartLayer
+import gi
+import requests
 
 
 gi.require_version('Gtk', '3.0')
@@ -35,7 +31,9 @@ except:
 from gi.repository import Gtk, Gdk, OsmGpsMap
 
 from ... import log
-import logging
+from ...core.core import LinePointValidityProvider
+from ...core.storage import DATA_DIR, TEMP_DIR
+from .chartlayer import ChartLayer
 
 
 logger = logging.getLogger ('gweatherrouting')
@@ -66,7 +64,7 @@ class OSMDownloadDialog(Gtk.Dialog):
 		box = self.get_content_area()
 		box.add(b)
 		self.show_all()
-		
+
 		self.thread = Thread(target=self.download, args=())
 		self.thread.start()
 
@@ -150,7 +148,7 @@ class GSHHSDownloadDialog(Gtk.Dialog):
 		box = self.get_content_area()
 		box.add(b)
 		self.show_all()
-		
+
 		self.thread = Thread(target=self.download, args=())
 		self.thread.start()
 
@@ -277,7 +275,7 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
 		vf = self.lpvFile
 
 		points = ogr.Geometry(ogr.wkbLinearRing)
-		pointsa = [] 
+		pointsa = []
 		res = [True for x in latlons]
 
 		for x in latlons:
@@ -299,32 +297,32 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
 				if not feat:
 					continue 
 
-				geom = feat.GetGeometryRef()				
+				geom = feat.GetGeometryRef()
 				geom = boundingGeometry.Intersection(geom)
-				
-				for i, x in enumerate(pointsa):
-					if not res[i]:
+
+				for ii, x in enumerate(pointsa):
+					if not res[ii]:
 						continue
 					if geom.Contains(x):
-						res[i] = False
-						
-				del geom 
+						res[ii] = False
+			
+				del geom
 				del feat
 
 				if len(list(filter(lambda x: x, res))) == 0:
 					return res
 
 				feat = layer.GetNextFeature()
-			del layer 
-		
+			del layer
+
 		return res
 
 
 	def linesValidity(self, latlons):
 		vf = self.lpvFile
-		
+
 		lines = ogr.Geometry(ogr.wkbLinearRing)
-		linesa = [] 
+		linesa = []
 		res = [True for x in latlons]
 
 		for x in latlons:
@@ -349,21 +347,21 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
 
 				geom = feat.GetGeometryRef()
 
-				for i, x in enumerate(linesa):
-					if not res[i]:
+				for ii, x in enumerate(linesa):
+					if not res[ii]:
 						continue
 					if geom.Intersects(x):
-						res[i] = False
+						res[ii] = False
 
-				del geom 
+				del geom
 				del feat
 
 				if len(list(filter(lambda x: x, res))) == 0:
 					return res
 
 				feat = layer.GetNextFeature()
-			del layer 
-		
+			del layer
+
 		return res
 
 
@@ -383,7 +381,7 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
 			q = 'h'
 		elif scale < 15:
 			q = 'f'
-				
+
 		t = time.time()
 		self.drawer.draw(gpsmap, cr, self.vectorFiles[q+'1'], boundingGeometry)
 		self.lastTime[q] = time.time() - t
@@ -410,5 +408,3 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
 
 	def do_button_press(self, gpsmap, gdkeventbutton):
 		return False
-
-

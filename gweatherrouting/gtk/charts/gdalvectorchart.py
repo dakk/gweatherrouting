@@ -13,13 +13,13 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+from osgeo import ogr
 
 from gweatherrouting.gtk.charts.cm93driver import CM93Driver
 from gweatherrouting.gtk.charts.vectordrawer.osmchartdrawer import OSMChartDrawer
 from .vectordrawer import SimpleChartDrawer
 from .vectordrawer import S57ChartDrawer
 from .vectordrawer import CM93ChartDrawer
-from osgeo import ogr
 
 from .chartlayer import ChartLayer
 
@@ -27,27 +27,27 @@ class GDALVectorChart(ChartLayer):
 	def __init__(self, path, settingsManager, metadata = None, enabled = True):
 		super().__init__(path, 'vector', settingsManager, metadata, enabled)
 
-		self.drawer = None 
+		self.drawer = None
 
 		drvName = None
 		if path.find("geojson") != -1:
 			drvName = "GeoJSON"
-			self.drawer = SimpleChartDrawer()
+			self.drawer = SimpleChartDrawer(settingsManager)
 		elif path.find("shp") != -1:
 			drvName = "ESRI Shapefile"
-			self.drawer = SimpleChartDrawer()
+			self.drawer = SimpleChartDrawer(settingsManager)
 		elif path.find (".000") != -1:
 			drvName = "S57"
-			self.drawer = S57ChartDrawer()
+			self.drawer = S57ChartDrawer(settingsManager)
 		elif path.find ("Cm93") != -1:
 			drvName = "CM93"
-			self.drawer = CM93ChartDrawer()
+			self.drawer = CM93ChartDrawer(settingsManager)
 		elif path.find ("osm") != -1 or path.find ("pbf") != -1:
 			drvName = "OSM"
 			self.drawer = OSMChartDrawer(self.settingsManager)
 
 		if drvName is None and self.drawer is None:
-			raise ("Invalid format")
+			raise Exception ("Invalid format")
 
 		if drvName == 'CM93':
 			drv = CM93Driver()
@@ -56,7 +56,7 @@ class GDALVectorChart(ChartLayer):
 		self.vectorFile = drv.Open(path)
 
 		if self.vectorFile is None:
-			raise ("Unable to open vector map %s" % path)
+			raise Exception ("Unable to open vector map %s" % path)
 
 	def onRegister(self, onTickHandler = None):
 		pass
@@ -73,4 +73,3 @@ class GDALVectorChart(ChartLayer):
 
 	def do_button_press(self, gpsmap, gdkeventbutton):
 		return False
-

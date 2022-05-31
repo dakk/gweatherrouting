@@ -25,5 +25,5 @@ class SettingsManager(Storage):
 		self.vectorCharts = []
 		self.rasterCharts = []
 		self.chartPalette = 'cm93'
-		
+
 		self.loadOrSaveDefault()

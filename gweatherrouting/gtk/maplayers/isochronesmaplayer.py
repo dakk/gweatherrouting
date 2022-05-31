@@ -13,12 +13,10 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-
-import gi
 import math
+import gi
 import cairo
 from weatherrouting import utils
-from ..style import Style
 
 gi.require_version("Gtk", "3.0")
 try:
@@ -26,7 +24,8 @@ try:
 except:
 	gi.require_version('OsmGpsMap', '1.0')
 
-from gi.repository import Gtk, Gio, GObject, OsmGpsMap
+from gi.repository import GObject, OsmGpsMap
+from ..style import Style
 
 
 class IsochronesMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
@@ -95,7 +94,7 @@ class IsochronesMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 					OsmGpsMap.MapPoint.new_degrees(icpoint.pos[0], icpoint.pos[1])
 				)
 
-				if prev:
+				if prev is not None:
 					cr.move_to(prev[0], prev[1])
 					(d, r) = utils.ortodromic(prev[2].pos[0], prev[2].pos[1], icpoint.pos[0], icpoint.pos[1])
 

@@ -15,7 +15,6 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 from osgeo import ogr
 
-
 class ChartLayer:
 	def __init__(self, path, ctype, settingsManager, metadata = None, enabled = True):
 		self.path = path
@@ -26,7 +25,7 @@ class ChartLayer:
 
 	def onRegister(self, onTickHandler = None):
 		""" Called when the dataset is registered on the software """
-		pass
+		return
 
 
 	def getBoundingWKTOfCoords(self, p1lat, p1lon, p2lat, p2lon):

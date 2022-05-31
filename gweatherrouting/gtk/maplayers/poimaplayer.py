@@ -13,10 +13,8 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
-import gi
 import math
-from ..style import *
+import gi
 
 gi.require_version('Gtk', '3.0')
 try:
@@ -25,52 +23,53 @@ except:
 	gi.require_version('OsmGpsMap', '1.0')
 
 from gi.repository import Gtk, Gio, GObject, OsmGpsMap
+from ..style import *
 
 class POIMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
-    def __init__ (self, poiManager):
-        GObject.GObject.__init__ (self)
-        self.poiManager = poiManager
+	def __init__ (self, poiManager):
+		GObject.GObject.__init__ (self)
+		self.poiManager = poiManager
 
 
-    def do_draw (self, gpsmap, cr):
-        for tr in self.poiManager.pois:
-            if not tr.visible:
-                continue 
+	def do_draw (self, gpsmap, cr):
+		for tr in self.poiManager.pois:
+			if not tr.visible:
+				continue 
 
-            x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (tr.position[0], tr.position[1]))
+			x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (tr.position[0], tr.position[1]))
 
-            Style.Poi.Quad.apply(cr)
-            cr.rectangle(x+3, y-5, len(tr.name) * 6.7, 12)
-            cr.stroke_preserve()
-            Style.Poi.QuadInt.apply(cr)
-            cr.fill()
+			Style.Poi.Quad.apply(cr)
+			cr.rectangle(x+3, y-5, len(tr.name) * 6.7, 12)
+			cr.stroke_preserve()
+			Style.Poi.QuadInt.apply(cr)
+			cr.fill()
 
-            Style.Poi.Font.apply(cr)
-            cr.move_to(x+5, y+5)
-            cr.show_text(tr.name)
-            cr.stroke()
+			Style.Poi.Font.apply(cr)
+			cr.move_to(x+5, y+5)
+			cr.show_text(tr.name)
+			cr.stroke()
 
 
-            Style.Poi.Dot.apply(cr)
-            cr.arc(x, y, 2, 0, 2 * math.pi)
-            cr.fill()
+			Style.Poi.Dot.apply(cr)
+			cr.arc(x, y, 2, 0, 2 * math.pi)
+			cr.fill()
 
-            # Triangle
-            # cr.move_to(x-5, y-5)
-            # cr.line_to(x,y+5)
-            # cr.move_to(x+5, y-5)
-            # cr.line_to(x,y+5)
-            # cr.move_to(x-5, y-5)
-            # cr.line_to(x+5,y-5)
-            # cr.stroke()
+			# Triangle
+			# cr.move_to(x-5, y-5)
+			# cr.line_to(x,y+5)
+			# cr.move_to(x+5, y-5)
+			# cr.line_to(x,y+5)
+			# cr.move_to(x-5, y-5)
+			# cr.line_to(x+5,y-5)
+			# cr.stroke()
 
-    def do_render (self, gpsmap):
-        pass
+	def do_render (self, gpsmap):
+		pass
 
-    def do_busy (self):
-        return False
+	def do_busy (self):
+		return False
 
-    def do_button_press (self, gpsmap, gdkeventbutton):
-        return False
+	def do_button_press (self, gpsmap, gdkeventbutton):
+		return False
 
 GObject.type_register (POIMapLayer)

@@ -13,21 +13,15 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
-from threading import Thread
-import gi
 import os
-import nmeatoolkit as nt 
-import cairo
 import io
+import logging
+from threading import Thread
+import nmeatoolkit as nt
+import cairo
 import numpy
 import PIL
 import gi
-
-from gweatherrouting.core.timecontrol import TimeControl
-from gweatherrouting.gtk.maplayers.toolsmaplayer import ToolsMapLayer
-from gweatherrouting.gtk.maplayers.trackmaplayer import TrackMapLayer
-from gweatherrouting.gtk.widgets.timetravel import TimeTravelWidget 
 
 gi.require_version('Gtk', '3.0')
 try:
@@ -35,15 +29,17 @@ try:
 except:
 	gi.require_version('OsmGpsMap', '1.0')
 
-from gi.repository import Gtk, OsmGpsMap, Gdk 
-from threading import Lock
-import logging
+from gi.repository import Gtk, Gdk 
+from ..core.timecontrol import TimeControl
+from .maplayers.toolsmaplayer import ToolsMapLayer
+from .maplayers.trackmaplayer import TrackMapLayer
+from .widgets.timetravel import TimeTravelWidget
 
 logger = logging.getLogger ('gweatherrouting')
 
 LOG_TEMP_FILE = '/tmp/gwr-recording.log'
 
-class LogsStack(Gtk.Box, nt.Output, nt.Input):		
+class LogsStack(Gtk.Box, nt.Output, nt.Input):
 	def __init__(self, parent, chartManager, core, settingsManager):
 		Gtk.Widget.__init__(self)
 
@@ -51,7 +47,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 		self.core = core
 		self.trackManager = self.core.trackManager
 		self.recording = False
-		self.loading = False 
+		self.loading = False
 		self.data = []
 		self.recordedData = None
 		self.toSend = []
@@ -63,8 +59,9 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 		self.hdgChart = True
 		self.rwChart = False
 
-		self.cropA = None 
-		self.cropB = None 
+		self.highlightedValue = None
+		self.cropA = None
+		self.cropB = None
 
 		self.core.connectionManager.connect("data", self.dataHandler)
 
@@ -107,19 +104,19 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 			self.loadingThread = Thread(target=self.loadFromFile, args=(LOG_TEMP_FILE,))
 			self.loadingThread.start ()
 		except:
-			pass 
+			pass
 
 	def onTimeChange(self, time):
 		self.selectedTime = time
 		if not self.recording and not self.loading:
 			self.graphArea.queue_draw()
 			self.map.queue_draw()
-	
+
 	def onLoadClick(self, widget):
 		dialog = Gtk.FileChooserDialog ("Please choose a file", self.parent,
 					Gtk.FileChooserAction.OPEN,
 					(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
-			
+	
 		filter_nmea = Gtk.FileFilter ()		
 		filter_nmea.set_name ("NMEA log")
 		# filter_nmea.add_mime_type ("application/gpx+xml")
@@ -133,7 +130,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 		# dialog.add_filter (filter_gpx)
 
 		response = dialog.run()
-		
+
 		if response == Gtk.ResponseType.OK:
 			filepath = dialog.get_filename ()
 			dialog.destroy ()
@@ -158,15 +155,15 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 
 		if self.loadingThread:
 			self.loadingThread.join()
-			
+
 	def setCropA(self, widget):
 		self.cropA = self.selectedTime
 		self.graphArea.queue_draw()
-			
+
 	def setCropB(self, widget):
 		self.cropB = self.selectedTime
 		self.graphArea.queue_draw()
-	
+
 	def cropData(self, widget):
 		if self.cropA is None and self.cropB is None:
 			return
@@ -182,7 +179,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 
 		self.rebuildTrack()
 		self.graphArea.queue_draw()
-		
+
 		if self.recordedData:
 			self.recordedData.flush()
 			self.recordedData.close()
@@ -272,12 +269,12 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 
 			if len(self.data) % 150 == 0:
 				self.trackManager.log.append((x.lat, x.lon))
-			
+
 			if self.recording or len(self.data) % 5000 == 0:
 				self.map.set_center_and_zoom (x.lat, x.lon, 12)
 				logger.debug("Recorded %d points" % len(self.data))
 				self.statusBar.push(0, "%s track points" % len(self.data))
-			
+
 			Gdk.threads_leave()
 
 
@@ -295,7 +292,8 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 		Gdk.threads_leave()
 
 	def onSaveClick(self, widget):
-		dialog = Gtk.FileChooserDialog("Save log", self.parent, Gtk.FileChooserAction.SAVE, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+		dialog = Gtk.FileChooserDialog("Save log", self.parent, Gtk.FileChooserAction.SAVE, 
+			(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
 		dialog.set_do_overwrite_confirmation(True)
 		response = dialog.run()
 		if response == Gtk.ResponseType.OK:
@@ -312,7 +310,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 		self.data = []
 		ext = filepath.split('.')[-1]
 
-		# TODO: support for gpx files 
+		# TODO: support for gpx files
 		self.trackManager.log = []
 
 		try:
@@ -341,11 +339,11 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 
 
 	def saveToFile(self, filepath):
-		pass 
+		pass
 
 	def clearData(self, widget):
 		self.data = []
-	
+
 		if self.recordedData:
 			self.recordedData.close()
 		self.recordedData = open(LOG_TEMP_FILE, 'w')
@@ -402,7 +400,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 
 		if self.hdgChart or self.apparentWindChart or self.trueWindChart:
 			nplots += 1
-		
+
 		if self.speedChart:
 			nplots += 1
 
@@ -418,7 +416,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 
 		i = 0
 		ii = -1
-		self.highlightedValues = None 
+		self.highlightedValue = None
 		self.statusBar.push(0, "")
 
 		if not self.recording and not self.loading:
@@ -437,8 +435,6 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 			if(ii != -1):
 				ax1[i].plot(x[ii], data[ii], color='#f00', marker='o', markersize=4)
 				# ax1[i].axvline(x=ii)
-
-			
 
 		if self.speedChart:
 			if i < nplots - 1:
@@ -486,7 +482,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 				plt.setp(ax1[i].get_xticklabels(), visible=False)
 
 			ax2 = ax1[i]
-			
+
 			if self.apparentWindChart:
 				if self.rwChart:
 					data = list(map(lambda x: x.awa if x.awa else 0, y))
@@ -530,13 +526,13 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 			except:
 				pass
 
-	
+
 		plt.tight_layout()
 		buf = io.BytesIO()
 		plt.savefig(buf, dpi=100)
 		buf.seek(0)
 		buf2 = PIL.Image.open(buf)
-	
+
 		arr = numpy.array(buf2)
 		height, width, channels = arr.shape
 		surface = cairo.ImageSurface.create_for_data(arr, cairo.FORMAT_RGB24, width, height)

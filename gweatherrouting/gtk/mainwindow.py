@@ -17,13 +17,9 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 # TODO:
 # https://eeperry.wordpress.com/2013/01/05/pygtk-new-style-python-class-using-builder/
 
-import gi
 import os
-
-from .chartstack import ChartStack
-from .polarstack import PolarStack
-from .regattastack import RegattaStack
-from .logsstack import LogsStack
+import gi
+import logging
 
 gi.require_version('Gtk', '3.0')
 try:
@@ -33,9 +29,11 @@ except:
 
 from gi.repository import Gtk, Gdk
 
-from .. import log
-import logging
 
+from .chartstack import ChartStack
+from .polarstack import PolarStack
+from .logsstack import LogsStack
+from .. import log
 from .settings import SettingsWindow
 from .projectpropertieswindow import ProjectPropertiesWindow
 from .gribmanagerwindow import GribManagerWindow
@@ -52,12 +50,12 @@ class MainWindow:
 
 		# Add custom icon path
 		Gtk.IconTheme.get_default().append_search_path(os.path.abspath(os.path.dirname(__file__)) + "/../data/icons")
-		
+
 		# Force dark theme
 		settings = Gtk.Settings.get_default()
 		#settings.set_property("gtk-theme-name", "")
 		settings.set_property("gtk-application-prefer-dark-theme", True)
-	
+
 
 		self.builder = Gtk.Builder()
 		self.builder.add_from_file(os.path.abspath(os.path.dirname(__file__)) + "/mainwindow.glade")
@@ -74,12 +72,12 @@ class MainWindow:
 		# Initialize chart manager
 		self.chartManager = ChartManager(self.settingsManager)
 		self.chartManager.loadBaseChart(self.window)
-		
+
 		for x in self.settingsManager.vectorCharts:
-			l = self.chartManager.loadVectorLayer(x['path'], x['metadata'], x['enabled'])
+			self.chartManager.loadVectorLayer(x['path'], x['metadata'], x['enabled'])
 
 		for x in self.settingsManager.rasterCharts:
-			l = self.chartManager.loadRasterLayer(x['path'], x['metadata'], x['enabled'])
+			self.chartManager.loadRasterLayer(x['path'], x['metadata'], x['enabled'])
 
 
 		Gdk.threads_init()

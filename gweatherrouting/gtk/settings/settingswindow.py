@@ -13,14 +13,12 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
-import gi
 import os
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 from .settingswindow_charts import SettingsWindowCharts
 from .settingswindow_connections import SettingsWindowConnections
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gio, GObject, Gdk
-from threading import Thread
 
 
 class SettingsWindow(SettingsWindowConnections, SettingsWindowCharts):
@@ -54,10 +52,9 @@ class SettingsWindow(SettingsWindowConnections, SettingsWindowCharts):
 
 	def close(self):
 		self.window.hide()
-		
+
 	def onGribArrowOnGroundChange(self, widget, v):
 		self.settingsManager.gribArrowOnGround = widget.get_active()
 
 	def onGribArrowOpacityChange(self, v):
 		self.settingsManager.gribArrowOpacity = v.get_value()
-

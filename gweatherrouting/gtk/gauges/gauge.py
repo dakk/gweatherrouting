@@ -16,5 +16,5 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 # Abstract class for a single gauge
 class Gauge:
-    def __init__(self):
-        pass
+	def __init__(self):
+		pass

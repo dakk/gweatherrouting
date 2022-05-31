@@ -13,9 +13,9 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
-import gi
 import os
+import logging
+import gi
 
 gi.require_version('Gtk', '3.0')
 try:
@@ -24,7 +24,6 @@ except:
 	gi.require_version('OsmGpsMap', '1.0')
 
 from gi.repository import Gtk
-import logging
 
 logger = logging.getLogger ('gweatherrouting')
 

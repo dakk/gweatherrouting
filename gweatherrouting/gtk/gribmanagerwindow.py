@@ -14,15 +14,13 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
-import gi
 import os
 import logging
-
 from threading import Thread
+import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GObject, Gdk
 
-from ..core import Storage
 logger = logging.getLogger ('gweatherrouting')
 
 GribFileFilter = Gtk.FileFilter ()
@@ -89,7 +87,8 @@ class GribManagerWindow:
 		self.gribManagerStore.clear()
 
 		for x in self.gribManager.localGribs:
-			self.gribManagerStore.append ([x.name, x.centre, str(x.startTime), x.lastForecast, self.gribManager.isEnabled(x.name)])
+			self.gribManagerStore.append ([x.name, x.centre, str(x.startTime), x.lastForecast, 
+				self.gribManager.isEnabled(x.name)])
 
 
 	def onRemoveLocalGrib(self, widget):
@@ -105,7 +104,7 @@ class GribManagerWindow:
 		dialog.add_filter (GribFileFilter)
 
 		response = dialog.run()
-		
+
 		if response == Gtk.ResponseType.OK:
 			filepath = dialog.get_filename ()
 			dialog.destroy ()

@@ -13,13 +13,12 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
-import gi
 import os
+import gi
 from ..timepickerdialog import TimePickerDialog
 
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gio, GObject, Gdk
+from gi.repository import Gtk, GObject
 
 
 TIME_UNITS = {
@@ -39,7 +38,7 @@ TIME_UNITS = {
 class TimeTravelWidget(Gtk.Box):
 	def __init__(self, parent, timeControl, map, smallerUnit = False):  
 		super(TimeTravelWidget, self).__init__()
-			
+
 		self.play = False
 		self.parent = parent
 		self.timeControl = timeControl
@@ -107,7 +106,7 @@ class TimeTravelWidget(Gtk.Box):
 
 		if response == Gtk.ResponseType.OK:
 			self.timeControl.setTime(tp.getDateTime())
-		
+
 		tp.destroy()
 
 

@@ -13,9 +13,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
 from .s57symbolprovider import S57SymbolProvider
-
 
 class VectorChartDrawer:
 	def __init__(self, settingsManager):
@@ -26,10 +24,10 @@ class VectorChartDrawer:
 
 	# TODO: this will handle object queries
 	def onQueryPoint(self, lat, lon):
-		raise ("Not implemented")
+		raise Exception("Not implemented")
 
 	def onChartPaletteChanged(self, v):
 		self.palette = v
 
 	def draw(self, gpsmap, cr, vectorFile, bounding):
-		raise ("Not implemented")
+		raise Exception("Not implemented")

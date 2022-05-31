@@ -13,9 +13,8 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
-import gi
 import os
+import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
@@ -33,6 +32,6 @@ class ProjectPropertiesWindow:
 
 	def show(self):
 		self.window.show_all()
-	
+
 	def close(self):
 		self.window.hide()

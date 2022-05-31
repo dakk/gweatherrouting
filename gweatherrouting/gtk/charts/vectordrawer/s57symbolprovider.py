@@ -13,13 +13,10 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
-import gi
-import json
 import os
 import logging
-
-from ....core.storage import DATA_DIR
+import json
+import gi
 
 gi.require_version("Gtk", "3.0")
 try:
@@ -30,6 +27,8 @@ except:
 from gi.repository import GdkPixbuf, Gdk
 from bs4 import BeautifulSoup
 
+from ....core.storage import DATA_DIR
+
 logger = logging.getLogger ('gweatherrouting')
 
 class S57SymbolProvider:
@@ -37,8 +36,10 @@ class S57SymbolProvider:
 		self.settingsManager = settingsManager
 		self.symbols = {}
 
-		self.p_day = GdkPixbuf.Pixbuf.new_from_file(os.path.abspath(os.path.dirname(__file__)) + '/../../../data/s57/rastersymbols-day.png')
-		self.p_dark = GdkPixbuf.Pixbuf.new_from_file(os.path.abspath(os.path.dirname(__file__)) + '/../../../data/s57/rastersymbols-dark.png')
+		self.p_day = GdkPixbuf.Pixbuf.new_from_file(
+			os.path.abspath(os.path.dirname(__file__)) + '/../../../data/s57/rastersymbols-day.png')
+		self.p_dark = GdkPixbuf.Pixbuf.new_from_file(
+			os.path.abspath(os.path.dirname(__file__)) + '/../../../data/s57/rastersymbols-dark.png')
 
 		self.p_select = self.p_day
 		self.onChartPaletteChanged(settingsManager.chartPalette)
@@ -49,7 +50,7 @@ class S57SymbolProvider:
 			with open(DATA_DIR + 's57_symbols.json', 'r') as f:
 				self.symbols = json.load(f)
 				logger.debug('Loaded cached S57 symbols')
-				return 
+				return
 		except:
 			logger.warning('Cached S57 symbols not found, loading from XML')
 			self.symbols = {}
@@ -58,7 +59,7 @@ class S57SymbolProvider:
 		data = open(os.path.abspath(os.path.dirname(__file__)) + '/../../../data/s57/chartsymbols.xml').read()
 
 		soup = BeautifulSoup(data, "html.parser")
-		
+
 		for row in soup.find_all("symbol"):
 			try:
 				name = row.find('name').text
@@ -66,7 +67,7 @@ class S57SymbolProvider:
 					description = row.find('description').text
 				except:
 					description = ''
-				
+
 				bm = row.find('bitmap')
 				dim = int(bm['width']), int(bm['height'])
 				dist = int(bm.find('distance')['max']), int(bm.find('distance')['min'])
@@ -84,7 +85,7 @@ class S57SymbolProvider:
 				}
 
 			except:
-				continue 
+				continue
 
 		with open(DATA_DIR + 's57_symbols.json', 'w') as f:
 			json.dump(self.symbols, f)

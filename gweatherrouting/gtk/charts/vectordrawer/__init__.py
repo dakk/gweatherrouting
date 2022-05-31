@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
 from .simplechartdrawer import SimpleChartDrawer
 from .s57chartdrawer import S57ChartDrawer
 from .s57symbolprovider import S57SymbolProvider

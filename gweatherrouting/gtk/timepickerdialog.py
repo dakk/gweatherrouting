@@ -13,10 +13,9 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-
-import gi
 import os
 import datetime
+import gi
 import dateutil.parser
 
 gi.require_version("Gtk", "3.0")
@@ -57,7 +56,12 @@ class TimePickerDialog:
 		self.minute.set_text(str(d.minute))
 
 	def getDateTime(self):
-		return datetime.datetime(int(self.year.get_text()), int(self.month.get_text()), int(self.day.get_text()), int(self.hour.get_text()), int(self.minute.get_text()))
+		return datetime.datetime(
+			int(self.year.get_text()),
+			int(self.month.get_text()),
+			int(self.day.get_text()),
+			int(self.hour.get_text()),
+			int(self.minute.get_text()))
 
 	def run(self):
 		return self.dialog.run()

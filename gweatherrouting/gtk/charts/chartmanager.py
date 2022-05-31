@@ -13,17 +13,9 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
-import gi
-import os
-
-from ...core.core import LinePointValidityProvider
-from ...core.storage import DATA_DIR
-from .gshhs import GSHHSAskDownloadDialog, GSHHSDownloadDialog, GSHHSVectorChart, OSMAskDownloadDialog, OSMDownloadDialog
-
 import logging
-from .gdalvectorchart import GDALVectorChart
-from .gdalrasterchart import GDALRasterChart
+import os
+import gi
 
 gi.require_version("Gtk", "3.0")
 try:
@@ -32,6 +24,13 @@ except:
 	gi.require_version('OsmGpsMap', '1.0')
 
 from gi.repository import Gtk, GObject, OsmGpsMap, Gdk
+
+from ...core.core import LinePointValidityProvider
+from ...core.storage import DATA_DIR
+from .gshhs import GSHHSAskDownloadDialog, GSHHSDownloadDialog, GSHHSVectorChart, OSMAskDownloadDialog, OSMDownloadDialog
+
+from .gdalvectorchart import GDALVectorChart
+from .gdalrasterchart import GDALRasterChart
 
 logger = logging.getLogger ('gweatherrouting')
 
@@ -92,7 +91,7 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 		if not self.osmLayer:
 			logger.info("OSM file not found, open a dialog asking for download")
 			
-			def f():
+			def ff():
 				Gdk.threads_enter()
 				d = OSMAskDownloadDialog(parent)
 				r = d.run()
@@ -106,7 +105,7 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 
 				Gdk.threads_leave()
 
-			GObject.timeout_add(10, f)
+			GObject.timeout_add(10, ff)
 
 	def loadVectorLayer(self, path, metadata = None, enabled = True):
 		logger.info("Loading vector chart %s" % path)

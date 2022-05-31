@@ -13,20 +13,18 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
+import io
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 import cairo
-import io
 import numpy
 import PIL
 
 class MPLWidget(Gtk.DrawingArea):
-	def __init__(self, parent):      
+	def __init__(self, parent):
 		self.par = parent
 		super(MPLWidget, self).__init__()
- 
 
 		# self.set_size_request(-1, 30)
 		self.connect("draw", self.draw)
@@ -34,7 +32,7 @@ class MPLWidget(Gtk.DrawingArea):
 	def plotDrawer(self, w, h, plt, s):
 		pass
 
-	def draw(self, area, ctx):     
+	def draw(self, area, ctx):
 		a = self.get_allocation()
 
 		import matplotlib.pyplot as plt
@@ -49,7 +47,7 @@ class MPLWidget(Gtk.DrawingArea):
 		plt.savefig(buf, dpi=100)
 		buf.seek(0)
 		buf2= PIL.Image.open(buf)
-	
+
 		arr = numpy.array(buf2)
 		height, width, channels = arr.shape
 		surface = cairo.ImageSurface.create_for_data(arr, cairo.FORMAT_RGB24, width, height)
@@ -62,7 +60,3 @@ class MPLWidget(Gtk.DrawingArea):
 		if fig:
 			fig.clf()
 			plt.close(fig)
-
-	
-
-	   

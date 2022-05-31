@@ -13,12 +13,8 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-
-import gi
 import math
-
-from gweatherrouting.core.utils import pointInCountry
-from ..style import *
+import gi
 
 gi.require_version("Gtk", "3.0")
 try:
@@ -26,9 +22,9 @@ try:
 except:
 	gi.require_version('OsmGpsMap', '1.0')
 
-from gi.repository import Gtk, Gio, GObject, OsmGpsMap
-from itertools import tee
-import cairo
+from gi.repository import GObject, OsmGpsMap
+from ..style import *
+from ...core.utils import pointInCountry
 from ...common import windColor
 
 
@@ -75,7 +71,7 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 	def do_draw(self, gpsmap, cr):
 		if not self.visible:
 			return
-			
+
 		p1, p2 = gpsmap.get_bbox()
 
 		p1lat, p1lon = p1.get_degrees()

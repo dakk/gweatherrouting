@@ -30,7 +30,7 @@ class S57ChartDrawer(VectorChartDrawer):
 				feat = layer.GetNextFeature()
 
 				if not feat:
-					continue 
+					continue
 
 				# print (feat.GetFieldCount())
 				for x in range(feat.GetFieldCount()):

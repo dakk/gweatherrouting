@@ -15,8 +15,9 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 import traceback
-import gi
+import logging
 from threading import Thread
+import gi
 
 gi.require_version('Gtk', '3.0')
 try:
@@ -25,13 +26,12 @@ except:
 	gi.require_version('OsmGpsMap', '1.0')
 
 from gi.repository import Gtk, Gdk, GObject
+from weatherrouting import RoutingNoWindException
 
 from .routingwizarddialog import RoutingWizardDialog
 from .maplayers import IsochronesMapLayer
 from ..core import RoutingTrack, utils
-from weatherrouting import RoutingNoWindException
 from .. import log
-import logging
 
 logger = logging.getLogger ('gweatherrouting')
 
@@ -41,6 +41,7 @@ class ChartStackRouting:
 	stopRouting = False
 
 	def __init__(self):
+		self.currentRouting = None
 		self.routingStore = self.builder.get_object("routing-store")
 
 		self.isochronesMapLayer = IsochronesMapLayer ()
@@ -48,7 +49,7 @@ class ChartStackRouting:
 
 		self.updateRoutings()
 
-	def __del__(self): 
+	def __del__(self):
 		if self.routingThread:
 			self.stopRouting = True
 
@@ -66,13 +67,13 @@ class ChartStackRouting:
 			self.builder.get_object("stop-routing-button").show()
 
 		dialog.destroy ()
-		
+
 	def onRoutingStep (self):
 		Gdk.threads_enter()
 		self.progressBar.set_fraction(1.0)
 		self.progressBar.set_text("1%")
 		self.progressBar.show()
-		Gdk.threads_leave()	
+		Gdk.threads_leave()
 
 		res = None 
 
@@ -82,7 +83,7 @@ class ChartStackRouting:
 				logger.debug ("Routing step: " + str(res))
 
 			# This exception is not raised by the algorithm
-			except RoutingNoWindException as e:
+			except RoutingNoWindException as _:
 				Gdk.threads_enter()
 				edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
 				edialog.format_secondary_text ('Trying to create a route without wind information')
@@ -115,14 +116,14 @@ class ChartStackRouting:
 			self.timeControl.setTime(res.time)
 			# self.map.queue_draw ()
 			# self.builder.get_object('time-adjustment').set_value (res.time)
-			Gdk.threads_leave()	
+			Gdk.threads_leave()
 
 		if self.stopRouting:
 			Gdk.threads_enter()
 			GObject.timeout_add (3000, self.progressBar.hide)
 			self.builder.get_object("stop-routing-button").hide()
 			self.isochronesMapLayer.setIsochrones ([], [])
-			Gdk.threads_leave()	
+			Gdk.threads_leave()
 			return
 
 		tr = []
@@ -160,7 +161,6 @@ class ChartStackRouting:
 	def onRoutingNameEdit(self, widget, i, name):
 		self.core.trackManager.routings[int(i)].name = utils.uniqueName(name, self.core.trackManager.routings)
 		self.updateRoutings()
-		
 
 	def onRoutingRemove(self, widget):
 		self.core.trackManager.removeRouting(self.selectedRouting)
@@ -184,7 +184,7 @@ class ChartStackRouting:
 
 		if response == Gtk.ResponseType.OK:
 			filepath = dialog.get_filename ()
-			
+
 			if not filepath.endswith('.gpx'):
 				filepath += '.gpx'
 
@@ -199,7 +199,7 @@ class ChartStackRouting:
 				edialog.format_secondary_text ("Cannot save file: %s" % filepath)
 				edialog.run ()
 				edialog.destroy ()
-			
+
 		dialog.destroy ()
 
 

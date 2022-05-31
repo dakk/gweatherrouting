@@ -162,7 +162,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		self.builder.get_object("track-add-point-lat").set_text (str (lat))
 		self.builder.get_object("track-add-point-lon").set_text (str (lon))
 		self.statusbar.push(self.statusbar.get_context_id ('Info'), "Clicked on " + str(lat) + " " + str(lon))
-		
+
 		if event.button == 3:
 			menu = self.builder.get_object("map-context-menu")
 			menu.popup (None, None, None, None, event.button, event.time)
@@ -204,7 +204,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		dialog = Gtk.FileChooserDialog ("Please choose a file", self.parent,
 					Gtk.FileChooserAction.OPEN,
 					(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
-			
+
 		filter_gpx = Gtk.FileFilter ()
 		filter_gpx.set_name ("GPX track")
 		filter_gpx.add_mime_type ("application/gpx+xml")
@@ -214,7 +214,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		dialog.add_filter (GribFileFilter)
 
 		response = dialog.run()
-		
+
 		if response == Gtk.ResponseType.OK:
 			filepath = dialog.get_filename ()
 			dialog.destroy ()
@@ -230,9 +230,9 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 					edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done")
 					edialog.format_secondary_text ("GPX file opened and loaded")
 					edialog.run ()
-					edialog.destroy ()	
+					edialog.destroy ()
 					self.statusbar.push (self.statusbar.get_context_id ('Info'), f'Loaded {filepath} with {len (self.core.trackManager.activeTrack)} waypoints')
-					
+	
 				else:
 					edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
 					edialog.format_secondary_text (f"Cannot open file: {filepath}")

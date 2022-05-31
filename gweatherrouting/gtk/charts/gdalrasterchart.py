@@ -15,15 +15,16 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
 import logging
-import gi
 import time
-import cairo
 import multiprocessing
-import numpy as np
 from os import listdir
 from os.path import isfile, join
-from osgeo import  osr, gdal
 from threading import Thread, Lock
+
+import gi
+import cairo
+import numpy as np
+from osgeo import  osr, gdal
 
 gi.require_version("Gtk", "3.0")
 try:
@@ -72,13 +73,14 @@ def datasetBBox(dataset):
 	originbr = transform.TransformPoint(minx,miny) 
 
 	return [origin, originbr]
-	
+
 class GDALSingleRasterChart:
+	@staticmethod
 	def getFileInfo(path):
 		dataset = gdal.Open(path, gdal.GA_ReadOnly)
 
 		if not dataset:
-			raise ("Unable to open raster chart %s" % path)
+			raise Exception ("Unable to open raster chart %s" % path)
 
 		bbox = datasetBBox(dataset)
 
@@ -89,7 +91,7 @@ class GDALSingleRasterChart:
 		dataset = gdal.Open(path, gdal.GA_ReadOnly)
 
 		if not dataset:
-			raise ("Unable to open raster chart %s" % path)
+			raise Exception ("Unable to open raster chart %s" % path)
 
 		# print("Driver: {}/{}".format(dataset.GetDriver().ShortName,
 		# 					dataset.GetDriver().LongName))
@@ -111,7 +113,8 @@ class GDALSingleRasterChart:
 		p.start()
 		p.join()
 		surface, bandXSize, bandYSize = return_dict['surface']
-		surf = cairo.ImageSurface.create_for_data(surface, cairo.Format.ARGB32, bandXSize, bandYSize, cairo.Format.RGB24.stride_for_width(bandXSize))
+		surf = cairo.ImageSurface.create_for_data(surface, cairo.Format.ARGB32, bandXSize, 
+			bandYSize, cairo.Format.RGB24.stride_for_width(bandXSize))
 		self.surface = surf
 
 	def bandToSurface(self, i):
@@ -124,7 +127,7 @@ class GDALSingleRasterChart:
 
 		colors = {0: 0x00000000}
 		ct = band.GetRasterColorTable()
-		
+
 		for x in range(int(min), int(max) + 1):
 			try: 
 				c = ct.GetColorEntry(x)
@@ -206,7 +209,7 @@ class GDALRasterChart(ChartLayer):
 			gpsmap.queue_draw()
 			Gdk.threads_leave()
 			self.lastRasters.append(r)
-		
+
 	def do_draw(self, gpsmap, cr):
 		p1, p2 = gpsmap.get_bbox()
 		p1lat, p1lon = p1.get_degrees()
@@ -256,7 +259,7 @@ class GDALRasterChart(ChartLayer):
 				if self.cached[x[0]] != 'loading':
 					rasters.append(self.cached[x[0]])
 				continue
-			
+
 			self.cached[x[0]] = 'loading'
 
 			t = Thread(target=self.loadRaster, args=(gpsmap, x[0],))
@@ -266,7 +269,7 @@ class GDALRasterChart(ChartLayer):
 		# Save and render
 		self.lastRect = [p1lat, p1lon, p2lat, p2lon]
 		self.lastRasters = rasters
-		
+
 		# print ('rendering',len(rasters))
 		for x in rasters:
 			x.do_draw(gpsmap, cr)
@@ -282,7 +285,7 @@ class GDALRasterChart(ChartLayer):
 			maxRLat = max(bb[0][0], bb[1][0])
 			minRLon = min(bb[0][1], bb[1][1])
 			maxRLon = max(bb[0][1], bb[1][1])
-			
+
 			xx, yy = gpsmap.convert_geographic_to_screen(
 				OsmGpsMap.MapPoint.new_degrees(minRLat, minRLon)
 			)

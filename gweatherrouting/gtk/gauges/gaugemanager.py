@@ -17,4 +17,4 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 # Repository for gauges
 
 class GaugeManager:
-    pass
+	pass

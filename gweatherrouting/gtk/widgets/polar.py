@@ -13,11 +13,10 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
-import gi
 import os
 import math
 import logging
+import gi
 from weatherrouting import Polar
 
 gi.require_version('Gtk', '3.0')
@@ -26,10 +25,10 @@ from gi.repository import Gtk, Gdk
 logger = logging.getLogger ('gweatherrouting')
 
 class PolarWidget(Gtk.DrawingArea):
-	def __init__(self, parent):      
+	def __init__(self, parent):   
 		self.par = parent
 		super(PolarWidget, self).__init__()
- 
+
 		self.set_size_request(60,180)
 		self.connect("draw", self.draw)
 		self.polar = None
@@ -62,10 +61,10 @@ class PolarWidget(Gtk.DrawingArea):
 		self.queue_draw()
 
 
-	def draw(self, area, cr):  
+	def draw(self, area, cr):
 		if not self.polar:
 			return
-	
+
 		a = self.get_allocation()
 		width = a.width
 		height = a.height
@@ -84,8 +83,7 @@ class PolarWidget(Gtk.DrawingArea):
 			cr.arc (100.0, 100.0, x * 3, math.radians (-90), math.radians (90.0))
 			cr.stroke ()
 
-
-		twsStep = 1  
+		twsStep = 1
 		if len(self.polar.tws) > 7:
 			twsStep = 2
 
@@ -97,10 +95,10 @@ class PolarWidget(Gtk.DrawingArea):
 
 		cr.set_source_rgba (1, 1, 1, 0.6)
 
-		twaStep = 1  
+		twaStep = 1
 		if len(self.polar.twa) > 20:
 			twaStep = int(len(self.polar.twa) / 10)
-		
+
 		for x in self.polar.twa[::twaStep]:
 			cr.move_to (100.0, 100.0)
 			cr.line_to (100 + math.sin (x) * 100.0, 100 - math.cos (x) * 80.0)
