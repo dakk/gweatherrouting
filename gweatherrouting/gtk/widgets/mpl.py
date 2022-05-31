@@ -30,7 +30,7 @@ class MPLWidget(Gtk.DrawingArea):
 		self.connect("draw", self.draw)
 
 	def plotDrawer(self, w, h, plt, s):
-		pass
+		return None
 
 	def draw(self, area, ctx):
 		a = self.get_allocation()
