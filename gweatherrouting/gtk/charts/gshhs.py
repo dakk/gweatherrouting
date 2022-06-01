@@ -206,7 +206,7 @@ class GSHHSDownloadDialog(Gtk.Dialog):
 		f.close()
 		logger.info("GSHHS base map download completed")
 
-		zipfile.ZipFile(TEMP_DIR + "/gshhs2.3.6.zip").extractall(DATA_DIR+'/gshhs/')
+		zipfile.ZipFile(TEMP_DIR + "/gshhs2.3.6.zip").extractall(DATA_DIR)
 		self.callback(True)
 
 
