@@ -53,8 +53,8 @@ class OSMChartDrawer(VectorChartDrawer):
 				geom = feat.GetGeometryRef()
 				try:
 					self.featureRender(gpsmap, cr, geom, feat, layer)
-				except Exception as e:
-					logger.debug('Failed to render OSM feature:', e)
+				except Exception as _:
+					logger.debug('Failed to render OSM feature:', exc_info=True)
 
 				feat = layer.GetNextFeature()
 
@@ -145,21 +145,21 @@ class OSMChartDrawer(VectorChartDrawer):
 
 		# ANCHORAGE
 		elif 'seamark:type' in tags and tags['seamark:type'] == 'anchorage':
-			if scale > 100: 
+			if scale > 100:
 				return
 
 			self.symbolProvider.draw(cr, 'ACHARE02', xx, yy)
 
 		# WRECK
 		elif 'seamark:type' in tags and tags['seamark:type'] == 'wreck':
-			if scale > 100: 
+			if scale > 100:
 				return
 
 			self.symbolProvider.draw(cr, 'WRECKS01', xx, yy)
 
 		# FUEL
 		elif 'seamark:type' in tags and tags['seamark:type'] == 'small_craft_facility' and 'seamark:small_craft_facility:category' in tags and tags['seamark:small_craft_facility:category'] == 'fuel_station':
-			if scale > 100: 
+			if scale > 100:
 				return
 
 			# self.symbolProvider.draw(cr, 'fuel', xx, yy)
@@ -197,14 +197,14 @@ class OSMChartDrawer(VectorChartDrawer):
 
 		# ISOLATE DANGER
 		elif 'seamark:type' in tags and tags['seamark:type'] == 'buoy_isolated_danger':
-			if scale > 100: 
+			if scale > 100:
 				return
 
 			self.symbolProvider.draw(cr, 'BOYCAN76', xx, yy)
 
 		# SPECIAL PURPOSE
 		elif 'seamark:type' in tags and tags['seamark:type'] == 'buoy_special_purpose':
-			if scale > 100: 
+			if scale > 100:
 				return
 
 			self.symbolProvider.draw(cr, 'BOYSPP11', xx, yy)

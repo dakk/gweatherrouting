@@ -18,8 +18,8 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 # https://eeperry.wordpress.com/2013/01/05/pygtk-new-style-python-class-using-builder/
 
 import os
-import gi
 import logging
+import gi
 
 gi.require_version('Gtk', '3.0')
 try:

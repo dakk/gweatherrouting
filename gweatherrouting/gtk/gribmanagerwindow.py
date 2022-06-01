@@ -74,7 +74,7 @@ class GribManagerWindow:
 			Gdk.threads_enter()
 		except:
 			Gdk.threads_enter()
-			print ('Failed to download grib file list')
+			logger.error ('Failed to download grib file list')
 			self.builder.get_object('download-progress').set_text("Failed to download grib list")
 
 
@@ -87,7 +87,7 @@ class GribManagerWindow:
 		self.gribManagerStore.clear()
 
 		for x in self.gribManager.localGribs:
-			self.gribManagerStore.append ([x.name, x.centre, str(x.startTime), x.lastForecast, 
+			self.gribManagerStore.append ([x.name, x.centre, str(x.startTime), x.lastForecast,
 				self.gribManager.isEnabled(x.name)])
 
 
@@ -113,12 +113,12 @@ class GribManagerWindow:
 				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done")
 				edialog.format_secondary_text ("File opened, loaded grib")
 				edialog.run ()
-				edialog.destroy ()	
-				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Loaded grib %s' % (filepath))					
+				edialog.destroy ()
+				self.statusbar.push (self.statusbar.get_context_id ('Info'), f'Loaded grib {filepath}')
 
 			else:
 				edialog = Gtk.MessageDialog (self.window, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
-				edialog.format_secondary_text ("Cannot open grib file: %s" % filepath)
+				edialog.format_secondary_text (f"Cannot open grib file: {filepath}")
 				edialog.run ()
 				edialog.destroy ()
 		else:
@@ -136,9 +136,9 @@ class GribManagerWindow:
 
 	def onGribDownloadPercentage (self, percentage):
 		if percentage % 10 == 0:
-			logger.info('Downloading grib: %d%% completed' % percentage)
+			logger.info('Downloading grib: %d%% completed', percentage)
 		self.builder.get_object('download-progress').set_fraction(percentage / 100.)
-		self.builder.get_object('download-progress').set_text("%d%%" % percentage)
+		self.builder.get_object('download-progress').set_text(f"{percentage}%")
 		# self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Downloading grib: %d%% completed' % percentage)
 
 	def onGribDownloadCompleted (self, status):
@@ -173,5 +173,6 @@ class GribManagerWindow:
 
 	def onGribDownload (self, widget):
 		self.builder.get_object('download-progress').show()
-		t = Thread(target=self.gribManager.download, args=(self.selectedGrib, self.onGribDownloadPercentage, self.onGribDownloadCompleted,))
+		t = Thread(target=self.gribManager.download, args=(
+			self.selectedGrib, self.onGribDownloadPercentage, self.onGribDownloadCompleted,))
 		t.start ()

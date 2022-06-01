@@ -80,7 +80,7 @@ class ChartStackRouting:
 		while (not self.currentRouting.end) and (not self.stopRouting):
 			try:
 				res = self.currentRouting.step ()
-				logger.debug ("Routing step: " + str(res))
+				logger.debug ("Routing step: %s", str(res))
 
 			# This exception is not raised by the algorithm
 			except RoutingNoWindException as _:
@@ -90,19 +90,19 @@ class ChartStackRouting:
 				edialog.run ()
 				edialog.destroy ()
 				self.progressBar.hide()
-				Gdk.threads_leave()	
+				Gdk.threads_leave()
 				self.isochronesMapLayer.setIsochrones ([], [])
 				self.builder.get_object("stop-routing-button").hide()
 				return None
 
-			except Exception as e:			
+			except Exception as e:
 				Gdk.threads_enter()
 				edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
 				edialog.format_secondary_text ('Error: ' + str(e))
 				edialog.run ()
 				edialog.destroy ()
 				self.progressBar.hide()
-				Gdk.threads_leave()	
+				Gdk.threads_leave()
 				self.isochronesMapLayer.setIsochrones ([], [])
 				self.builder.get_object("stop-routing-button").hide()
 				traceback.print_exc()
@@ -136,7 +136,9 @@ class ChartStackRouting:
 		GObject.timeout_add (3000, self.progressBar.hide)
 		Gdk.threads_leave()
 
-		self.core.trackManager.routings.append(RoutingTrack(name=utils.uniqueName(self.currentRouting.name, self.core.trackManager.routings), waypoints=tr, isochrones=res.isochrones, trackManager=self.core.trackManager))
+		self.core.trackManager.routings.append(
+			RoutingTrack(name=utils.uniqueName(self.currentRouting.name, self.core.trackManager.routings),
+				waypoints=tr, isochrones=res.isochrones, trackManager=self.core.trackManager))
 		self.updateRoutings()
 		self.builder.get_object("stop-routing-button").hide()
 
@@ -189,14 +191,14 @@ class ChartStackRouting:
 				filepath += '.gpx'
 
 			if routing.export (filepath):
-				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Saved %d waypoints' % (len (routing)))
+				self.statusbar.push (self.statusbar.get_context_id ('Info'), f'Saved {len (routing)} waypoints')
 				edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Saved")
-				edialog.format_secondary_text ('Saved %d waypoints' % (len (routing)))
+				edialog.format_secondary_text (f'Saved {len (routing)} waypoints')
 				edialog.run ()
 				edialog.destroy ()
 			else:
 				edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
-				edialog.format_secondary_text ("Cannot save file: %s" % filepath)
+				edialog.format_secondary_text (f"Cannot save file: {filepath}")
 				edialog.run ()
 				edialog.destroy ()
 
@@ -224,7 +226,7 @@ class ChartStackRouting:
 			else:
 				self.selectedRouting = None
 
-	def onRoutingClick(self, item, event):		
+	def onRoutingClick(self, item, event):
 		if self.selectedRouting is not None and event.button == 3 and len(self.core.trackManager.routings) > 0:
 			menu = self.builder.get_object("routing-item-menu")
 			menu.popup (None, None, None, None, event.button, event.time)

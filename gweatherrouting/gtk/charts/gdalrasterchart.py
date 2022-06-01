@@ -57,7 +57,7 @@ def datasetBBox(dataset):
 	new_cs = osr.SpatialReference()
 	new_cs .ImportFromWkt(wgs84_wkt)
 
-	transform = osr.CoordinateTransformation(old_cs,new_cs) 
+	transform = osr.CoordinateTransformation(old_cs,new_cs)
 
 	width = dataset.RasterXSize
 	height = dataset.RasterYSize
@@ -65,12 +65,12 @@ def datasetBBox(dataset):
 	minx = gt[0]
 	miny = gt[3]
 
-	origin = transform.TransformPoint(minx,miny) 
+	origin = transform.TransformPoint(minx,miny)
 
-	minx = gt[0] + width*gt[1] + height*gt[2] 
-	miny = gt[3] + width*gt[4] + height*gt[5] 
+	minx = gt[0] + width*gt[1] + height*gt[2]
+	miny = gt[3] + width*gt[4] + height*gt[5]
 
-	originbr = transform.TransformPoint(minx,miny) 
+	originbr = transform.TransformPoint(minx,miny)
 
 	return [origin, originbr]
 
@@ -80,7 +80,7 @@ class GDALSingleRasterChart:
 		dataset = gdal.Open(path, gdal.GA_ReadOnly)
 
 		if not dataset:
-			raise Exception ("Unable to open raster chart %s" % path)
+			raise Exception ("Unable to open raster chart %s", path)
 
 		bbox = datasetBBox(dataset)
 
@@ -91,7 +91,7 @@ class GDALSingleRasterChart:
 		dataset = gdal.Open(path, gdal.GA_ReadOnly)
 
 		if not dataset:
-			raise Exception ("Unable to open raster chart %s" % path)
+			raise Exception ("Unable to open raster chart %s", path)
 
 		# print("Driver: {}/{}".format(dataset.GetDriver().ShortName,
 		# 					dataset.GetDriver().LongName))
@@ -113,7 +113,7 @@ class GDALSingleRasterChart:
 		p.start()
 		p.join()
 		surface, bandXSize, bandYSize = return_dict['surface']
-		surf = cairo.ImageSurface.create_for_data(surface, cairo.Format.ARGB32, bandXSize, 
+		surf = cairo.ImageSurface.create_for_data(surface, cairo.Format.ARGB32, bandXSize,
 			bandYSize, cairo.Format.RGB24.stride_for_width(bandXSize))
 		self.surface = surf
 
@@ -196,14 +196,14 @@ class GDALRasterChart(ChartLayer):
 
 	def loadRaster(self, gpsmap, path):
 		with self.loadLock:
-			logger.debug('Loading raster file ' + path)
+			logger.debug('Loading raster file %s', path)
 			try:
 				s = time.time()
 				r = GDALSingleRasterChart(path)
 				self.cached[path] = r
-				logger.debug('Done loading raster file ' + path.split('/')[-1] + ' in ' + str(int((time.time() - s)* 10.)/10.) + ' seconds')
+				logger.debug('Done loading raster file %s in %ss', path.split('/')[-1], str(int((time.time() - s)* 10.)/10.))
 			except:
-				logger.error('Error loading raster file ' + path.split('/')[-1])
+				logger.error('Error loading raster file %s', path.split('/')[-1])
 				return None
 			Gdk.threads_enter()
 			gpsmap.queue_draw()

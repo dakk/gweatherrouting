@@ -147,7 +147,7 @@ class Storage(dict):
 		with open(DATA_DIR + '/' + self.__filename + '.json', 'r') as f:
 			j = json.loads(f.read())
 			self.loadData(j)            
-			logger.debug ('Load configuration from %s/%s.json' % (DATA_DIR, self.__filename))
+			logger.debug ('Load configuration from %s/%s.json', DATA_DIR, self.__filename)
 
 	def loadOrSaveDefault(self):
 		try:

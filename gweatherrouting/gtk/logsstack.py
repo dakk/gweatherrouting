@@ -272,8 +272,8 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 
 			if self.recording or len(self.data) % 5000 == 0:
 				self.map.set_center_and_zoom (x.lat, x.lon, 12)
-				logger.debug("Recorded %d points" % len(self.data))
-				self.statusBar.push(0, "%s track points" % len(self.data))
+				logger.debug("Recorded %d points", len(self.data))
+				self.statusBar.push(0, f"{len(self.data)} track points")
 
 			Gdk.threads_leave()
 
@@ -299,9 +299,9 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 		if response == Gtk.ResponseType.OK:
 			filename = dialog.get_filename()
 			dialog.destroy()
-			os.system('cp %s %s' % (LOG_TEMP_FILE, filename))
+			os.system(f'cp {LOG_TEMP_FILE} {filename}')
 
-			self.statusBar.push(0, "Saved to %s" % filename)
+			self.statusBar.push(0, f"Saved to {filename}")
 		else:
 			dialog.destroy()
 
@@ -316,7 +316,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 		try:
 			fi = nt.FileInput(filepath)
 		except:
-			logger.error("Error loading file %s" % filepath)
+			logger.error(f"Error loading file {filepath}")
 			self.loading = False
 			return
 
@@ -334,7 +334,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 		pip.run()
 
 		if filepath != LOG_TEMP_FILE:
-			os.system('cp %s %s' % (filepath, LOG_TEMP_FILE))
+			os.system(f'cp {filepath} {LOG_TEMP_FILE}')
 		# self.statusBar.push(0, "Load completed!")
 
 
@@ -388,7 +388,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 		width = a.width
 
 		if self.data == []:
-			return 
+			return
 
 		import matplotlib.pyplot as plt
 		plt.style.use('dark_background')
@@ -409,7 +409,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 
 		fig, ax1 = plt.subplots(nplots)
 		try:
-			ax1[0] 
+			ax1[0]
 		except:
 			ax1 = [ax1]
 		fig.set_size_inches((width / 100), (a.height / 100.))
@@ -432,7 +432,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 				ii = -1
 
 		def highlight(i, data):
-			if(ii != -1):
+			if ii != -1:
 				ax1[i].plot(x[ii], data[ii], color='#f00', marker='o', markersize=4)
 				# ax1[i].axvline(x=ii)
 
@@ -461,7 +461,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 				data = list(map(lambda x: x.tws if x.tws else 0, y))
 				ax1[i].plot(x, data, color='#bfbbd9', linewidth=0.6,label='TWS')
 				ax1[i].legend()
-				
+
 				highlight(i, data)
 			i+=1
 

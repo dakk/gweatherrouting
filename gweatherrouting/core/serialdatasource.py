@@ -34,7 +34,7 @@ class SerialDataSource(DataSource):
 			self.connected = True
 			return True
 		except:
-			logger.error ('Error connecting to serial port %s' % self.port)
+			logger.error ('Error connecting to serial port %s', self.port)
 			return False
 
 	@staticmethod
@@ -43,7 +43,7 @@ class SerialDataSource(DataSource):
 		for x in list_ports.comports():
 			try:
 				devices.append(x.device)
-				logger.info ('Detected new data source: %s [%s]' % (x.device, x.description))
+				logger.info ('Detected new data source: %s [%s]', x.device, x.description)
 			except:
 				pass
 

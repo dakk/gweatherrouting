@@ -51,8 +51,8 @@ class PolarWidget(Gtk.DrawingArea):
 			try:
 				polar = Polar (polarFile)
 			except:
-				logger.error ('Error loading polar file %s' % polarFile)
-				pass 
+				logger.error ('Error loading polar file %s', polarFile)
+				pass
 
 		self.setPolar(polar)
 

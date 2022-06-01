@@ -52,7 +52,7 @@ class GribManager(weatherrouting.Grib):
 		self.storage.opened = ss
 
 	def load(self, path):
-		logger.info("Loading grib %s" % path)
+		logger.info("Loading grib %s", path)
 		self.gribs.append(Grib.parse(path))
 
 	def changeState(self, name, state):
@@ -170,7 +170,7 @@ class GribManager(weatherrouting.Grib):
 	def importGrib(self, path):
 		try:
 			name = path.split("/")[-1]
-			logger.info("Importing grib %s" % path)
+			logger.info("Importing grib %s", path)
 			copyfile(path, GRIB_DIR + "/" + name)
 			self.enable(name)
 			return True
@@ -181,7 +181,7 @@ class GribManager(weatherrouting.Grib):
 		import bz2
 
 		name = uri.split("/")[-1]
-		logger.info("Downloading grib %s" % uri)
+		logger.info("Downloading grib %s", uri)
 
 		response = requests.get(uri, stream=True)
 		total_length = response.headers.get("content-length")
@@ -203,7 +203,7 @@ class GribManager(weatherrouting.Grib):
 					last_signal_percent = done
 
 		f.close()
-		logger.info("Grib download completed %s" % uri)
+		logger.info("Grib download completed %s", uri)
 
 		bf = bz2.open(TEMP_DIR + "/" + name, "rb")
 		f = open(GRIB_DIR + "/" + name.replace(".bz2", ""), "wb")

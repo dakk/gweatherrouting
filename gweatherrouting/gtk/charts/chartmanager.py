@@ -90,7 +90,7 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 
 		if not self.osmLayer:
 			logger.info("OSM file not found, open a dialog asking for download")
-			
+
 			def ff():
 				Gdk.threads_enter()
 				d = OSMAskDownloadDialog(parent)
@@ -108,7 +108,7 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 			GObject.timeout_add(10, ff)
 
 	def loadVectorLayer(self, path, metadata = None, enabled = True):
-		logger.info("Loading vector chart %s" % path)
+		logger.info("Loading vector chart %s", path)
 		l = GDALVectorChart(path, self.settingsManager, metadata=metadata, enabled=enabled)
 		self.charts += [l]
 
@@ -120,12 +120,12 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 		return l
 
 	def loadRasterLayer(self, path, metadata = None, enabled = True):
-		logger.info("Loading raster chart %s" % path)
+		logger.info("Loading raster chart %s", path)
 		l = GDALRasterChart(path, self.settingsManager, metadata=metadata, enabled=enabled)
 		self.charts += [l]
 
 		if self.osmLayer and enabled:
-			self.osmLayer.enabled = False 
+			self.osmLayer.enabled = False
 		if self.gshhsLayer and enabled:
 			self.gshhsLayer.forceDownscale = True
 		return l

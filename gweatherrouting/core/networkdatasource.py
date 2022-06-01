@@ -39,7 +39,7 @@ class NetworkDataSource(DataSource):
 			self.connected = True
 			return True
 		except Exception as e:
-			logger.error ('Error while connecting to the network: %s' % e)
+			logger.error ('Error while connecting to the network: %s', e)
 			return False
 
 

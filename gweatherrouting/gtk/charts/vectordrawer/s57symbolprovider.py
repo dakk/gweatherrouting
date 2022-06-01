@@ -122,5 +122,5 @@ class S57SymbolProvider:
 				cr.show_text(txt)
 				y += 12
 				i += 1
-		
+
 		self.draw(cr, 'LIGHTS13', xx, yy)
