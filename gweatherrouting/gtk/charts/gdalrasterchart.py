@@ -80,7 +80,7 @@ class GDALSingleRasterChart:
 		dataset = gdal.Open(path, gdal.GA_ReadOnly)
 
 		if not dataset:
-			raise Exception ("Unable to open raster chart %s", path)
+			raise Exception (f"Unable to open raster chart {path}")
 
 		bbox = datasetBBox(dataset)
 
@@ -91,7 +91,7 @@ class GDALSingleRasterChart:
 		dataset = gdal.Open(path, gdal.GA_ReadOnly)
 
 		if not dataset:
-			raise Exception ("Unable to open raster chart %s", path)
+			raise Exception (f"Unable to open raster chart {path}")
 
 		# print("Driver: {}/{}".format(dataset.GetDriver().ShortName,
 		# 					dataset.GetDriver().LongName))
@@ -120,16 +120,16 @@ class GDALSingleRasterChart:
 	def bandToSurface(self, i):
 		band = self.dataset.GetRasterBand(i)
 
-		min = band.GetMinimum()
-		max = band.GetMaximum()
-		if not min or not max:
-			(min,max) = band.ComputeRasterMinMax(True)
+		mmin = band.GetMinimum()
+		mmax = band.GetMaximum()
+		if not mmin or not mmax:
+			(mmin,mmax) = band.ComputeRasterMinMax(True)
 
 		colors = {0: 0x00000000}
 		ct = band.GetRasterColorTable()
 
-		for x in range(int(min), int(max) + 1):
-			try: 
+		for x in range(int(mmin), int(mmax) + 1):
+			try:
 				c = ct.GetColorEntry(x)
 				colors[x] = (c[3] << 24) | (c[2] << 16) | (c[1] << 8) | c[0]
 			except:
@@ -229,7 +229,7 @@ class GDALRasterChart(ChartLayer):
 
 		toload = []
 		for x in self.metadata:
-			bb, path, sizeX, sizeY = x[1], x[0], x[2], x[3]
+			bb, path = x[1], x[0] #sizeX, sizeY x[2], x[3]
 
 			minRLat = min(bb[0][0], bb[1][0])
 			maxRLat = max(bb[0][0], bb[1][0])
@@ -279,29 +279,29 @@ class GDALRasterChart(ChartLayer):
 			# Disable bbox rendering
 			continue
 
-			bb = x[1]
+			# bb = x[1]
 
-			minRLat = min(bb[0][0], bb[1][0])
-			maxRLat = max(bb[0][0], bb[1][0])
-			minRLon = min(bb[0][1], bb[1][1])
-			maxRLon = max(bb[0][1], bb[1][1])
+			# minRLat = min(bb[0][0], bb[1][0])
+			# maxRLat = max(bb[0][0], bb[1][0])
+			# minRLon = min(bb[0][1], bb[1][1])
+			# maxRLon = max(bb[0][1], bb[1][1])
 
-			xx, yy = gpsmap.convert_geographic_to_screen(
-				OsmGpsMap.MapPoint.new_degrees(minRLat, minRLon)
-			)
-			xx2, yy2 = gpsmap.convert_geographic_to_screen(
-				OsmGpsMap.MapPoint.new_degrees(maxRLat, maxRLon)
-			)
+			# xx, yy = gpsmap.convert_geographic_to_screen(
+			# 	OsmGpsMap.MapPoint.new_degrees(minRLat, minRLon)
+			# )
+			# xx2, yy2 = gpsmap.convert_geographic_to_screen(
+			# 	OsmGpsMap.MapPoint.new_degrees(maxRLat, maxRLon)
+			# )
 
-			cr.set_source_rgba(1,0,0,0.6)
-			cr.set_line_width(0.3)
-			cr.move_to(xx, yy)
-			cr.line_to(xx, yy2)
-			cr.line_to(xx2, yy2)
-			cr.line_to(xx2, yy)
-			cr.line_to(xx, yy)
+			# cr.set_source_rgba(1,0,0,0.6)
+			# cr.set_line_width(0.3)
+			# cr.move_to(xx, yy)
+			# cr.line_to(xx, yy2)
+			# cr.line_to(xx2, yy2)
+			# cr.line_to(xx2, yy)
+			# cr.line_to(xx, yy)
 
-			cr.stroke()
+			# cr.stroke()
 
 	def do_render(self, gpsmap):
 		pass

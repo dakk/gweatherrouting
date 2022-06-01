@@ -48,7 +48,7 @@ class OSMChartDrawer(VectorChartDrawer):
 			feat = layer.GetNextFeature()
 			while feat is not None:
 				if not feat:
-					continue 
+					continue
 
 				geom = feat.GetGeometryRef()
 				try:
@@ -182,7 +182,7 @@ class OSMChartDrawer(VectorChartDrawer):
 
 		# ROCK
 		elif 'seamark:type' in tags and tags['seamark:type'] == 'rock':
-			if scale > 100: 
+			if scale > 100:
 				return
 
 			s = 'UWTROC03'

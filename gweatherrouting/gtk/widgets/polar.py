@@ -25,7 +25,7 @@ from gi.repository import Gtk, Gdk
 logger = logging.getLogger ('gweatherrouting')
 
 class PolarWidget(Gtk.DrawingArea):
-	def __init__(self, parent):   
+	def __init__(self, parent):
 		self.par = parent
 		super(PolarWidget, self).__init__()
 
@@ -52,7 +52,6 @@ class PolarWidget(Gtk.DrawingArea):
 				polar = Polar (polarFile)
 			except:
 				logger.error ('Error loading polar file %s', polarFile)
-				pass
 
 		self.setPolar(polar)
 
@@ -66,7 +65,7 @@ class PolarWidget(Gtk.DrawingArea):
 			return
 
 		a = self.get_allocation()
-		width = a.width
+		# width = a.width
 		height = a.height
 
 		s = height * 0.8 / 160
@@ -122,19 +121,23 @@ class PolarWidget(Gtk.DrawingArea):
 		for i in range (0, len (self.polar.tws), 1):
 			for j in range (0, len (self.polar.twa), 1):
 				if len(self.polar.speedTable [j]) <= i:
-					continue 
+					continue
 
-				cr.line_to (100 + 5 * self.polar.speedTable [j][i] * math.sin (self.polar.twa[j]), 100 - 5 * self.polar.speedTable [j][i] * math.cos (self.polar.twa[j]))
+				cr.line_to (100 + 5 * self.polar.speedTable [j][i] *
+					math.sin (self.polar.twa[j]), 100 - 5 * self.polar.speedTable [j][i] * math.cos (self.polar.twa[j]))
 				cr.stroke ()
-				cr.move_to (100 + 5 * self.polar.speedTable [j][i] * math.sin (self.polar.twa[j]), 100 - 5 * self.polar.speedTable [j][i] * math.cos (self.polar.twa[j]))
+				cr.move_to (100 + 5 * self.polar.speedTable [j][i] *
+					math.sin (self.polar.twa[j]), 100 - 5 * self.polar.speedTable [j][i] * math.cos (self.polar.twa[j]))
 
 
 		# cr.move_to (100.0, 100.0)
 		# for i in range (0, len (self.polar.tws), 1):
 		# 	for j in range (0, len (self.polar.twa), 1):
-		# 		cr.line_to (100 - 5 * self.polar.speedTable [j][i] * math.sin (self.polar.twa[j]), 100 - 5 * self.polar.speedTable [j][i] * math.cos (self.polar.twa[j]))
+		# 		cr.line_to (100 - 5 * self.polar.speedTable [j][i]
+		# 			* math.sin (self.polar.twa[j]), 100 - 5 * self.polar.speedTable [j][i] * math.cos (self.polar.twa[j]))
 		# 		cr.stroke ()
-		# 		cr.move_to (100 - 5 * self.polar.speedTable [j][i] * math.sin (self.polar.twa[j]), 100 - 5 * self.polar.speedTable [j][i] * math.cos (self.polar.twa[j]))
+		# 		cr.move_to (100 - 5 * self.polar.speedTable [j][i]
+		# 			* math.sin (self.polar.twa[j]), 100 - 5 * self.polar.speedTable [j][i] * math.cos (self.polar.twa[j]))
 
 
 		# 200 : 0.8 = height : x

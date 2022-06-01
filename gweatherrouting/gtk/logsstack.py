@@ -29,7 +29,7 @@ try:
 except:
 	gi.require_version('OsmGpsMap', '1.0')
 
-from gi.repository import Gtk, Gdk 
+from gi.repository import Gtk, Gdk
 from ..core.timecontrol import TimeControl
 from .maplayers.toolsmaplayer import ToolsMapLayer
 from .maplayers.trackmaplayer import TrackMapLayer
@@ -97,7 +97,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 
 		self.builder.get_object('stop-button').hide()
 
-		self.recordinThread = None 
+		self.recordinThread = None
 		self.loadingThread = None
 
 		try:
@@ -116,14 +116,14 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 		dialog = Gtk.FileChooserDialog ("Please choose a file", self.parent,
 					Gtk.FileChooserAction.OPEN,
 					(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
-	
-		filter_nmea = Gtk.FileFilter ()		
+
+		filter_nmea = Gtk.FileFilter ()
 		filter_nmea.set_name ("NMEA log")
 		# filter_nmea.add_mime_type ("application/gpx+xml")
 		filter_nmea.add_pattern ('*.nmea')
 		dialog.add_filter (filter_nmea)
 
-		# filter_gpx = Gtk.FileFilter ()		
+		# filter_gpx = Gtk.FileFilter ()
 		# filter_gpx.set_name ("GPX track file")
 		# filter_gpx.add_mime_type ("application/gpx+xml")
 		# filter_gpx.add_pattern ('*.gpx')
@@ -136,13 +136,13 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 			dialog.destroy ()
 
 			try:
-				self.statusBar.push(0, "Loading %s" % filepath)
+				self.statusBar.push(0, f"Loading {filepath}")
 				self.loadingThread = Thread(target=self.loadFromFile, args=(filepath,))
 				self.loadingThread.start ()
 			except Exception as e:
 				print(e)
 				edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
-				edialog.format_secondary_text ("Cannot open file: %s" % filepath)
+				edialog.format_secondary_text (f"Cannot open file: {filepath}")
 				edialog.run ()
 				edialog.destroy ()
 		else:
@@ -183,7 +183,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 		if self.recordedData:
 			self.recordedData.flush()
 			self.recordedData.close()
-		os.system('mv %s %s.2' % (LOG_TEMP_FILE, LOG_TEMP_FILE))
+		os.system(f'mv {LOG_TEMP_FILE} {LOG_TEMP_FILE}.2')
 		pip = nt.Pipeline(
 			nt.FileInput(LOG_TEMP_FILE + ".2"),
 			nt.FileOutput(LOG_TEMP_FILE),
@@ -191,13 +191,13 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 			[ nt.CropPipe(self.cropA, self.cropB) ]
 		)
 		pip.run()
-		os.system('rm %s.2' % LOG_TEMP_FILE)
+		os.system(f'rm {LOG_TEMP_FILE}.2')
 		self.cropA = None
 		self.cropB = None
 
 	def onRecordingClick(self, widget):
 		if self.recording:
-			return 
+			return
 
 		self.builder.get_object('record-button').hide()
 		self.builder.get_object('stop-button').show()
@@ -220,7 +220,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 
 	def toggleSpeedChart(self, widget):
 		self.speedChart = not self.speedChart
-		self.graphArea.queue_draw()		
+		self.graphArea.queue_draw()
 
 	def toggleApparentWindChart(self, widget):
 		self.apparentWindChart = not self.apparentWindChart
@@ -252,26 +252,26 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 	def readSentence(self):
 		if len(self.toSend) > 0:
 			return self.toSend.pop(0)
-		return None 		
+		return None
 
 	def end(self):
 		return not self.recording
 
-	def write(self, x):
-		if not x or not isinstance(x, nt.TrackPoint):
+	def write(self, data):
+		if not data or not isinstance(data, nt.TrackPoint):
 			return None
 
-		self.data.append(x)	
+		self.data.append(data)
 
 		if len(self.data) % 150 == 0 or (self.recording or len(self.data) % 5000 == 0):
 			Gdk.threads_enter()
-			self.timeControl.setTime(x.time)	
+			self.timeControl.setTime(data.time)
 
 			if len(self.data) % 150 == 0:
-				self.trackManager.log.append((x.lat, x.lon))
+				self.trackManager.log.append((data.lat, data.lon))
 
 			if self.recording or len(self.data) % 5000 == 0:
-				self.map.set_center_and_zoom (x.lat, x.lon, 12)
+				self.map.set_center_and_zoom (data.lat, data.lon, 12)
 				logger.debug("Recorded %d points", len(self.data))
 				self.statusBar.push(0, f"{len(self.data)} track points")
 
@@ -292,7 +292,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 		Gdk.threads_leave()
 
 	def onSaveClick(self, widget):
-		dialog = Gtk.FileChooserDialog("Save log", self.parent, Gtk.FileChooserAction.SAVE, 
+		dialog = Gtk.FileChooserDialog("Save log", self.parent, Gtk.FileChooserAction.SAVE,
 			(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
 		dialog.set_do_overwrite_confirmation(True)
 		response = dialog.run()
@@ -308,7 +308,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 	def loadFromFile(self, filepath):
 		self.loading = True
 		self.data = []
-		ext = filepath.split('.')[-1]
+		# ext = filepath.split('.')[-1]
 
 		# TODO: support for gpx files
 		self.trackManager.log = []
@@ -316,7 +316,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 		try:
 			fi = nt.FileInput(filepath)
 		except:
-			logger.error(f"Error loading file {filepath}")
+			logger.error("Error loading file %s", filepath)
 			self.loading = False
 			return
 
@@ -420,14 +420,17 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 		self.statusBar.push(0, "")
 
 		if not self.recording and not self.loading:
-			ii = numpy.where((x > (numpy.datetime64(self.selectedTime))) & (x < (numpy.datetime64(self.selectedTime) + numpy.timedelta64(self.timetravelWidget.getChangeUnit(), 's'))))
+			ii = numpy.where((x > (numpy.datetime64(self.selectedTime))) &
+				(x < (numpy.datetime64(self.selectedTime) + numpy.timedelta64(self.timetravelWidget.getChangeUnit(), 's'))))
 			try:
 				ii = ii[0][0]
 				self.highlightedValue = y[ii]
-				self.toolsMapLayer.gpsAdd(self.highlightedValue.lat, self.highlightedValue.lon, self.highlightedValue.hdg, self.highlightedValue.speed)
+				self.toolsMapLayer.gpsAdd(self.highlightedValue.lat, self.highlightedValue.lon,
+					self.highlightedValue.hdg, self.highlightedValue.speed)
 
 
-				self.statusBar.push(0, "Time: %s, Position: (%.2f, %.2f), Speed: %.1fkn, Heading: %d, TWS: %.1fkn, TWA: %d, TWD: %d, Depth: %.2f" % (self.selectedTime, self.highlightedValue.lat, self.highlightedValue.lon, self.highlightedValue.speed, self.highlightedValue.hdg, self.highlightedValue.tws, self.highlightedValue.twa, (self.highlightedValue.twa + self.highlightedValue.hdg) % 360, self.highlightedValue.depth))
+				self.statusBar.push(0, "Time: %s, Position: (%.2f, %.2f), Speed: %.1fkn, Heading: %d, TWS: %.1fkn, TWA: %d, TWD: %d, Depth: %.2f"
+					% (self.selectedTime, self.highlightedValue.lat, self.highlightedValue.lon, self.highlightedValue.speed, self.highlightedValue.hdg, self.highlightedValue.tws, self.highlightedValue.twa, (self.highlightedValue.twa + self.highlightedValue.hdg) % 360, self.highlightedValue.depth))
 			except:
 				ii = -1
 
@@ -441,7 +444,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 				plt.setp(ax1[i].get_xticklabels(), visible=False)
 
 			data = list(map(lambda x: x.speed if x.speed else 0, y))
-			ax1[i].plot(x, data, color='#8dd3c7', linewidth=0.6,label='Speed')	
+			ax1[i].plot(x, data, color='#8dd3c7', linewidth=0.6,label='Speed')
 
 			highlight(i, data)
 
@@ -470,7 +473,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 				plt.setp(ax1[i].get_xticklabels(), visible=False)
 
 			data = list(map(lambda x: x.depth if x.depth else 0, y))
-			ax1[i].plot(x, data, color='#fa8174', linewidth=0.6,label='Depth')	
+			ax1[i].plot(x, data, color='#fa8174', linewidth=0.6,label='Depth')
 			ax1[i].legend()
 
 			highlight(i, data)
@@ -512,15 +515,17 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 
 		if self.cropA is not None:
 			try:
-				ii = numpy.where((x > (numpy.datetime64(self.cropA))) & (x < (numpy.datetime64(self.cropA) + numpy.timedelta64(self.timetravelWidget.getChangeUnit(), 's'))))
+				ii = numpy.where((x > (numpy.datetime64(self.cropA))) &
+					(x < (numpy.datetime64(self.cropA) + numpy.timedelta64(self.timetravelWidget.getChangeUnit(), 's'))))
 				for axx in ax1:
 					axx.axvline(x=x[ii[0][0]], color='#ffffff', linewidth=0.5)
 			except:
-				pass 
+				pass
 
 		if self.cropB is not None:
 			try:
-				ii = numpy.where((x > (numpy.datetime64(self.cropB))) & (x < (numpy.datetime64(self.cropB) + numpy.timedelta64(self.timetravelWidget.getChangeUnit(), 's'))))
+				ii = numpy.where((x > (numpy.datetime64(self.cropB))) &
+					(x < (numpy.datetime64(self.cropB) + numpy.timedelta64(self.timetravelWidget.getChangeUnit(), 's'))))
 				for axx in ax1:
 					axx.axvline(x=x[ii[0][0]], color='#ffffff', linewidth=0.5)
 			except:
@@ -534,7 +539,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 		buf2 = PIL.Image.open(buf)
 
 		arr = numpy.array(buf2)
-		height, width, channels = arr.shape
+		height, width, _ = arr.shape
 		surface = cairo.ImageSurface.create_for_data(arr, cairo.FORMAT_RGB24, width, height)
 
 		ctx.save()

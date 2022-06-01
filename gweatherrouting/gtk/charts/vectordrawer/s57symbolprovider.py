@@ -108,14 +108,16 @@ class S57SymbolProvider:
 	def drawLight (self, cr, xx, yy, tags, major):
 		cr.move_to(xx + 12, yy + 4)
 		try:
-			txt = tags['seamark:light:character'] + '.' + tags['seamark:light:colour'][0].upper() + '.' + tags['seamark:light:period'] + 's'
+			txt = (tags['seamark:light:character'] + '.' + tags['seamark:light:colour'][0].upper() + '.' +
+				tags['seamark:light:period'] + 's')
 			cr.show_text(txt)
 		except:
 			y = yy + 4
 			i = 1
 			while True:
 				try:
-					txt = tags['seamark:light:'+str(i)+':character'] + '.' + tags['seamark:light:'+str(i)+':colour'][0].upper() + '.' + tags['seamark:light:'+str(i)+':period'] + 's'
+					txt = (tags['seamark:light:'+str(i)+':character'] + '.' +
+						tags['seamark:light:'+str(i)+':colour'][0].upper() + '.' + tags['seamark:light:'+str(i)+':period'] + 's')
 				except:
 					break
 				cr.move_to(xx + 12, y)

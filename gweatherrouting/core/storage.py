@@ -29,7 +29,7 @@ def json_serial(obj):
 
 	if isinstance(obj, (datetime, date)):
 		return obj.isoformat()
-	raise TypeError ("Type %s not serializable" % type(obj))
+	raise TypeError (f"Type {type(obj)} not serializable")
 
 
 def app_data_path (appname, roaming=True):
@@ -54,7 +54,7 @@ def app_data_path (appname, roaming=True):
 		if appname:
 			path = os.path.join(path, appname)
 	elif system == 'android':
-		path = '' 
+		path = ''
 	elif system == 'ios':
 		pass
 	else:
@@ -146,7 +146,7 @@ class Storage(dict):
 
 		with open(DATA_DIR + '/' + self.__filename + '.json', 'r') as f:
 			j = json.loads(f.read())
-			self.loadData(j)            
+			self.loadData(j)
 			logger.debug ('Load configuration from %s/%s.json', DATA_DIR, self.__filename)
 
 	def loadOrSaveDefault(self):

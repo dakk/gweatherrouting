@@ -58,5 +58,5 @@ class NetworkDataSource(DataSource):
 			except:
 				pass
 
-	def _write(self, msg):
-		self.s.send(msg.encode('ascii'))
+	def _write(self, data):
+		self.s.send(data.encode('ascii'))

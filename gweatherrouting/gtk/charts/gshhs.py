@@ -294,7 +294,7 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
 			feat = layer.GetNextFeature()
 			while feat is not None:
 				if not feat:
-					continue 
+					continue
 
 				geom = feat.GetGeometryRef()
 				geom = boundingGeometry.Intersection(geom)

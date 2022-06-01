@@ -27,7 +27,8 @@ from gi.repository import Gtk, GObject, OsmGpsMap, Gdk
 
 from ...core.core import LinePointValidityProvider
 from ...core.storage import DATA_DIR
-from .gshhs import GSHHSAskDownloadDialog, GSHHSDownloadDialog, GSHHSVectorChart, OSMAskDownloadDialog, OSMDownloadDialog
+from .gshhs import (GSHHSAskDownloadDialog, GSHHSDownloadDialog, GSHHSVectorChart,
+	OSMAskDownloadDialog, OSMDownloadDialog)
 
 from .gdalvectorchart import GDALVectorChart
 from .gdalrasterchart import GDALRasterChart
@@ -82,7 +83,9 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 					if r == Gtk.ResponseType.OK:
 						self.loadBaseChart(parent)
 				else:
-					self.charts = [GDALVectorChart(os.path.abspath(os.path.dirname(__file__)) + "/../../data/countries.geojson", self.settingsManager)] + self.charts
+					self.charts = [GDALVectorChart(
+						os.path.abspath(os.path.dirname(__file__)) + "/../../data/countries.geojson",
+						self.settingsManager)] + self.charts
 
 				Gdk.threads_leave()
 
@@ -113,7 +116,7 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 		self.charts += [l]
 
 		if self.osmLayer and enabled:
-			self.osmLayer.enabled = False 
+			self.osmLayer.enabled = False
 		if self.gshhsLayer and enabled:
 			self.gshhsLayer.forceDownscale = True
 

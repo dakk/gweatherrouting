@@ -69,7 +69,8 @@ class ConnectionManager(EventDispatcher):
 
 
 			elif x['type'] == 'network':
-				self.sources[x['host'] + ':' + str(x['port'])] = NetworkDataSource(x['protocol'], x['direction'], x['host'], x['port'], x['network'])
+				self.sources[x['host'] + ':' + str(x['port'])] = NetworkDataSource(
+					x['protocol'], x['direction'], x['host'], x['port'], x['network'])
 				if self.sources[x['host'] + ':' + str(x['port'])].connect():
 					logger.info ('Data source %s:%d connected', x['host'], x['port'])
 
@@ -78,7 +79,8 @@ class ConnectionManager(EventDispatcher):
 			if not list(filter(lambda x: x['type'] == 'serial' and x['data-port'] == d['data-port'], self.connections)):
 				self.storage.connections.append(d)
 		elif d['type'] == 'network':
-			if not list(filter(lambda x: x['type'] == 'network' and x['host'] == d['host'] and x['port'] == d['port'], self.connections)):
+			if not list(filter(lambda x: x['type'] == 'network'
+				and x['host'] == d['host'] and x['port'] == d['port'], self.connections)):
 				self.storage.connections.append(d)
 
 		self.storage.save()
@@ -94,7 +96,7 @@ class ConnectionManager(EventDispatcher):
 		dd = []
 		rf = 0
 
-		for x, ds in self.sources.items():
+		for _, ds in self.sources.items():
 			if not ds.connected:
 				continue
 

@@ -69,7 +69,7 @@ class GribManagerWindow:
 		try:
 			for x in self.gribManager.getDownloadList():
 				Gdk.threads_enter()
-				self.gribFilesStore.append(x)	
+				self.gribFilesStore.append(x)
 				Gdk.threads_leave()
 			Gdk.threads_enter()
 		except:
