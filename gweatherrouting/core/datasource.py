@@ -40,7 +40,7 @@ class NMEADataPacket(DataPacket):
 		DataPacket.__init__(self, 'nmea', sentence)
 
 	def isPosition(self):
-		return isinstance(self.data, LatLonFix) and self.data.latitude != 0.0 and self.data.longitude != 0.0       
+		return isinstance(self.data, LatLonFix) and self.data.latitude != 0.0 and self.data.longitude != 0.0
 
 	@staticmethod
 	def parse(data):
@@ -64,7 +64,7 @@ class DataSource:
 
 	def write(self, packet):
 		if not self.connected:
-			return False 
+			return False
 
 		if self.direction == 'in':
 			return False
@@ -87,7 +87,7 @@ class DataSource:
 		for msg in data:
 			if len(msg) == 0:
 				continue
-			
+
 			try:
 				msgs.append(self.parser.parse(msg))
 			except Exception as e:

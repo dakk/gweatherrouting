@@ -71,7 +71,7 @@ class OSMDownloadDialog(Gtk.Dialog):
 	def percentageCallback(self, percentage, d, t):
 		Gdk.threads_enter()
 		self.pb.set_fraction(percentage / 100)
-		self.l.set_text("Downloading: %d%%" % percentage)
+		self.l.set_text(f"Downloading: {percentage}%")
 		Gdk.threads_leave()
 
 	def callback(self, success):
@@ -155,7 +155,7 @@ class GSHHSDownloadDialog(Gtk.Dialog):
 	def percentageCallback(self, percentage, d, t):
 		Gdk.threads_enter()
 		self.pb.set_fraction(percentage / 100)
-		self.l.set_text("Downloading: %d%%" % percentage)
+		self.l.set_text(f"Downloading: {percentage}%")
 		Gdk.threads_leave()
 
 	def callback(self, success):
@@ -213,14 +213,12 @@ class GSHHSDownloadDialog(Gtk.Dialog):
 
 # 	GSHHS_shp: Shapefiles (polygons) derived from shorelines.
 # 		   These are named GSHHS_<resolution>_L<level>.*
-		
 # 	WDBII_shp: Political boundaries and rivers (lines).
 # 		   These are called
 # 		   WDBII_border_<resolution>_L<level>.*
 # 		   WDBII_river_<resolution>_L<level>.*
 
-# where <resolution> is one of f,h,i,l,c and <level> is an integer.		
-
+# where <resolution> is one of f,h,i,l,c and <level> is an integer.
 # All data sets come in 5 different resolutions:
 # 	f : Full resolution.  These contain the maximum resolution
 # 	    of this data and has not been decimated.
@@ -260,7 +258,7 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
 			for y in [1]: #,2,3,4,5,6]:
 				f = drv.Open(path+'/GSHHS_shp/'+x+'/GSHHS_'+x+'_L'+str(y)+'.shp')
 				if f is not None:
-					self.vectorFiles[x+str(y)] = f 
+					self.vectorFiles[x+str(y)] = f
 
 		self.lpvFile = drv.Open(path+'/GSHHS_shp/h/GSHHS_h_L1.shp')
 
@@ -306,7 +304,7 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
 						continue
 					if geom.Contains(x):
 						res[ii] = False
-			
+
 				del geom
 				del feat
 
@@ -344,7 +342,7 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
 			feat = layer.GetNextFeature()
 			while feat is not None:
 				if not feat:
-					continue 
+					continue
 
 				geom = feat.GetGeometryRef()
 
@@ -376,7 +374,7 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
 			q = 'c'
 		elif scale > 500: #or self.lastTime['i'] > 1.0:
 			q = 'l'
-		elif scale > 200 or self.forceDownscale: #or self.lastTime['h'] > 1.0 
+		elif scale > 200 or self.forceDownscale: #or self.lastTime['h'] > 1.0
 			q = 'i'
 		elif scale >= 15 or self.lastTime['f'] > 0.25:
 			q = 'h'

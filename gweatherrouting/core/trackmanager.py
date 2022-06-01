@@ -75,7 +75,7 @@ class TrackManager():
 			if x.name == name:
 				self.activeTrack = x
 				self.saveTracks()
-				return 
+				return
 
 	def create(self):
 		nt = Track(name=uniqueName('track', self.tracks), trackManager=self)
