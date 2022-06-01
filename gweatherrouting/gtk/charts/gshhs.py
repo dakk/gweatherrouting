@@ -180,7 +180,8 @@ class GSHHSDownloadDialog(Gtk.Dialog):
 	def download(self):
 		import zipfile
 
-		uri = "https://www.ngdc.noaa.gov/mgg/shorelines/data/gshhg/oldversions/version2.3.6/gshhg-shp-2.3.6.zip"
+		# uri = "https://www.ngdc.noaa.gov/mgg/shorelines/data/gshhg/oldversions/version2.3.6/gshhg-shp-2.3.6.zip"
+		uri = "https://github.com/dakk/gweatherrouting/releases/download/gshhs2.3.6/gshhg-shp-2.3.6.zip"
 		logger.info("Downloading gshhs base map")
 
 		response = requests.get(uri, stream=True)
