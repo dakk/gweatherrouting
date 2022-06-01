@@ -45,7 +45,7 @@ class TrackManager():
 			self.tracks.append(tr)
 
 		for x in self.storage.routings:
-			ic = list(map(lambda x: list(map(IsoPoint.fromList(y), x)), x['isochrones']))
+			ic = list(map(lambda x: list(map(IsoPoint.fromList, x)), x['isochrones']))
 			tr = RoutingTrack(name=x['name'], waypoints=x['waypoints'], isochrones=ic, visible=x['visible'], trackManager=self)
 			self.routings.append(tr)
 

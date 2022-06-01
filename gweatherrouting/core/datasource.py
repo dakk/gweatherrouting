@@ -85,10 +85,13 @@ class DataSource:
 
 		msgs = []
 		for msg in data:
+			if len(msg) == 0:
+				continue
+			
 			try:
 				msgs.append(self.parser.parse(msg))
 			except Exception as e:
-				print(e)
+				print('Unable to parse data:', e)
 		return msgs
 
 	def _read(self):
