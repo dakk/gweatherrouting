@@ -429,8 +429,14 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 					self.highlightedValue.hdg, self.highlightedValue.speed)
 
 
-				self.statusBar.push(0, "Time: %s, Position: (%.2f, %.2f), Speed: %.1fkn, Heading: %d, TWS: %.1fkn, TWA: %d, TWD: %d, Depth: %.2f"
-					% (self.selectedTime, self.highlightedValue.lat, self.highlightedValue.lon, self.highlightedValue.speed, self.highlightedValue.hdg, self.highlightedValue.tws, self.highlightedValue.twa, (self.highlightedValue.twa + self.highlightedValue.hdg) % 360, self.highlightedValue.depth))
+				self.statusBar.push(0, f"Time: {self.selectedTime}, " +
+					f"Position: ({self.highlightedValue.lat:.2f}, {self.highlightedValue.lon:.2f}), " +
+					f"Speed: {self.highlightedValue.speed:.1f}kn, " +
+					f"Heading: {self.highlightedValue.hdg}, " +
+					f"TWS: {self.highlightedValue.tws:.1f}kn, TWA: {self.highlightedValue.twa}, " +
+					f"TWD: {(self.highlightedValue.twa + self.highlightedValue.hdg) % 360}, " +
+					f"Depth: {self.highlightedValue.depth:.2f}")
+
 			except:
 				ii = -1
 

@@ -75,7 +75,7 @@ class POI:
 		# TODO: handle symbol
 		# q: circle; x: anchor
 
-		return '$PFEC,GPwpl,%s,%s,%s,%s,%s,%d,@q00:00 00AAA00,A,,,,' % (lat, latns, lon, lonew, name, 3)
+		return f'$PFEC,GPwpl,{lat},{latns},{lon},{lonew},{name},3,@q00:00 00AAA00,A,,,,'
 
 
 	def toGPXWaypoint(self):

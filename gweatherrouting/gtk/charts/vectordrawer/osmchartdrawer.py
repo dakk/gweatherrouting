@@ -158,14 +158,17 @@ class OSMChartDrawer(VectorChartDrawer):
 			self.symbolProvider.draw(cr, 'WRECKS01', xx, yy)
 
 		# FUEL
-		elif 'seamark:type' in tags and tags['seamark:type'] == 'small_craft_facility' and 'seamark:small_craft_facility:category' in tags and tags['seamark:small_craft_facility:category'] == 'fuel_station':
+		elif ('seamark:type' in tags and tags['seamark:type'] == 'small_craft_facility'
+			and 'seamark:small_craft_facility:category' in tags
+			and tags['seamark:small_craft_facility:category'] == 'fuel_station'):
 			if scale > 100:
 				return
 
 			# self.symbolProvider.draw(cr, 'fuel', xx, yy)
 
 		# MINOR LIGHT
-		elif 'seamark:type' in tags and (tags['seamark:type'] == 'light_minor' or tags['seamark:type'] == 'beacon_special_purpose'):
+		elif 'seamark:type' in tags and (tags['seamark:type'] == 'light_minor'
+			or tags['seamark:type'] == 'beacon_special_purpose'):
 			if scale > 100:
 				return
 
@@ -212,7 +215,8 @@ class OSMChartDrawer(VectorChartDrawer):
 
 
 		# BEACON CARDINAL / BUOY CARDINAL
-		elif 'seamark:type' in tags and (tags['seamark:type'] == 'beacon_cardinal' or tags['seamark:type'] == 'buoy_cardinal'):
+		elif 'seamark:type' in tags and (tags['seamark:type'] == 'beacon_cardinal'
+			or tags['seamark:type'] == 'buoy_cardinal'):
 			if scale > 100:
 				return
 
