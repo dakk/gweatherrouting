@@ -28,10 +28,8 @@ class ElementPoint(Element):
 
 	@staticmethod
 	def fromJSON(j):
-		print ('point from json')
 		d = Element.fromJSON(j)
-		d.position = j['position']
-		return d
+		return ElementPoint(d.name, j['position'], d.visible)
 
 	def toGPXObject(self):
 		raise Exception("Not implemented")

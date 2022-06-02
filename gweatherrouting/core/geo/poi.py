@@ -57,8 +57,7 @@ class POI(ElementPoint):
 	@staticmethod
 	def fromJSON(j):
 		d = ElementPoint.fromJSON(j)
-		d.symbol = j['symbol']
-		return d
+		return POI(d.name, d.position, j['symbol'], d.visible)
 
 	def toGPXObject(self):
 		# TODO: add symbol , sym=self.symb

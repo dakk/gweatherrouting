@@ -13,8 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-import sys
-import traceback
 import gpxpy
 
 class Element:
@@ -27,7 +25,6 @@ class Element:
 		raise Exception("Not implemented")
 
 	def toJSON(self):
-		# print(traceback.print_stack(file=sys.stdout))
 		return {
 			'name': self.name,
 			'visible': self.visible

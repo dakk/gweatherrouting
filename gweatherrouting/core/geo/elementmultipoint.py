@@ -32,8 +32,7 @@ class ElementMultiPoint(Element):
 	@staticmethod
 	def fromJSON(j):
 		d = Element.fromJSON(j)
-		d.points = j['points']
-		return d
+		return ElementMultiPoint(d.name, j['points'], d.visible)
 
 	def __len__(self):
 		return len(self.points)

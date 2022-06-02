@@ -13,8 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-import traceback
-import sys
 from typing import Generic, TypeVar
 import gpxpy
 from .element import Element
@@ -39,7 +37,6 @@ class Collection(Generic[T]):
 			self.loadJSON(self.storage.data)
 
 	def save(self):
-		# print(traceback.print_stack(file=sys.stdout))
 		self.storage.data = self.toJSON()
 
 	def __iter__(self):

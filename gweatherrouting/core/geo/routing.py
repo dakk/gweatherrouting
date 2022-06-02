@@ -24,7 +24,7 @@ class Routing (Track):
 	def toGPXObject(self):
 		gpx_route = gpxpy.gpx.GPXRoute()
 
-		for x in self.waypoints:
+		for x in self.points:
 			gpx_route.points.append(gpxpy.gpx.GPXRoutePoint(x[0], x[1]))
 
 		return gpx_route
@@ -37,5 +37,4 @@ class Routing (Track):
 	@staticmethod
 	def fromJSON(j):
 		d = Track.fromJSON(j)
-		d.isochrones = j['isochrones']
-		return d
+		return Routing(d.name, d.points, j['isochrones'], d.visible)
