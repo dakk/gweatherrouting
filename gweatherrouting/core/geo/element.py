@@ -30,6 +30,10 @@ class Element:
 			'visible': self.visible
 		}
 
+	@staticmethod
+	def fromJSON(j):
+		return Element(name = j['name'], visible = j['visible'])
+
 	def export(self, dest, format = 'gpx'):
 		if format == 'gpx':
 			gpx = gpxpy.gpx.GPX()

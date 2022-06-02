@@ -28,6 +28,12 @@ class ElementMultiPoint(Element):
 		c['points'] = self.points
 		return c
 
+	@staticmethod
+	def fromJSON(j):
+		d = super().fromJSON(j)
+		d.points = j['points']
+		return d
+
 	def __len__(self):
 		return len(self.points)
 

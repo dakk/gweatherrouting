@@ -26,5 +26,11 @@ class ElementPoint(Element):
 		c['position'] = self.position
 		return c
 
+	@staticmethod
+	def fromJSON(j):
+		d = super().fromJSON(j)
+		d.position = j['position']
+		return d
+
 	def toGPXObject(self):
 		raise Exception("Not implemented")

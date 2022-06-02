@@ -42,6 +42,13 @@ class Collection:
 			'elements': [x.toJSON() for x in self.elements]
 		}
 
+	def loadJSON(self, j):
+		self.clear()
+
+		for x in j['elements']:
+			e = self.of.fromJSON(x)
+			self.append(e)
+
 	def getUniqueName(self, baseName = None):
 		if baseName is None:
 			baseName = self.baseName
