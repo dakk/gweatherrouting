@@ -49,8 +49,12 @@ class Element:
 			try:
 				f = open(dest, "w")
 				f.write(gpx.to_xml())
+				f.close()
+				return True
 			except Exception as e:
 				print (str(e))
+
+		return False
 
 	def __len__(self):
 		return 0

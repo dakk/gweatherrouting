@@ -45,6 +45,7 @@ def app_data_path (appname, roaming=True):
 		system = sys.platform
 
 	if system == "win32":
+		from appdirs import _get_win_folder
 		const = roaming and "CSIDL_APPDATA" or "CSIDL_LOCAL_APPDATA"
 		path = os.path.normpath(_get_win_folder(const))
 		if appname:
