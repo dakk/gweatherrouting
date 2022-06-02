@@ -19,7 +19,7 @@ import logging
 from threading import Thread
 import gi
 
-from gweatherrouting.core.geo.routing import Routing
+from ..core.geo.routing import Routing
 
 gi.require_version('Gtk', '3.0')
 try:
@@ -140,8 +140,7 @@ class ChartStackRouting:
 		GObject.timeout_add (3000, self.progressBar.hide)
 		Gdk.threads_leave()
 
-		self.core.routingManager.append(
-			Routing(name=self.core.routingManager.getUniqueName(self.currentRouting.name),
+		self.core.routingManager.append(Routing(name=self.core.routingManager.getUniqueName(self.currentRouting.name),
 				points=tr, isochrones=res.isochrones, collection=self.core.routingManager))
 		self.updateRoutings()
 		self.builder.get_object("stop-routing-button").hide()
@@ -153,7 +152,7 @@ class ChartStackRouting:
 		for r in self.core.routingManager:
 			riter = self.routingStore.append(None, [r.name, '', 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, r.visible, False, True])
 
-			for x in r.waypoints:
+			for x in r:
 				self.routingStore.append(riter, ['', x[2], x[0], x[1], x[3], x[4], x[5], x[6], False, True, False])
 
 		self.map.queue_draw()
@@ -169,12 +168,12 @@ class ChartStackRouting:
 		self.updateRoutings()
 
 	def onRoutingRemove(self, widget):
-		self.core.trackManager.removeRouting(self.selectedRouting)
+		self.core.routingManager.removeByName(self.selectedRouting)
 		self.updateRoutings()
 		self.map.queue_draw()
 
 	def onRoutingExport(self, widget):
-		routing = self.core.trackManager.getRouting(self.selectedRouting)
+		routing = self.core.routingManager.getByName(self.selectedRouting)
 
 		dialog = Gtk.FileChooserDialog ("Please select a destination", self.parent,
 			Gtk.FileChooserAction.SAVE,
@@ -225,7 +224,7 @@ class ChartStackRouting:
 			if path.get_depth() == 1:
 				self.selectedRouting = value
 
-				routing = self.core.trackManager.getRouting(self.selectedRouting)
+				routing = self.core.routingManager.getByName(self.selectedRouting)
 				self.isochronesMapLayer.setIsochrones(routing.isochrones, None)
 			else:
 				self.selectedRouting = None

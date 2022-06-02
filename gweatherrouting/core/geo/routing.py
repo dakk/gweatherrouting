@@ -14,6 +14,7 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 import gpxpy
+from weatherrouting import IsoPoint
 from . import Track
 
 class Routing (Track):
@@ -31,10 +32,11 @@ class Routing (Track):
 
 	def toJSON(self):
 		c = super().toJSON()
-		c['isochrones'] = self.isochrones
+		c['isochrones'] = list(map(lambda x: list(map(lambda y: y.toList(), x)), self.isochrones))
 		return c
 
 	@staticmethod
 	def fromJSON(j):
 		d = Track.fromJSON(j)
-		return Routing(d.name, d.points, j['isochrones'], d.visible)
+		ic = list(map(lambda x: list(map(IsoPoint.fromList, x)), j['isochrones']))
+		return Routing(d.name, d.points, ic, d.visible)

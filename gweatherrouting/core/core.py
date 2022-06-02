@@ -127,15 +127,15 @@ class Core(EventDispatcher):
 	def exportGPX(self, path):
 		gpx = gpxpy.gpx.GPX()
 
-		for track in self.trackManager.tracks:
+		for track in self.trackManager:
 			gpx_track = track.toGPXTrack()
 			gpx.tracks.append(gpx_track)
 
-		for track in self.trackManager.routings:
+		for track in self.routingManager:
 			gpx_track = track.toGPXTrack()
 			gpx.tracks.append(gpx_track)
 
-		for poi in self.poiManager.pois:
+		for poi in self.poiManager:
 			gpx.waypoints.append(poi.toGPXWaypoint())
 
 		try:

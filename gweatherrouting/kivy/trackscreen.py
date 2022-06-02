@@ -39,7 +39,7 @@ class TrackScreen(MDScreen):
 	def updateTracksAndPois(self):
 		trackList = self.ids.trackList
 
-		for x in self.trackManager.tracks:
+		for x in self.trackManager:
 		 	trackList.add_widget(TrackListItem(
 				 text=x.name, 
 				 trackManager=self.trackManager,
@@ -47,7 +47,7 @@ class TrackScreen(MDScreen):
 				 secondary_text="Distance of %f nm, with %d track points" % (x.length(), len(x.waypoints))
 			 ))
 
-		for x in self.poiManager.pois:
+		for x in self.poiManager:
 		 	trackList.add_widget(POIListItem(
 				 text=x.name, 
 				 poiManager=self.poiManager,

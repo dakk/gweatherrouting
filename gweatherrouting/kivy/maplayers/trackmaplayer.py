@@ -76,7 +76,7 @@ class TrackMapLayer(MapLayer):
 			prevp = None 
 			i = 0
 
-			for p in tr.waypoints:
+			for p in tr:
 				i += 1
 				x, y = view.get_window_xy_from(p[0], p[1], zoom)
 
@@ -116,7 +116,7 @@ class TrackMapLayer(MapLayer):
 				prevy = y
 				prevp = p
 
-		for tr in self.trackManager.tracks:
+		for tr in self.trackManager:
 			if not tr.visible:
 				continue
 
@@ -128,7 +128,7 @@ class TrackMapLayer(MapLayer):
 			prevy = None
 			i = 0
 
-			for p in tr.waypoints:
+			for p in tr:
 				i += 1
 				x, y = view.get_window_xy_from(p[0], p[1], zoom)
 

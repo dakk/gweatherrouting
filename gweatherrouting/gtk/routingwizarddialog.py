@@ -50,7 +50,7 @@ class RoutingWizardDialog:
 		start_store.append (['First track point', 'first-track-point'])
 		start_store.append (['Boat position', 'boat-position'])
 
-		for p in self.core.poiManager.pois:
+		for p in self.core.poiManager:
 			start_store.append (['POI: ' + p.name, 'poi-' + p.name])
 		self.builder.get_object('start-select').set_active (0)
 
@@ -67,7 +67,7 @@ class RoutingWizardDialog:
 		self.builder.get_object('routing-select').set_active (0)
 
 		track_store = self.builder.get_object('track-store')
-		for r in self.core.trackManager.tracks:
+		for r in self.core.trackManager:
 			track_store.append ([r.name])
 		self.builder.get_object('track-select').set_active (0)
 
@@ -150,7 +150,7 @@ class RoutingWizardDialog:
 		return datetime.datetime.strptime(self.builder.get_object('time-entry').get_text(), TimeControl.DFORMAT)
 
 	def getSelectedTrack (self):
-		return self.core.trackManager.tracks[self.builder.get_object('track-select').get_active ()]
+		return self.core.trackManager[self.builder.get_object('track-select').get_active ()]
 
 	def getSelectedAlgorithm (self):
 		return weatherrouting.listRoutingAlgorithms()[self.builder.get_object('routing-select').get_active ()]['class']
@@ -169,4 +169,4 @@ class RoutingWizardDialog:
 				return None
 		else:
 			s -= 2
-			return self.core.poiManager.pois[s].position
+			return self.core.poiManager[s].position

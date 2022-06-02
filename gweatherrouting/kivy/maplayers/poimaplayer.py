@@ -64,7 +64,7 @@ class POIMapLayer(MapLayer):
 		bbox = view.get_bbox()
 		self.canvas.clear()
 
-		for tr in self.poiManager.pois:
+		for tr in self.poiManager:
 			if not tr.visible:
 				continue
 
