@@ -13,10 +13,13 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
+from typing import Generic, TypeVar
 from . import Track
 from .collection import CollectionWithActiveElement
 
-class TrackCollection (CollectionWithActiveElement):
+T = TypeVar('T')
+
+class _TrackCollection (CollectionWithActiveElement, Generic[T]):
 	def __init__(self):
 		super().__init__(Track, 'track')
 
@@ -29,3 +32,5 @@ class TrackCollection (CollectionWithActiveElement):
 					waypoints.append([point.latitude, point.longitude])
 
 			self.append(Track(track.name, waypoints, collection=self))
+
+TrackCollection = _TrackCollection[Track]

@@ -13,10 +13,13 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
+from typing import Generic, TypeVar
 from . import Routing
 from .collection import CollectionWithActiveElement
 
-class RoutingCollection (CollectionWithActiveElement):
+T = TypeVar('T')
+
+class _RoutingCollection (CollectionWithActiveElement, Generic[T]):
 	def __init__(self):
 		super().__init__(Routing, 'routing')
 
@@ -29,3 +32,5 @@ class RoutingCollection (CollectionWithActiveElement):
 					waypoints.append([point.latitude, point.longitude])
 
 			self.append(Routing(track.name, waypoints, collection=self))
+
+RoutingCollection = _RoutingCollection[Routing]

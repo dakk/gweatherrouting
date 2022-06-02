@@ -13,11 +13,13 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-from typing import Tuple
+from typing import Generic, Tuple, TypeVar
 from . import POI
 from .collection import Collection
 
-class POICollection(Collection):
+T = TypeVar('T')
+
+class _POICollection(Collection, Generic[T]):
 	def __init__(self):
 		super().__init__(POI, 'poi')
 
@@ -44,3 +46,5 @@ class POICollection(Collection):
 		self.append(e)
 		self.save()
 		return e
+
+POICollection = _POICollection[POI]

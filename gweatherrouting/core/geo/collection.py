@@ -13,8 +13,11 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
+from typing import Generic, TypeVar
 import gpxpy
 from ..utils import uniqueName, Storage
+
+T = TypeVar('T')
 
 class CollectionStorage(Storage):
 	def __init__(self, name):
@@ -24,11 +27,11 @@ class CollectionStorage(Storage):
 		self.loadOrSaveDefault()
 		print('loaded collection: ' + name)
 
-class Collection:
+class Collection(Generic[T]):
 	def __init__(self, of, baseName):
 		self.storage = CollectionStorage(baseName)
 		self.of = of
-		self.elements = []
+		self.elements: list[T] = []
 		self.baseName = baseName
 
 		if self.storage.data is not None:
