@@ -17,17 +17,16 @@ from typing import Generic, Tuple, TypeVar
 from . import POI
 from .collection import Collection
 
-T = TypeVar('T')
+T = TypeVar('T', bound=POI)
 
 class _POICollection(Collection, Generic[T]):
 	def __init__(self):
 		super().__init__(POI, 'poi')
 
+
 	def importFromGPX(self, gpx):
 		for waypoint in gpx.waypoints:
-			self.append(
-				POI(waypoint.name, [waypoint.latitude, waypoint.longitude])
-			)
+			self.append(POI(waypoint.name, [waypoint.latitude, waypoint.longitude], collection=self))
 
 	def toNMEAPFEC(self):
 		s = ''

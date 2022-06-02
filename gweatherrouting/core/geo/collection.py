@@ -13,19 +13,20 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
+import traceback
+import sys
 from typing import Generic, TypeVar
 import gpxpy
+from .element import Element
 from ..utils import uniqueName, Storage
 
-T = TypeVar('T')
+T = TypeVar('T', bound=Element)
 
 class CollectionStorage(Storage):
 	def __init__(self, name):
-		print('loading collection: ' + name)
 		Storage.__init__(self, name)
 		self.data = {}
 		self.loadOrSaveDefault()
-		print('loaded collection: ' + name)
 
 class Collection(Generic[T]):
 	def __init__(self, of, baseName):
@@ -38,6 +39,7 @@ class Collection(Generic[T]):
 			self.loadJSON(self.storage.data)
 
 	def save(self):
+		# print(traceback.print_stack(file=sys.stdout))
 		self.storage.data = self.toJSON()
 
 	def __iter__(self):
@@ -62,7 +64,6 @@ class Collection(Generic[T]):
 
 	def loadJSON(self, j):
 		self.clear()
-		print(j)
 
 		if not 'elements' in j:
 			return
@@ -117,7 +118,7 @@ class Collection(Generic[T]):
 			elif isinstance(gpx.GPXWaypoint, ob):
 				gpx.waypoints.append(ob)
 
-		return gpx 
+		return gpx
 
 	def export(self, dest, format = 'gpx'):
 		if format == 'gpx':

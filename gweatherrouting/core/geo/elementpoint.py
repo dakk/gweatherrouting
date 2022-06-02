@@ -28,6 +28,7 @@ class ElementPoint(Element):
 
 	@staticmethod
 	def fromJSON(j):
+		print ('point from json')
 		d = Element.fromJSON(j)
 		d.position = j['position']
 		return d

@@ -17,8 +17,8 @@ import gpxpy
 from .elementmultipoint import ElementMultiPoint
 
 class Track (ElementMultiPoint):
-	# def __init__(self, name, points = [], visible = True, collection = None):
-	# 	super().__init__(name, points, visible, collection)
+	def __init__(self, name, points = [], visible = True, collection = None):
+		super().__init__(name, points, visible, collection)
 
 	def toGPXObject(self):
 		gpx_track = gpxpy.gpx.GPXTrack()

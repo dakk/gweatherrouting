@@ -17,11 +17,12 @@ from typing import Generic, TypeVar
 from . import Track
 from .collection import CollectionWithActiveElement
 
-T = TypeVar('T')
+T = TypeVar('T', bound=Track)
 
 class _TrackCollection (CollectionWithActiveElement, Generic[T]):
 	def __init__(self):
 		super().__init__(Track, 'track')
+
 
 	def importFromGPX(self, gpx):
 		for track in gpx.tracks:

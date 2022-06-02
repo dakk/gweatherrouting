@@ -59,7 +59,7 @@ class POI(ElementPoint):
 		d = ElementPoint.fromJSON(j)
 		d.symbol = j['symbol']
 		return d
-	
+
 	def toGPXObject(self):
 		# TODO: add symbol , sym=self.symb
 		return gpxpy.gpx.GPXWaypoint(latitude=self.position[0], longitude=self.position[1], name=self.name)

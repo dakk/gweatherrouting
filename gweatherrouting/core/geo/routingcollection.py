@@ -17,11 +17,12 @@ from typing import Generic, TypeVar
 from . import Routing
 from .collection import CollectionWithActiveElement
 
-T = TypeVar('T')
+T = TypeVar('T', bound=Routing)
 
 class _RoutingCollection (CollectionWithActiveElement, Generic[T]):
 	def __init__(self):
 		super().__init__(Routing, 'routing')
+
 
 	def importFromGPX(self, gpx):
 		for track in gpx.routes:
