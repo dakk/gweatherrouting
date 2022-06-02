@@ -13,17 +13,25 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
+from typing import Generic, TypeVar
+from . import Track
+from .collection import CollectionWithActiveElement
 
-from ...core.utils import Storage
+T = TypeVar('T', bound=Track)
 
-class SettingsManager(Storage):
+class _TrackCollection (CollectionWithActiveElement, Generic[T]):
 	def __init__(self):
-		Storage.__init__(self, "settings")
+		super().__init__(Track, 'track')
 
-		self.gribArrowOpacity = 0.4
-		self.gribArrowOnGround = False
-		self.vectorCharts = []
-		self.rasterCharts = []
-		self.chartPalette = 'cm93'
 
-		self.loadOrSaveDefault()
+	def importFromGPX(self, gpx):
+		for track in gpx.tracks:
+			waypoints = []
+
+			for segment in track.segments:
+				for point in segment.points:
+					waypoints.append([point.latitude, point.longitude])
+
+			self.append(Track(track.name, waypoints, collection=self))
+
+TrackCollection = _TrackCollection[Track]

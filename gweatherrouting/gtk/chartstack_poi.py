@@ -45,7 +45,7 @@ class ChartStackPOI:
 
 
 	def onPOINameEdit(self, widget, i, name):
-		self.core.poiManager.pois[int(i)].name = utils.uniqueName(name, self.core.poiManager.pois)
+		self.core.poiManager.elements[int(i)].name = self.core.poiManager.getUniqueName(name)
 		self.updatePOI()
 
 	def onSelectPOI (self, selection):
@@ -63,23 +63,23 @@ class ChartStackPOI:
 
 	def onPOIRemove(self, widget):
 		if self.selectedPOI is not None:
-			self.core.poiManager.remove(self.core.poiManager.remove(self.selectedPOI))
+			self.core.poiManager.remove(self.selectedPOI)
 			self.updatePOI()
 
 	def onPOIToggle(self, widget, i):
-		self.core.poiManager.pois[int(i)].visible = not self.core.poiManager.pois[int(i)].visible
+		self.core.poiManager.elements[int(i)].visible = not self.core.poiManager.elements[int(i)].visible
 		self.updatePOI()
 
 	def onPOIClick(self, item, event):
-		if event.button == 3 and len(self.core.poiManager.pois) > 0:
+		if event.button == 3 and len(self.core.poiManager.elements) > 0:
 			menu = self.builder.get_object("poi-menu")
 			menu.popup (None, None, None, None, event.button, event.time)
 
 	def updatePOI (self):
 		self.poiStore.clear()
-		for x in self.core.poiManager.pois:
+		for x in self.core.poiManager.elements:
 			self.poiStore.append([x.name, x.position[0], x.position[1], x.visible, x.symbol])
-		self.core.poiManager.savePOI()
+		self.core.poiManager.save()
 		self.map.queue_draw ()
 
 
@@ -88,7 +88,7 @@ class ChartStackPOI:
 		lon = self.builder.get_object("track-add-point-lon").get_text ()
 
 		if len (lat) > 1 and len (lon) > 1:
-			self.core.poiManager.create([float (lat), float (lon)])
+			self.core.poiManager.create((float (lat), float (lon)))
 			self.map.queue_draw ()
 			self.updatePOI()
 
@@ -111,6 +111,6 @@ class ChartStackPOI:
 			f.write(s)
 			f.close()
 
-			self.statusbar.push(0, "POIs exported as NMEA PFEC to %s" % filename)
+			self.statusbar.push(0, f"POIs exported as NMEA PFEC to {filename}")
 		else:
 			dialog.destroy()

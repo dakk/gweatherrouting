@@ -13,17 +13,9 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
-
-from ...core.utils import Storage
-
-class SettingsManager(Storage):
-	def __init__(self):
-		Storage.__init__(self, "settings")
-
-		self.gribArrowOpacity = 0.4
-		self.gribArrowOnGround = False
-		self.vectorCharts = []
-		self.rasterCharts = []
-		self.chartPalette = 'cm93'
-
-		self.loadOrSaveDefault()
+from .track import Track
+from .routing import Routing
+from .poi import POI
+from .trackcollection import TrackCollection
+from .routingcollection import RoutingCollection
+from .poicollection import POICollection

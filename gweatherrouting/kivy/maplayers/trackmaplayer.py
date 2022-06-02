@@ -118,14 +118,14 @@ class TrackMapLayer(MapLayer):
 
 		for tr in self.trackManager.tracks:
 			if not tr.visible:
-				continue 
+				continue
 
 			active = False
-			if self.trackManager.activeTrack and self.trackManager.activeTrack.name == tr.name:
+			if self.trackManager.hasActive() and self.trackManager.getActive().name == tr.name:
 				active = True
 
 			prevx = None
-			prevy = None 
+			prevy = None
 			i = 0
 
 			for p in tr.waypoints:

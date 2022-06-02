@@ -13,17 +13,25 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
+from typing import Generic, TypeVar
+from . import Routing
+from .collection import CollectionWithActiveElement
 
-from ...core.utils import Storage
+T = TypeVar('T', bound=Routing)
 
-class SettingsManager(Storage):
+class _RoutingCollection (CollectionWithActiveElement, Generic[T]):
 	def __init__(self):
-		Storage.__init__(self, "settings")
+		super().__init__(Routing, 'routing')
 
-		self.gribArrowOpacity = 0.4
-		self.gribArrowOnGround = False
-		self.vectorCharts = []
-		self.rasterCharts = []
-		self.chartPalette = 'cm93'
 
-		self.loadOrSaveDefault()
+	def importFromGPX(self, gpx):
+		for track in gpx.routes:
+			waypoints = []
+
+			for segment in track.segments:
+				for point in segment.points:
+					waypoints.append([point.latitude, point.longitude])
+
+			self.append(Routing(track.name, waypoints, collection=self))
+
+RoutingCollection = _RoutingCollection[Routing]

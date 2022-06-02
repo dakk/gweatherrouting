@@ -20,16 +20,20 @@ import json
 import latlon
 from geojson_utils import point_in_polygon
 
+try:
+	from .storage import *
+except:
+	from .dummy_storage import *
 
 this_dir, this_fn = os.path.split (__file__)
-COUNTRIES = json.load (open (this_dir + '/../data/countries.geojson', 'r'))
+COUNTRIES = json.load (open (this_dir + '/../../data/countries.geojson', 'r'))
 COUNTRY_SHAPES = []
 
 def extractCoordinates(coord):
 	c = []
 	for x in coord:
 		if isinstance(x[0], float):
-			return coord 
+			return coord
 		else:
 			for xx in extractCoordinates(x):
 				c.append(xx)
@@ -94,7 +98,10 @@ def pointValidity (lat, lon):
 def pointsValidity (latlons):
 	return list(map(pointValidity, latlons))
 
-def uniqueName(name, collection):
+def uniqueName(name, collection = None):
+	if not collection:
+		return name
+
 	names = []
 	for x in collection:
 		names.append(x.name)

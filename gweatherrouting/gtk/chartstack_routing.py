@@ -19,6 +19,8 @@ import logging
 from threading import Thread
 import gi
 
+from gweatherrouting.core.geo.routing import Routing
+
 gi.require_version('Gtk', '3.0')
 try:
 	gi.require_version('OsmGpsMap', '1.2')
@@ -30,7 +32,7 @@ from weatherrouting import RoutingNoWindException
 
 from .routingwizarddialog import RoutingWizardDialog
 from .maplayers import IsochronesMapLayer
-from ..core import RoutingTrack, utils
+from ..core import utils
 from .. import log
 
 logger = logging.getLogger ('gweatherrouting')
@@ -138,9 +140,9 @@ class ChartStackRouting:
 		GObject.timeout_add (3000, self.progressBar.hide)
 		Gdk.threads_leave()
 
-		self.core.trackManager.routings.append(
-			RoutingTrack(name=utils.uniqueName(self.currentRouting.name, self.core.trackManager.routings),
-				waypoints=tr, isochrones=res.isochrones, trackManager=self.core.trackManager))
+		self.core.routingManager.append(
+			Routing(name=self.core.routingManager.getUniqueName(self.currentRouting.name),
+				points=tr, isochrones=res.isochrones, collection=self.core.routingManager))
 		self.updateRoutings()
 		self.builder.get_object("stop-routing-button").hide()
 
@@ -148,22 +150,22 @@ class ChartStackRouting:
 	def updateRoutings(self):
 		self.routingStore.clear()
 
-		for r in self.core.trackManager.routings:
+		for r in self.core.routingManager:
 			riter = self.routingStore.append(None, [r.name, '', 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, r.visible, False, True])
 
 			for x in r.waypoints:
 				self.routingStore.append(riter, ['', x[2], x[0], x[1], x[3], x[4], x[5], x[6], False, True, False])
 
 		self.map.queue_draw()
-		self.core.trackManager.saveTracks()
+		self.core.trackManager.save()
 
 	def onRoutingToggle(self, widget, i):
-		self.core.trackManager.routings[int(i)].visible = not self.core.trackManager.routings[int(i)].visible
+		self.core.routingManager[int(i)].visible = not self.core.routingManager[int(i)].visible
 		self.updateRoutings()
 		self.updateTrack()
 
 	def onRoutingNameEdit(self, widget, i, name):
-		self.core.trackManager.routings[int(i)].name = utils.uniqueName(name, self.core.trackManager.routings)
+		self.core.routingManager[int(i)].name = utils.uniqueName(name, self.core.routingManager)
 		self.updateRoutings()
 
 	def onRoutingRemove(self, widget):
@@ -229,6 +231,6 @@ class ChartStackRouting:
 				self.selectedRouting = None
 
 	def onRoutingClick(self, item, event):
-		if self.selectedRouting is not None and event.button == 3 and len(self.core.trackManager.routings) > 0:
+		if self.selectedRouting is not None and event.button == 3 and len(self.core.routingManager) > 0:
 			menu = self.builder.get_object("routing-item-menu")
 			menu.popup (None, None, None, None, event.button, event.time)

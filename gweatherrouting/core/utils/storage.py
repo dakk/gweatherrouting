@@ -20,7 +20,7 @@ import platform
 import logging
 import json
 from datetime import date, datetime
-from .. import log
+from ... import log
 
 logger = logging.getLogger ('gweatherrouting')
 
@@ -120,10 +120,10 @@ class Storage(dict):
 
 	def loadData(self, data):
 		for x in data:
-			if isinstance(data[x], dict):
-				self[x].loadData(data[x])
-			else:
-				self[x] = data[x]
+			# if isinstance(data[x], dict):
+			# 	self[x].loadData(data[x])
+			# else:
+			self[x] = data[x]
 
 	def save(self):
 		if self.__parent:
@@ -163,10 +163,12 @@ class Storage(dict):
 			if x.find('Storage') != -1:
 				continue
 
-			if isinstance(self[x], dict):
-				d[x] = self[x].to_dict()
-			else:
-				d[x] = self[x]
+			# check if self[x] has a to_dict method
+			# if hasattr(self[x], 'to_dict'):
+			# 	# if isinstance(self[x], dict) and
+			# 	# d[x] = self[x].to_dict()
+			# else:
+			d[x] = self[x]
 
 		return d
 

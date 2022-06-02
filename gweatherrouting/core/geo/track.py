@@ -13,17 +13,24 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
+import gpxpy
+from .elementmultipoint import ElementMultiPoint
 
-from ...core.utils import Storage
+class Track (ElementMultiPoint):
+	def __init__(self, name, points = [], visible = True, collection = None):
+		super().__init__(name, points, visible, collection)
 
-class SettingsManager(Storage):
-	def __init__(self):
-		Storage.__init__(self, "settings")
+	@staticmethod
+	def fromJSON(j):
+		d = ElementMultiPoint.fromJSON(j)
+		return Track(d.name, d.points, d.visible)
 
-		self.gribArrowOpacity = 0.4
-		self.gribArrowOnGround = False
-		self.vectorCharts = []
-		self.rasterCharts = []
-		self.chartPalette = 'cm93'
+	def toGPXObject(self):
+		gpx_track = gpxpy.gpx.GPXTrack()
+		gpx_segment = gpxpy.gpx.GPXTrackSegment()
+		gpx_track.segments.append(gpx_segment)
 
-		self.loadOrSaveDefault()
+		for x in self.waypoints:
+			gpx_segment.points.append(gpxpy.gpx.GPXTrackPoint(x[0], x[1]))
+
+		return gpx_track

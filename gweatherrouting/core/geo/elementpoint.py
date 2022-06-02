@@ -13,17 +13,23 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
+from typing import Tuple
+from .element import Element
 
-from ...core.utils import Storage
+class ElementPoint(Element):
+	def __init__(self, name, position: Tuple[float, float], visible = True, collection = None):
+		super().__init__(name, visible, collection)
+		self.position = position
 
-class SettingsManager(Storage):
-	def __init__(self):
-		Storage.__init__(self, "settings")
+	def toJSON(self):
+		c = super().toJSON()
+		c['position'] = self.position
+		return c
 
-		self.gribArrowOpacity = 0.4
-		self.gribArrowOnGround = False
-		self.vectorCharts = []
-		self.rasterCharts = []
-		self.chartPalette = 'cm93'
+	@staticmethod
+	def fromJSON(j):
+		d = Element.fromJSON(j)
+		return ElementPoint(d.name, j['position'], d.visible)
 
-		self.loadOrSaveDefault()
+	def toGPXObject(self):
+		raise Exception("Not implemented")

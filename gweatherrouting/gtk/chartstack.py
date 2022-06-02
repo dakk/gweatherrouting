@@ -170,7 +170,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 
 
 	def onNew (self, widget):
-		self.core.trackManager.create()
+		self.core.trackManager.newElement()
 		self.updateTrack ()
 		self.map.queue_draw ()
 
@@ -231,7 +231,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 					edialog.format_secondary_text ("GPX file opened and loaded")
 					edialog.run ()
 					edialog.destroy ()
-					self.statusbar.push (self.statusbar.get_context_id ('Info'), f'Loaded {filepath} with {len (self.core.trackManager.activeTrack)} waypoints')
+					self.statusbar.push (self.statusbar.get_context_id ('Info'), f'Loaded {filepath} with {len (self.core.trackManager.getActive())} waypoints')
 	
 				else:
 					edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")

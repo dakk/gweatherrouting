@@ -29,9 +29,10 @@ from ..style import *
 
 
 class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
-	def __init__ (self, trackManager, timeControl):
+	def __init__ (self, trackManager, routingManager, timeControl):
 		GObject.GObject.__init__ (self)
 		self.trackManager = trackManager
+		self.routingManager = routingManager
 		self.timeControl = timeControl
 		self.hlRouting = None
 
@@ -39,12 +40,13 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 		self.hlRouting = name
 
 	def do_draw (self, gpsmap, cr):
-		if self.trackManager.log:
+		log = self.trackManager.getByName('log')
+		if log:
 			prevx = None
 			prevy = None
 			prevp = None
 
-			for p in self.trackManager.log:
+			for p in log:
 				x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (p[0], p[1]))
 
 				if prevx is not None and prevy is not None:
@@ -58,7 +60,7 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 				prevp = p
 
 
-		for tr in self.trackManager.routings:
+		for tr in self.routingManager:
 			highlight = False
 
 			if not tr.visible:
@@ -72,7 +74,7 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 			prevp = None
 			i = 0
 
-			for p in tr.waypoints:
+			for p in tr:
 				i += 1
 				x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (p[0], p[1]))
 
@@ -123,19 +125,17 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 				prevy = y
 				prevp = p
 
-		for tr in self.trackManager.tracks:
+		for tr in self.trackManager:
 			if not tr.visible:
 				continue
 
-			active = False
-			if self.trackManager.activeTrack and self.trackManager.activeTrack.name == tr.name:
-				active = True
+			active = self.trackManager.isActive(tr)
 
 			prevx = None
 			prevy = None
 			i = 0
 
-			for p in tr.waypoints:
+			for p in tr:
 				i += 1
 				x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (p[0], p[1]))
 
