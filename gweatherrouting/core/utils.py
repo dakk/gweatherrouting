@@ -94,7 +94,10 @@ def pointValidity (lat, lon):
 def pointsValidity (latlons):
 	return list(map(pointValidity, latlons))
 
-def uniqueName(name, collection):
+def uniqueName(name, collection = None):
+	if not collection:
+		return name
+
 	names = []
 	for x in collection:
 		names.append(x.name)

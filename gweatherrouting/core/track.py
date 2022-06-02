@@ -119,6 +119,14 @@ class RoutingTrack(Track):
 	def boatPosition(self, routing, t):
 		pass
 
+	def toGPXRoute(self):
+		gpx_route = gpxpy.gpx.GPXRoute()
+
+		for x in self.waypoints:
+			gpx_route.points.append(gpxpy.gpx.GPXRoutePoint(x[0], x[1]))
+
+		return gpx_route
+
 	# def add(self, lat, lon, t):
 	#     self.waypoints.append((lat, lon, t))
 	#     self.trackManager.saveTracks()

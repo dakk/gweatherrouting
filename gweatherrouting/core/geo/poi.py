@@ -13,6 +13,9 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
+from typing import Tuple
+import gpxpy
+from .elementpoint import ElementPoint
 
 # FURUNO PFEC NMEA https://www.manualsdir.com/manuals/100982/furuno-gp-1650.html?page=66
 
@@ -41,21 +44,19 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 # $PFEC,GPwpl,4012.32,N,958.18,E,WP0000,3,@q00:53 25MAR22,A,,,,
 # $PFEC,GPwpl,3912.32,N,1918.18,E,WP0001,3,@q00:55 25MAR22,A,,,,
 
-import gpxpy
-from .utils import uniqueName
-try:
-	from . import Storage
-except:
-	from .dummy_storage import Storage
+class POI(ElementPoint):
+	def __init__(self, name, position: Tuple[float, float], symbol = None, visible = True, collection = None):
+		super().__init__(name, position, visible, collection)
+		self.symbol = None
 
+	def toJSON(self):
+		c = super().toJSON()
+		c['symbol'] = self.symbol
+		return c
 
-class POI:
-	def __init__(self, name, position, symbol=None, visible=True):
-		self.name = name
-		self.position = position
-		self.visible = visible
-		self.symbol = symbol
-
+	def toGPXObject(self):
+		# TODO: add symbol , sym=self.symb
+		return gpxpy.gpx.GPXWaypoint(latitude=self.position[0], longitude=self.position[1], name=self.name)
 
 	def toNMEAPFEC(self):
 		""" Export POI as PFEC NMEA sentence """
@@ -76,60 +77,3 @@ class POI:
 		# q: circle; x: anchor
 
 		return f'$PFEC,GPwpl,{lat},{latns},{lon},{lonew},{name},3,@q00:00 00AAA00,A,,,,'
-
-
-	def toGPXWaypoint(self):
-		# TODO: add symbol , sym=self.symb
-		return gpxpy.gpx.GPXWaypoint(latitude=self.position[0], longitude=self.position[1], name=self.name)
-
-class PoiManagerStorage(Storage):
-	def __init__(self):
-		Storage.__init__(self, "poi-manager")
-		self.pois = []
-		self.loadOrSaveDefault()
-
-class POIManager():
-	def __init__(self):
-		self.storage = PoiManagerStorage()
-		self.pois = []
-
-		for x in self.storage.pois:
-			tr = POI(name=x['name'], position=x['position'], visible=x['visible'], symbol=x['symbol'])
-			self.pois.append(tr)
-
-
-	def getByName(self, name):
-		for x in self.pois:
-			if x.name == name:
-				return x
-		return None
-
-	def remove(self, name):
-		for x in self.pois:
-			if x.name == name:
-				return self.pois.remove(x)
-
-	def move(self, name, lat, lon):
-		for x in self.pois:
-			if x.name == name:
-				x.position = (lat, lon)
-				return
-
-	def savePOI(self):
-		ts = []
-		for x in self.pois:
-			ts.append({'name': x.name, 'position': x.position, 'visible': x.visible, 'symbol': x.symbol })
-
-		self.storage.pois = ts
-
-	def toNMEAPFEC(self):
-		s = ''
-		for x in self.pois:
-			s += x.toNMEAPFEC() + '\n'
-		s += '$PFEC,GPxfr,CTL,E'
-		return s
-
-	def create(self, position):
-		nt = POI(name=uniqueName('poi', self.pois), position=position, symbol=None)
-		self.pois.append (nt)
-		self.savePOI()
