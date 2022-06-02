@@ -30,7 +30,7 @@ class Track (ElementMultiPoint):
 		gpx_segment = gpxpy.gpx.GPXTrackSegment()
 		gpx_track.segments.append(gpx_segment)
 
-		for x in self.waypoints:
+		for x in self.points:
 			gpx_segment.points.append(gpxpy.gpx.GPXTrackPoint(x[0], x[1]))
 
 		return gpx_track

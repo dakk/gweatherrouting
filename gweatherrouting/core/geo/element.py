@@ -39,11 +39,11 @@ class Element:
 			gpx = gpxpy.gpx.GPX()
 
 			ob = self.toGPXObject()
-			if isinstance(gpx.GPXTrack, ob):
+			if isinstance(ob, gpxpy.gpx.GPXTrack):
 				gpx.tracks.append(ob)
-			elif isinstance(gpx.GPXRoute, ob):
+			elif isinstance(ob, gpxpy.gpx.GPXRoute):
 				gpx.routes.append(ob)
-			elif isinstance(gpx.GPXWaypoint, ob):
+			elif isinstance(ob, gpxpy.gpx.GPXWaypoint):
 				gpx.waypoints.append(ob)
 
 			try:
