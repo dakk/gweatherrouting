@@ -79,7 +79,7 @@ class ChartStackPOI:
 		self.poiStore.clear()
 		for x in self.core.poiManager.pois:
 			self.poiStore.append([x.name, x.position[0], x.position[1], x.visible, x.symbol])
-		self.core.poiManager.savePOI()
+		self.core.poiManager.save()
 		self.map.queue_draw ()
 
 

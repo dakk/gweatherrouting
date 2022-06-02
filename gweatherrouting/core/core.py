@@ -21,10 +21,7 @@ import weatherrouting
 from .connectionmanager import ConnectionManager
 from .datasource import DataPacket
 
-from . import utils
-from .poimanager import POI
-from .track import Track
-from . import GribManager, TrackManager, POIManager, EventDispatcher
+from . import utils, geo, GribManager, EventDispatcher
 
 logger = logging.getLogger("gweatherrouting")
 
@@ -49,9 +46,10 @@ class BoatInfo:
 class Core(EventDispatcher):
 	def __init__(self):
 		self.connectionManager = ConnectionManager()
-		self.trackManager = TrackManager()
+		self.trackManager = geo.TrackCollection()
+		self.routingManager = geo.RoutingCollection()
+		self.poiManager = geo.POICollection()
 		self.gribManager = GribManager()
-		self.poiManager = POIManager()
 		self.boatInfo = BoatInfo()
 
 		self.connectionManager.connect("data", self.dataHandler)
@@ -111,32 +109,12 @@ class Core(EventDispatcher):
 			gpx = gpxpy.parse(f)
 
 			# Tracks
-			for track in gpx.tracks:
-				waypoints = []
-
-				for segment in track.segments:
-					for point in segment.points:
-						waypoints.append([point.latitude, point.longitude])
-
-				self.trackManager.tracks.append(
-					Track(
-						path.split("/")[-1].split(".")[0],
-						waypoints,
-						trackManager=self.trackManager,
-					)
-				)
-
-			self.trackManager.saveTracks()
+			self.trackManager.importFromGPX(gpx)
 
 			# Routes
 
 			# POI
-			for waypoint in gpx.waypoints:
-				self.poiManager.pois.append(
-					POI(waypoint.name, [waypoint.latitude, waypoint.longitude])
-				)
-
-			self.poiManager.savePOI()
+			self.poiManager.importFromGPX(gpx)
 
 			return True
 		except Exception as e:

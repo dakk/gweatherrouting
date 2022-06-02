@@ -14,6 +14,7 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 from .element import Element
+from .. import utils
 
 class ElementMultiPoint(Element):
 	def __init__(self, name, points = [], visible = True, collection = None):
@@ -42,9 +43,54 @@ class ElementMultiPoint(Element):
 
 	def __setitem__(self, key, value):
 		self.points[key] = value
+		self.collection.save()
 
 	def __delitem__(self, key):
 		del self.points[key]
+		self.collection.save()
 
 	def __iter__(self):
 		return iter(self.points)
+
+	def length(self):
+		if len(self.points) <= 1:
+			return 0.0
+
+		d = 0.0
+		prev = self.points[0]
+		for x in self.points[1::]:
+			d += utils.pointDistance(prev[0], prev[1], x[0], x[1])
+			prev = x
+
+		return d
+
+	def moveUp(self, i):
+		if i > 0 and i < len(self):
+			sw = self.points[i - 1]
+			self.points[i - 1] = self.points[i]
+			self.points[i] = sw
+			self.collection.save()
+
+	def moveDown(self, i):
+		if i < len(self) - 1 and i >= 0:
+			sw = self.points[i + 1]
+			self.points[i + 1] = self.points[i]
+			self.points[i] = sw
+			self.collection.save()
+
+	def remove(self, i):
+		if i >= 0 and i < len(self):
+			del self.points[i]
+			self.collection.save()
+
+	def duplicate(self, i):
+		self.points.append(self.points[i])
+		self.collection.save()
+
+	def add(self, lat, lon, t=None):
+		self.points.append((lat, lon, t))
+		self.collection.save()
+
+	def move(self, i, lat, lon):
+		self.points[i] = (lat, lon, None)
+		self.collection.save()

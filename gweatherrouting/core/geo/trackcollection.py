@@ -19,3 +19,13 @@ from .collection import CollectionWithActiveElement
 class TrackCollection (CollectionWithActiveElement):
 	def __init__(self):
 		super().__init__(Track, 'track')
+
+	def importFromGPX(self, gpx):
+		for track in gpx.tracks:
+			waypoints = []
+
+			for segment in track.segments:
+				for point in segment.points:
+					waypoints.append([point.latitude, point.longitude])
+
+			self.append(Track(track.name, waypoints, collection=self))

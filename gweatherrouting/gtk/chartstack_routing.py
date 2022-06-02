@@ -155,7 +155,7 @@ class ChartStackRouting:
 				self.routingStore.append(riter, ['', x[2], x[0], x[1], x[3], x[4], x[5], x[6], False, True, False])
 
 		self.map.queue_draw()
-		self.core.trackManager.saveTracks()
+		self.core.trackManager.save()
 
 	def onRoutingToggle(self, widget, i):
 		self.core.trackManager.routings[int(i)].visible = not self.core.trackManager.routings[int(i)].visible

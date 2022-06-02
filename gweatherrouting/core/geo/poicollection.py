@@ -20,6 +20,12 @@ class POICollection(Collection):
 	def __init__(self):
 		super().__init__(POI, 'poi')
 
+	def importFromGPX(self, gpx):
+		for waypoint in gpx.waypoints:
+			self.append(
+				POI(waypoint.name, [waypoint.latitude, waypoint.longitude])
+			)
+
 	def toNMEAPFEC(self):
 		s = ''
 		for x in self.elements:

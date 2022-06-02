@@ -29,7 +29,7 @@ def extractCoordinates(coord):
 	c = []
 	for x in coord:
 		if isinstance(x[0], float):
-			return coord 
+			return coord
 		else:
 			for xx in extractCoordinates(x):
 				c.append(xx)
