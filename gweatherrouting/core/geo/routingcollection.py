@@ -13,3 +13,19 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
+from . import Routing
+from .collection import CollectionWithActiveElement
+
+class RoutingCollection (CollectionWithActiveElement):
+	def __init__(self):
+		super().__init__(Routing, 'routing')
+
+	def importFromGPX(self, gpx):
+		for track in gpx.routes:
+			waypoints = []
+
+			for segment in track.segments:
+				for point in segment.points:
+					waypoints.append([point.latitude, point.longitude])
+
+			self.append(Routing(track.name, waypoints, collection=self))

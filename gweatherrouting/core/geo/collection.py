@@ -14,13 +14,15 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 import gpxpy
-from .. import Storage, utils
+from ..utils import uniqueName, Storage
 
 class CollectionStorage(Storage):
 	def __init__(self, name):
+		print('loading collection: ' + name)
 		Storage.__init__(self, name)
 		self.data = {}
 		self.loadOrSaveDefault()
+		print('loaded collection: ' + name)
 
 class Collection:
 	def __init__(self, of, baseName):
@@ -57,6 +59,10 @@ class Collection:
 
 	def loadJSON(self, j):
 		self.clear()
+		print(j)
+
+		if not 'elements' in j:
+			return
 
 		for x in j['elements']:
 			e = self.of.fromJSON(x)
@@ -65,7 +71,7 @@ class Collection:
 	def getUniqueName(self, baseName = None):
 		if baseName is None:
 			baseName = self.baseName
-		return utils.uniqueName(baseName, self.elements)
+		return uniqueName(baseName, self.elements)
 
 	def newElement(self):
 		e = self.of(self.getUniqueName(), collection = self)
@@ -129,12 +135,15 @@ class CollectionWithActiveElement(Collection):
 
 	def toJSON(self):
 		c = super().toJSON()
-		c['activeElement'] = self.activeElement.name
+		c['activeElement'] = self.activeElement.name if self.activeElement else None
 		return c
 
 	def loadJSON(self, j):
 		super().loadJSON(j)
-		self.activeElement = self.getByName(j['activeElement'])
+		self.activeElement = self.getByName(j['activeElement']) if 'activeElement' in j else None
+
+	def hasActive(self):
+		return self.activeElement is not None
 
 	def getActive(self):
 		return self.activeElement
@@ -145,3 +154,6 @@ class CollectionWithActiveElement(Collection):
 
 	def activate(self, name):
 		self.setActive(self.getByName(name))
+
+	def isActive(self, element):
+		return self.activeElement == element

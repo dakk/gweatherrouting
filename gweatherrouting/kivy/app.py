@@ -55,7 +55,7 @@ class GWeatherRoutingApp(MDApp):
 		# Setup map
 		self.root.ids.mapView.add_layer(GribMapLayer(self.core.gribManager, self.timeControl))
 		self.root.ids.mapView.add_layer(POIMapLayer(self.core.poiManager, self.timeControl))
-		self.root.ids.mapView.add_layer(TrackMapLayer(self.core.trackManager, self.timeControl))
+		self.root.ids.mapView.add_layer(TrackMapLayer(self.core.trackManager, self.core.routingManager self.timeControl))
 
 		# Setup grib
 		self.root.ids.gribScreen.gribManager = self.core.gribManager

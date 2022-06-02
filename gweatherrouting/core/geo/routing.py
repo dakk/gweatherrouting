@@ -17,8 +17,9 @@ import gpxpy
 from . import Track
 
 class Routing (Track):
-	# def __init__(self, name, points = [], visible = True, collection = None):
-	# 	super().__init__(name, points, visible, collection)
+	def __init__(self, name, points = [], isochrones = [], visible = True, collection = None):
+		super().__init__(name, points, visible, collection)
+		self.isochrones = isochrones
 
 	def toGPXObject(self):
 		gpx_route = gpxpy.gpx.GPXRoute()
@@ -27,3 +28,14 @@ class Routing (Track):
 			gpx_route.points.append(gpxpy.gpx.GPXRoutePoint(x[0], x[1]))
 
 		return gpx_route
+
+	def toJSON(self):
+		c = super().toJSON()
+		c['isochrones'] = self.isochrones
+		return c
+
+	@staticmethod
+	def fromJSON(j):
+		d = Track.fromJSON(j)
+		d.isochrones = j['isochrones']
+		return d

@@ -32,9 +32,9 @@ class POIMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 
 
 	def do_draw (self, gpsmap, cr):
-		for tr in self.poiManager.pois:
+		for tr in self.poiManager:
 			if not tr.visible:
-				continue 
+				continue
 
 			x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (tr.position[0], tr.position[1]))
 

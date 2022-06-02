@@ -15,7 +15,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
 import datetime
-from . import EventDispatcher
+from .utils import EventDispatcher
 
 class TimeControl(EventDispatcher):
 	DFORMAT = "%Y/%m/%d, %H:%M"

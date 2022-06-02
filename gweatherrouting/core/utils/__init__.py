@@ -20,9 +20,13 @@ import json
 import latlon
 from geojson_utils import point_in_polygon
 
+try:
+	from .storage import *
+except:
+	from .dummy_storage import *
 
 this_dir, this_fn = os.path.split (__file__)
-COUNTRIES = json.load (open (this_dir + '/../data/countries.geojson', 'r'))
+COUNTRIES = json.load (open (this_dir + '/../../data/countries.geojson', 'r'))
 COUNTRY_SHAPES = []
 
 def extractCoordinates(coord):

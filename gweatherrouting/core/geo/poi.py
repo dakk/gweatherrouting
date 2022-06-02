@@ -56,7 +56,7 @@ class POI(ElementPoint):
 
 	@staticmethod
 	def fromJSON(j):
-		d = super().fromJSON(j)
+		d = ElementPoint.fromJSON(j)
 		d.symbol = j['symbol']
 		return d
 	

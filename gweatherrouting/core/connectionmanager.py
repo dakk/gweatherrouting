@@ -17,8 +17,8 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import logging
 import time
 from threading import Thread
-from . import SerialDataSource, NetworkDataSource, EventDispatcher
-from . import Storage
+from . import SerialDataSource, NetworkDataSource
+from .utils import EventDispatcher, Storage
 
 logger = logging.getLogger ('gweatherrouting')
 

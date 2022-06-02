@@ -19,7 +19,7 @@ class Element:
 	def __init__(self, name = 'any', visible = True, collection = None):
 		self.name = name
 		self.visible = visible
-		self.collection = None
+		self.collection = collection
 
 	def toGPXObject(self):
 		raise Exception("Not implemented")
@@ -51,3 +51,6 @@ class Element:
 				f.write(gpx.to_xml())
 			except Exception as e:
 				print (str(e))
+
+	def __len__(self):
+		return 0

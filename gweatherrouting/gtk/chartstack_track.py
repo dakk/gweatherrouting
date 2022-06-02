@@ -25,13 +25,12 @@ except:
 from gi.repository import Gtk
 
 from .maplayers import TrackMapLayer
-from ..core import utils
 
 class ChartStackTrack:
 	selectedTrackItem = None
 
 	def __init__(self):
-		self.trackMapLayer = TrackMapLayer(self.core.trackManager, self.timeControl)
+		self.trackMapLayer = TrackMapLayer(self.core.trackManager, self.core.routingManager, self.timeControl)
 		self.map.layer_add (self.trackMapLayer)
 
 		self.trackStore = self.builder.get_object("track-store")
@@ -42,14 +41,14 @@ class ChartStackTrack:
 	def updateTrack (self, onlyActive = False):
 		if not onlyActive:
 			self.trackListStore.clear()
-			for x in self.core.trackManager.tracks:
-				self.trackListStore.append([x.name, x.size(), x.length(), x.visible])
+			for x in self.core.trackManager:
+				self.trackListStore.append([x.name, len(x), x.length(), x.visible])
 
 		self.trackStore.clear ()
 
-		if self.core.trackManager.activeTrack:
+		if self.core.trackManager.hasActive():
 			i = 0
-			for wp in self.core.trackManager.activeTrack:
+			for wp in self.core.trackManager.getActive():
 				i += 1
 				self.trackStore.append([i, wp[0], wp[1]])
 
@@ -74,16 +73,16 @@ class ChartStackTrack:
 			if not filepath.endswith('.gpx'):
 				filepath += '.gpx'
 
-			if self.core.trackManager.activeTrack.export (filepath):
+			if self.core.trackManager.getActive().export (filepath):
 				# self.builder.get_object('header-bar').set_subtitle (filepath)
-				self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Saved %d waypoints' % (len (self.core.trackManager.activeTrack)))
+				self.statusbar.push (self.statusbar.get_context_id ('Info'), f'Saved {len (self.core.trackManager.getActive())} waypoints')
 				edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Saved")
-				edialog.format_secondary_text ('Saved %d waypoints' % (len (self.core.trackManager.activeTrack)))
+				edialog.format_secondary_text (f'Saved {len (self.core.trackManager.getActive())} waypoints')
 				edialog.run ()
 				edialog.destroy ()
 			else:
 				edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error")
-				edialog.format_secondary_text ("Cannot save file: %s" % filepath)
+				edialog.format_secondary_text (f"Cannot save file: {filepath}")
 				edialog.run ()
 				edialog.destroy ()
 
@@ -91,25 +90,25 @@ class ChartStackTrack:
 
 
 	def onTrackNameEdit(self, widget, i, name):
-		self.core.trackManager.tracks[int(i)].name = utils.uniqueName(name, self.core.trackManager.tracks)
+		self.core.trackManager[int(i)].name = self.core.trackManager.getUniqueName(name)
 		self.updateTrack()
 
 	def onTrackToggle(self, widget, i):
-		self.core.trackManager.tracks[int(i)].visible = not self.core.trackManager.tracks[int(i)].visible
+		self.core.trackManager[int(i)].visible = not self.core.trackManager[int(i)].visible
 		self.updateTrack()
 
 	def onTrackRemove(self, widget):
-		self.core.trackManager.remove(self.core.trackManager.activeTrack)
+		self.core.trackManager.remove(self.core.trackManager.getActive())
 		self.updateTrack()
 		self.map.queue_draw()
 
 	def onTrackClick(self, item, event):
-		if event.button == 3 and len(self.core.trackManager.tracks) > 0:
+		if event.button == 3 and len(self.core.trackManager) > 0:
 			menu = self.builder.get_object("track-list-item-menu")
 			menu.popup (None, None, None, None, event.button, event.time)
 
 	def onTrackItemClick(self, item, event):
-		if event.button == 3 and self.core.trackManager.activeTrack.size() > 0:
+		if event.button == 3 and self.core.trackManager.getActive().size() > 0:
 			menu = self.builder.get_object("track-item-menu")
 			menu.popup (None, None, None, None, event.button, event.time)
 
@@ -134,30 +133,30 @@ class ChartStackTrack:
 	def onTrackItemMove(self, widget):
 		if self.selectedTrackItem is not None:
 			self.toolsMapLayer.enablePOIMoving(
-				lambda x,y: self.core.trackManager.activeTrack.move(self.selectedTrackItem, x, y))
+				lambda x,y: self.core.trackManager.getActive().move(self.selectedTrackItem, x, y))
 
 
 	def onTrackItemMoveUp(self, widget):
 		if self.selectedTrackItem is not None:
-			self.core.trackManager.activeTrack.moveUp(self.selectedTrackItem)
+			self.core.trackManager.getActive().moveUp(self.selectedTrackItem)
 			self.updateTrack()
 			self.map.queue_draw ()
 
 	def onTrackItemMoveDown(self, widget):
 		if self.selectedTrackItem is not None:
-			self.core.trackManager.activeTrack.moveDown(self.selectedTrackItem)
+			self.core.trackManager.getActive().moveDown(self.selectedTrackItem)
 			self.updateTrack()
 			self.map.queue_draw ()
 
 	def onTrackItemRemove(self, widget):
 		if self.selectedTrackItem is not None:
-			self.core.trackManager.activeTrack.remove(self.selectedTrackItem)
+			self.core.trackManager.getActive().remove(self.selectedTrackItem)
 			self.updateTrack()
 			self.map.queue_draw ()
 
 	def onTrackItemDuplicate(self, widget):
 		if self.selectedTrackItem is not None:
-			self.core.trackManager.activeTrack.duplicate(self.selectedTrackItem)
+			self.core.trackManager.getActive().duplicate(self.selectedTrackItem)
 			self.updateTrack()
 			self.map.queue_draw ()
 
@@ -171,10 +170,14 @@ class ChartStackTrack:
 		lon = self.builder.get_object("track-add-point-lon").get_text ()
 
 		if len (lat) > 1 and len (lon) > 1:
-			if len(self.core.trackManager.tracks) == 0:
-				self.core.trackManager.create()
+			if len(self.core.trackManager) == 0:
+				e = self.core.trackManager.newElement()
+				self.core.trackManager.setActive(e)
 
-			self.core.trackManager.activeTrack.add (float (lat), float (lon))
+			if not self.core.trackManager.hasActive():
+				return
+
+			self.core.trackManager.getActive().add (float (lat), float (lon))
 			self.updateTrack ()
 
 			self.builder.get_object("track-add-point-lat").set_text ('')

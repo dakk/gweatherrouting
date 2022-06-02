@@ -4,10 +4,10 @@ import logging
 import requests
 import weatherrouting
 from .grib import Grib
-try:
-	from . import Storage, GRIB_DIR, TEMP_DIR
-except:
-	from .dummy_storage import Storage
+# try:
+from .utils.storage import Storage, GRIB_DIR, TEMP_DIR
+# except:
+# from .utils.dummy_storage import Storage
 
 # from bs4 import BeautifulSoup
 

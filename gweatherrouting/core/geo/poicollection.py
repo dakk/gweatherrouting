@@ -13,6 +13,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
+from typing import Tuple
 from . import POI
 from .collection import Collection
 
@@ -37,3 +38,9 @@ class POICollection(Collection):
 		c = self.getByName(name)
 		if c is not None:
 			c.position = (lat, lon)
+
+	def create(self, position: Tuple[float, float]):
+		e = POI(self.getUniqueName(), position=position, collection = self)
+		self.append(e)
+		self.save()
+		return e

@@ -14,7 +14,7 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 '''
 
-from ...core import Storage
+from ...core.utils import Storage
 
 class SettingsManager(Storage):
 	def __init__(self):

@@ -18,13 +18,16 @@ import logging
 import gpxpy
 import weatherrouting
 
+from . import utils
+
 from .connectionmanager import ConnectionManager
 from .datasource import DataPacket
 
-from . import utils, geo, GribManager, EventDispatcher
+from . import GribManager
+from .utils import EventDispatcher
+from .geo import TrackCollection, RoutingCollection, POICollection
 
 logger = logging.getLogger("gweatherrouting")
-
 
 class LinePointValidityProvider:
 	def pointsValidity(self, latlons):
@@ -46,9 +49,9 @@ class BoatInfo:
 class Core(EventDispatcher):
 	def __init__(self):
 		self.connectionManager = ConnectionManager()
-		self.trackManager = geo.TrackCollection()
-		self.routingManager = geo.RoutingCollection()
-		self.poiManager = geo.POICollection()
+		self.trackManager = TrackCollection()
+		self.routingManager = RoutingCollection()
+		self.poiManager = POICollection()
 		self.gribManager = GribManager()
 		self.boatInfo = BoatInfo()
 
