@@ -268,7 +268,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 			self.timeControl.setTime(data.time)
 
 			if len(self.data) % 150 == 0:
-				self.trackManager.log.append((data.lat, data.lon))
+				self.trackManager.getByName('log').append((data.lat, data.lon))
 
 			if self.recording or len(self.data) % 5000 == 0:
 				self.map.set_center_and_zoom (data.lat, data.lon, 12)
@@ -311,7 +311,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 		# ext = filepath.split('.')[-1]
 
 		# TODO: support for gpx files
-		self.trackManager.log = []
+		self.trackManager.getByName('log').clear()
 
 		try:
 			fi = nt.FileInput(filepath)
@@ -348,15 +348,15 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 			self.recordedData.close()
 		self.recordedData = open(LOG_TEMP_FILE, 'w')
 		self.toSend = []
-		self.trackManager.log = []
+		self.trackManager.getByName('log').clear()
 		self.map.queue_draw()
 		self.graphArea.queue_draw()
 		logger.debug("Data cleared")
 
 	def rebuildTrack(self):
-		self.trackManager.log = []
+		self.trackManager.getByName('log').clear()
 		for x in self.data[0::150]:
-			self.trackManager.log.append((x.lat, x.lon))
+			self.trackManager.getByName('log').append((x.lat, x.lon))
 		self.map.queue_draw()
 
 	def startRecording(self):
