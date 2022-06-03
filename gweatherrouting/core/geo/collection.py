@@ -124,8 +124,8 @@ class Collection(Generic[T]):
 
 		return gpx
 
-	def export(self, dest, format = 'gpx'):
-		if format == 'gpx':
+	def export(self, dest, fmt = 'gpx'):
+		if fmt == 'gpx':
 			gpx = self.toGPXObject()
 
 			try:

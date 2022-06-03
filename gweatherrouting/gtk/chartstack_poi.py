@@ -24,9 +24,6 @@ except:
 
 from gi.repository import Gtk, GdkPixbuf
 
-from ..core import utils
-from .maplayers import POIMapLayer
-
 class ChartStackPOI:
 	selectedPOI = None
 
@@ -90,7 +87,8 @@ class ChartStackPOI:
 			self.updatePOI()
 
 	def exportPOIsAsNMEAPFEC(self, widget):
-		dialog = Gtk.FileChooserDialog("Export POIs as NMEA PFEC", self.parent, Gtk.FileChooserAction.SAVE, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+		dialog = Gtk.FileChooserDialog("Export POIs as NMEA PFEC", self.parent,
+			Gtk.FileChooserAction.SAVE, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
 		dialog.set_do_overwrite_confirmation(True)
 
 		filter_gpx = Gtk.FileFilter()
