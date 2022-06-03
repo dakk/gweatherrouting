@@ -326,6 +326,7 @@ loaded to created a routing</property>
               <object class="GtkToolbar">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
+                <property name="toolbar-style">both</property>
                 <child>
                   <object class="GtkToolButton">
                     <property name="visible">True</property>
@@ -391,9 +392,77 @@ loaded to created a routing</property>
                     <property name="use-action-appearance">True</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
+                    <property name="tooltip-text" translatable="yes">Show / Hide Track / POI tabs</property>
+                    <property name="margin-end">2</property>
+                    <property name="label" translatable="yes">Tabs</property>
+                    <property name="use-underline">True</property>
+                    <property name="icon-name">gtk-fullscreen</property>
+                    <property name="active">True</property>
+                    <signal name="toggled" handler="onToggleNotebook" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="homogeneous">True</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkToggleToolButton">
+                    <property name="use-action-appearance">True</property>
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="tooltip-text" translatable="yes">Enable / Disable connections</property>
+                    <property name="margin-end">2</property>
+                    <property name="label" translatable="yes">Data</property>
+                    <property name="use-underline">True</property>
+                    <property name="icon-name">gnome-dev-wavelan</property>
+                    <property name="active">True</property>
+                    <signal name="toggled" handler="onToggleConnections" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="homogeneous">True</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkToggleToolButton">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="tooltip-text" translatable="yes">Show / Hide gribs</property>
+                    <property name="margin-end">2</property>
+                    <property name="label" translatable="yes">Grib</property>
+                    <property name="use-underline">True</property>
+                    <property name="icon-name">weather-windy</property>
+                    <signal name="toggled" handler="onToggleGrib" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="homogeneous">True</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkToggleToolButton">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="tooltip-text" translatable="yes">Show / Hide compass</property>
+                    <property name="margin-end">2</property>
+                    <property name="label" translatable="yes">Compass</property>
+                    <property name="use-underline">True</property>
+                    <property name="icon-name">compass</property>
+                    <signal name="toggled" handler="onToggleCompass" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="homogeneous">True</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkToggleToolButton">
+                    <property name="use-action-appearance">True</property>
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
                     <property name="tooltip-text" translatable="yes">Show / Hide dashboard</property>
                     <property name="margin-end">2</property>
-                    <property name="label" translatable="yes">Toggle Dashboard</property>
+                    <property name="label" translatable="yes">Dashboard</property>
                     <property name="use-underline">True</property>
                     <property name="icon-name">kt-speed-limits</property>
                     <signal name="toggled" handler="onToggleDashboard" swapped="no"/>
@@ -409,75 +478,11 @@ loaded to created a routing</property>
                     <property name="can-focus">False</property>
                     <property name="tooltip-text" translatable="yes">Show / Hide AIS Targets</property>
                     <property name="margin-end">2</property>
-                    <property name="label" translatable="yes">Toggle AIS</property>
+                    <property name="label" translatable="yes">AIS</property>
                     <property name="use-underline">True</property>
                     <property name="icon-name">eye-open-negative-filled-symbolic</property>
                     <property name="active">True</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="homogeneous">True</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkToggleToolButton">
-                    <property name="use-action-appearance">True</property>
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="tooltip-text" translatable="yes">Show / Hide Track / POI tabs</property>
-                    <property name="margin-end">2</property>
-                    <property name="label" translatable="yes">Toggle Tabs</property>
-                    <property name="use-underline">True</property>
-                    <property name="icon-name">gtk-fullscreen</property>
-                    <property name="active">True</property>
-                    <signal name="toggled" handler="onToggleNotebook" swapped="no"/>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="homogeneous">True</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkToggleToolButton">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="tooltip-text" translatable="yes">Show / Hide gribs</property>
-                    <property name="label" translatable="yes">Toggle Grib</property>
-                    <property name="use-underline">True</property>
-                    <property name="icon-name">weather-windy</property>
-                    <signal name="toggled" handler="onToggleGrib" swapped="no"/>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="homogeneous">True</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkToggleToolButton">
-                    <property name="use-action-appearance">True</property>
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="tooltip-text" translatable="yes">Enable / Disable connections</property>
-                    <property name="label" translatable="yes">Togle Connections</property>
-                    <property name="use-underline">True</property>
-                    <property name="stock-id">gtk-disconnect</property>
-                    <property name="active">True</property>
-                    <signal name="toggled" handler="onToggleConnections" swapped="no"/>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="homogeneous">True</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkToggleToolButton">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="tooltip-text" translatable="yes">Show / Hide compass</property>
-                    <property name="label" translatable="yes">Compass</property>
-                    <property name="use-underline">True</property>
-                    <property name="icon-name">compass</property>
-                    <signal name="toggled" handler="onToggleCompass" swapped="no"/>
+                    <signal name="toggled" handler="onToggleAIS" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -531,13 +536,28 @@ loaded to created a routing</property>
               </packing>
             </child>
             <child>
-              <object class="GtkBox" id="timetravelcontainer">
+              <object class="GtkBox">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-top">3</property>
-                <property name="margin-bottom">3</property>
+                <property name="orientation">vertical</property>
                 <child>
                   <placeholder/>
+                </child>
+                <child>
+                  <object class="GtkBox" id="timetravelcontainer">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="margin-top">3</property>
+                    <property name="margin-bottom">3</property>
+                    <child>
+                      <placeholder/>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
                 </child>
               </object>
               <packing>

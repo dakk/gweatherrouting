@@ -37,7 +37,7 @@ class ChartStackTrack:
 		if not onlyActive:
 			self.trackListStore.clear()
 			for x in self.core.trackManager:
-				if x.name == 'log':
+				if x.name == 'log' or x.name =='log-history':
 					continue
 				self.trackListStore.append([x.name, len(x), x.length(), x.visible])
 

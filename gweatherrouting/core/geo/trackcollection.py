@@ -26,6 +26,9 @@ class _TrackCollection (CollectionWithActiveElement, Generic[T]):
 		if not self.exists('log'):
 			e = self.newElement()
 			e.name = 'log'
+		if not self.exists('log-history'):
+			e = self.newElement()
+			e.name = 'log-history'
 
 
 	def importFromGPX(self, gpx):
