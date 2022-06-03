@@ -90,7 +90,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 		self.timeControl.connect('time-change', self.onTimeChange)
 		self.builder.get_object("timetravelcontainer").pack_start(self.timetravelWidget, True, True, 0)
 
-		self.geoMapLayer = GeoMapLayer(self.core.trackManager, self.core.routingManager, self.core.poiManager, self.timeControl)
+		self.geoMapLayer = GeoMapLayer(self.core, self.timeControl)
 		self.map.layer_add (self.geoMapLayer)
 
 		self.show_all()

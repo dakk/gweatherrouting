@@ -29,11 +29,11 @@ from ..style import *
 
 
 class GeoMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
-	def __init__ (self, trackManager, routingManager, poiManager, timeControl):
+	def __init__ (self, core, timeControl):
 		GObject.GObject.__init__ (self)
-		self.trackManager = trackManager
-		self.routingManager = routingManager
-		self.poiManager = poiManager
+		self.trackManager = core.trackManager
+		self.routingManager = core.routingManager
+		self.poiManager = core.poiManager
 		self.timeControl = timeControl
 		self.hlRouting = None
 

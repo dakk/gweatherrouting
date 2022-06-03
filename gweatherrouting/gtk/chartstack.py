@@ -78,7 +78,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		self.aisMapLayer = AISMapLayer (core)
 		self.map.layer_add (self.aisMapLayer)
 
-		self.geoMapLayer = GeoMapLayer(self.core.trackManager, self.core.routingManager, self.core.poiManager, self.timeControl)
+		self.geoMapLayer = GeoMapLayer(self.core, self.timeControl)
 		self.map.layer_add (self.geoMapLayer)
 
 
@@ -185,7 +185,8 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 
 
 	def exportAsGPX(self, widget):
-		dialog = Gtk.FileChooserDialog("Export as GPX", self.parent, Gtk.FileChooserAction.SAVE, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+		dialog = Gtk.FileChooserDialog("Export as GPX", self.parent, Gtk.FileChooserAction.SAVE,
+			(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
 		dialog.set_do_overwrite_confirmation(True)
 
 		filter_gpx = Gtk.FileFilter()
@@ -236,8 +237,9 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 					edialog.format_secondary_text ("GPX file opened and loaded")
 					edialog.run ()
 					edialog.destroy ()
-					self.statusbar.push (self.statusbar.get_context_id ('Info'), f'Loaded {filepath} with {len (self.core.trackManager.getActive())} waypoints')
-	
+					self.statusbar.push (self.statusbar.get_context_id ('Info'),
+						f'Loaded {filepath} with {len (self.core.trackManager.getActive())} waypoints')
+
 				else:
 					edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")
 					edialog.format_secondary_text (f"Cannot open file: {filepath}")
@@ -249,8 +251,8 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 					edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done")
 					edialog.format_secondary_text ("File opened, loaded grib")
 					edialog.run ()
-					edialog.destroy ()	
-					self.statusbar.push (self.statusbar.get_context_id ('Info'), f'Loaded grib {filepath}')		
+					edialog.destroy ()
+					self.statusbar.push (self.statusbar.get_context_id ('Info'), f'Loaded grib {filepath}')
 
 				else:
 					edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.CANCEL, "Error")

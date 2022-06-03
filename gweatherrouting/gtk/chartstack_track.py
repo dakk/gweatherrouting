@@ -24,8 +24,6 @@ except:
 
 from gi.repository import Gtk
 
-from .maplayers import GeoMapLayer
-
 class ChartStackTrack:
 	selectedTrackItem = None
 
@@ -40,7 +38,7 @@ class ChartStackTrack:
 			self.trackListStore.clear()
 			for x in self.core.trackManager:
 				if x.name == 'log':
-					continue 
+					continue
 				self.trackListStore.append([x.name, len(x), x.length(), x.visible])
 
 		self.trackStore.clear ()
@@ -74,7 +72,8 @@ class ChartStackTrack:
 
 			if self.core.trackManager.getActive().export (filepath):
 				# self.builder.get_object('header-bar').set_subtitle (filepath)
-				self.statusbar.push (self.statusbar.get_context_id ('Info'), f'Saved {len (self.core.trackManager.getActive())} waypoints')
+				self.statusbar.push (self.statusbar.get_context_id ('Info'),
+					f'Saved {len (self.core.trackManager.getActive())} waypoints')
 				edialog = Gtk.MessageDialog (self.parent, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Saved")
 				edialog.format_secondary_text (f'Saved {len (self.core.trackManager.getActive())} waypoints')
 				edialog.run ()
