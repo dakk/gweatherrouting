@@ -17,6 +17,7 @@ import logging
 import os
 import gi
 
+
 gi.require_version('Gtk', '3.0')
 try:
 	gi.require_version('OsmGpsMap', '1.2')
@@ -26,7 +27,7 @@ except:
 from gi.repository import Gtk, Gdk, OsmGpsMap #Keybinder
 
 from .gribmanagerwindow import GribFileFilter
-from .maplayers import GribMapLayer, AISMapLayer, ToolsMapLayer
+from .maplayers import GribMapLayer, AISMapLayer, ToolsMapLayer, GeoMapLayer
 
 from ..core import TimeControl
 from .chartstack_poi import ChartStackPOI
@@ -76,6 +77,10 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 
 		self.aisMapLayer = AISMapLayer (core)
 		self.map.layer_add (self.aisMapLayer)
+
+		self.geoMapLayer = GeoMapLayer(self.core.trackManager, self.core.routingManager, self.core.poiManager, self.timeControl)
+		self.map.layer_add (self.geoMapLayer)
+
 
 		# This causes rendering problem
 		# self.map.layer_add (OsmGpsMap.MapOsd (show_scale=True, show_dpad=False, show_zoom=False, show_crosshair=False))

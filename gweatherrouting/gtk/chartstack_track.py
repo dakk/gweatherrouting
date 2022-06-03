@@ -24,15 +24,12 @@ except:
 
 from gi.repository import Gtk
 
-from .maplayers import TrackMapLayer
+from .maplayers import GeoMapLayer
 
 class ChartStackTrack:
 	selectedTrackItem = None
 
 	def __init__(self):
-		self.trackMapLayer = TrackMapLayer(self.core.trackManager, self.core.routingManager, self.timeControl)
-		self.map.layer_add (self.trackMapLayer)
-
 		self.trackStore = self.builder.get_object("track-store")
 		self.trackListStore = self.builder.get_object("track-list-store")
 		self.updateTrack()
@@ -42,6 +39,8 @@ class ChartStackTrack:
 		if not onlyActive:
 			self.trackListStore.clear()
 			for x in self.core.trackManager:
+				if x.name == 'log':
+					continue 
 				self.trackListStore.append([x.name, len(x), x.length(), x.visible])
 
 		self.trackStore.clear ()

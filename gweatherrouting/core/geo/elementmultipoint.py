@@ -93,3 +93,7 @@ class ElementMultiPoint(Element):
 	def move(self, i, lat, lon):
 		self.points[i] = (lat, lon, None)
 		self.collection.save()
+
+	def clear(self):
+		self.points = []
+		self.collection.save()

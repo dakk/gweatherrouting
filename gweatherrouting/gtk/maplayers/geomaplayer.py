@@ -28,11 +28,12 @@ from ...core import utils
 from ..style import *
 
 
-class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
-	def __init__ (self, trackManager, routingManager, timeControl):
+class GeoMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
+	def __init__ (self, trackManager, routingManager, poiManager, timeControl):
 		GObject.GObject.__init__ (self)
 		self.trackManager = trackManager
 		self.routingManager = routingManager
+		self.poiManager = poiManager
 		self.timeControl = timeControl
 		self.hlRouting = None
 
@@ -88,7 +89,7 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 					cr.stroke()
 
 				# Draw boat
-				if prevp is not None:    
+				if prevp is not None:
 					tprev = dateutil.parser.parse(prevp[2])
 					tcurr = dateutil.parser.parse(p[2])
 
@@ -101,7 +102,7 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 						Style.Track.RoutingBoat.apply(cr)
 						xx, yy = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (rp[0], rp[1]))
 						cr.arc(xx, yy, 7, 0, 2 * math.pi)
-						cr.fill()  
+						cr.fill()
 
 				if prevx is not None and prevy is not None:
 					if highlight:
@@ -181,6 +182,38 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 				prevx = x
 				prevy = y
 
+
+		for tr in self.poiManager:
+			if not tr.visible:
+				continue
+
+			x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (tr.position[0], tr.position[1]))
+
+			Style.Poi.Quad.apply(cr)
+			cr.rectangle(x+3, y-5, len(tr.name) * 6.7, 12)
+			cr.stroke_preserve()
+			Style.Poi.QuadInt.apply(cr)
+			cr.fill()
+
+			Style.Poi.Font.apply(cr)
+			cr.move_to(x+5, y+5)
+			cr.show_text(tr.name)
+			cr.stroke()
+
+
+			Style.Poi.Dot.apply(cr)
+			cr.arc(x, y, 2, 0, 2 * math.pi)
+			cr.fill()
+
+			# Triangle
+			# cr.move_to(x-5, y-5)
+			# cr.line_to(x,y+5)
+			# cr.move_to(x+5, y-5)
+			# cr.line_to(x,y+5)
+			# cr.move_to(x-5, y-5)
+			# cr.line_to(x+5,y-5)
+			# cr.stroke()
+
 	def do_render (self, gpsmap):
 		pass
 
@@ -190,4 +223,4 @@ class TrackMapLayer (GObject.GObject, OsmGpsMap.MapLayer):
 	def do_button_press (self, gpsmap, gdkeventbutton):
 		return False
 
-GObject.type_register (TrackMapLayer)
+GObject.type_register (GeoMapLayer)

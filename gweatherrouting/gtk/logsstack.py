@@ -32,7 +32,7 @@ except:
 from gi.repository import Gtk, Gdk
 from ..core.timecontrol import TimeControl
 from .maplayers.toolsmaplayer import ToolsMapLayer
-from .maplayers.trackmaplayer import TrackMapLayer
+from .maplayers.geomaplayer import GeoMapLayer
 from .widgets.timetravel import TimeTravelWidget
 
 logger = logging.getLogger ('gweatherrouting')
@@ -90,8 +90,8 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 		self.timeControl.connect('time-change', self.onTimeChange)
 		self.builder.get_object("timetravelcontainer").pack_start(self.timetravelWidget, True, True, 0)
 
-		self.trackMapLayer = TrackMapLayer(self.core.trackManager, self.core.routingManager, self.timeControl)
-		self.map.layer_add (self.trackMapLayer)
+		self.geoMapLayer = GeoMapLayer(self.core.trackManager, self.core.routingManager, self.core.poiManager, self.timeControl)
+		self.map.layer_add (self.geoMapLayer)
 
 		self.show_all()
 

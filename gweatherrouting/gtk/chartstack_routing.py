@@ -217,7 +217,7 @@ class ChartStackRouting:
 		for path in pathlist:
 			tree_iter = store.get_iter(path)
 			value = store.get_value(tree_iter, 0)
-			self.trackMapLayer.hightlightRouting(value)
+			self.geoMapLayer.hightlightRouting(value)
 
 			self.map.queue_draw()
 

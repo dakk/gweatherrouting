@@ -31,9 +31,6 @@ class ChartStackPOI:
 	selectedPOI = None
 
 	def __init__(self):
-		self.poiMapLayer = POIMapLayer(self.core.poiManager)
-		self.map.layer_add (self.poiMapLayer)
-
 		self.poiStore = self.builder.get_object("poi-store")
 		self.updatePOI()
 

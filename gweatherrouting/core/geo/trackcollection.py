@@ -23,6 +23,10 @@ class _TrackCollection (CollectionWithActiveElement, Generic[T]):
 	def __init__(self):
 		super().__init__(Track, 'track')
 
+		if not self.exists('log'):
+			e = self.newElement()
+			e.name = 'log'
+
 
 	def importFromGPX(self, gpx):
 		for track in gpx.tracks:

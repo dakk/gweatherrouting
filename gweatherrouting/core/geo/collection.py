@@ -67,6 +67,7 @@ class Collection(Generic[T]):
 
 		for x in j['elements']:
 			e = self.of.fromJSON(x)
+			e.collection = self
 			self.append(e)
 
 	def getUniqueName(self, baseName = None):
@@ -102,6 +103,12 @@ class Collection(Generic[T]):
 			if x.name == n:
 				return x
 		return None
+
+	def exists(self, n):
+		for x in self.elements:
+			if x.name == n:
+				return True
+		return False
 
 	def toGPXObject(self):
 		gpx = gpxpy.gpx.GPX()
