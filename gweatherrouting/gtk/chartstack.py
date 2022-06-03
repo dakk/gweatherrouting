@@ -132,6 +132,13 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 		self.gribMapLayer.setVisible(widget.get_active())
 		self.map.queue_draw()
 
+	def onToggleConnections(self, widget):
+		s = widget.get_active()
+		if s:
+			self.core.connectionManager.startPolling()
+		else:
+			self.core.connectionManager.stopPolling()
+
 	def onToggleAIS(self, widget):
 		self.aisMapLayer.setVisible(widget.get_active())
 		self.map.queue_draw()

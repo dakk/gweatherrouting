@@ -134,5 +134,6 @@ class ConnectionManager(EventDispatcher):
 
 	def startPolling(self):
 		logger.info ('Polling started')
+		self.running = True
 		self.thread = Thread(target=self.pollLoop, args=(True, ))
 		self.thread.start()
