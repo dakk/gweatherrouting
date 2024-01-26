@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017-2022 Davide Gessa
+# Copyright (C) 2017-2024 Davide Gessa
 # Copyright (C) 2012 Riccardo Apolloni
 """
 This program is free software: you can redistribute it and/or modify
