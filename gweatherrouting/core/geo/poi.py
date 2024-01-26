@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) 2017-2022 Davide Gessa
-'''
+"""
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
@@ -12,9 +12,11 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
-'''
+"""
 from typing import Tuple
+
 import gpxpy
+
 from .elementpoint import ElementPoint
 
 # FURUNO PFEC NMEA https://www.manualsdir.com/manuals/100982/furuno-gp-1650.html?page=66
@@ -44,41 +46,52 @@ from .elementpoint import ElementPoint
 # $PFEC,GPwpl,4012.32,N,958.18,E,WP0000,3,@q00:53 25MAR22,A,,,,
 # $PFEC,GPwpl,3912.32,N,1918.18,E,WP0001,3,@q00:55 25MAR22,A,,,,
 
+
 class POI(ElementPoint):
-	def __init__(self, name, position: Tuple[float, float], symbol = None, visible = True, collection = None):
-		super().__init__(name, position, visible, collection)
-		self.symbol = None
+    def __init__(
+        self,
+        name,
+        position: Tuple[float, float],
+        symbol=None,
+        visible=True,
+        collection=None,
+    ):
+        super().__init__(name, position, visible, collection)
+        self.symbol = None
 
-	def toJSON(self):
-		c = super().toJSON()
-		c['symbol'] = self.symbol
-		return c
+    def toJSON(self):
+        c = super().toJSON()
+        c["symbol"] = self.symbol
+        return c
 
-	@staticmethod
-	def fromJSON(j):
-		d = ElementPoint.fromJSON(j)
-		return POI(d.name, d.position, j['symbol'], d.visible)
+    @staticmethod
+    def fromJSON(j):
+        d = ElementPoint.fromJSON(j)
+        return POI(d.name, d.position, j["symbol"], d.visible)
 
-	def toGPXObject(self):
-		# TODO: add symbol , sym=self.symb
-		return gpxpy.gpx.GPXWaypoint(latitude=self.position[0], longitude=self.position[1], name=self.name)
+    def toGPXObject(self):
+        # TODO: add symbol , sym=self.symb
+        return gpxpy.gpx.GPXWaypoint(
+            latitude=self.position[0], longitude=self.position[1], name=self.name
+        )
 
-	def toNMEAPFEC(self):
-		""" Export POI as PFEC NMEA sentence """
-		# convert coordinate from signed degree to dddmm.mmmm
-		def formatCoordinate(v):
-			d = (v - int(v)) * 60
-			return '{:d}{}'.format(int(v),'%05.2f' % d)
+    def toNMEAPFEC(self):
+        """Export POI as PFEC NMEA sentence"""
 
-		lat = formatCoordinate(self.position[0])
-		latns = 'N' if self.position[0] >= 0 else 'S'
+        # convert coordinate from signed degree to dddmm.mmmm
+        def formatCoordinate(v):
+            d = (v - int(v)) * 60
+            return "{:d}{}".format(int(v), "%05.2f" % d)
 
-		lon = formatCoordinate(self.position[1])
-		lonew = 'E' if self.position[1] >= 0 else 'W'
+        lat = formatCoordinate(self.position[0])
+        latns = "N" if self.position[0] >= 0 else "S"
 
-		name = self.name.ljust(6)[:6]
+        lon = formatCoordinate(self.position[1])
+        lonew = "E" if self.position[1] >= 0 else "W"
 
-		# TODO: handle symbol
-		# q: circle; x: anchor
+        name = self.name.ljust(6)[:6]
 
-		return f'$PFEC,GPwpl,{lat},{latns},{lon},{lonew},{name},3,@q00:00 00AAA00,A,,,,'
+        # TODO: handle symbol
+        # q: circle; x: anchor
+
+        return f"$PFEC,GPwpl,{lat},{latns},{lon},{lonew},{name},3,@q00:00 00AAA00,A,,,,"

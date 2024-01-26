@@ -1,6 +1,6 @@
 # GWeatherRouting
 
-[![Build Status](https://travis-ci.com/dakk/gweatherrouting.svg?branch=master)](https://travis-ci.com/dakk/gweatherrouting.svg?branch=master)
+![CI Status](https://github.com/dakk/gweatherrouting/actions/workflows/ci.yaml/badge.svg)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 <!-- [![PyPI version](https://badge.fury.io/py/gweatherrouting.svg)](https://badge.fury.io/py/gweatherrouting) -->
 
@@ -52,7 +52,7 @@ First, install the following dependencies using your OS package manager:
 - python3-pip
 
 Then checkout the repository and run:
-```sudo python3 setup.py install```
+```python setup.py install```
 
 Start the software running:
 ```gweatherrouting```

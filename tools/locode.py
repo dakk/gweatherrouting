@@ -125,7 +125,7 @@
 # 		results = results
 # 			.map(parseLocData)
 # 			.filter(l => l.functions.indexOf(1) != -1)	// Get only locs with port
-# 			.filter(l => l.locode != null) // Get only locs with valid 
+# 			.filter(l => l.locode != null) // Get only locs with valid
 # 			.filter(l => l.latitude != null && l.longitude != null); // Get only valid position ports
 
 # 		return results;

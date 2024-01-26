@@ -1,0 +1,69 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        pip install tox
+        pip install -r requirements.txt
+
+    - name: Run tests
+      run: pip install .
+
+  linters:
+    runs-on: ubuntu-latest
+    container:
+      image: cimg/python:3.8
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: pip install tox
+
+    - name: Run linters
+      run: tox -e linters
+
+
+  typecheck:
+    runs-on: ubuntu-latest
+    container:
+      image: cimg/python:3.8
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: pip install tox
+
+    - name: Run typecheck
+      run: tox -e typecheck

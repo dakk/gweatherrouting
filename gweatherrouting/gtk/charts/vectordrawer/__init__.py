@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) 2017-2022 Davide Gessa
-'''
+"""
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
@@ -12,9 +12,10 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
-'''
-from .simplechartdrawer import SimpleChartDrawer
-from .s57chartdrawer import S57ChartDrawer
-from .s57symbolprovider import S57SymbolProvider
-from .cm93chartdrawer import CM93ChartDrawer
-from .osmchartdrawer import OSMChartDrawer
+"""
+# isort:skip_file
+from .cm93chartdrawer import CM93ChartDrawer  # noqa: F401
+from .osmchartdrawer import OSMChartDrawer  # noqa: F401
+from .s57chartdrawer import S57ChartDrawer  # noqa: F401
+from .s57symbolprovider import S57SymbolProvider  # noqa: F401
+from .simplechartdrawer import SimpleChartDrawer  # noqa: F401

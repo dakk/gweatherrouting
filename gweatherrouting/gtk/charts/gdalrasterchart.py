@@ -13,37 +13,40 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+# flake8: noqa: E402
 
 import logging
-import time
 import multiprocessing
+import time
 from os import listdir
 from os.path import isfile, join
-from threading import Thread, Lock
+from threading import Lock, Thread
 
-import gi
 import cairo
+import gi
 import numpy as np
-from osgeo import  osr, gdal
+from osgeo import gdal, osr
 
 gi.require_version("Gtk", "3.0")
 try:
-	gi.require_version('OsmGpsMap', '1.2')
+    gi.require_version("OsmGpsMap", "1.2")
 except:
-	gi.require_version('OsmGpsMap', '1.0')
+    gi.require_version("OsmGpsMap", "1.0")
 
-from gi.repository import OsmGpsMap, Gdk
+from gi.repository import Gdk, OsmGpsMap
+
 from .chartlayer import ChartLayer
 
-logger = logging.getLogger ('gweatherrouting')
+logger = logging.getLogger("gweatherrouting")
 
 # https://gdal.org/tutorials/raster_api_tut.html
 
-def datasetBBox(dataset):
-	old_cs = osr.SpatialReference()
-	old_cs.ImportFromWkt(dataset.GetProjectionRef())
 
-	wgs84_wkt = """
+def datasetBBox(dataset):
+    old_cs = osr.SpatialReference()
+    old_cs.ImportFromWkt(dataset.GetProjectionRef())
+
+    wgs84_wkt = """
 	GEOGCS["WGS 84",
 		DATUM["WGS_1984",
 			SPHEROID["WGS 84",6378137,298.257223563,
@@ -54,260 +57,297 @@ def datasetBBox(dataset):
 		UNIT["degree",0.01745329251994328,
 			AUTHORITY["EPSG","9122"]],
 		AUTHORITY["EPSG","4326"]]"""
-	new_cs = osr.SpatialReference()
-	new_cs .ImportFromWkt(wgs84_wkt)
+    new_cs = osr.SpatialReference()
+    new_cs.ImportFromWkt(wgs84_wkt)
 
-	transform = osr.CoordinateTransformation(old_cs,new_cs)
+    transform = osr.CoordinateTransformation(old_cs, new_cs)
 
-	width = dataset.RasterXSize
-	height = dataset.RasterYSize
-	gt = dataset.GetGeoTransform()
-	minx = gt[0]
-	miny = gt[3]
+    width = dataset.RasterXSize
+    height = dataset.RasterYSize
+    gt = dataset.GetGeoTransform()
+    minx = gt[0]
+    miny = gt[3]
 
-	origin = transform.TransformPoint(minx,miny)
+    origin = transform.TransformPoint(minx, miny)
 
-	minx = gt[0] + width*gt[1] + height*gt[2]
-	miny = gt[3] + width*gt[4] + height*gt[5]
+    minx = gt[0] + width * gt[1] + height * gt[2]
+    miny = gt[3] + width * gt[4] + height * gt[5]
 
-	originbr = transform.TransformPoint(minx,miny)
+    originbr = transform.TransformPoint(minx, miny)
 
-	return [origin, originbr]
+    return [origin, originbr]
+
 
 class GDALSingleRasterChart:
-	@staticmethod
-	def getFileInfo(path):
-		dataset = gdal.Open(path, gdal.GA_ReadOnly)
+    @staticmethod
+    def getFileInfo(path):
+        dataset = gdal.Open(path, gdal.GA_ReadOnly)
 
-		if not dataset:
-			raise Exception (f"Unable to open raster chart {path}")
+        if not dataset:
+            raise Exception(f"Unable to open raster chart {path}")
 
-		bbox = datasetBBox(dataset)
+        bbox = datasetBBox(dataset)
 
-		return (path, bbox, dataset.RasterXSize, dataset.RasterYSize)
+        return (path, bbox, dataset.RasterXSize, dataset.RasterYSize)
 
+    def __init__(self, path):
+        dataset = gdal.Open(path, gdal.GA_ReadOnly)
 
-	def __init__(self, path):
-		dataset = gdal.Open(path, gdal.GA_ReadOnly)
+        if not dataset:
+            raise Exception(f"Unable to open raster chart {path}")
 
-		if not dataset:
-			raise Exception (f"Unable to open raster chart {path}")
+        # print("Driver: {}/{}".format(dataset.GetDriver().ShortName,
+        # 					dataset.GetDriver().LongName))
+        # print("Size is {} x {} x {}".format(dataset.RasterXSize,
+        # 									dataset.RasterYSize,
+        # 									dataset.RasterCount))
+        geotransform = dataset.GetGeoTransform()
 
-		# print("Driver: {}/{}".format(dataset.GetDriver().ShortName,
-		# 					dataset.GetDriver().LongName))
-		# print("Size is {} x {} x {}".format(dataset.RasterXSize,
-		# 									dataset.RasterYSize,
-		# 									dataset.RasterCount))
-		geotransform = dataset.GetGeoTransform()
+        self.geotransform = geotransform
+        self.dataset = dataset
+        self.bbox = datasetBBox(dataset)
 
-		self.geotransform = geotransform
-		self.dataset = dataset
-		self.bbox = datasetBBox(dataset)
+        def worker(i, return_dict):
+            return_dict["surface"] = self.bandToSurface(i)
 
-		def worker(i, return_dict):
-			return_dict['surface'] = self.bandToSurface(i)
+        manager = multiprocessing.Manager()
+        return_dict = manager.dict()
+        p = multiprocessing.Process(target=worker, args=(1, return_dict))
+        p.start()
+        p.join()
+        surface, bandXSize, bandYSize = return_dict["surface"]
+        surf = cairo.ImageSurface.create_for_data(
+            surface,
+            cairo.Format.ARGB32,
+            bandXSize,
+            bandYSize,
+            cairo.Format.RGB24.stride_for_width(bandXSize),
+        )
+        self.surface = surf
 
-		manager = multiprocessing.Manager()
-		return_dict = manager.dict()
-		p = multiprocessing.Process(target=worker, args=(1, return_dict))
-		p.start()
-		p.join()
-		surface, bandXSize, bandYSize = return_dict['surface']
-		surf = cairo.ImageSurface.create_for_data(surface, cairo.Format.ARGB32, bandXSize,
-			bandYSize, cairo.Format.RGB24.stride_for_width(bandXSize))
-		self.surface = surf
+    def bandToSurface(self, i):
+        band = self.dataset.GetRasterBand(i)
 
-	def bandToSurface(self, i):
-		band = self.dataset.GetRasterBand(i)
+        mmin = band.GetMinimum()
+        mmax = band.GetMaximum()
+        if not mmin or not mmax:
+            (mmin, mmax) = band.ComputeRasterMinMax(True)
 
-		mmin = band.GetMinimum()
-		mmax = band.GetMaximum()
-		if not mmin or not mmax:
-			(mmin,mmax) = band.ComputeRasterMinMax(True)
+        colors = {0: 0x00000000}
+        ct = band.GetRasterColorTable()
 
-		colors = {0: 0x00000000}
-		ct = band.GetRasterColorTable()
+        for x in range(int(mmin), int(mmax) + 1):
+            try:
+                c = ct.GetColorEntry(x)
+                colors[x] = (c[3] << 24) | (c[2] << 16) | (c[1] << 8) | c[0]
+            except:
+                colors[x] = 0x00000000
 
-		for x in range(int(mmin), int(mmax) + 1):
-			try:
-				c = ct.GetColorEntry(x)
-				colors[x] = (c[3] << 24) | (c[2] << 16) | (c[1] << 8) | c[0]
-			except:
-				colors[x] = 0x00000000
+        data = np.vectorize(lambda x: colors[x], otypes=[np.int32])(band.ReadAsArray())
+        return data, band.XSize, band.YSize
 
-		data = np.vectorize(lambda x: colors[x], otypes=[np.int32])(band.ReadAsArray())
-		return data, band.XSize, band.YSize
-
-
-	def do_draw(self, gpsmap, cr):
-		cr.save()
-		xx, yy = gpsmap.convert_geographic_to_screen(
-			OsmGpsMap.MapPoint.new_degrees(self.bbox[0][0], self.bbox[0][1])
-		)
-		xx2, yy2 = gpsmap.convert_geographic_to_screen(
-			OsmGpsMap.MapPoint.new_degrees(self.bbox[1][0], self.bbox[1][1])
-		)
-		scalingy = (yy2 - yy) / self.dataset.RasterYSize
-		scalingx = (xx2 - xx) / self.dataset.RasterXSize
-		cr.translate(xx, yy)
-		cr.scale(scalingx, scalingy)
-		cr.set_source_surface(self.surface, 0,0)
-		cr.paint()
-		cr.restore()
-
+    def do_draw(self, gpsmap, cr):
+        cr.save()
+        xx, yy = gpsmap.convert_geographic_to_screen(
+            OsmGpsMap.MapPoint.new_degrees(self.bbox[0][0], self.bbox[0][1])
+        )
+        xx2, yy2 = gpsmap.convert_geographic_to_screen(
+            OsmGpsMap.MapPoint.new_degrees(self.bbox[1][0], self.bbox[1][1])
+        )
+        scalingy = (yy2 - yy) / self.dataset.RasterYSize
+        scalingx = (xx2 - xx) / self.dataset.RasterXSize
+        cr.translate(xx, yy)
+        cr.scale(scalingx, scalingy)
+        cr.set_source_surface(self.surface, 0, 0)
+        cr.paint()
+        cr.restore()
 
 
 class GDALRasterChart(ChartLayer):
-	def __init__(self, path, settingsManager, metadata = None, enabled = True):
-		super().__init__(path, 'raster', settingsManager, metadata, enabled)
-		self.cached = {}
-		self.loadLock = Lock()
+    def __init__(self, path, settingsManager, metadata=None, enabled=True):
+        super().__init__(path, "raster", settingsManager, metadata, enabled)
+        self.cached = {}
+        self.loadLock = Lock()
 
-		if metadata:
-			self.onMetadataUpdate()
+        if metadata:
+            self.onMetadataUpdate()
 
+    def onMetadataUpdate(self):
+        pass
 
-	def onMetadataUpdate(self):
-		pass
+    def onRegister(self, onTickHandler=None):
+        self.metadata = []
 
-	def onRegister(self, onTickHandler = None):
-		self.metadata = []
+        files = [f for f in listdir(self.path) if isfile(join(self.path, f))]
+        i = 0
 
-		files = [f for f in listdir(self.path) if isfile(join(self.path, f))]
-		i = 0
+        for x in files:
+            finfo = GDALSingleRasterChart.getFileInfo(self.path + x)
+            self.metadata.append(finfo)
 
-		for x in files:
-			finfo = GDALSingleRasterChart.getFileInfo(self.path + x)
-			self.metadata.append(finfo)
+            i += 1
+            if onTickHandler:
+                onTickHandler(i / len(files))
 
-			i += 1
-			if onTickHandler:
-				onTickHandler(i/len(files))
+        self.onMetadataUpdate()
 
-		self.onMetadataUpdate()
+        if onTickHandler:
+            onTickHandler(1.0)
 
-		if onTickHandler:
-			onTickHandler(1.0)
+        return True
 
-		return True
+    lastRect = None
+    lastRasters = None
 
-	lastRect = None
-	lastRasters = None
+    def loadRaster(self, gpsmap, path):
+        with self.loadLock:
+            logger.debug("Loading raster file %s", path)
+            try:
+                s = time.time()
+                r = GDALSingleRasterChart(path)
+                self.cached[path] = r
+                logger.debug(
+                    "Done loading raster file %s in %ss",
+                    path.split("/")[-1],
+                    str(int((time.time() - s) * 10.0) / 10.0),
+                )
+            except:
+                logger.error("Error loading raster file %s", path.split("/")[-1])
+                return None
+            Gdk.threads_enter()
+            gpsmap.queue_draw()
+            Gdk.threads_leave()
+            self.lastRasters.append(r)
 
-	def loadRaster(self, gpsmap, path):
-		with self.loadLock:
-			logger.debug('Loading raster file %s', path)
-			try:
-				s = time.time()
-				r = GDALSingleRasterChart(path)
-				self.cached[path] = r
-				logger.debug('Done loading raster file %s in %ss', path.split('/')[-1], str(int((time.time() - s)* 10.)/10.))
-			except:
-				logger.error('Error loading raster file %s', path.split('/')[-1])
-				return None
-			Gdk.threads_enter()
-			gpsmap.queue_draw()
-			Gdk.threads_leave()
-			self.lastRasters.append(r)
+    def do_draw(self, gpsmap, cr):
+        p1, p2 = gpsmap.get_bbox()
+        p1lat, p1lon = p1.get_degrees()
+        p2lat, p2lon = p2.get_degrees()
 
-	def do_draw(self, gpsmap, cr):
-		p1, p2 = gpsmap.get_bbox()
-		p1lat, p1lon = p1.get_degrees()
-		p2lat, p2lon = p2.get_degrees()
+        # Check if bounds hasn't changed
+        if self.lastRasters and self.lastRect == [p1lat, p1lon, p2lat, p2lon]:
+            for x in self.lastRasters:
+                x.do_draw(gpsmap, cr)
+            return
 
-		# Check if bounds hasn't changed
-		if self.lastRasters and self.lastRect == [p1lat, p1lon, p2lat, p2lon]:
-			for x in self.lastRasters:
-				x.do_draw(gpsmap, cr)
-			return
+        # Estimate which raster is necessary given bound and zoom
+        minBLat = min(p1lat, p2lat)
+        maxBLat = max(p1lat, p2lat)
+        minBLon = min(p1lon, p2lon)
+        maxBLon = max(p1lon, p2lon)
 
-		# Estimate which raster is necessary given bound and zoom
-		minBLat = min(p1lat, p2lat)
-		maxBLat = max(p1lat, p2lat)
-		minBLon = min(p1lon, p2lon)
-		maxBLon = max(p1lon, p2lon)
+        toload = []
+        for x in self.metadata:
+            bb, path = x[1], x[0]  # sizeX, sizeY x[2], x[3]
 
-		toload = []
-		for x in self.metadata:
-			bb, path = x[1], x[0] #sizeX, sizeY x[2], x[3]
+            minRLat = min(bb[0][0], bb[1][0])
+            maxRLat = max(bb[0][0], bb[1][0])
+            minRLon = min(bb[0][1], bb[1][1])
+            maxRLon = max(bb[0][1], bb[1][1])
 
-			minRLat = min(bb[0][0], bb[1][0])
-			maxRLat = max(bb[0][0], bb[1][0])
-			minRLon = min(bb[0][1], bb[1][1])
-			maxRLon = max(bb[0][1], bb[1][1])
+            inside = (
+                minRLat > minBLat
+                and maxRLat < maxBLat
+                and minRLon > minBLon
+                and maxRLon < maxBLon
+            )
+            a = (
+                minRLat < minBLat
+                and maxRLat > maxBLat
+                and minRLon > minBLon
+                and minRLon < maxBLon
+            )
+            b = (
+                minRLat < minBLat
+                and maxRLat > maxBLat
+                and minRLon < minBLon
+                and maxRLon > minBLon
+            )
+            c = (
+                minRLat < minBLat
+                and maxRLat > minBLat
+                and minRLon < minBLon
+                and maxRLon > maxBLon
+            )
+            d = (
+                minRLat < maxBLat
+                and maxRLat > maxBLat
+                and minRLon < minBLon
+                and maxRLon > maxBLon
+            )
 
-			inside = minRLat > minBLat and maxRLat < maxBLat and minRLon > minBLon and maxRLon < maxBLon
-			a = minRLat < minBLat and maxRLat > maxBLat and minRLon > minBLon and minRLon < maxBLon
-			b = minRLat < minBLat and maxRLat > maxBLat and minRLon < minBLon and maxRLon > minBLon
-			c = minRLat < minBLat and maxRLat > minBLat and minRLon < minBLon and maxRLon > maxBLon
-			d = minRLat < maxBLat and maxRLat > maxBLat and minRLon < minBLon and maxRLon > maxBLon
+            area = (((maxRLat + 90) - (minRLat + 90))) * (
+                ((maxRLon + 180) - (minRLon + 180))
+            )
 
-			area = (((maxRLat + 90) - (minRLat + 90))) * (((maxRLon + 180) - (minRLon + 180)))
+            if a or b or c or d:
+                toload.append([path, bb, area, inside])
 
-			if a or b or c or d:
-				toload.append([path, bb, area, inside])
+        toload.sort(key=lambda x: x[2])
+        toload.reverse()
 
+        # Check which rasters are already loaded
+        rasters = []
 
-		toload.sort(key=lambda x: x[2])
-		toload.reverse()
+        for x in toload:
+            if x[0] in self.cached:
+                if self.cached[x[0]] != "loading":
+                    rasters.append(self.cached[x[0]])
+                continue
 
-		# Check which rasters are already loaded
-		rasters = []
+            self.cached[x[0]] = "loading"
 
-		for x in toload:
-			if x[0] in self.cached:
-				if self.cached[x[0]] != 'loading':
-					rasters.append(self.cached[x[0]])
-				continue
+            t = Thread(
+                target=self.loadRaster,
+                args=(
+                    gpsmap,
+                    x[0],
+                ),
+            )
+            t.daemon = True
+            t.start()
 
-			self.cached[x[0]] = 'loading'
+        # Save and render
+        self.lastRect = [p1lat, p1lon, p2lat, p2lon]
+        self.lastRasters = rasters
 
-			t = Thread(target=self.loadRaster, args=(gpsmap, x[0],))
-			t.daemon = True
-			t.start()
+        # print ('rendering',len(rasters))
+        for x in rasters:
+            x.do_draw(gpsmap, cr)
 
-		# Save and render
-		self.lastRect = [p1lat, p1lon, p2lat, p2lon]
-		self.lastRasters = rasters
+        for x in self.metadata:
+            # Disable bbox rendering
+            continue
 
-		# print ('rendering',len(rasters))
-		for x in rasters:
-			x.do_draw(gpsmap, cr)
+            # bb = x[1]
 
+            # minRLat = min(bb[0][0], bb[1][0])
+            # maxRLat = max(bb[0][0], bb[1][0])
+            # minRLon = min(bb[0][1], bb[1][1])
+            # maxRLon = max(bb[0][1], bb[1][1])
 
-		for x in self.metadata:
-			# Disable bbox rendering
-			continue
+            # xx, yy = gpsmap.convert_geographic_to_screen(
+            # 	OsmGpsMap.MapPoint.new_degrees(minRLat, minRLon)
+            # )
+            # xx2, yy2 = gpsmap.convert_geographic_to_screen(
+            # 	OsmGpsMap.MapPoint.new_degrees(maxRLat, maxRLon)
+            # )
 
-			# bb = x[1]
+            # cr.set_source_rgba(1,0,0,0.6)
+            # cr.set_line_width(0.3)
+            # cr.move_to(xx, yy)
+            # cr.line_to(xx, yy2)
+            # cr.line_to(xx2, yy2)
+            # cr.line_to(xx2, yy)
+            # cr.line_to(xx, yy)
 
-			# minRLat = min(bb[0][0], bb[1][0])
-			# maxRLat = max(bb[0][0], bb[1][0])
-			# minRLon = min(bb[0][1], bb[1][1])
-			# maxRLon = max(bb[0][1], bb[1][1])
+            # cr.stroke()
 
-			# xx, yy = gpsmap.convert_geographic_to_screen(
-			# 	OsmGpsMap.MapPoint.new_degrees(minRLat, minRLon)
-			# )
-			# xx2, yy2 = gpsmap.convert_geographic_to_screen(
-			# 	OsmGpsMap.MapPoint.new_degrees(maxRLat, maxRLon)
-			# )
+    def do_render(self, gpsmap):
+        pass
 
-			# cr.set_source_rgba(1,0,0,0.6)
-			# cr.set_line_width(0.3)
-			# cr.move_to(xx, yy)
-			# cr.line_to(xx, yy2)
-			# cr.line_to(xx2, yy2)
-			# cr.line_to(xx2, yy)
-			# cr.line_to(xx, yy)
+    def do_busy(self):
+        return False
 
-			# cr.stroke()
-
-	def do_render(self, gpsmap):
-		pass
-
-	def do_busy(self):
-		return False
-
-	def do_button_press(self, gpsmap, gdkeventbutton):
-		return False
+    def do_button_press(self, gpsmap, gdkeventbutton):
+        return False

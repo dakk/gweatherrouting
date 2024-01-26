@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) 2017-2022 Davide Gessa
-'''
+"""
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
@@ -12,49 +12,47 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
-'''
+"""
 import gpxpy
 
+
 class Element:
-	def __init__(self, name = 'any', visible = True, collection = None):
-		self.name = name
-		self.visible = visible
-		self.collection = collection
+    def __init__(self, name="any", visible=True, collection=None):
+        self.name = name
+        self.visible = visible
+        self.collection = collection
 
-	def toGPXObject(self):
-		raise Exception("Not implemented")
+    def toGPXObject(self):
+        raise Exception("Not implemented")
 
-	def toJSON(self):
-		return {
-			'name': self.name,
-			'visible': self.visible
-		}
+    def toJSON(self):
+        return {"name": self.name, "visible": self.visible}
 
-	@staticmethod
-	def fromJSON(j):
-		return Element(name = j['name'], visible = j['visible'])
+    @staticmethod
+    def fromJSON(j):
+        return Element(name=j["name"], visible=j["visible"])
 
-	def export(self, dest, format = 'gpx'):
-		if format == 'gpx':
-			gpx = gpxpy.gpx.GPX()
+    def export(self, dest, format="gpx"):
+        if format == "gpx":
+            gpx = gpxpy.gpx.GPX()
 
-			ob = self.toGPXObject()
-			if isinstance(ob, gpxpy.gpx.GPXTrack):
-				gpx.tracks.append(ob)
-			elif isinstance(ob, gpxpy.gpx.GPXRoute):
-				gpx.routes.append(ob)
-			elif isinstance(ob, gpxpy.gpx.GPXWaypoint):
-				gpx.waypoints.append(ob)
+            ob = self.toGPXObject()
+            if isinstance(ob, gpxpy.gpx.GPXTrack):
+                gpx.tracks.append(ob)
+            elif isinstance(ob, gpxpy.gpx.GPXRoute):
+                gpx.routes.append(ob)
+            elif isinstance(ob, gpxpy.gpx.GPXWaypoint):
+                gpx.waypoints.append(ob)
 
-			try:
-				f = open(dest, "w")
-				f.write(gpx.to_xml())
-				f.close()
-				return True
-			except Exception as e:
-				print (str(e))
+            try:
+                f = open(dest, "w")
+                f.write(gpx.to_xml())
+                f.close()
+                return True
+            except Exception as e:
+                print(str(e))
 
-		return False
+        return False
 
-	def __len__(self):
-		return 0
+    def __len__(self):
+        return 0

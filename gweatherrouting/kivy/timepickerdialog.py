@@ -13,14 +13,10 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-from kivy.properties import BooleanProperty, ObjectProperty
-from kivymd.uix.screen import MDScreen
-from kivymd.uix.list import IRightBodyTouch, TwoLineIconListItem
-from kivymd.uix.selectioncontrol import MDCheckbox
 from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDFlatButton, MDRaisedButton
-from kivymd.uix.picker import MDTimePicker, MDDatePicker
+from kivymd.uix.dialog import MDDialog
+from kivymd.uix.picker import MDDatePicker, MDTimePicker
 
 
 class TimePickerDialogContent(MDBoxLayout):
@@ -33,7 +29,9 @@ class TimePickerDialogContent(MDBoxLayout):
         self.ids.timeLabel.text = self.datetime.strftime("%H:%M")
 
     def onDateSave(self, instance, date, date_range):
-        self.datetime = self.datetime.replace(year=date.year, month=date.month, day=date.day)
+        self.datetime = self.datetime.replace(
+            year=date.year, month=date.month, day=date.day
+        )
         self.ids.dateLabel.text = self.datetime.strftime("%d/%m/%Y")
 
     def openTimePicker(self):
@@ -43,12 +41,15 @@ class TimePickerDialogContent(MDBoxLayout):
         time_dialog.open()
 
     def openDatePicker(self):
-        date_dialog = MDDatePicker(year=self.datetime.year, month=self.datetime.month, day=self.datetime.day)
+        date_dialog = MDDatePicker(
+            year=self.datetime.year, month=self.datetime.month, day=self.datetime.day
+        )
         date_dialog.bind(on_save=self.onDateSave)
         date_dialog.open()
 
     def getResult(self):
         return self.datetime
+
 
 class TimePickerDialog(MDDialog):
     def __init__(self, datetime):
@@ -57,7 +58,7 @@ class TimePickerDialog(MDDialog):
         super().__init__(
             title="Set Date and Time",
             type="custom",
-            content_cls= self.pickerContent,
+            content_cls=self.pickerContent,
             buttons=[
                 MDFlatButton(
                     text="CANCEL",

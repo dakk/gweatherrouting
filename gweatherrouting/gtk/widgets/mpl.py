@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (C) 2017-2022 Davide Gessa
-'''
+"""
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
@@ -12,51 +12,57 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
-'''
+"""
+# flake8: noqa: E402
 import io
+
 import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+
+gi.require_version("Gtk", "3.0")
 import cairo
 import numpy
 import PIL
+from gi.repository import Gtk
+
 
 class MPLWidget(Gtk.DrawingArea):
-	def __init__(self, parent):
-		self.par = parent
-		super(MPLWidget, self).__init__()
+    def __init__(self, parent):
+        self.par = parent
+        super(MPLWidget, self).__init__()
 
-		# self.set_size_request(-1, 30)
-		self.connect("draw", self.draw)
+        # self.set_size_request(-1, 30)
+        self.connect("draw", self.draw)
 
-	def plotDrawer(self, w, h, plt, s):
-		return None
+    def plotDrawer(self, w, h, plt, s):
+        return None
 
-	def draw(self, area, ctx):
-		a = self.get_allocation()
+    def draw(self, area, ctx):
+        a = self.get_allocation()
 
-		import matplotlib.pyplot as plt
+        import matplotlib.pyplot as plt
 
-		plt.style.use('dark_background')
-		plt.rcParams.update({'font.size': 8})
+        plt.style.use("dark_background")
+        plt.rcParams.update({"font.size": 8})
 
-		fig = self.plotDrawer(a.width, a.height, plt, self)
+        fig = self.plotDrawer(a.width, a.height, plt, self)
 
-		plt.tight_layout()
-		buf = io.BytesIO()
-		plt.savefig(buf, dpi=100)
-		buf.seek(0)
-		buf2= PIL.Image.open(buf)
+        plt.tight_layout()
+        buf = io.BytesIO()
+        plt.savefig(buf, dpi=100)
+        buf.seek(0)
+        buf2 = PIL.Image.open(buf)
 
-		arr = numpy.array(buf2)
-		height, width, channels = arr.shape
-		surface = cairo.ImageSurface.create_for_data(arr, cairo.FORMAT_RGB24, width, height)
+        arr = numpy.array(buf2)
+        height, width, channels = arr.shape
+        surface = cairo.ImageSurface.create_for_data(
+            arr, cairo.FORMAT_RGB24, width, height
+        )
 
-		ctx.save()
-		ctx.set_source_surface (surface, 0, 0)
-		ctx.paint()
-		ctx.restore()
+        ctx.save()
+        ctx.set_source_surface(surface, 0, 0)
+        ctx.paint()
+        ctx.restore()
 
-		if fig:
-			fig.clf()
-			plt.close(fig)
+        if fig:
+            fig.clf()
+            plt.close(fig)
