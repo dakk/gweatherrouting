@@ -20,6 +20,7 @@ import os
 import json
 import latlon
 from geojson_utils import point_in_polygon
+from typing import Dict, Callable
 
 try:
     from .storage import *  # noqa: F401, F403
@@ -181,7 +182,7 @@ class DictCache(dict):
 
 
 class EventDispatcher:
-    handlers = {}
+    handlers: Dict[str, Callable] = {}
 
     def connect(self, evt, f):
         if evt not in self.handlers:
@@ -199,9 +200,10 @@ class EventDispatcher:
             x(e)
 
 
+
 class dotdict(dict):
     """dot.notation access to dictionary attributes"""
 
-    __getattr__ = dict.get
-    __setattr__ = dict.__setitem__
-    __delattr__ = dict.__delitem__
+    __getattr__ = dict.get # type: ignore
+    __setattr__ = dict.__setitem__ # type: ignore
+    __delattr__ = dict.__delitem__ # type: ignore
