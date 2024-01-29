@@ -12,8 +12,8 @@ for x in os.walk("../gtk"):
 
 icons = []
 
-for x in gladeFiles:
-    f = open(x, "r")
+for g_file in gladeFiles:
+    f = open(g_file, "r")
     data = f.read()
     f.close()
 
@@ -21,18 +21,18 @@ for x in gladeFiles:
     strings = []
 
     dataIName = data.split('<property name="icon-name">')[1:]
-    for x in dataIName:
-        if x.find("</property>") == -1:
+    for iprop in dataIName:
+        if iprop.find("</property>") == -1:
             continue
 
-        strings += [x.split("</property>")[0]]
+        strings += [iprop.split("</property>")[0]]
 
     dataStock = data.split('<property name="icon-name">')[1:]
-    for x in dataStock:
-        if x.find("</property>") == -1:
+    for data in dataStock:
+        if data.find("</property>") == -1:
             continue
 
-        strings += [x.split("</property>")[0]]
+        strings += [data.split("</property>")[0]]
 
     for y in strings:
         if y in icons:
@@ -50,10 +50,10 @@ def findIcon(x):
                 return os.path.join(y[0], z)
 
 
-for x in icons:
-    l_icn = findIcon(x + ".svg")
+for icn in icons:
+    l_icn = findIcon(icn + ".svg")
     if not l_icn:
-        print("NOTFOUND:", x)
+        print("NOTFOUND:", icn)
         continue
 
     # copy l to ../data/icons/
