@@ -46,5 +46,6 @@ stream = logging.StreamHandler()
 stream.setFormatter(formatter)
 
 logger = logging.getLogger("gweatherrouting")
+logger.propagate = False
 logger.addHandler(stream)
 logger.setLevel(10)
