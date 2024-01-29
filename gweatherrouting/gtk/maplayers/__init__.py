@@ -17,6 +17,5 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 from .gribmaplayer import GribMapLayer  # noqa: F401
 from .isochronesmaplayer import IsochronesMapLayer  # noqa: F401
 from .geomaplayer import GeoMapLayer  # noqa: F401
-from .poimaplayer import POIMapLayer  # noqa: F401
 from .aismaplayer import AISMapLayer  # noqa: F401
 from .toolsmaplayer import ToolsMapLayer  # noqa: F401

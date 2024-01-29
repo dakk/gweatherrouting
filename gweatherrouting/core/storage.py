@@ -21,7 +21,7 @@ import platform
 import sys
 from datetime import date, datetime
 
-from ... import log  # noqa: F401
+from .. import log  # noqa: F401
 
 logger = logging.getLogger("gweatherrouting")
 
