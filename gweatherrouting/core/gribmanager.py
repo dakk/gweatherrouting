@@ -8,7 +8,7 @@ import weatherrouting
 from .grib import Grib
 
 # try:
-from .utils.storage import GRIB_DIR, TEMP_DIR, Storage
+from .storage import GRIB_DIR, TEMP_DIR, Storage
 
 # except:
 # from .utils.dummy_storage import Storage
