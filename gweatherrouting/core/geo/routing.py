@@ -16,7 +16,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import gpxpy
 from weatherrouting import IsoPoint
 
-from . import Track
+from gweatherrouting.core.geo.track import Track
 
 
 class Routing(Track):

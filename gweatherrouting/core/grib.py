@@ -20,7 +20,7 @@ import math
 
 import weatherrouting
 
-from . import utils
+from gweatherrouting.core import utils
 
 logger = logging.getLogger("gweatherrouting")
 

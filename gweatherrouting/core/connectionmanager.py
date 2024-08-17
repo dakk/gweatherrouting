@@ -18,8 +18,8 @@ import logging
 import time
 from threading import Thread
 
-from . import NetworkDataSource, SerialDataSource
-from .utils import EventDispatcher, Storage
+from gweatherrouting.core import NetworkDataSource, SerialDataSource
+from gweatherrouting.core.utils import EventDispatcher, Storage
 
 logger = logging.getLogger("gweatherrouting")
 

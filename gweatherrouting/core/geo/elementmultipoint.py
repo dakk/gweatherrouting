@@ -13,8 +13,8 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-from .. import utils
-from .element import Element
+from gweatherrouting.core import utils
+from gweatherrouting.core.geo.element import Element
 
 
 class ElementMultiPoint(Element):

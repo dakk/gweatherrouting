@@ -19,11 +19,11 @@ import os
 import gpxpy
 import weatherrouting
 
-from . import GribManager, utils
-from .connectionmanager import ConnectionManager
-from .datasource import DataPacket
-from .geo import POICollection, RoutingCollection, TrackCollection
-from .utils import EventDispatcher
+from gweatherrouting.core import GribManager, utils
+from gweatherrouting.core.connectionmanager import ConnectionManager
+from gweatherrouting.core.datasource import DataPacket
+from gweatherrouting.core.geo import POICollection, RoutingCollection, TrackCollection
+from gweatherrouting.core.utils import EventDispatcher
 
 logger = logging.getLogger("gweatherrouting")
 

@@ -15,8 +15,8 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 import logging
 
-from . import log  # noqa: F401
-from .core import Core
+from gweatherrouting import log  # noqa: F401
+from gweatherrouting.core import Core
 
 logger = logging.getLogger("gweatherrouting")
 
@@ -33,11 +33,11 @@ def startUIGtk():
     gi.require_version("Gtk", "3.0")
     from gi.repository import Gtk
 
-    from .gtk.mainwindow import MainWindow
+    from gweatherrouting.gtk.mainwindow import MainWindow
 
     MainWindow(Core())
     Gtk.main()
 
 
-# if __name__ == "__main__":
-#     startUIKivy()
+if __name__ == "__main__":
+    startUIGtk()

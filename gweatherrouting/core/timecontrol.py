@@ -16,7 +16,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import datetime
 
-from .utils import EventDispatcher
+from gweatherrouting.core.utils import EventDispatcher
 
 
 class TimeControl(EventDispatcher):

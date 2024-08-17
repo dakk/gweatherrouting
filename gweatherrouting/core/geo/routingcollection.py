@@ -15,8 +15,8 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 from typing import Generic, TypeVar
 
-from . import Routing
-from .collection import CollectionWithActiveElement
+from gweatherrouting.core.geo.routing import Routing
+from gweatherrouting.core.geo.collection import CollectionWithActiveElement
 
 T = TypeVar("T", bound=Routing)
 
