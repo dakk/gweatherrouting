@@ -13,9 +13,10 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-from kivymd.uix.screen import MDScreen
+
+import unittest
 
 
-class RegattaScreen(MDScreen):
-    def on_pre_enter(self, *args):
-        pass
+class TestPlaceholder(unittest.TestCase):
+    def test_place_holder(self):
+        self.assertEqual(True, True)

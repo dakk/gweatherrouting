@@ -13,8 +13,8 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# isort:skip_file
-from .gribscreen import GribScreen  # noqa: F401
-from .trackscreen import TrackScreen  # noqa: F401
-from .settingsscreen import SettingsScreen  # noqa: F401
-from .regattascreen import RegattaScreen  # noqa: F401
+
+import unittest
+
+if __name__ == "__main__":
+    unittest.main()

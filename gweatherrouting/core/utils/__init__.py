@@ -22,11 +22,7 @@ import latlon
 from geojson_utils import point_in_polygon
 from typing import Dict, Callable
 
-# try:
 from gweatherrouting.core.storage import *  # noqa: F401, F403
-
-# except:
-#     from .dummy_storage import *  # noqa: F401, F403
 
 this_dir, this_fn = os.path.split(__file__)
 COUNTRIES = json.load(open(this_dir + "/../../data/countries.geojson", "r"))
