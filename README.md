@@ -46,7 +46,7 @@ GWeatherRouting is an opensource sailing route calculator written in python and:
 ## Installation
 
 1. Make sure to have Python >= 3.9 installed and the `pip` package manager.
-2. Install the following dependencies using your OS package manager (e.g: debian=apt, macos=homebrew, windows=chocolate). Be aware that some packages have different names with different package managers.
+2. Install the following dependencies using your OS package manager (e.g: debian=apt, macos=homebrew) Be aware that some packages have different names with different package managers.
    - gobject-introspection
    - gdal
    - gtk+3

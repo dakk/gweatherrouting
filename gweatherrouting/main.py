@@ -39,5 +39,8 @@ def startUIGtk():
     Gtk.main()
 
 
-if __name__ == "__main__":
-    startUIGtk()
+# if __name__ == "__main__":
+#     startUIKivy()
+
+# if __name__ == "__main__":
+#     startUIGtk()
