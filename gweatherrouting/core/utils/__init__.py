@@ -24,6 +24,7 @@ from typing import Dict, Callable
 
 # try:
 from gweatherrouting.core.storage import *  # noqa: F401, F403
+
 # except:
 #     from .dummy_storage import *  # noqa: F401, F403
 
@@ -200,10 +201,9 @@ class EventDispatcher:
             x(e)
 
 
-
 class dotdict(dict):
     """dot.notation access to dictionary attributes"""
 
-    __getattr__ = dict.get # type: ignore
-    __setattr__ = dict.__setitem__ # type: ignore
-    __delattr__ = dict.__delitem__ # type: ignore
+    __getattr__ = dict.get  # type: ignore
+    __setattr__ = dict.__setitem__  # type: ignore
+    __delattr__ = dict.__delitem__  # type: ignore

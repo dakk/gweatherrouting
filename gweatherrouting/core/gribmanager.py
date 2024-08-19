@@ -6,12 +6,10 @@ import requests
 import weatherrouting
 
 from gweatherrouting.core.grib import Grib
+from gweatherrouting.core.storage import GRIB_DIR, TEMP_DIR, Storage
 
-try:
-    from gweatherrouting.core.storage import GRIB_DIR, TEMP_DIR, Storage
-
-except:
-    from gweatherrouting.core.utils.dummy_storage import Storage
+# except:
+#     from gweatherrouting.core.utils.dummy_storage import Storage
 
 # from bs4 import BeautifulSoup
 

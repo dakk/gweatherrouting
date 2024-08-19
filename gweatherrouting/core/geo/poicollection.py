@@ -15,8 +15,8 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 from typing import Generic, Tuple, TypeVar
 
-from gweatherrouting.core.geo.poi import POI
 from gweatherrouting.core.geo.collection import Collection
+from gweatherrouting.core.geo.poi import POI
 
 T = TypeVar("T", bound=POI)
 
