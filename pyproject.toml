@@ -1,0 +1,119 @@
+[build-system]
+requires = ["setuptools>=42", "wheel", "tox>=4", "mypy", "flake8", "isort", "black[jupyter]"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gweatherrouting"
+version = "0.1.5"
+description = "Weather routing tool"
+authors = [
+    { name = "Davide Gessa", email = "gessadavide@gmail.com" }
+]
+license = { text = "GPL-3.0-or-later" }
+readme = "README.md"
+requires-python = ">=3.6"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "requests",
+    "colorlog",
+    "eccodes==1.6.1",
+    "geojson_utils",
+    "bs4",
+    "vext @ git+https://github.com/vext-python/vext@32ad4d1c5f45797e244df1d2816f76b60f28e20e",
+    "vext.gi",
+    "pyserial",
+    "pynmea2",
+    "gpxpy",
+    "numpy",
+    "nmeatoolkit",
+    "matplotlib",
+    "weatherrouting",
+    "GDAL==3.9.2"
+]
+scripts = { gweatherrouting = "gweatherrouting.main:startUIGtk" }
+
+[tool.setuptools]
+packages = ["gweatherrouting"]
+
+[tool.setuptools.package-data]
+"gweatherrouting" = [
+    "data/*",
+    "data/boats/*",
+    "data/polars/*",
+    "data/symbols/*",
+    "data/s57/*",
+    "data/icons/*",
+    "gtk/*.glade",
+    "gtk/settings/*.glade",
+    "gtk/widgets/*.glade",
+]
+
+[tool.tox]
+envlist = ["linters", "typecheck", "unit-tests"]
+
+[tool.tox.testenv]
+deps = []
+
+[tool.tox.testenv.unit-tests]
+deps = ["pytest", "parameterized"]
+commands = ["pytest"]
+
+[tool.tox.testenv.flake8]
+deps = ["flake8"]
+commands = ["flake8 ./gweatherrouting"]
+
+[tool.tox.testenv.isort]
+deps = ["isort"]
+commands = ["isort ."]
+
+[tool.tox.testenv.black]
+deps = ["black[jupyter]"]
+commands = ["black ."]
+
+[tool.tox.testenv.typecheck]
+deps = ["mypy", "types-setuptools", "types-requests", "types-python-dateutil"]
+commands = ["mypy ./gweatherrouting"]
+
+[tool.tox.testenv.linters]
+deps = ["isort", "black[jupyter]", "flake8"]
+commands = [
+    "isort .",
+    "black .",
+    "flake8 ./gweatherrouting"
+]
+
+[tool.flake8]
+ignore = [
+    "E722",
+    "E203",
+    "E231",
+    "W503",
+    "RST201",
+    "RST203",
+    "RST301"
+]
+max-line-length = 100
+max-complexity = 10
+exclude = [
+    "__pycache__",
+    ".tox",
+    ".git",
+    "bin",
+    "build",
+    "venv"
+]
+
+[tool.isort]
+line_length = 100
+multi_line_output = 3
+include_trailing_comma = true
+
+[tool.black]
+line-length = 100
+
+[tool.mypy]
+ignore_missing_imports = true
