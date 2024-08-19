@@ -52,6 +52,9 @@ jobs:
     - name: Run linters
       run: tox -e linters
 
+    - name: Run tests
+      run: tox -e unit-tests
+
 
   typecheck:
     runs-on: ubuntu-latest
