@@ -21,12 +21,6 @@ from gweatherrouting.core import Core
 logger = logging.getLogger("gweatherrouting")
 
 
-def startUIKivy():
-    from .kivy.app import GWeatherRoutingApp
-
-    GWeatherRoutingApp(Core()).run()
-
-
 def startUIGtk():
     import gi
 
@@ -39,8 +33,5 @@ def startUIGtk():
     Gtk.main()
 
 
-# if __name__ == "__main__":
-#     startUIKivy()
-
-# if __name__ == "__main__":
-#     startUIGtk()
+if __name__ == "__main__":
+    startUIGtk()

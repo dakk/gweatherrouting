@@ -39,8 +39,6 @@ setup(
         "gweatherrouting.core.utils",
         "gweatherrouting.core.geo",
         "gweatherrouting.common",
-        "gweatherrouting.kivy",
-        "gweatherrouting.kivy.maplayers",
         "gweatherrouting.gtk",
         "gweatherrouting.gtk.maplayers",
         "gweatherrouting.gtk.settings",
@@ -59,7 +57,6 @@ setup(
             "gtk/*.glade",
             "gtk/settings/*.glade",
             "gtk/widgets/*.glade",
-            "kivy/*.kv",
         ]
     },
     entry_points={
