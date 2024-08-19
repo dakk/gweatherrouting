@@ -23,7 +23,7 @@ from geojson_utils import point_in_polygon
 from typing import Dict, Callable
 
 # try:
-from .storage import *  # noqa: F401, F403
+from gweatherrouting.core.storage import *  # noqa: F401, F403
 # except:
 #     from .dummy_storage import *  # noqa: F401, F403
 

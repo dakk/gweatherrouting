@@ -16,7 +16,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import logging
 import socket
 
-from . import DataSource
+from gweatherrouting.core import DataSource
 
 logger = logging.getLogger("gweatherrouting")
 

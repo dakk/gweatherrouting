@@ -17,7 +17,7 @@ from typing import Tuple
 
 import gpxpy
 
-from .elementpoint import ElementPoint
+from gweatherrouting.core.geo.elementpoint import ElementPoint
 
 # FURUNO PFEC NMEA https://www.manualsdir.com/manuals/100982/furuno-gp-1650.html?page=66
 

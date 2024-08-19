@@ -17,9 +17,9 @@ from typing import Generic, TypeVar
 
 import gpxpy
 
-from ..utils import uniqueName
-from ..storage import Storage
-from .element import Element
+from gweatherrouting.core.utils import uniqueName
+from gweatherrouting.core.storage import Storage
+from gweatherrouting.core.geo.element import Element
 
 T = TypeVar("T", bound=Element)
 

@@ -15,7 +15,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 import gpxpy
 
-from .elementmultipoint import ElementMultiPoint
+from gweatherrouting.core.geo.elementmultipoint import ElementMultiPoint
 
 
 class Track(ElementMultiPoint):

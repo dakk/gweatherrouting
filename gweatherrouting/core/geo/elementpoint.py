@@ -15,7 +15,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 from typing import Tuple
 
-from .element import Element
+from gweatherrouting.core.geo.element import Element
 
 
 class ElementPoint(Element):

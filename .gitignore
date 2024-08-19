@@ -8,3 +8,4 @@ venv
 cache
 .buildozer
 bin
+.idea/*

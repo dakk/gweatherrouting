@@ -18,7 +18,7 @@ import logging
 import serial
 from serial.tools import list_ports
 
-from . import DataSource
+from gweatherrouting.core import DataSource
 
 logger = logging.getLogger("gweatherrouting")
 
