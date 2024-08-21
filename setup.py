@@ -26,7 +26,7 @@ if W32:
     buildOptions = {"build_exe": {"packages": ["gi"], "include_files": []}}
     executables = [Executable("main.py")]  #  icon="evm_bg_KYa_icon.ico")
 
-GDAL_VERSION = subprocess.check_output(['gdal-config', '--version']).strip()
+GDAL_VERSION = subprocess.check_output(['gdal-config', '--version']).decode('ascii').strip()
 
 requirements = open("requirements.txt", "r").read().split("\n")[:-1]
 requirements.append(f'GDAL=={GDAL_VERSION}')
