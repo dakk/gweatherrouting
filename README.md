@@ -59,11 +59,11 @@ GWeatherRouting is an opensource sailing route calculator written in python and:
 > [!NOTE]
 > Ubuntu uses an old version of GDAL and other libraries; in order to use a never version, use the following commands:
 > ```
->       sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
->       sudo apt-get update
->       sudo apt-get install gdal-bin libgdal-dev
->       sudo apt-get install libgtk-4-dev libgtk-4-1
->       pip install git+https://github.com/vext-python/vext@32ad4d1c5f45797e244df1d2816f76b60f28e20e
+> sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
+> sudo apt-get update
+> sudo apt-get install gdal-bin libgdal-dev
+> sudo apt-get install libgtk-4-dev libgtk-4-1
+> pip install git+https://github.com/vext-python/vext@32ad4d1c5f45797e244df1d2816f76b60f28e20e
 > ```
 
 > [!NOTE]  
