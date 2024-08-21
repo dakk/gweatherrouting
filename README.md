@@ -43,7 +43,7 @@ GWeatherRouting is an opensource sailing route calculator written in python and:
 
 ## Installation
 
-1. Make sure to have Python >= 3.9 installed and the `pip` package manager.
+1. Make sure to have Python >= 3.8 installed and the `pip` package manager.
 2. Install the following dependencies using your OS package manager (e.g: debian=apt, macos=homebrew) Be aware that some packages have different names with different package managers.
    - gobject-introspection
    - gdal
@@ -55,6 +55,16 @@ GWeatherRouting is an opensource sailing route calculator written in python and:
    - pygobject3
    - pkg-config
    - eccodes
+
+> [!NOTE]
+> Ubuntu uses an old version of GDAL and other libraries; in order to use a never version, use the following commands:
+> ```
+>       sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
+>       sudo apt-get update
+>       sudo apt-get install gdal-bin libgdal-dev
+>       sudo apt-get install libgtk-4-dev libgtk-4-1
+>       pip install git+https://github.com/vext-python/vext@32ad4d1c5f45797e244df1d2816f76b60f28e20e
+> ```
 
 > [!NOTE]  
 > If you are using a `virtualenv` you need to make symbolic links from the UI libraries to your `venv` folder (this is not needed using system interpreter outside venv).
