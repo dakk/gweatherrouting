@@ -13,6 +13,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+import subprocess
 from setuptools import find_packages, setup
 
 buildOptions = {}
@@ -24,6 +25,11 @@ if W32:
 
     buildOptions = {"build_exe": {"packages": ["gi"], "include_files": []}}
     executables = [Executable("main.py")]  #  icon="evm_bg_KYa_icon.ico")
+
+GDAL_VERSION = subprocess.check_output(['gdal-config', '--version']).strip()
+
+requirements = open("requirements.txt", "r").read().split("\n")[:-1]
+requirements.append(f'GDAL=={GDAL_VERSION}')
 
 
 setup(
@@ -67,5 +73,5 @@ setup(
     },
     options=buildOptions,
     executables=executables,
-    install_requires=open("requirements.txt", "r").read().split("\n"),
+    install_requires=requirements,
 )
