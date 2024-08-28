@@ -32,7 +32,8 @@ dependencies = [
     "nmeatoolkit",
     "matplotlib",
     "weatherrouting",
-    "GDAL==3.9.2"
+    "GDAL==3.9.2;sys_platform == 'darwin'",
+    "GDAL==3.6.4;sys_platform == 'linux'"
 ]
 scripts = { gweatherrouting = "gweatherrouting.main:startUIGtk" }
 
