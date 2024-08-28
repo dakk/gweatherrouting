@@ -6,3 +6,12 @@ run:
 
 build-standalone:
 	nuitka3 gweatherrouting/main.py --follow-imports --follow-stdlib 
+
+test:
+	tox
+
+lint:
+	tox -e linters
+
+typecheck:
+	tox -e typecheck
