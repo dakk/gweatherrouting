@@ -1,0 +1,82 @@
+[project]
+name = "gweatherrouting"
+dynamic = ["version"]
+description = ""
+readme = "README.md"
+requires-python = ">= 3.8.0, <=3.13.1"
+license = {text = "GPLv3"}
+authors = [
+    {name = "Davide Gessa", email = "gessadavide@gmail.com"},
+]
+dependencies = [
+    "requests",
+    "colorlog",
+    "eccodes==1.6.1",
+    "geojson_utils",
+    "bs4",
+    "vext @ git+https://github.com/vext-python/vext@32ad4d1c5f45797e244df1d2816f76b60f28e20e",
+    "vext.gi",
+    "pyserial",
+    "pynmea2",
+    "gpxpy",
+    "numpy",
+    "nmeatoolkit",
+    "matplotlib",
+    "weatherrouting",
+    "GDAL==3.6.4",
+    "PyGObject"
+]
+classifiers = [
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/dakk/gweatherrouting"
+"Bug Tracker" = "https://github.com/dakk/gweatherrouting/issues/"
+Documentation = "https://github.com/dakk/gweatherrouting"
+Source = "https://github.com/dakk/gweatherrouting"
+
+[project.scripts]
+gweatherrouting = "gweatherrouting.main:startUIGtk"
+
+[tool.setuptools]
+packages = [
+    "gweatherrouting",
+    "gweatherrouting.core",
+    "gweatherrouting.core.utils",
+    "gweatherrouting.core.geo",
+    "gweatherrouting.common",
+    "gweatherrouting.gtk",
+    "gweatherrouting.gtk.maplayers",
+    "gweatherrouting.gtk.settings",
+    "gweatherrouting.gtk.widgets",
+    "gweatherrouting.gtk.charts",
+    "gweatherrouting.gtk.charts.vectordrawer",
+]
+zip-safe = false
+
+[tool.setuptools.package-data]
+gweatherrouting = [
+    "data/*",
+    "data/boats/*",
+    "data/polars/*",
+    "data/symbols/*",
+    "data/s57/*",
+    "data/icons/*",
+    "gtk/*.glade",
+    "gtk/settings/*.glade",
+    "gtk/widgets/*.glade"
+]
+
+[build-system]
+requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
