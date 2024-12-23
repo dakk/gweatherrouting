@@ -23,8 +23,9 @@ dependencies = [
     "nmeatoolkit",
     "matplotlib",
     "weatherrouting",
-    "GDAL==3.6.4",
-    "PyGObject"
+    "PyGObject",
+    "GDAL==3.9.2;sys_platform == 'darwin'",
+    "GDAL==3.6.4;sys_platform == 'linux'"
 ]
 classifiers = [
     "Programming Language :: Python",
