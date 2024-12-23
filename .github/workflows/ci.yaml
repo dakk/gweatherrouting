@@ -8,7 +8,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
     - name: Checkout
@@ -27,7 +27,6 @@ jobs:
         sudo apt-get install libgtk-4-dev libgtk-4-1
         pip install git+https://github.com/vext-python/vext@32ad4d1c5f45797e244df1d2816f76b60f28e20e
         pip install tox
-        pip install -r requirements.txt
 
     - name: Run tests
       run: pip install .
