@@ -54,7 +54,7 @@ class S57SymbolProvider:
 
         # Try to load cached data
         try:
-            with open(DATA_DIR + "s57_symbols.json", "r") as f:
+            with open(DATA_DIR + "/s57_symbols.json", "r") as f:
                 self.symbols = json.load(f)
                 logger.debug("Loaded cached S57 symbols")
                 return
@@ -99,7 +99,7 @@ class S57SymbolProvider:
             except:
                 continue
 
-        with open(DATA_DIR + "s57_symbols.json", "w") as f:
+        with open(DATA_DIR + "/s57_symbols.json", "w") as f:
             json.dump(self.symbols, f)
             f.close()
             logger.debug("Saved cached S57 symbols")

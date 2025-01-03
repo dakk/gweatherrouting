@@ -78,9 +78,9 @@ class GribManagerWindow:
                 self.gribFilesStore.append(x)
                 Gdk.threads_leave()
             Gdk.threads_enter()
-        except:
+        except Exception as e:
             Gdk.threads_enter()
-            logger.error("Failed to download grib file list")
+            logger.error(f"Failed to download grib file list: {str(e)}")
             self.builder.get_object("download-progress").set_text(
                 "Failed to download grib list"
             )
