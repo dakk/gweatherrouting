@@ -63,6 +63,7 @@ NO_STRIP=true DEPLOY_GTK_VERSION=3 ./linuxdeploy-x86_64.AppImage --appdir AppDir
 echo "Configuring AppRun file..."
 rm "$APP_DIR/AppRun"
 cp "appimage/AppRun" "$APP_DIR/AppRun"
+chmod +x "$APP_DIR/AppRun"
 
 # 6. Create the AppImage
 echo "Creating the final AppImage..."
