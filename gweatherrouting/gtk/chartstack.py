@@ -27,7 +27,8 @@ except:
 
 from gi.repository import Gdk, Gtk, OsmGpsMap  # Keybinder
 
-from ..core import TimeControl
+from gweatherrouting.core import TimeControl
+
 from .chartstack_poi import ChartStackPOI
 from .chartstack_routing import ChartStackRouting
 from .chartstack_track import ChartStackTrack

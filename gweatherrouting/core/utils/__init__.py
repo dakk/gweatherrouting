@@ -16,16 +16,17 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 # isort:skip_file
 import math
-import os
 import json
 import latlon
 from geojson_utils import point_in_polygon
 from typing import Dict, Callable
 
+from gweatherrouting.common import resource_path
 from gweatherrouting.core.storage import *  # noqa: F401, F403
 
-this_dir, this_fn = os.path.split(__file__)
-COUNTRIES = json.load(open(this_dir + "/../../data/countries.geojson", "r"))
+COUNTRIES = json.load(
+    open(resource_path("gweatherrouting", "data/countries.geojson"), "r")
+)
 COUNTRY_SHAPES = []
 
 

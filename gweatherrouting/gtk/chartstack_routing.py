@@ -21,8 +21,6 @@ from threading import Thread
 
 import gi
 
-from ..core.geo.routing import Routing
-
 gi.require_version("Gtk", "3.0")
 try:
     gi.require_version("OsmGpsMap", "1.2")
@@ -32,8 +30,10 @@ except:
 from gi.repository import Gdk, GObject, Gtk
 from weatherrouting import RoutingNoWindException
 
-from .. import log
-from ..core import utils
+from gweatherrouting import log
+from gweatherrouting.core import utils
+from gweatherrouting.core.geo.routing import Routing
+
 from .maplayers import IsochronesMapLayer
 from .routingwizarddialog import RoutingWizardDialog
 

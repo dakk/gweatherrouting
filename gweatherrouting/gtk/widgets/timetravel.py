@@ -18,7 +18,7 @@ import os
 
 import gi
 
-from ..timepickerdialog import TimePickerDialog
+from gweatherrouting.gtk.timepickerdialog import TimePickerDialog
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import GObject, Gtk

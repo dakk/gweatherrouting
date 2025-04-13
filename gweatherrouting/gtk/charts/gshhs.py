@@ -31,9 +31,11 @@ except:
 
 from gi.repository import Gdk, Gtk, OsmGpsMap
 
-from ... import log
-from ...core.core import LinePointValidityProvider
-from ...core.storage import DATA_DIR, TEMP_DIR
+from gweatherrouting import log
+from gweatherrouting.common import resource_path
+from gweatherrouting.core.core import LinePointValidityProvider
+from gweatherrouting.core.storage import DATA_DIR, TEMP_DIR
+
 from .chartlayer import ChartLayer
 
 logger = logging.getLogger("gweatherrouting")
@@ -280,7 +282,7 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
         self.lpvFile = drv.Open(path + "/GSHHS_shp/h/GSHHS_h_L1.shp")
 
         f = open(
-            os.path.abspath(os.path.dirname(__file__)) + "/../../data/countries_en.txt",
+            resource_path("gweatherrouting", "data/countries_en.txt"),
             "r",
         )
         self.countries = list(

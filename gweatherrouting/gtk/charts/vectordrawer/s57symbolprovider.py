@@ -16,7 +16,6 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 # flake8: noqa: E402
 import json
 import logging
-import os
 
 import gi
 
@@ -29,7 +28,8 @@ except:
 from bs4 import BeautifulSoup
 from gi.repository import Gdk, GdkPixbuf
 
-from ....core.storage import DATA_DIR
+from gweatherrouting.common import resource_path
+from gweatherrouting.core.storage import DATA_DIR
 
 logger = logging.getLogger("gweatherrouting")
 
@@ -40,12 +40,10 @@ class S57SymbolProvider:
         self.symbols = {}
 
         self.p_day = GdkPixbuf.Pixbuf.new_from_file(
-            os.path.abspath(os.path.dirname(__file__))
-            + "/../../../data/s57/rastersymbols-day.png"
+            resource_path("gweatherrouting", "data/s57/rastersymbols-day.png")
         )
         self.p_dark = GdkPixbuf.Pixbuf.new_from_file(
-            os.path.abspath(os.path.dirname(__file__))
-            + "/../../../data/s57/rastersymbols-dark.png"
+            resource_path("gweatherrouting", "data/s57/rastersymbols-dark.png")
         )
 
         self.p_select = self.p_day
@@ -64,8 +62,7 @@ class S57SymbolProvider:
 
         # Load symbols
         data = open(
-            os.path.abspath(os.path.dirname(__file__))
-            + "/../../../data/s57/chartsymbols.xml"
+            resource_path("gweatherrouting", "data/s57/chartsymbols.xml")
         ).read()
 
         soup = BeautifulSoup(data, "html.parser")

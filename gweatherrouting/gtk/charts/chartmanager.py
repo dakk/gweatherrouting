@@ -27,8 +27,10 @@ except:
 
 from gi.repository import Gdk, GObject, Gtk, OsmGpsMap
 
-from ...core.core import LinePointValidityProvider
-from ...core.storage import DATA_DIR
+from gweatherrouting.common import resource_path
+from gweatherrouting.core.core import LinePointValidityProvider
+from gweatherrouting.core.storage import DATA_DIR
+
 from .gdalrasterchart import GDALRasterChart
 from .gdalvectorchart import GDALVectorChart
 from .gshhs import (
@@ -98,8 +100,7 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
                 else:
                     self.charts = [
                         GDALVectorChart(
-                            os.path.abspath(os.path.dirname(__file__))
-                            + "/../../data/countries.geojson",
+                            resource_path("gweatherrouting", "data/countries.geojson"),
                             self.settingsManager,
                         )
                     ] + self.charts

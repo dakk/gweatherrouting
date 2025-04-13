@@ -26,6 +26,8 @@ except:
 
 from gi.repository import GdkPixbuf, Gtk
 
+from gweatherrouting.common import resource_path
+
 
 class ChartStackPOI:
     selectedPOI = None
@@ -35,7 +37,7 @@ class ChartStackPOI:
         self.updatePOI()
 
         poiSymbolStore = self.builder.get_object("poi-symbols-store")
-        basePath = os.path.abspath(os.path.dirname(__file__)) + "/../data/symbols/"
+        basePath = resource_path("gweatherrouting", "data/symbols/")
 
         for x in os.listdir(basePath):
             poiSymbolStore.append(

@@ -29,6 +29,8 @@ except:
 
 from gi.repository import Gtk
 
+from gweatherrouting.common import resource_path
+
 from .widgets.polar import PolarWidget
 
 logger = logging.getLogger("gweatherrouting")
@@ -52,9 +54,7 @@ class PolarStack(Gtk.Box):
 
         self.statusBar = self.builder.get_object("statusbar")
 
-        self.polars = os.listdir(
-            os.path.abspath(os.path.dirname(__file__)) + "/../data/polars/"
-        )
+        self.polars = os.listdir(resource_path("gweatherrouting", "data/polars/"))
         boatselect = self.builder.get_object("boat-select")
         for polar in self.polars:
             boatselect.insert_text(0, polar)
