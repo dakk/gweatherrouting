@@ -16,13 +16,14 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 # flake8: noqa: E402
 import logging
 import math
-import os
 
 import gi
 from weatherrouting import Polar
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gdk, Gtk
+
+from gweatherrouting.common import resource_path
 
 logger = logging.getLogger("gweatherrouting")
 
@@ -49,11 +50,7 @@ class PolarWidget(Gtk.DrawingArea):
     def loadPolar(self, polarFile):
         polar = None
         try:
-            polar = Polar(
-                os.path.abspath(os.path.dirname(__file__))
-                + "/../../data/polars/"
-                + polarFile
-            )
+            polar = Polar(resource_path("gweatherrouting", f"data/polars/{polarFile}"))
         except:
             try:
                 polar = Polar(polarFile)

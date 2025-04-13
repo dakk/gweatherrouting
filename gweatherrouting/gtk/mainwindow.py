@@ -31,6 +31,8 @@ except:
 
 from gi.repository import Gdk, Gtk
 
+from gweatherrouting.common import resource_path
+
 from .. import log
 from .charts import ChartManager
 from .chartstack import ChartStack
@@ -50,7 +52,7 @@ class MainWindow:
 
         # Add custom icon path
         Gtk.IconTheme.get_default().append_search_path(
-            os.path.abspath(os.path.dirname(__file__)) + "/../data/icons"
+            resource_path("gweatherrouting", "data/icons/")
         )
 
         # Force dark theme
