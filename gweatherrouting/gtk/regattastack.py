@@ -51,5 +51,6 @@ class RegattaStack(Gtk.Box):
         self.map = self.builder.get_object("map")
         self.map.set_center_and_zoom(39.0, 9.0, 6)
         # self.map.layer_add (chartManager)
+        # self.chartManager.addMap(self.map)
 
         self.show_all()
