@@ -11,9 +11,18 @@ jobs:
   build:
     runs-on: ubuntu-22.04
 
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10"]
+
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
       run: |
@@ -21,7 +30,6 @@ jobs:
         sudo apt-get update
         sudo apt-get install gdal-bin libgdal-dev
         sudo apt-get install libgtk-4-dev libgtk-4-1 libgirepository1.0-dev
-        pip install setuptools
         pip install git+https://github.com/vext-python/vext@32ad4d1c5f45797e244df1d2816f76b60f28e20e
         pip install tox
 
@@ -37,9 +45,18 @@ jobs:
   build-latest:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        python-version: ["3.12", "3.13"] # "3.11", 
+
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
       run: |
@@ -47,7 +64,6 @@ jobs:
         sudo apt-get update
         sudo apt-get install gdal-bin libgdal-dev
         sudo apt-get install libgtk-4-dev libgtk-4-1 libgirepository1.0-dev
-        pip install setuptools
         pip install git+https://github.com/vext-python/vext@32ad4d1c5f45797e244df1d2816f76b60f28e20e
         pip install tox
 
