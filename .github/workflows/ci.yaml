@@ -1,6 +1,11 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
   build:
@@ -24,7 +29,7 @@ jobs:
         sudo add-apt-repository ppa:ubuntugis/ppa
         sudo apt-get update
         sudo apt-get install gdal-bin libgdal-dev
-        sudo apt-get install libgtk-4-dev libgtk-4-1
+        sudo apt-get install libgtk-4-dev libgtk-4-1 libgirepository1.0-dev
         pip install git+https://github.com/vext-python/vext@32ad4d1c5f45797e244df1d2816f76b60f28e20e
         pip install tox
 
@@ -52,7 +57,7 @@ jobs:
         sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
         sudo apt-get update
         sudo apt-get install gdal-bin libgdal-dev
-        sudo apt-get install libgtk-4-dev libgtk-4-1
+        sudo apt-get install libgtk-4-dev libgtk-4-1 libgirepository1.0-dev
         pip install git+https://github.com/vext-python/vext@32ad4d1c5f45797e244df1d2816f76b60f28e20e
         pip install tox
 
