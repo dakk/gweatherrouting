@@ -55,6 +55,7 @@ GWeatherRouting is an opensource sailing route calculator written in python and:
    - pygobject3
    - pkg-config
    - eccodes
+   - libgirepository-2.0-dev
 
 > [!NOTE]  
 > If you are using a `virtualenv` you may need to make symbolic links from the UI libraries to your `venv` folder (this is not needed using system interpreter outside venv).
