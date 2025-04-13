@@ -24,8 +24,8 @@ import weatherrouting
 from gi.repository import Gtk
 
 from gweatherrouting.common import resource_path
+from gweatherrouting.core import TimeControl
 
-from ..core import TimeControl
 from .timepickerdialog import TimePickerDialog
 from .widgets.polar import PolarWidget
 

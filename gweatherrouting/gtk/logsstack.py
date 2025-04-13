@@ -33,7 +33,8 @@ except:
 
 from gi.repository import Gdk, Gtk
 
-from ..core.timecontrol import TimeControl
+from gweatherrouting.core.timecontrol import TimeControl
+
 from .maplayers.geomaplayer import GeoMapLayer
 from .maplayers.toolsmaplayer import ToolsMapLayer
 from .widgets.timetravel import TimeTravelWidget

@@ -24,8 +24,6 @@ except:
 
 from gi.repository import GObject, OsmGpsMap
 
-from ..style import *
-
 
 class AISMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
     def __init__(self, core):

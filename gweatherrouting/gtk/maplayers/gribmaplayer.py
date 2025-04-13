@@ -26,9 +26,8 @@ except:
 
 from gi.repository import GObject, OsmGpsMap
 
-from ...common import windColor
-from ...core.utils import pointInCountry
-from ..style import *
+from gweatherrouting.common import windColor
+from gweatherrouting.core.utils import pointInCountry
 
 
 class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):

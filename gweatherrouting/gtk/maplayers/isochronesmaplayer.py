@@ -28,7 +28,7 @@ except:
 
 from gi.repository import GObject, OsmGpsMap
 
-from ..style import Style
+from gweatherrouting.gtk.style import Style
 
 
 class IsochronesMapLayer(GObject.GObject, OsmGpsMap.MapLayer):

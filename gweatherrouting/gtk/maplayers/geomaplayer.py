@@ -27,8 +27,8 @@ except:
 
 from gi.repository import GObject, OsmGpsMap
 
-from ...core import utils
-from ..style import *
+from gweatherrouting.core import utils
+from gweatherrouting.gtk.style import Style
 
 
 class GeoMapLayer(GObject.GObject, OsmGpsMap.MapLayer):

@@ -31,11 +31,11 @@ except:
 
 from gi.repository import Gdk, Gtk, OsmGpsMap
 
+from gweatherrouting import log
 from gweatherrouting.common import resource_path
+from gweatherrouting.core.core import LinePointValidityProvider
+from gweatherrouting.core.storage import DATA_DIR, TEMP_DIR
 
-from ... import log
-from ...core.core import LinePointValidityProvider
-from ...core.storage import DATA_DIR, TEMP_DIR
 from .chartlayer import ChartLayer
 
 logger = logging.getLogger("gweatherrouting")

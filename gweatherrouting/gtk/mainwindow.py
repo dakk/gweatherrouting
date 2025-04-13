@@ -31,9 +31,9 @@ except:
 
 from gi.repository import Gdk, Gtk
 
+from gweatherrouting import log
 from gweatherrouting.common import resource_path
 
-from .. import log
 from .charts import ChartManager
 from .chartstack import ChartStack
 from .gribmanagerwindow import GribManagerWindow
