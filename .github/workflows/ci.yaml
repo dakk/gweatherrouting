@@ -33,8 +33,11 @@ jobs:
         pip install git+https://github.com/vext-python/vext@32ad4d1c5f45797e244df1d2816f76b60f28e20e
         pip install tox
 
-    - name: Run tests
+    - name: Install gww
       run: pip install .
+
+    - name: Build appimage
+      run: make build-appimage
 
   build-latest:
     runs-on: ubuntu-latest
@@ -61,8 +64,12 @@ jobs:
         pip install git+https://github.com/vext-python/vext@32ad4d1c5f45797e244df1d2816f76b60f28e20e
         pip install tox
 
-    - name: Run tests
+    - name: Install gww
       run: pip install .
+
+    - name: Build appimage
+      run: make build-appimage
+
 
   linters:
     runs-on: ubuntu-latest
