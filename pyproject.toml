@@ -3,7 +3,7 @@ name = "gweatherrouting"
 dynamic = ["version"]
 description = ""
 readme = "README.md"
-requires-python = ">= 3.8.0, <=3.13.1"
+requires-python = ">= 3.9.0, <=3.13.1"
 license = {text = "GPLv3"}
 authors = [
     {name = "Davide Gessa", email = "gessadavide@gmail.com"},
@@ -29,7 +29,6 @@ dependencies = [
 ]
 classifiers = [
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
