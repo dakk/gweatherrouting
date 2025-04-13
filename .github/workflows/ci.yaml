@@ -31,7 +31,7 @@ jobs:
     - name: Run tests
       run: pip install .
 
-  build:
+  build-latest:
     runs-on: ubuntu-latest
 
     strategy:
