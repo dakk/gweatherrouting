@@ -39,7 +39,7 @@ jobs:
 
     - name: Build appimage
       run: |
-        apt install libfuse2
+        sudo apt-get install libfuse2
         pip install pyinstaller
         cd appimage
         bash appimagegen.sh -y
@@ -75,7 +75,7 @@ jobs:
 
     - name: Build appimage
       run: |
-        apt install libfuse2
+        sudo apt-get install libfuse2
         pip install pyinstaller
         cd appimage
         bash appimagegen.sh -y
