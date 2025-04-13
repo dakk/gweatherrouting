@@ -68,35 +68,37 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
         # TODO QUEUE A DRAW
         pass
 
-    def loadBaseChart(self, parent):
+    def _loadBaseGSHHS(self):
         if os.path.exists(DATA_DIR + "/gshhs"):
             self.gshhsLayer = GSHHSVectorChart(
                 DATA_DIR + "/gshhs", self.settingsManager
             )
             self.charts = [self.gshhsLayer] + self.charts
-            gshhs = True
 
+    def _loadBaseOSM(self):
         if os.path.exists(DATA_DIR + "/seamarks.pbf"):
             self.osmLayer = GDALVectorChart(
                 DATA_DIR + "/seamarks.pbf", self.settingsManager
             )
             self.charts = self.charts + [self.osmLayer]
-            osm = True
+
+    def loadBaseChart(self, parent):
+        self._loadBaseGSHHS()
 
         if not self.gshhsLayer:
             logger.info("GSHHS files not found, open a dialog asking for download")
 
             def f():
                 Gdk.threads_enter()
-                d = GSHHSAskDownloadDialog(parent)
-                r = d.run()
-                d.destroy()
+                ask_diag = GSHHSAskDownloadDialog(parent)
+                r = ask_diag.run()
+                ask_diag.destroy()
                 if r == Gtk.ResponseType.OK:
-                    d = GSHHSDownloadDialog(parent)
-                    r = d.run()
-                    d.destroy()
+                    down_diag = GSHHSDownloadDialog(parent)
+                    r = down_diag.run()
+                    down_diag.destroy()
                     if r == Gtk.ResponseType.OK:
-                        self.loadBaseChart(parent)
+                        self._loadBaseGSHHS()
                 else:
                     self.charts = [
                         GDALVectorChart(
@@ -109,20 +111,22 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 
             GObject.timeout_add(10, f)
 
+        self._loadBaseOSM()
+
         if not self.osmLayer:
             logger.info("OSM file not found, open a dialog asking for download")
 
             def ff():
                 Gdk.threads_enter()
-                d = OSMAskDownloadDialog(parent)
-                r = d.run()
-                d.destroy()
+                ask_diag = OSMAskDownloadDialog(parent)
+                r = ask_diag.run()
+                ask_diag.destroy()
                 if r == Gtk.ResponseType.OK:
-                    d = OSMDownloadDialog(parent)
-                    r = d.run()
-                    d.destroy()
+                    down_diag = OSMDownloadDialog(parent)
+                    r = down_diag.run()
+                    down_diag.destroy()
                     if r == Gtk.ResponseType.OK:
-                        self.loadBaseChart(parent)
+                        self._loadBaseOSM()
 
                 Gdk.threads_leave()
 
