@@ -13,10 +13,12 @@ echo "pyinstaller is installed (you can install it using 'pip install pyinstalle
 echo -e "\n===============================\n"
 
 # Ask for confirmation to proceed
-read -p "Do you want to continue? (y/n): " confirm
-if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
-    echo "Script execution cancelled."
-    exit 0
+if [[ "$1" != "-y" ]]; then
+    read -p "Do you want to continue? (y/n): " confirm
+    if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+        echo "Script execution cancelled."
+        exit 0
+    fi
 fi
 
 DEFAULT_OSM_PATH="/usr/lib/libosmgpsmap-1.0.so.1"
@@ -83,15 +85,18 @@ chmod +x appimagetool-x86_64.AppImage
 
 echo -e "\nAppImage creation completed successfully!"
 # Ask if the user wants to clean up
-read -p "Do you want to clean up temporary files and directories? (y/n): " cleanup
-if [[ "$cleanup" == "y" || "$cleanup" == "Y" ]]; then
-    echo "Cleaning up..."
-    rm linuxdeploy-plugin-gtk.sh
-    rm linuxdeploy-x86_64.AppImage
-    rm appimagetool-x86_64.AppImage
-    rm -r gweatherrouting/dist
-    rm -r gweatherrouting/build
-    rm -r gweatherrouting/gWeatherRouting.spec
-    rm -r AppDir
-    echo "Cleanup completed."
+
+if [[ "$1" != "-y" ]]; then
+    read -p "Do you want to clean up temporary files and directories? (y/n): " cleanup
+    if [[ "$cleanup" == "y" || "$cleanup" == "Y" ]]; then
+        echo "Cleaning up..."
+        rm linuxdeploy-plugin-gtk.sh
+        rm linuxdeploy-x86_64.AppImage
+        rm appimagetool-x86_64.AppImage
+        rm -r gweatherrouting/dist
+        rm -r gweatherrouting/build
+        rm -r gweatherrouting/gWeatherRouting.spec
+        rm -r AppDir
+        echo "Cleanup completed."
+    fi
 fi
