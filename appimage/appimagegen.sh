@@ -19,15 +19,25 @@ if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
     exit 0
 fi
 
-# Ask for the path to the library
-echo -e "\nPlease provide the path to libosmgpsmap-1.0.so.1"
-echo "You can find it using: find /usr -name \"libosmgpsmap-1.0.so.1\""
-read -p "Path to libosmgpsmap-1.0.so.1: " LIBOSM_PATH
+DEFAULT_OSM_PATH="/usr/lib/libosmgpsmap-1.0.so.1"
+LIBOSM_PATH=""
 
-if [ ! -f "$LIBOSM_PATH" ]; then
-    echo "Error: The specified library file does not exist."
-    exit 1
+if [ -f "$DEFAULT_OSM_PATH" ]; then
+    echo "Found libosmgpsmap-1.0.so.1 at default location: $DEFAULT_OSM_PATH"
+    LIBOSM_PATH="$DEFAULT_OSM_PATH"
+else
+    echo -e "\nCould not find libosmgpsmap-1.0.so.1 at default location."
+    echo "Please provide an alternative path to libosmgpsmap-1.0.so.1"
+    echo "You can find it using: find /usr -name \"libosmgpsmap-1.0.so.1\""
+    read -p "Path to libosmgpsmap-1.0.so.1: " LIBOSM_PATH
+
+    if [ ! -f "$LIBOSM_PATH" ]; then
+        echo "Error: The specified library file does not exist."
+        exit 1
+    fi
 fi
+
+echo "Using library at: $LIBOSM_PATH"
 
 # Define variables
 APP_NAME="gWeatherRouting"
