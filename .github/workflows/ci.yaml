@@ -61,8 +61,6 @@ jobs:
 
   linters:
     runs-on: ubuntu-latest
-    container:
-      image: cimg/python:3.11
 
     steps:
     - name: Checkout
@@ -71,7 +69,7 @@ jobs:
     - name: Set up Python 3.11
       uses: actions/setup-python@v5
       with:
-        python-version: 3.11
+        python-version: '3.11'
 
     - name: Install dependencies
       run: pip install tox
@@ -84,8 +82,6 @@ jobs:
 
   typecheck:
     runs-on: ubuntu-latest
-    container:
-      image: cimg/python:3.11
 
     steps:
     - name: Checkout
@@ -94,7 +90,7 @@ jobs:
     - name: Set up Python 3.11
       uses: actions/setup-python@v5
       with:
-        python-version: 3.11
+        python-version: '3.11'
 
     - name: Install dependencies
       run: pip install tox
@@ -104,8 +100,6 @@ jobs:
 
   tests:
     runs-on: ubuntu-latest
-    container:
-      image: cimg/python:3.11
 
     steps:
     - name: Checkout
@@ -114,7 +108,7 @@ jobs:
     - name: Set up Python 3.11
       uses: actions/setup-python@v5
       with:
-        python-version: 3.11
+        python-version: '3.11'
 
     - name: Install dependencies
       run: pip install tox
