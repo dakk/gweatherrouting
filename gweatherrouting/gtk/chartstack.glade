@@ -520,7 +520,7 @@ loaded to created a routing</property>
                     <property name="tooltip-text" translatable="yes">Drop a MOB mark</property>
                     <property name="label" translatable="yes">MOB</property>
                     <property name="use-underline">True</property>
-                    <property name="icon-name">indicator-messages-red</property>
+                    <property name="icon-name">flag-red</property>
                     <signal name="clicked" handler="onMob" swapped="no"/>
                   </object>
                   <packing>
