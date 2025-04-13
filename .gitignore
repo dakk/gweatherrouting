@@ -9,3 +9,11 @@ cache
 bin
 .idea/*
 *.AppImage
+AppDir
+linuxdeploy*
+.pytest_cache
+.mypy_cache
+.tox
+gweatherrouting/build
+gweatherrouting/dist
+gweatherrouting/*.spec

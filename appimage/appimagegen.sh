@@ -21,12 +21,10 @@ if [[ "$1" != "-y" ]]; then
     fi
 fi
 
-DEFAULT_OSM_PATH="/usr/lib/libosmgpsmap-1.0.so.1"
-LIBOSM_PATH=""
+LIBOSM_PATH=$(ldconfig -p | grep "libosmgpsmap-1.0.so.1" | awk '{print $NF}')
 
-if [ -f "$DEFAULT_OSM_PATH" ]; then
-    echo "Found libosmgpsmap-1.0.so.1 at default location: $DEFAULT_OSM_PATH"
-    LIBOSM_PATH="$DEFAULT_OSM_PATH"
+if [[ -n "$LIBOSM_PATH" ]]; then
+    echo "Found libosmgpsmap-1.0.so.1 at default location: $LIBOSM_PATH"
 else
     echo -e "\nCould not find libosmgpsmap-1.0.so.1 at default location."
     echo "Please provide an alternative path to libosmgpsmap-1.0.so.1"
@@ -84,19 +82,15 @@ chmod +x appimagetool-x86_64.AppImage
 ./appimagetool-x86_64.AppImage "$APP_DIR"
 
 echo -e "\nAppImage creation completed successfully!"
-# Ask if the user wants to clean up
 
-if [[ "$1" != "-y" ]]; then
-    read -p "Do you want to clean up temporary files and directories? (y/n): " cleanup
-    if [[ "$cleanup" == "y" || "$cleanup" == "Y" ]]; then
-        echo "Cleaning up..."
-        rm linuxdeploy-plugin-gtk.sh
-        rm linuxdeploy-x86_64.AppImage
-        rm appimagetool-x86_64.AppImage
-        rm -r gweatherrouting/dist
-        rm -r gweatherrouting/build
-        rm -r gweatherrouting/gWeatherRouting.spec
-        rm -r AppDir
-        echo "Cleanup completed."
-    fi
-fi
+# 7. Clean up
+
+echo "Cleaning up..."
+rm linuxdeploy-plugin-gtk.sh
+rm linuxdeploy-x86_64.AppImage
+rm appimagetool-x86_64.AppImage
+rm -r gweatherrouting/dist
+rm -r gweatherrouting/build
+rm -r gweatherrouting/gWeatherRouting.spec
+rm -r AppDir
+echo "Cleanup completed."
