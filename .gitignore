@@ -8,3 +8,4 @@ venv
 cache
 bin
 .idea/*
+*.AppImage

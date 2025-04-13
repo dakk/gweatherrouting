@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=gWeatherRouting
+Comment=Weather Routing Application
+Exec=gWeatherRouting
+Icon=icon
+Type=Application
+Categories=Utility

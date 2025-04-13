@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Auto-generated and improved AppRun script for AppImage
+# Stops on any error
+set -e
+# Resolve the directory of this script (AppDir root)
+this_dir="$(readlink -f "$(dirname "$0")")"
+source "$this_dir/apprun-hooks/linuxdeploy-plugin-gtk.sh"
+
+# Set APPDIR if not already set
+export APPDIR="${APPDIR:-$this_dir}"
+
+# Set library path to use bundled libraries first
+export LD_LIBRARY_PATH="$APPDIR/usr/lib:$LD_LIBRARY_PATH"
+
+# Execute the wrapped binary with passed arguments
+exec "$this_dir/AppRun.wrapped" "$@"
