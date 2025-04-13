@@ -3,7 +3,7 @@ name = "gweatherrouting"
 dynamic = ["version"]
 description = ""
 readme = "README.md"
-requires-python = ">= 3.8.0, <=3.13.1"
+requires-python = ">= 3.9.0, <=3.13.2"
 license = {text = "GPLv3"}
 authors = [
     {name = "Davide Gessa", email = "gessadavide@gmail.com"},
@@ -23,13 +23,12 @@ dependencies = [
     "nmeatoolkit",
     "matplotlib",
     "weatherrouting>=0.1.13",
-    "PyGObject",
+    "PyGObject==3.50.0",
     "GDAL==3.9.2;sys_platform == 'darwin'",
     "GDAL==3.6.4;sys_platform == 'linux'"
 ]
 classifiers = [
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",

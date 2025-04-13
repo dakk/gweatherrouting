@@ -1,30 +1,63 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
       run: |
-        sudo add-apt-repository ppa:ubuntugis/ppa 
+        sudo add-apt-repository ppa:ubuntugis/ppa
         sudo apt-get update
         sudo apt-get install gdal-bin libgdal-dev
-        sudo apt-get install libgtk-4-dev libgtk-4-1
+        sudo apt-get install libgtk-4-dev libgtk-4-1 libgirepository1.0-dev
+        pip install git+https://github.com/vext-python/vext@32ad4d1c5f45797e244df1d2816f76b60f28e20e
+        pip install tox
+
+    - name: Run tests
+      run: pip install .
+
+  build-latest:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
+        sudo apt-get update
+        sudo apt-get install gdal-bin libgdal-dev
+        sudo apt-get install libgtk-4-dev libgtk-4-1 libgirepository1.0-dev
         pip install git+https://github.com/vext-python/vext@32ad4d1c5f45797e244df1d2816f76b60f28e20e
         pip install tox
 
@@ -33,17 +66,15 @@ jobs:
 
   linters:
     runs-on: ubuntu-latest
-    container:
-      image: cimg/python:3.8
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
       with:
-        python-version: 3.8
+        python-version: '3.11'
 
     - name: Install dependencies
       run: pip install tox
@@ -54,23 +85,38 @@ jobs:
     - name: Run tests
       run: tox -e unit-tests
 
-
   typecheck:
     runs-on: ubuntu-latest
-    container:
-      image: cimg/python:3.8
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
       with:
-        python-version: 3.8
+        python-version: '3.11'
 
     - name: Install dependencies
       run: pip install tox
 
     - name: Run typecheck
       run: tox -e typecheck
+
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: pip install tox
+
+    - name: Run tests
+      run: tox -e unit-tests

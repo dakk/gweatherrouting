@@ -15,6 +15,9 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 # isort:skip_file
 
+from os import fspath, sep
+from importlib.resources import files, as_file
+
 
 def windColor(wspeed):  # noqa: C901
     color = "0000CC"
@@ -53,3 +56,9 @@ def windColor(wspeed):  # noqa: C901
     b = int(color[2:4], 16) / 255.0
     c = int(color[4:6], 16) / 255.0
     return (a, b, c)
+
+
+def resource_path(package: str, relative_path: str):
+    resource = files(package).joinpath(relative_path)
+    with as_file(resource) as path:
+        return fspath(path) + (sep if relative_path[-1] == sep else "")

@@ -14,11 +14,11 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 import logging
-import os
 
 import gpxpy
 import weatherrouting
 
+from gweatherrouting.common import resource_path
 from gweatherrouting.core import GribManager, utils
 from gweatherrouting.core.connectionmanager import ConnectionManager
 from gweatherrouting.core.datasource import DataPacket
@@ -96,7 +96,7 @@ class Core(EventDispatcher):
         disableCoastlineChecks=False,
     ):
         polar = weatherrouting.Polar(
-            os.path.abspath(os.path.dirname(__file__)) + "/../data/polars/" + polarFile
+            resource_path("gweatherrouting", f"data/polars/{polarFile}")
         )
 
         pval = utils.pointsValidity

@@ -23,7 +23,9 @@ gi.require_version("Gtk", "3.0")
 import weatherrouting
 from gi.repository import Gtk
 
-from ..core import TimeControl
+from gweatherrouting.common import resource_path
+from gweatherrouting.core import TimeControl
+
 from .timepickerdialog import TimePickerDialog
 from .widgets.polar import PolarWidget
 
@@ -34,13 +36,11 @@ class RoutingWizardDialog:
         self.polar = None
 
         self.paramWidgets = {}
-        self.polars = os.listdir(
-            os.path.abspath(os.path.dirname(__file__)) + "/../data/polars/"
-        )
+        self.polars = os.listdir(resource_path("gweatherrouting", "data/polars/"))
 
         self.builder = Gtk.Builder()
         self.builder.add_from_file(
-            os.path.abspath(os.path.dirname(__file__)) + "/routingwizarddialog.glade"
+            resource_path("gweatherrouting.gtk", "routingwizarddialog.glade")
         )
         self.builder.connect_signals(self)
 
@@ -152,7 +152,7 @@ class RoutingWizardDialog:
     def onBoatSelect(self, widget):
         pfile = self.polars[self.builder.get_object("boat-select").get_active()]
         self.polar = weatherrouting.Polar(
-            os.path.abspath(os.path.dirname(__file__)) + "/../data/polars/" + pfile
+            resource_path("gweatherrouting", f"data/polars/{pfile}")
         )
         self.polarWidget.setPolar(self.polar)
 

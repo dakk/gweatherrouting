@@ -14,7 +14,7 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
-from ...core.utils import Storage
+from gweatherrouting.core.utils import Storage
 
 
 class SettingsManager(Storage):

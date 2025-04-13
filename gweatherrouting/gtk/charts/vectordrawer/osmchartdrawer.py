@@ -26,7 +26,6 @@ except:
 
 from gi.repository import OsmGpsMap
 
-from ...style import *
 from .vectorchartdrawer import VectorChartDrawer
 
 logger = logging.getLogger("gweatherrouting")

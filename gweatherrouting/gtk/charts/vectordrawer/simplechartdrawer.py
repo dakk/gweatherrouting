@@ -25,7 +25,8 @@ except:
 
 from gi.repository import OsmGpsMap
 
-from ...style import *
+from gweatherrouting.gtk.style import Style
+
 from .vectorchartdrawer import VectorChartDrawer
 
 
