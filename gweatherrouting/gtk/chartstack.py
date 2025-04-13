@@ -81,6 +81,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
         )
 
         self.map.layer_add(self.chartManager)
+        self.chartManager.addMap(self.map)
 
         self.gribMapLayer = GribMapLayer(
             self.core.gribManager, self.timeControl, self.settingsManager

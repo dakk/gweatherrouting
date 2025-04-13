@@ -13,9 +13,11 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 import logging
 import os
+
+# flake8: noqa: E402
+from typing import List
 
 import gi
 
@@ -30,7 +32,9 @@ from gi.repository import Gdk, GObject, Gtk, OsmGpsMap
 from gweatherrouting.common import resource_path
 from gweatherrouting.core.core import LinePointValidityProvider
 from gweatherrouting.core.storage import DATA_DIR
+from gweatherrouting.gtk.settings import SettingsManager
 
+from .chartlayer import ChartLayer
 from .gdalrasterchart import GDALRasterChart
 from .gdalvectorchart import GDALVectorChart
 from .gshhs import (
@@ -47,14 +51,18 @@ logger = logging.getLogger("gweatherrouting")
 class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
     def __init__(self, settingsManager):
         GObject.GObject.__init__(self)
-        self.charts = []
-        self.gshhsLayer = None
-        self.osmLayer = None
-        self.settingsManager = settingsManager
+        self.charts: List[ChartLayer] = []
+        self.gshhsLayer: GSHHSVectorChart = None
+        self.osmLayer: GDALVectorChart = None
+        self.settingsManager: SettingsManager = settingsManager
+        self.maps: List[OsmGpsMap] = []
 
         self.settingsManager.register_on_change(
             "chartPalette", self.onChartPaletteChanged
         )
+
+    def addMap(self, m: OsmGpsMap):
+        self.maps.append(m)
 
     def getLinePointValidityProviders(self):
         lpvp = []
@@ -64,9 +72,8 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
         return lpvp
 
     def onChartPaletteChanged(self, v):
-        # self.queue_draw ()
-        # TODO QUEUE A DRAW
-        pass
+        for m in self.maps:
+            m.map_redraw_idle()
 
     def _loadBaseGSHHS(self):
         if os.path.exists(DATA_DIR + "/gshhs"):
