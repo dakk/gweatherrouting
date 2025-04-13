@@ -10,5 +10,4 @@ build-standalone:
 
 build-appimage:
 	pip install pyinstaller
-	cd appimage
-	bash appimagegen.sh
+	cd appimage && bash appimagegen.sh -y
