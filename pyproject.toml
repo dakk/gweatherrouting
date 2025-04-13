@@ -23,7 +23,7 @@ dependencies = [
     "nmeatoolkit",
     "matplotlib",
     "weatherrouting>=0.1.13",
-    "PyGObject",
+    "PyGObject==3.50.0",
     "GDAL==3.9.2;sys_platform == 'darwin'",
     "GDAL==3.6.4;sys_platform == 'linux'"
 ]
