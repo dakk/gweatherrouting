@@ -115,7 +115,7 @@ class Core(EventDispatcher):
         routing = weatherrouting.Routing(
             algorithm,
             polar,
-            track,
+            track.toList(),
             self.gribManager,
             startDatetime=startDatetime,
             startPosition=startPosition,

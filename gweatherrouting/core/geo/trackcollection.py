@@ -44,8 +44,11 @@ class _TrackCollection(CollectionWithActiveElement, Generic[T]):
 
     def __iter__(self):
         return iter(
-            filter(lambda e: e.name not in ["log", "log-history"], self.elements)
+            list(filter(lambda e: e.name not in ["log", "log-history"], self.elements))
         )
+    
+    def __getitem__(self, i):
+        return self.elements[i+2] 
 
 
 TrackCollection = _TrackCollection[Track]

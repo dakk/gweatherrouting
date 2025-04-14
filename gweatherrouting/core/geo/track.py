@@ -14,6 +14,7 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 import gpxpy
+from typing import List, Tuple, Dict
 
 from gweatherrouting.core.geo.elementmultipoint import ElementMultiPoint
 
@@ -23,7 +24,7 @@ class Track(ElementMultiPoint):
         super().__init__(name, points, visible, collection)
 
     @staticmethod
-    def fromJSON(j):
+    def fromJSON(j: Dict) -> "Track":
         d = ElementMultiPoint.fromJSON(j)
         return Track(d.name, d.points, d.visible)
 
@@ -36,3 +37,6 @@ class Track(ElementMultiPoint):
             gpx_segment.points.append(gpxpy.gpx.GPXTrackPoint(x[0], x[1]))
 
         return gpx_track
+
+    def toList(self) -> List[Tuple[float, float]]:
+        return [(x[0], x[1]) for x in self.points]
