@@ -13,8 +13,9 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+from typing import Dict, List, Tuple
+
 import gpxpy
-from typing import List, Tuple, Dict
 
 from gweatherrouting.core.geo.elementmultipoint import ElementMultiPoint
 

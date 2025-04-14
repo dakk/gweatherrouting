@@ -22,15 +22,8 @@ T = TypeVar("T", bound=Track)
 
 
 class _TrackCollection(CollectionWithActiveElement, Generic[T]):
-    def __init__(self):
-        super().__init__(Track, "track")
-
-        if not self.exists("log"):
-            e = self.newElement()
-            e.name = "log"
-        if not self.exists("log-history"):
-            e = self.newElement()
-            e.name = "log-history"
+    def __init__(self, name="track"):
+        super().__init__(Track, name)
 
     def importFromGPX(self, gpx):
         for track in gpx.tracks:
@@ -41,14 +34,6 @@ class _TrackCollection(CollectionWithActiveElement, Generic[T]):
                     waypoints.append([point.latitude, point.longitude])
 
             self.append(Track(track.name, waypoints, collection=self))
-
-    def __iter__(self):
-        return iter(
-            list(filter(lambda e: e.name not in ["log", "log-history"], self.elements))
-        )
-    
-    def __getitem__(self, i):
-        return self.elements[i+2] 
 
 
 TrackCollection = _TrackCollection[Track]

@@ -27,16 +27,15 @@ except:
 
 from gi.repository import GObject, OsmGpsMap
 
-from gweatherrouting.core import utils
+from gweatherrouting.core import Core, TimeControl, utils
 from gweatherrouting.gtk.style import Style
 
 
 class GeoMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
-    def __init__(self, core, timeControl):
+    def __init__(self, core: Core, timeControl: TimeControl):
         GObject.GObject.__init__(self)
-        self.trackManager = core.trackManager
-        self.routingManager = core.routingManager
-        self.poiManager = core.poiManager
+
+        self.core = core
         self.timeControl = timeControl
         self.hlRouting = None
 
@@ -44,7 +43,7 @@ class GeoMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
         self.hlRouting = name
 
     def do_draw(self, gpsmap, cr):
-        log = self.trackManager.getByName("log")
+        log = self.core.logManager.getByName("log")
         if log:
             prevx = None
             prevy = None
@@ -65,7 +64,7 @@ class GeoMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
                 prevy = y
                 prevp = p
 
-        for tr in self.routingManager:
+        for tr in self.core.routingManager:
             highlight = False
 
             if not tr.visible:
@@ -140,11 +139,11 @@ class GeoMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
                 prevy = y
                 prevp = p
 
-        for tr in self.trackManager:
+        for tr in self.core.trackManager:
             if not tr.visible:
                 continue
 
-            active = self.trackManager.isActive(tr)
+            active = self.core.trackManager.isActive(tr)
 
             prevx = None
             prevy = None
@@ -198,7 +197,7 @@ class GeoMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
                 prevx = x
                 prevy = y
 
-        for tr in self.poiManager:
+        for tr in self.core.poiManager:
             if not tr.visible:
                 continue
 

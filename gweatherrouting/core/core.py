@@ -54,6 +54,16 @@ class Core(EventDispatcher):
         self.poiManager = POICollection()
         self.gribManager = GribManager()
         self.boatInfo = BoatInfo()
+        self.logManager = TrackCollection("log")
+
+        # "log" is the boat track
+        if not self.logManager.exists("log"):
+            e = self.logManager.newElement()
+            e.name = "log"
+        # "log-history" is the loaded from log tab
+        if not self.logManager.exists("log-history"):
+            e = self.logManager.newElement()
+            e.name = "log-history"
 
         self.connectionManager.connect("data", self.dataHandler)
         logger.info("Initialized")
