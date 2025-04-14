@@ -35,11 +35,5 @@ class _TrackCollection(CollectionWithActiveElement, Generic[T]):
 
             self.append(Track(track.name, waypoints, collection=self))
 
-    def __iter__(self):
-        return iter(self.elements)
-
-    def __getitem__(self, i):
-        return self.elements[i]
-
 
 TrackCollection = _TrackCollection[Track]
