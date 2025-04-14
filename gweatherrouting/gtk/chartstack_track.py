@@ -148,7 +148,7 @@ class ChartStackTrack:
             menu.popup(None, None, None, None, event.button, event.time)
 
     def onTrackItemClick(self, item, event):
-        if event.button == 3 and len(self.core.trackManager.getActive()) > 0:
+        if event.button == 3 and self.core.trackManager.getActive() is not None:
             menu = self.builder.get_object("track-item-menu")
             menu.popup(None, None, None, None, event.button, event.time)
 
