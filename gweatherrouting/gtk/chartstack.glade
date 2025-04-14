@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
+<!-- Generated with glade 3.40.0 -->
 <interface>
   <requires lib="gtk+" version="3.24"/>
   <requires lib="osmgpsmap" version="1.0"/>
@@ -596,7 +596,7 @@ loaded to created a routing</property>
                         <property name="vscrollbar-policy">always</property>
                         <property name="shadow-type">in</property>
                         <child>
-                          <object class="GtkTreeView">
+                          <object class="GtkTreeView" id="track-list-view">
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="model">track-list-store</property>
@@ -606,7 +606,8 @@ loaded to created a routing</property>
                             <property name="enable-grid-lines">horizontal</property>
                             <signal name="button-press-event" handler="onTrackClick" swapped="no"/>
                             <child internal-child="selection">
-                              <object class="GtkTreeSelection">
+                              <object class="GtkTreeSelection" id="track-list-selection">
+                                <property name="mode">browse</property>
                                 <signal name="changed" handler="onSelectTrack" swapped="no"/>
                               </object>
                             </child>

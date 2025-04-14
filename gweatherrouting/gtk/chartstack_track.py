@@ -23,16 +23,19 @@ try:
 except:
     gi.require_version("OsmGpsMap", "1.0")
 
-from gi.repository import Gtk
+from gi.repository import Gtk, GObject
 
+from gweatherrouting.core import Core
 
 class ChartStackTrack:
+    core: Core
     selectedTrackItem = None
 
     def __init__(self):
         self.trackStore = self.builder.get_object("track-store")
         self.trackListStore = self.builder.get_object("track-list-store")
         self.updateTrack()
+        self.selectLastTrack()
 
     def updateTrack(self, onlyActive=False):
         if not onlyActive:
@@ -49,6 +52,28 @@ class ChartStackTrack:
                 self.trackStore.append([i, wp[0], wp[1]])
 
         self.map.queue_draw()
+
+    def selectLastTrack(self):
+        def _inner():
+            treeview = self.builder.get_object("track-list-view")
+            selection = treeview.get_selection()
+            model = treeview.get_model()
+
+            iter_ = model.get_iter_first()
+            last_iter = None
+
+            while iter_ is not None:
+                last_iter = iter_
+                iter_ = model.iter_next(iter_)
+
+            if last_iter is not None:
+                selection.select_iter(last_iter)
+
+                # Optionally scroll to it
+                path = model.get_path(last_iter)
+                treeview.scroll_to_cell(path, None, False, 0, 0)
+
+        GObject.timeout_add(100, _inner)
 
     def onTrackExport(self, widget):
         dialog = Gtk.FileChooserDialog(
@@ -115,6 +140,7 @@ class ChartStackTrack:
         self.core.trackManager.remove(self.core.trackManager.getActive())
         self.updateTrack()
         self.map.queue_draw()
+        self.selectLastTrack()
 
     def onTrackClick(self, item, event):
         if event.button == 3 and len(self.core.trackManager) > 0:
@@ -183,11 +209,22 @@ class ChartStackTrack:
         lon = self.builder.get_object("track-add-point-lon").get_text()
 
         if len(lat) > 1 and len(lon) > 1:
-            if len(self.core.trackManager) == 0:
-                e = self.core.trackManager.newElement()
-                self.core.trackManager.setActive(e)
+            tracks_l = len(self.core.trackManager)
 
-            if not self.core.trackManager.hasActive():
+            if tracks_l == 0:
+                e = self.core.trackManager.newElement(points=[])
+                self.core.trackManager.setActive(e)
+                self.selectLastTrack()
+            elif tracks_l == 1 and not self.core.trackManager.hasActive():
+                self.core.trackManager.setActive(self.core.trackManager[0])
+                self.selectLastTrack()
+            elif tracks_l > 1 and not self.core.trackManager.hasActive():
+                edialog = Gtk.MessageDialog(
+                    self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error"
+                )
+                edialog.format_secondary_text(f"No track selected")
+                edialog.run()
+                edialog.destroy()       
                 return
 
             self.core.trackManager.getActive().add(float(lat), float(lon))

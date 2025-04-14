@@ -211,8 +211,10 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
         self.map.queue_draw()
 
     def onNew(self, widget):
-        self.core.trackManager.newElement()
+        e = self.core.trackManager.newElement(points=[])
+        self.core.trackManager.setActive(e)
         self.updateTrack()
+        self.selectLastTrack()
         self.map.queue_draw()
 
     def onExport(self, widget):
