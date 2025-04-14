@@ -42,5 +42,10 @@ class _TrackCollection(CollectionWithActiveElement, Generic[T]):
 
             self.append(Track(track.name, waypoints, collection=self))
 
+    def __iter__(self):
+        return iter(
+            filter(lambda e: e.name not in ["log", "log-history"], self.elements)
+        )
+
 
 TrackCollection = _TrackCollection[Track]
