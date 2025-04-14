@@ -5,7 +5,7 @@ run:
 	gweatherrouting
 
 build-standalone:
-	nuitka3 gweatherrouting/main.py --follow-imports --follow-stdlib 
+	nuitka3 gweatherrouting/__main__.py --follow-imports --follow-stdlib 
 
 
 build-appimage:

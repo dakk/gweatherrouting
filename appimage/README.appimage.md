@@ -27,7 +27,7 @@ Run `pyinstaller` with necessary options:
 ```bash
 pyinstaller --onefile --hidden-import=gi --collect-submodules=gi \
 --add-data "data/:gweatherrouting/data" --add-data "gtk/:gweatherrouting/gtk" \
---name gWeatherRouting --additional-hooks-dir=. main.py
+--name gWeatherRouting --additional-hooks-dir=. __main__.py
 cd ../..
 ```
 

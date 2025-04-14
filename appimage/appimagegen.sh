@@ -49,7 +49,7 @@ echo -e "\nStarting AppImage creation process..."
 # 1. Generate Binary from Python File
 cd ../gweatherrouting
 echo "Generating binary with PyInstaller..."
-pyinstaller --onefile --hidden-import=gi --collect-submodules=gi --add-data "data/:gweatherrouting/data" --add-data "gtk/:gweatherrouting/gtk" --name "$APP_NAME" main.py
+pyinstaller --onefile --hidden-import=gi --collect-submodules=gi --add-data "data/:gweatherrouting/data" --add-data "gtk/:gweatherrouting/gtk" --name "$APP_NAME" __main__.py
 cd ..
 
 # 2. Create AppImage Directory Structure
