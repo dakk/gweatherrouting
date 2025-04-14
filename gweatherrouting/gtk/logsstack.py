@@ -18,6 +18,7 @@ import io
 import logging
 import os
 from threading import Thread
+from typing import List
 
 import cairo
 import gi
@@ -33,7 +34,10 @@ except:
 
 from gi.repository import Gdk, Gtk
 
+from gweatherrouting.core import Core
 from gweatherrouting.core.timecontrol import TimeControl
+from gweatherrouting.gtk.charts import ChartManager
+from gweatherrouting.gtk.settings import SettingsManager
 
 from .maplayers.geomaplayer import GeoMapLayer
 from .maplayers.toolsmaplayer import ToolsMapLayer
@@ -45,17 +49,22 @@ LOG_TEMP_FILE = "/tmp/gwr-recording.log"
 
 
 class LogsStack(Gtk.Box, nt.Output, nt.Input):
-    def __init__(self, parent, chartManager, core, settingsManager):
+    def __init__(
+        self,
+        parent,
+        chartManager: ChartManager,
+        core: Core,
+        settingsManager: SettingsManager,
+    ):
         Gtk.Widget.__init__(self)
 
         self.parent = parent
         self.core = core
-        self.trackManager = self.core.trackManager
         self.recording = False
         self.loading = False
-        self.data = []
+        self.data: List = []
         self.recordedData = None
-        self.toSend = []
+        self.toSend: List = []
 
         self.depthChart = False
         self.speedChart = True
@@ -293,7 +302,9 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
             self.timeControl.setTime(data.time)
 
             if len(self.data) % 150 == 0:
-                self.trackManager.getByName("log-history").append((data.lat, data.lon))
+                self.core.logManager.getByName("log-history").append(
+                    (data.lat, data.lon)
+                )
 
             if self.recording or len(self.data) % 5000 == 0:
                 self.map.set_center_and_zoom(data.lat, data.lon, 12)
@@ -344,7 +355,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
         # ext = filepath.split('.')[-1]
 
         # TODO: support for gpx files
-        self.trackManager.getByName("log-history").clear()
+        self.core.logManager.getByName("log-history").clear()
 
         try:
             fi = nt.FileInput(filepath)
@@ -379,15 +390,15 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
             self.recordedData.close()
         self.recordedData = open(LOG_TEMP_FILE, "w")
         self.toSend = []
-        self.trackManager.getByName("log-history").clear()
+        self.core.logManager.getByName("log-history").clear()
         self.map.queue_draw()
         self.graphArea.queue_draw()
         logger.debug("Data cleared")
 
     def rebuildTrack(self):
-        self.trackManager.getByName("log-history").clear()
+        self.core.logManager.getByName("log-history").clear()
         for x in self.data[0::150]:
-            self.trackManager.getByName("log-history").append((x.lat, x.lon))
+            self.core.logManager.getByName("log-history").append((x.lat, x.lon))
         self.map.queue_draw()
 
     def startRecording(self):

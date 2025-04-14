@@ -27,20 +27,28 @@ except:
 
 from gi.repository import Gdk, Gtk, OsmGpsMap  # Keybinder
 
-from gweatherrouting.core import TimeControl
+from gweatherrouting.core import Core, TimeControl
 
+from .charts.chartmanager import ChartManager
 from .chartstack_poi import ChartStackPOI
 from .chartstack_routing import ChartStackRouting
 from .chartstack_track import ChartStackTrack
 from .gribmanagerwindow import GribFileFilter
 from .maplayers import AISMapLayer, GeoMapLayer, GribMapLayer, ToolsMapLayer
+from .settings import SettingsManager
 from .widgets.timetravel import TimeTravelWidget
 
 logger = logging.getLogger("gweatherrouting")
 
 
 class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
-    def __init__(self, parent, chartManager, core, settingsManager):
+    def __init__(
+        self,
+        parent,
+        chartManager: ChartManager,
+        core: Core,
+        settingsManager: SettingsManager,
+    ):
         Gtk.Widget.__init__(self)
 
         # Keybinder.init()
@@ -171,7 +179,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 
     def boatInfoHandler(self, bi):
         self.toolsMapLayer.gpsAdd(bi.latitude, bi.longitude, bi.heading, bi.speed)
-        self.trackManager.getByName("log").append((bi.latitude, bi.longitude))
+        self.core.logManager.getByName("log").append((bi.latitude, bi.longitude))
         self.map.queue_draw()
 
     def onMapMouseMove(self, map, event):
