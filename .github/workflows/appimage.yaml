@@ -1,7 +1,8 @@
+name: Build AppImage
 on: [push]
 
 jobs:
-  hello_world_job:
+  build:
     runs-on: ubuntu-latest
     name: AppImage generation
     steps:
