@@ -3,13 +3,14 @@ on: [push]
 jobs:
   hello_world_job:
     runs-on: ubuntu-latest
-    name: A job to say hello
+    name: A job to say goodbye
     steps:
       - uses: actions/checkout@v4
+      - name: Make script executable
+        run: chmod +x .github/workflows/script/goodbye.sh
       - id: foo
-        uses: /script/goodbye.sh
-        with:
-          who-to-greet: 'Mona the Octocat'
+        name: Run goodbye script
+        run: .github/workflows/script/goodbye.sh
       - run: echo random-number "$RANDOM_NUMBER"
         shell: bash
         env:
