@@ -13,12 +13,12 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Ubuntu Dependencies
+      - name: Install Ubuntu Dependencies (ecCodes by binary)
         run: |
             chmod +x .github/workflows/script/ubuntu_dep_eccodes_bin.sh
             .github/workflows/script/ubuntu_dep_eccodes_bin.sh
 
-      - name: Install Python
+      - name: Install Python Dependencies
         run: |
             chmod +x .github/workflows/script/python_dep.sh
             .github/workflows/script/python_dep.sh
