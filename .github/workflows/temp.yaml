@@ -1,4 +1,4 @@
-name: Build AppImage
+name: Test ecCodes
 on: [push]
 
 jobs:
@@ -12,4 +12,5 @@ jobs:
         run: |
             sudo apt-get install -y libaec-dev
             wget -O eccodes-2.41.0-Source "https://confluence.ecmwf.int/download/attachments/45757960/eccodes-2.41.0-Source.tar.gz?api=v2"
+            ls
             tar -xzf eccodes-2.41.0-Source
