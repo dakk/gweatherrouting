@@ -1,0 +1,15 @@
+name: Build AppImage
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: AppImage generation
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: ecCodes by binary
+        run: |
+            sudo apt-get install -y libaec-dev
+            wget -O eccodes-2.41.0-Source "https://confluence.ecmwf.int/download/attachments/45757960/eccodes-2.41.0-Source.tar.gz?api=v2"
+            tar -xzf eccodes-2.41.0-Source
