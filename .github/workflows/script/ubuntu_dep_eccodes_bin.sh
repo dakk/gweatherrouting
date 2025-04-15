@@ -1,6 +1,6 @@
 sudo apt-get install -y libaec-dev
-wget -O eccodes-2.41.0-Source "https://confluence.ecmwf.int/download/attachments/45757960/eccodes-2.41.0-Source.tar.gz?api=v2"
-tar -xzf eccodes-2.41.0-Source
+wget -O eccodes-2.41.0-Source.tar.gz "https://confluence.ecmwf.int/download/attachments/45757960/eccodes-2.41.0-Source.tar.gz?api=v2"
+tar -xzf eccodes-2.41.0-Source.tar.gz
 cd eccodes-2.41.0-Source
 mkdir build && cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local
