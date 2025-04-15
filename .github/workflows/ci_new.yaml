@@ -28,18 +28,11 @@ jobs:
       run: |
         chmod +x .github/workflows/script/ubuntu_dep.sh
         .github/workflows/script/ubuntu_dep.sh
-        pip install git+https://github.com/vext-python/vext@32ad4d1c5f45797e244df1d2816f76b60f28e20e
-        pip install tox
+        chmod +x .github/workflows/script/python_dep.sh
+        .github/workflows/script/python_dep.sh
 
     - name: Install gww
       run: pip install .
-
-    - name: Build appimage
-      run: |
-        sudo apt-get install libfuse2
-        pip install pyinstaller
-        cd appimage
-        bash appimagegen.sh -y
 
   build-latest:
     runs-on: ubuntu-latest
@@ -61,19 +54,11 @@ jobs:
       run: |
         chmod +x .github/workflows/script/ubuntu_dep.sh
         .github/workflows/script/ubuntu_dep.sh
-        pip install git+https://github.com/vext-python/vext@32ad4d1c5f45797e244df1d2816f76b60f28e20e
-        pip install tox
+        chmod +x .github/workflows/script/python_dep.sh
+        .github/workflows/script/python_dep.sh
 
     - name: Install gww
       run: pip install .
-
-    - name: Build appimage
-      run: |
-        sudo apt-get install libfuse2
-        pip install pyinstaller
-        cd appimage
-        bash appimagegen.sh -y
-
 
   linters:
     runs-on: ubuntu-latest
