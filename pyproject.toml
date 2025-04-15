@@ -44,7 +44,7 @@ Documentation = "https://github.com/dakk/gweatherrouting"
 Source = "https://github.com/dakk/gweatherrouting"
 
 [project.scripts]
-gweatherrouting = "gweatherrouting.main:startUIGtk"
+gweatherrouting = "gweatherrouting.__main__:startUIGtk"
 
 [tool.setuptools]
 packages = [

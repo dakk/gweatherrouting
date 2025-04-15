@@ -78,8 +78,8 @@ class Collection(Generic[T]):
             baseName = self.baseName
         return uniqueName(baseName, self.elements)
 
-    def newElement(self):
-        e = self.of(self.getUniqueName(), collection=self)
+    def newElement(self, **kwargs):
+        e = self.of(self.getUniqueName(), collection=self, **kwargs)
         self.append(e)
         self.save()
         return e
@@ -170,3 +170,9 @@ class CollectionWithActiveElement(Collection):
 
     def isActive(self, element):
         return self.activeElement == element
+
+    def remove(self, element):
+        if self.activeElement == element:
+            self.activeElement = None
+
+        Collection.remove(self, element)
