@@ -7,5 +7,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Ubuntu Dependencies
-        run: chmod +x .github/workflows/script/ubuntu_dep.sh
-        run: .github/workflows/script/ubuntu_dep.sh
+        run: |
+            chmod +x .github/workflows/script/ubuntu_dep.sh
+            .github/workflows/script/ubuntu_dep.sh
