@@ -22,12 +22,13 @@ jobs:
         run: |
             chmod +x .github/workflows/script/python_dep.sh
             .github/workflows/script/python_dep.sh
-            pip install pyinstaller
       - name: Instal gww
         run: pip install .
 
       - name: Generate AppImage
         run: |
+            sudo apt-get install libfuse2
+            pip install pyinstaller
             cd appimage
             bash appimagegen.sh -y
 
