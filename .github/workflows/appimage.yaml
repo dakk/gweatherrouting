@@ -1,0 +1,11 @@
+on: [push]
+
+jobs:
+  hello_world_job:
+    runs-on: ubuntu-latest
+    name: AppImage generation
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Ubuntu Dependencies
+        run: chmod +x .github/workflows/script/ubuntu_dep.sh
+        run: .github/workflows/script/ubuntu_dep.sh
