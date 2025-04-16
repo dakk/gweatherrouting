@@ -23,10 +23,6 @@ jobs:
       - name: Instal gww
         run: pip install .
 
-      - name: Set environment variables for X11 compatibility
-        run: |
-            echo "GDK_BACKEND=x11" >> $GITHUB_ENV
-
       - name: Generate AppImage
         run: |
             sudo apt-get install libfuse2
