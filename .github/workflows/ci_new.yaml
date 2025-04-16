@@ -26,10 +26,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        chmod +x .github/workflows/script/ubuntu_dep.sh
-        .github/workflows/script/ubuntu_dep.sh
-        chmod +x .github/workflows/script/python_dep.sh
-        .github/workflows/script/python_dep.sh
+        bash .github/workflows/script/ubuntu_dep.sh
+        bash .github/workflows/script/python_dep.sh
 
     - name: Install gww
       run: pip install .
@@ -52,10 +50,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        chmod +x .github/workflows/script/ubuntu_dep.sh
-        .github/workflows/script/ubuntu_dep.sh
-        chmod +x .github/workflows/script/python_dep.sh
-        .github/workflows/script/python_dep.sh
+        bash .github/workflows/script/ubuntu_dep.sh
+        bash .github/workflows/script/python_dep.sh
 
     - name: Install gww
       run: pip install .

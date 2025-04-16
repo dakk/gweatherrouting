@@ -15,13 +15,11 @@ jobs:
 
       - name: Install Ubuntu Dependencies (ecCodes by binary)
         run: |
-            chmod +x .github/workflows/script/ubuntu_dep_eccodes_bin.sh
-            .github/workflows/script/ubuntu_dep_eccodes_bin.sh
+            bash .github/workflows/script/ubuntu_dep_eccodes_bin.sh
 
       - name: Install Python Dependencies
         run: |
-            chmod +x .github/workflows/script/python_dep.sh
-            .github/workflows/script/python_dep.sh
+            bash .github/workflows/script/python_dep.sh
       - name: Instal gww
         run: pip install .
 
