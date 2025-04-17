@@ -1,0 +1,37 @@
+name: Build AppImage
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: AppImage generation
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Ubuntu Dependencies (ecCodes by binary)
+        run: |
+            bash .github/workflows/script/ubuntu_dep.sh
+
+      - name: Install Python Dependencies
+        run: |
+            bash .github/workflows/script/python_dep.sh
+      - name: Instal gww
+        run: pip install .
+
+      - name: Generate AppImage
+        run: |
+            sudo apt-get install libfuse2
+            pip install pyinstaller
+            cd appimage
+            bash appimagegen.sh -y
+
+      - name: Upload AppImage as artifact
+        uses: actions/upload-artifact@v4
+        with:
+            name: gww AppImage
+            path: ${{ github.workspace }}/**/*.AppImage

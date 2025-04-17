@@ -2,6 +2,7 @@
 # Auto-generated and improved AppRun script for AppImage
 # Stops on any error
 set -e
+GDK_BACKEND=x11
 # Resolve the directory of this script (AppDir root)
 this_dir="$(readlink -f "$(dirname "$0")")"
 source "$this_dir/apprun-hooks/linuxdeploy-plugin-gtk.sh"
