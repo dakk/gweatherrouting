@@ -3,7 +3,7 @@ on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     name: AppImage generation
     steps:
       - uses: actions/checkout@v4
@@ -15,7 +15,7 @@ jobs:
 
       - name: Install Ubuntu Dependencies (ecCodes by binary)
         run: |
-            bash .github/workflows/script/ubuntu_dep_eccodes_bin.sh
+            bash .github/workflows/script/ubuntu_dep.sh
 
       - name: Install Python Dependencies
         run: |
