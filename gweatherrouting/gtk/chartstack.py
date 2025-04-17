@@ -130,12 +130,13 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
         self.builder.get_object("stop-routing-button").hide()
         self.progressBar = self.builder.get_object("progressbar")
         self.progressBar.hide()
-        
+
     def on_map_clicked(self, widget, event):
         # First grab focus for the map
         self.map.grab_focus()
         # Then proceed with your existing click handling
         return False  # Return False to allow other handlers to process the event
+
     def on_map_mapped(self, widget):
         # Widget is now visible on screen, safe to grab focus
         self.map.grab_focus()

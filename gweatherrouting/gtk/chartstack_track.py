@@ -23,9 +23,10 @@ try:
 except:
     gi.require_version("OsmGpsMap", "1.0")
 
-from gi.repository import Gtk, GObject
+from gi.repository import GObject, Gtk
 
 from gweatherrouting.core import Core
+
 
 class ChartStackTrack:
     core: Core
@@ -224,7 +225,7 @@ class ChartStackTrack:
                 )
                 edialog.format_secondary_text(f"No track selected")
                 edialog.run()
-                edialog.destroy()       
+                edialog.destroy()
                 return
 
             self.core.trackManager.getActive().add(float(lat), float(lon))
