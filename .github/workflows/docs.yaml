@@ -16,7 +16,6 @@ jobs:
       - name: Install dependencies
         run: |
           pip install sphinx myst_nb pydata-sphinx-theme sphinx_design
-          python setup.py install
       - name: Sphinx build
         run: |
           sphinx-build docs/source _build
