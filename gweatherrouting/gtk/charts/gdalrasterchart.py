@@ -108,13 +108,17 @@ class GDALSingleRasterChart:
         self.bbox = datasetBBox(dataset)
 
         def worker(i, return_dict):
-            return_dict["surface"] = self.bandToSurface(i)
+            try:
+                return_dict["surface"] = self.bandToSurface(i)
+            except:
+                # Fixes error on quit
+                logger.warning(f"Interrupted band to surface process on {i}")
 
         manager = multiprocessing.Manager()
         return_dict = manager.dict()
-        p = multiprocessing.Process(target=worker, args=(1, return_dict))
-        p.start()
-        p.join()
+        self.process = multiprocessing.Process(target=worker, args=(1, return_dict))
+        self.process.start()
+        self.process.join()
         surface, bandXSize, bandYSize = return_dict["surface"]
         surf = cairo.ImageSurface.create_for_data(
             surface,
