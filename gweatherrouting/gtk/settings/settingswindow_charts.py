@@ -143,4 +143,11 @@ class SettingsWindowCharts:
             dialog.destroy()
 
     def onAddVectorChart(self, widget):
-        pass
+        edialog = Gtk.MessageDialog(
+            self.parent.window, 0, Gtk.MessageType.WARNING, Gtk.ButtonsType.OK, "Warning"
+        )
+        edialog.format_secondary_text(
+            "Only the already shown OSM vector data is currently supported."
+        )
+        edialog.run()
+        edialog.destroy()
