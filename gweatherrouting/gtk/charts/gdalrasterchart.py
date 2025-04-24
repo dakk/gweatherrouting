@@ -143,7 +143,7 @@ class GDALSingleRasterChart:
             except:
                 colors[x] = 0x00000000
 
-        data = np.vectorize(lambda x: colors[x], otypes=[np.int32])(band.ReadAsArray())
+        data = np.vectorize(lambda x: colors[x], otypes=[np.int64])(band.ReadAsArray())
         return data, band.XSize, band.YSize
 
     def do_draw(self, gpsmap, cr):

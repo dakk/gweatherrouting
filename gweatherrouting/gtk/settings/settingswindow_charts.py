@@ -62,7 +62,7 @@ class SettingsWindowCharts:
             if not vc:
                 vc = []
 
-            vc.append({"path": l.path, "metadata": l.metadata})
+            vc.append({"path": l.path, "metadata": l.metadata, "enabled": True})
             self.settingsManager[t + "Charts"] = vc
 
             self.reloadChart()
