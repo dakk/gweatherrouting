@@ -143,7 +143,7 @@ class GDALSingleRasterChart:
             except:
                 colors[x] = 0x00000000
 
-        data = np.vectorize(lambda x: colors[x], otypes=[np.int64])(band.ReadAsArray())
+        data = np.vectorize(lambda x: colors[x], otypes=[np.uint32])(band.ReadAsArray())
         return data, band.XSize, band.YSize
 
     def do_draw(self, gpsmap, cr):
@@ -317,31 +317,31 @@ class GDALRasterChart(ChartLayer):
 
         for x in self.metadata:
             # Disable bbox rendering
-            continue
+            # continue
 
-            # bb = x[1]
+            bb = x[1]
 
-            # minRLat = min(bb[0][0], bb[1][0])
-            # maxRLat = max(bb[0][0], bb[1][0])
-            # minRLon = min(bb[0][1], bb[1][1])
-            # maxRLon = max(bb[0][1], bb[1][1])
+            minRLat = min(bb[0][0], bb[1][0])
+            maxRLat = max(bb[0][0], bb[1][0])
+            minRLon = min(bb[0][1], bb[1][1])
+            maxRLon = max(bb[0][1], bb[1][1])
 
-            # xx, yy = gpsmap.convert_geographic_to_screen(
-            # 	OsmGpsMap.MapPoint.new_degrees(minRLat, minRLon)
-            # )
-            # xx2, yy2 = gpsmap.convert_geographic_to_screen(
-            # 	OsmGpsMap.MapPoint.new_degrees(maxRLat, maxRLon)
-            # )
+            xx, yy = gpsmap.convert_geographic_to_screen(
+            	OsmGpsMap.MapPoint.new_degrees(minRLat, minRLon)
+            )
+            xx2, yy2 = gpsmap.convert_geographic_to_screen(
+            	OsmGpsMap.MapPoint.new_degrees(maxRLat, maxRLon)
+            )
 
-            # cr.set_source_rgba(1,0,0,0.6)
-            # cr.set_line_width(0.3)
-            # cr.move_to(xx, yy)
-            # cr.line_to(xx, yy2)
-            # cr.line_to(xx2, yy2)
-            # cr.line_to(xx2, yy)
-            # cr.line_to(xx, yy)
+            cr.set_source_rgba(1,0,0,0.6)
+            cr.set_line_width(0.3)
+            cr.move_to(xx, yy)
+            cr.line_to(xx, yy2)
+            cr.line_to(xx2, yy2)
+            cr.line_to(xx2, yy)
+            cr.line_to(xx, yy)
 
-            # cr.stroke()
+            cr.stroke()
 
     def do_render(self, gpsmap):
         pass
