@@ -1,7 +1,7 @@
 [project]
 name = "gweatherrouting"
 dynamic = ["version"]
-description = ""
+description = "Sailing routing and navigation software"
 readme = "README.md"
 requires-python = ">= 3.9.0"
 license = {text = "GPLv3"}

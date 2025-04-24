@@ -4,7 +4,7 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 <!-- [![PyPI version](https://badge.fury.io/py/gweatherrouting.svg)](https://badge.fury.io/py/gweatherrouting) -->
 
-GWeatherRouting is an opensource sailing route calculator written in python and Gtk4.
+GWeatherRouting is an open-source sailing routing and navigation software written using Python and Gtk4.
 
 ![Routing in progress](https://github.com/dakk/gweatherrouting/raw/master/media/s3.png)
 
@@ -24,10 +24,10 @@ GWeatherRouting is an opensource sailing route calculator written in python and 
 - Chart rendering: 
     - GeoJSON (coastlines included)
     - GSHHS basemap (download helper included)
-    - KAP, GeoTiff charts and other raster formats
+    - KAP, GeoTiff charts and other raster formats supported by GDAL
     - OpenStreetMap seamark rendering
-- Gtk3 interface
-- NMEA interface
+- Gtk4 interface
+- NMEA instruments interface
 - Raster Nautical charts (KAP)
 - NMEA / GPX log analysys
 

@@ -33,7 +33,7 @@ h3:not(#hero h3) {
 <div id="hero-left">  <!-- Start Hero Left -->
   <h2 style="font-size: 60px; font-weight: bold; margin: 2rem auto 0;">GWeatherRouting</h2>
   <h3 style="font-weight: bold; margin-top: 0;">Open-source sailing routing and navigation</h3>
-  <p></p>
+  <p>GWeatherRouting is an open-source sailing routing and navigation software written using Python and Gtk4.</p>
 
 <!-- <div class="homepage-button-container">
   <div class="homepage-button-container-row">
