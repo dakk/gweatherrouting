@@ -6,13 +6,13 @@
 
 GWeatherRouting is an open-source sailing routing and navigation software written using Python and Gtk4.
 
-![Routing in progress](https://github.com/dakk/gweatherrouting/raw/master/media/s3.png)
+![Routing in progress](https://github.com/dakk/gweatherrouting/raw/master/docs/source/_static/images/s3.png)
 
-![Routing done](https://github.com/dakk/gweatherrouting/raw/master/media/s5.png)
+![Routing done](https://github.com/dakk/gweatherrouting/raw/master/docs/source/_static/images/s5.png)
 
-![Chart detail](https://github.com/dakk/gweatherrouting/raw/master/media/s6.png)
+![Chart detail](https://github.com/dakk/gweatherrouting/raw/master/docs/source/_static/images/s6.png)
 
-![Log analysis](https://github.com/dakk/gweatherrouting/raw/master/media/loganalysis.png)
+![Log analysis](https://github.com/dakk/gweatherrouting/raw/master/docs/source/_static/images/loganalysis.png)
 
 ## Features
 

@@ -12,15 +12,20 @@ GWeatherRouting  Documentation
    :target: https://www.gnu.org/licenses/gpl-3.0
 
 
+Welcome to the GWeatherRouting documentation.
+
+
+Sections
+---------
 
 .. toctree::
    :maxdepth: 2
-   :caption: GWeatherRouting
+
+   installation
+   quickstart
+   routing
 
 
-Indices and tables
-==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. * :ref:`genindex`
+.. * :ref:`search`

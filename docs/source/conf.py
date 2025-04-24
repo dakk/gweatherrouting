@@ -24,14 +24,18 @@ extensions = [
     "sphinx.ext.napoleon",
     "pydata_sphinx_theme",
     "sphinx_design",
-    "myst_nb",
+    "myst_parser"
 ]
 
 # "sphinx_rtd_dark_mode",
 # "sphinx_rtd_theme",
 jupyter_execute_notebooks = "off"
-myst_enable_extensions = ["colon_fence"]
-
+myst_enable_extensions = [
+    "colon_fence",    
+    "deflist",        
+    "html_admonition", 
+    "html_image", 
+]
 templates_path = ["_templates"]
 exclude_patterns = []
 autodoc_source_dir = [
@@ -76,7 +80,7 @@ html_theme_options = {
         "sourcelink",
     ],
     "use_edit_page_button": True,
-    "analytics": {"google_analytics_id": "G-JJNSHE8EFK"},
+    # "analytics": {"google_analytics_id": "TODO"},
     "external_links": [
         # {"name": "", "url": ""},
     ],

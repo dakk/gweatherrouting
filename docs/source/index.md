@@ -21,7 +21,7 @@ h1:not(.sd-d-none) {
 /* Override all h3 headers that are not in hero */
 h3:not(#hero h3) {
   font-weight: bold;
-  text-align: center;
+  /* text-align: center; */
 }
 </style>
 
@@ -29,41 +29,23 @@ h3:not(#hero h3) {
 # GWeatherRouting: Open-source sailing routing and navigation
 
 <div id="hero">
-
-<div id="hero-left">  <!-- Start Hero Left -->
-  <h2 style="font-size: 60px; font-weight: bold; margin: 2rem auto 0;">GWeatherRouting</h2>
-  <h3 style="font-weight: bold; margin-top: 0;">Open-source sailing routing and navigation</h3>
-  <p>GWeatherRouting is an open-source sailing routing and navigation software written using Python and Gtk4.</p>
-
-<!-- <div class="homepage-button-container">
-  <div class="homepage-button-container-row">
-      <a href="./docs/qiskit_example.html" class="homepage-button primary-button">Get Started</a>
-      <a href="https://dqpu.io/app" target="_blank" class="homepage-button secondary-button">App UI</a>
+  <div id="hero-left">  <!-- Start Hero Left -->
+    <h2 style="font-size: 60px; font-weight: bold; margin: 2rem auto 0;">GWeatherRouting</h2>
+    <h3 style="font-weight: bold; margin-top: 0;">Open-source sailing routing and navigation</h3>
+    <p>GWeatherRouting is an open-source sailing routing and navigation software written using Python and Gtk4.</p>
+    <div class="homepage-button-container">
+      <div class="homepage-button-container-row">
+          <a href="https://github.com/dakk/gweatherrouting/releases" class="homepage-button primary-button">Download</a>
+      </div>
+      <div class="homepage-button-container-row">
+          <a href="./docs/index.html" class="homepage-button-link">See Documentation →</a>
+      </div>
+    </div>
   </div>
-  <div class="homepage-button-container-row">
-      <a href="./docs/index.html" class="homepage-button-link">See Documentation →</a>
+  <div id="hero-right">
+    <img src="./_static/images/s3.png">
   </div>
-</div> -->
-</div>  <!-- End Hero Left -->
-<!-- <div id="hero-right">
-
-<!-- ```bash
-pip install dqpu
-```
-
-```python
-from dqpu.backends.qiskit import DQPUBackend
-
-backend = DQPUBackend()
-backend.load_account("dqpu_alice.testnet")
-
-job = backend.run(quantum_circuit, shots=1024)
-counts = job.result().get_counts(circ)
-```
-
-</div> -->
-
-</div>  End Hero -->
+</div>
 
 
 
@@ -98,59 +80,22 @@ counts = job.result().get_counts(circ)
 </div>
 :::
 
-::::
+::::-->
 
+<!-- ::::{grid} 1 1 2 2
 
-The following process outlines how clients can submit quantum circuits for sampling using the DQPU contract on NEAR blockchain:
-
-1. **Client Submits Job**: A *Client* sends a quantum circuit along with a reward to the DQPU smart contract
-
-2. **Verifier Validates Circuit**: A *Verifier* validates the submitted circuit adding `trap qubits`
-
-3. **Simulation or Hardware Execution**: A *Sampler* executes the job retrieved from the waiting list and submit the result
-
-4. **Verifier Checks Result**: The *Verifier* checks result validity and the rewards are distributed
-
-5. **Client Receives Result**: The *Client* can retrieve the final result from the smart contract.
-
-Read the extended workflow from the [README Workflow section](https://github.com/dakk/dqpu?tab=readme-ov-file#workflow)
-
-
-# Support DQPU
-
-::::{grid} 1 1 2 2
-
-:::{grid-item} -->
+:::{grid-item}  -->
 
 <h3>Contributions</h3>
 
-Contributions and issue reports are very welcome at
-[the GitHub repository](https://github.com/dakk/gweatherrouting).
-:::
-
-:::{grid-item}
-
-<!-- <h3>Citation</h3>
-
-```
-  @software{dqpu2024,
-      author = {Davide Gessa},
-      title = {dqpu: A Web3-Powered, Decentralized Quantum Simulator with Verifiable Computation },
-      url = {https://github.com/dakk/dqpu},
-      year = {2024},
-  }
-``` -->
-
-:::
+Contributions and issue reports are very welcome at the
+[GitHub repository](https://github.com/dakk/gweatherrouting).
+<!-- ::: -->
 
 :::{toctree}
 :maxdepth: 1
 :hidden:
 
-<!-- Getting Started<docs/qiskit_example.ipynb> -->
 Documentation<docs/index>
-<!-- Node operator<nodes/index> -->
-<!-- API<api/index> -->
-<!-- App UI<https://dqpu.io/app> -->
 Source Code<https://github.com/dakk/gweatherrouting>
 :::
