@@ -3,7 +3,7 @@ wget -O eccodes-2.41.0-Source.tar.gz "https://confluence.ecmwf.int/download/atta
 tar -xzf eccodes-2.41.0-Source.tar.gz
 cd eccodes-2.41.0-Source
 mkdir build && cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local
+cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DENABLE_EXAMPLES=OFF -DENABLE_TESTS=OFF ..
 make
 ctest
 sudo make install
