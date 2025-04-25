@@ -33,5 +33,5 @@ jobs:
       - name: Upload AppImage as artifact
         uses: actions/upload-artifact@v4
         with:
-            name: gww AppImage
+            name: GWeatherRouting-linux-x86_64.appimage
             path: ${{ github.workspace }}/**/*.AppImage
