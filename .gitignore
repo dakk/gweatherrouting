@@ -17,3 +17,4 @@ linuxdeploy*
 gweatherrouting/build
 gweatherrouting/dist
 gweatherrouting/*.spec
+docs/build
