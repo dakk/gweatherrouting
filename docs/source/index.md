@@ -35,15 +35,15 @@ h3:not(#hero h3) {
     <p>GWeatherRouting is an open-source sailing routing and navigation software written using Python and Gtk4.</p>
     <div class="homepage-button-container">
       <div class="homepage-button-container-row">
-          <a href="https://github.com/dakk/gweatherrouting/releases" class="homepage-button primary-button">Download</a>
+          <a href="https://github.com/dakk/gweatherrouting/releases/download/v0.2-rc0/GWeatherRouting-linux-x86_64.AppImage" class="homepage-button primary-button"><i class="fa fa-download"></i> Download Appimage</a>
       </div>
       <div class="homepage-button-container-row">
-          <a href="./docs/index.html" class="homepage-button-link">See Documentation →</a>
+          <a href="./docs/quickstart.html" class="homepage-button-link">Quickstart →</a>
       </div>
     </div>
   </div>
   <div id="hero-right">
-    <img src="./_static/images/s3.png">
+    <img src="./_static/images/quickstart/10.gif">
   </div>
 </div>
 

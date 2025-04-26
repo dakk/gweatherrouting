@@ -21,9 +21,7 @@ Sections
 .. toctree::
    :maxdepth: 2
 
-   installation
    quickstart
-   routing
 
 
 
