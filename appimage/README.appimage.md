@@ -1,6 +1,6 @@
-# gWeatherRouting - AppImage Generation Guide
+# GWeatherRouting - AppImage Generation Guide
 
-This document provides a step-by-step guide to generating an AppImage from the `gWeatherRouting` repository.
+This document provides a step-by-step guide to generating an AppImage from the `GWeatherRouting` repository.
 `AppImageGen.sh` automatically executes a procedure similar to the one outlined below.
 ## Prerequisites
 
@@ -27,7 +27,7 @@ Run `pyinstaller` with necessary options:
 ```bash
 pyinstaller --onefile --hidden-import=gi --collect-submodules=gi \
 --add-data "data/:gweatherrouting/data" --add-data "gtk/:gweatherrouting/gtk" \
---name gWeatherRouting --additional-hooks-dir=. __main__.py
+--name GWeatherRouting --additional-hooks-dir=. __main__.py
 cd ../..
 ```
 
@@ -39,9 +39,9 @@ cd ../..
 
 ```bash
 mkdir -p AppDir/usr/{bin,share/applications,share/icons/hicolor/256x256/apps}
-cp gweatherrouting/gweatherrouting/dist/gWeatherRouting AppDir/usr/bin/
+cp gweatherrouting/gweatherrouting/dist/GWeatherRouting AppDir/usr/bin/
 cp gweatherrouting/icon.png AppDir/usr/share/icons/hicolor/256x256/apps/
-cp gweatherrouting/gWeatherRouting.desktop AppDir/usr/share/applications/
+cp gweatherrouting/GWeatherRouting.desktop AppDir/usr/share/applications/
 ```
 
 ## 4. Install `linuxdeploy` and GTK Plugin
@@ -61,6 +61,6 @@ NO_STRIP=true DEPLOY_GTK_VERSION=3 ./linuxdeploy-x86_64.AppImage --appdir AppDir
 ## 6. Generate the AppImage
 
 ```bash
-cp gweatherrouting/gWeatherRouting.desktop AppDir/
+cp gweatherrouting/GWeatherRouting.desktop AppDir/
 appimagetool AppDir/
 ```

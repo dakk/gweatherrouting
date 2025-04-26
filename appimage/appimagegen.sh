@@ -40,7 +40,7 @@ fi
 echo "Using library at: $LIBOSM_PATH"
 
 # Define variables
-APP_NAME="gWeatherRouting"
+APP_NAME="GWeatherRouting"
 APP_DIR="AppDir"
 DEPLOY_GTK_VERSION=3
 
@@ -92,6 +92,6 @@ rm linuxdeploy-x86_64.AppImage
 rm appimagetool-x86_64.AppImage
 rm -r gweatherrouting/dist
 rm -r gweatherrouting/build
-rm -r gweatherrouting/gWeatherRouting.spec
+rm -r gweatherrouting/GWeatherRouting.spec
 rm -r AppDir
 echo "Cleanup completed."
