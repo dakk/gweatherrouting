@@ -194,15 +194,19 @@ class ToolsMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
             cr.move_to(x, y)
             cr.line_to(x1, y1)
             cr.stroke()
-
-            # Calculate distance and bearing
-            (d, r) = utils.ortodromic(
+            
+            # TODO: remove this
+            d = utils.pointDistance(self.measureStart[0], self.measureStart[1], 
+                                         self.mousePosition[0], self.mousePosition[1],'nm')
+            
+            # Calculate bearing
+            (_, r) = utils.ortodromic(
                 self.measureStart[0],
                 self.measureStart[1],
                 self.mousePosition[0],
                 self.mousePosition[1],
             )
-
+            
             # Draw info
             Style.Measure.Font.apply(cr)
             cr.move_to(x1 + 15, y1)
