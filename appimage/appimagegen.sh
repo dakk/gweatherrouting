@@ -55,6 +55,7 @@ cd ..
 # 2. Create AppImage Directory Structure
 echo "Creating AppImage directory structure..."
 mkdir -p "$APP_DIR/usr/bin" "$APP_DIR/usr/share/applications" "$APP_DIR/usr/share/icons/hicolor/256x256/apps"
+cp -r /usr/local/share/eccodes/definitions "$APP_DIR/usr/local/share/eccodes/definitions"
 cp "gweatherrouting/dist/$APP_NAME" "$APP_DIR/usr/bin/"
 cp "appimage/icon.png" "$APP_DIR/usr/share/icons/hicolor/256x256/apps/"
 cp "appimage/$APP_NAME.desktop" "$APP_DIR/usr/share/applications/"

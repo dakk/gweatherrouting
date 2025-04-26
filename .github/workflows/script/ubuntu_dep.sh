@@ -7,8 +7,6 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DENABLE_EXAMPLES=OFF -DENABLE_TESTS=OFF
 make
 ctest
 sudo make install
-echo "ECCODES_DEFINITION_PATH=/usr/local/share/eccodes/definitions" >> $GITHUB_ENV
-
 
 sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
 sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
