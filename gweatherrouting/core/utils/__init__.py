@@ -23,6 +23,7 @@ from typing import Dict, Callable
 
 from gweatherrouting.common import resource_path
 from gweatherrouting.core.storage import *  # noqa: F401, F403
+from weatherrouting import utils
 
 COUNTRIES = json.load(
     open(resource_path("gweatherrouting", "data/countries.geojson"), "r")
@@ -133,9 +134,8 @@ EARTH_RADIUS = 60.0 * 360 / (2 * math.pi)  # nm
 
 
 def pointDistance(latA, lonA, latB, lonB):
-    p1 = latlon.LatLon(latlon.Latitude(latA), latlon.Longitude(lonA))
-    p2 = latlon.LatLon(latlon.Latitude(latB), latlon.Longitude(lonB))
-    return p1.distance(p2)
+    d = utils.pointDistance(latA, lonA, latB, lonB, "nm")
+    return d
 
 
 def routagePointDistance(latA, lonA, Distanza, Rotta):

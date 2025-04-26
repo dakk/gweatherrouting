@@ -195,7 +195,6 @@ class ToolsMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
             cr.line_to(x1, y1)
             cr.stroke()
             
-            # TODO: remove this
             d = utils.pointDistance(self.measureStart[0], self.measureStart[1], 
                                          self.mousePosition[0], self.mousePosition[1],'nm')
             
