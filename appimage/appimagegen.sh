@@ -39,6 +39,25 @@ fi
 
 echo "Using library at: $LIBOSM_PATH"
 
+
+LIBOSM_PATH2=$(ldconfig -p | grep "libosmgpsmap-1.0.so" | awk '{print $NF}')
+
+if [[ -n "$LIBOSM_PATH2" ]]; then
+    echo "Found libosmgpsmap-1.0.so at default location: $LIBOSM_PATH2"
+else
+    echo -e "\nCould not find libosmgpsmap-1.0.so at default location."
+    echo "Please provide an alternative path to libosmgpsmap-1.0.so"
+    echo "You can find it using: find /usr -name \"libosmgpsmap-1.0.so\""
+    read -p "Path to libosmgpsmap-1.0.so: " LIBOSM_PATH2
+
+    if [ ! -f "$LIBOSM_PATH2" ]; then
+        echo "Error: The specified library file does not exist."
+        exit 1
+    fi
+fi
+
+echo "Using library at: $LIBOSM_PATH2"
+
 # Define variables
 APP_NAME="GWeatherRouting"
 APP_DIR="AppDir"
@@ -54,14 +73,12 @@ cd ..
 
 # 2. Create AppImage Directory Structure
 echo "Creating AppImage directory structure..."
-mkdir -p "$APP_DIR/usr/bin" "$APP_DIR/usr/share/applications" "$APP_DIR/usr/share/icons/hicolor/256x256/apps" "$APP_DIR/usr/local/share/eccodes/" \
-    "$APP_DIR/usr/lib" "$APP_DIR/usr/lib/x86_64-linux-gnu"
+mkdir -p "$APP_DIR/usr/bin" "$APP_DIR/usr/share/applications" "$APP_DIR/usr/share/icons/hicolor/256x256/apps" "$APP_DIR/usr/local/share/eccodes/" 
 
 cp -r /usr/local/share/eccodes/definitions "$APP_DIR/usr/local/share/eccodes/"
 cp "gweatherrouting/dist/$APP_NAME" "$APP_DIR/usr/bin/"
 cp "appimage/icon.png" "$APP_DIR/usr/share/icons/hicolor/256x256/apps/"
 cp "appimage/$APP_NAME.desktop" "$APP_DIR/usr/share/applications/"
-cp "/usr/lib/x86_64-linux-gnu/libosm*" "$APP_DIR/usr/lib/x86_64-linux-gnu/" 
 
 # 3. Install linuxdeploy and GTK Plugin
 echo "Downloading linuxdeploy tools..."
@@ -71,7 +88,7 @@ chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-gtk.sh
 
 # 4. Add Required Libraries to AppImage Directory
 echo "Adding required libraries to AppImage directory..."
-NO_STRIP=true DEPLOY_GTK_VERSION=3 ./linuxdeploy-x86_64.AppImage --appdir AppDir --plugin gtk --library "$LIBOSM_PATH"
+NO_STRIP=true DEPLOY_GTK_VERSION=3 ./linuxdeploy-x86_64.AppImage --appdir AppDir --plugin gtk --library "$LIBOSM_PATH" --library "$LIBOSM_PATH2"
 
 # 5. Modify the AppRun file to add LD_LIBRARY_PATH after the gtk plugin line
 echo "Configuring AppRun file..."
