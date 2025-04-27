@@ -22,6 +22,7 @@ if [[ "$1" != "-y" ]]; then
 fi
 
 LIBOSM_PATH=$(ldconfig -p | grep "libosmgpsmap-1.0.so.1" | awk '{print $NF}')
+LIBOSM_PATH_A=$(ldconfig -p | grep "libosmgpsmap-1.0.a" | awk '{print $NF}')
 
 if [[ -n "$LIBOSM_PATH" ]]; then
     echo "Found libosmgpsmap-1.0.so.1 at default location: $LIBOSM_PATH"
@@ -68,7 +69,7 @@ chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-gtk.sh
 
 # 4. Add Required Libraries to AppImage Directory
 echo "Adding required libraries to AppImage directory..."
-NO_STRIP=true DEPLOY_GTK_VERSION=3 ./linuxdeploy-x86_64.AppImage --appdir AppDir --plugin gtk --library "$LIBOSM_PATH"
+NO_STRIP=true DEPLOY_GTK_VERSION=3 ./linuxdeploy-x86_64.AppImage --appdir AppDir --plugin gtk --library "$LIBOSM_PATH" "$LIBOSM_PATH_A"
 
 # 5. Modify the AppRun file to add LD_LIBRARY_PATH after the gtk plugin line
 echo "Configuring AppRun file..."
