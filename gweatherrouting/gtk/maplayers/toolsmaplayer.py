@@ -18,7 +18,8 @@ import math
 
 import cairo
 import gi
-from weatherrouting import utils
+from gweatherrouting.core import utils
+
 
 gi.require_version("Gtk", "3.0")
 try:
