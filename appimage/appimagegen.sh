@@ -21,42 +21,25 @@ if [[ "$1" != "-y" ]]; then
     fi
 fi
 
-LIBOSM_PATH=$(ldconfig -p | grep "libosmgpsmap-1.0.so.1" | awk '{print $NF}')
+LIBOSM_PATHS=$(ldconfig -p | grep "libosmgpsmap-1.0" | awk '{print $NF}' | tr '\n' ' ')
+echo "Using library at: $LIBOSM_PATHS"
 
-if [[ -n "$LIBOSM_PATH" ]]; then
-    echo "Found libosmgpsmap-1.0.so.1 at default location: $LIBOSM_PATH"
-else
-    echo -e "\nCould not find libosmgpsmap-1.0.so.1 at default location."
-    echo "Please provide an alternative path to libosmgpsmap-1.0.so.1"
-    echo "You can find it using: find /usr -name \"libosmgpsmap-1.0.so.1\""
-    read -p "Path to libosmgpsmap-1.0.so.1: " LIBOSM_PATH
+# if [[ -n "$LIBOSM_PATH" ]]; then
+#     echo "Found libosmgpsmap-1.0.so.1 at default location: $LIBOSM_PATH"
+# else
+#     echo -e "\nCould not find libosmgpsmap-1.0.so.1 at default location."
+#     echo "Please provide an alternative path to libosmgpsmap-1.0.so.1"
+#     echo "You can find it using: find /usr -name \"libosmgpsmap-1.0.so.1\""
+#     read -p "Path to libosmgpsmap-1.0.so.1: " LIBOSM_PATH
 
-    if [ ! -f "$LIBOSM_PATH" ]; then
-        echo "Error: The specified library file does not exist."
-        exit 1
-    fi
-fi
+#     if [ ! -f "$LIBOSM_PATH" ]; then
+#         echo "Error: The specified library file does not exist."
+#         exit 1
+#     fi
+# fi
 
-echo "Using library at: $LIBOSM_PATH"
+# echo "Using library at: $LIBOSM_PATH"
 
-
-LIBOSM_PATH2=$(ldconfig -p | grep "libosmgpsmap-1.0.so" | awk '{print $NF}')
-
-if [[ -n "$LIBOSM_PATH2" ]]; then
-    echo "Found libosmgpsmap-1.0.so at default location: $LIBOSM_PATH2"
-else
-    echo -e "\nCould not find libosmgpsmap-1.0.so at default location."
-    echo "Please provide an alternative path to libosmgpsmap-1.0.so"
-    echo "You can find it using: find /usr -name \"libosmgpsmap-1.0.so\""
-    read -p "Path to libosmgpsmap-1.0.so: " LIBOSM_PATH2
-
-    if [ ! -f "$LIBOSM_PATH2" ]; then
-        echo "Error: The specified library file does not exist."
-        exit 1
-    fi
-fi
-
-echo "Using library at: $LIBOSM_PATH2"
 
 # Define variables
 APP_NAME="GWeatherRouting"
@@ -88,8 +71,9 @@ chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-gtk.sh
 
 # 4. Add Required Libraries to AppImage Directory
 echo "Adding required libraries to AppImage directory..."
-NO_STRIP=true DEPLOY_GTK_VERSION=3 ./linuxdeploy-x86_64.AppImage --appdir AppDir --plugin gtk --library "$LIBOSM_PATH" 
-NO_STRIP=true DEPLOY_GTK_VERSION=3 ./linuxdeploy-x86_64.AppImage --appdir AppDir --plugin gtk --library "$LIBOSM_PATH2"
+for LIBOSM_PATH in $LIBOSM_PATHS; do
+    NO_STRIP=true DEPLOY_GTK_VERSION=3 ./linuxdeploy-x86_64.AppImage --appdir AppDir --plugin gtk --library "$LIBOSM_PATH" 
+done
 
 # 5. Modify the AppRun file to add LD_LIBRARY_PATH after the gtk plugin line
 echo "Configuring AppRun file..."
