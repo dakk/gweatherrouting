@@ -38,7 +38,21 @@ else
     fi
 fi
 
-echo "Using library at: $LIBOSM_PATH"
+if [[ -n "$LIBOSM_PATH_A" ]]; then
+    echo "Found libosmgpsmap-1.0.a at default location: $LIBOSM_PATH_A"
+else
+    echo -e "\nCould not find libosmgpsmap-1.0.a at default location."
+    echo "Please provide an alternative path to libosmgpsmap-1.0.a"
+    echo "You can find it using: find /usr -name \"libosmgpsmap-1.0.a\""
+    read -p "Path to libosmgpsmap-1.0.a: " LIBOSM_PATH_A
+
+    if [ ! -f "$LIBOSM_PATH_A" ]; then
+        echo "Error: The specified library file does not exist."
+        exit 1
+    fi
+fi
+
+echo "Using library at: $LIBOSM_PATH and $LIBOSM_PATH_A"
 
 # Define variables
 APP_NAME="GWeatherRouting"
@@ -69,7 +83,7 @@ chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-gtk.sh
 
 # 4. Add Required Libraries to AppImage Directory
 echo "Adding required libraries to AppImage directory..."
-NO_STRIP=true DEPLOY_GTK_VERSION=3 ./linuxdeploy-x86_64.AppImage --appdir AppDir --plugin gtk --library "$LIBOSM_PATH" "$LIBOSM_PATH_A"
+NO_STRIP=true DEPLOY_GTK_VERSION=3 ./linuxdeploy-x86_64.AppImage --appdir AppDir --plugin gtk --library "$LIBOSM_PATH" --library "$LIBOSM_PATH_A"
 
 # 5. Modify the AppRun file to add LD_LIBRARY_PATH after the gtk plugin line
 echo "Configuring AppRun file..."
