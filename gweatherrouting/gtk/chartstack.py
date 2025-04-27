@@ -131,6 +131,13 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
         self.progressBar = self.builder.get_object("progressbar")
         self.progressBar.hide()
 
+        routing_page_idx = self.builder.get_object("routing_page")
+        self.notebook = self.builder.get_object("notebook")
+        if self.notebook and routing_page_idx:
+            self.routing_page_index = self.notebook.page_num(routing_page_idx)
+        else:
+            logger.error("Could not find notebook or routing page widget index in Glade file.")
+
     def on_map_clicked(self, widget, event):
         # First grab focus for the map
         self.map.grab_focus()
@@ -360,3 +367,9 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 
         else:
             dialog.destroy()
+    def onPageSwitched(self, notebook, page, page_num):
+        if page_num != self.routing_page_index:
+            self.isochronesMapLayer.setIsochrones([], [])
+        self.map.queue_draw()
+    
+        
