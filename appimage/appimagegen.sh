@@ -88,7 +88,8 @@ chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-gtk.sh
 
 # 4. Add Required Libraries to AppImage Directory
 echo "Adding required libraries to AppImage directory..."
-NO_STRIP=true DEPLOY_GTK_VERSION=3 ./linuxdeploy-x86_64.AppImage --appdir AppDir --plugin gtk --library "$LIBOSM_PATH" --library "$LIBOSM_PATH2"
+NO_STRIP=true DEPLOY_GTK_VERSION=3 ./linuxdeploy-x86_64.AppImage --appdir AppDir --plugin gtk --library "$LIBOSM_PATH" 
+NO_STRIP=true DEPLOY_GTK_VERSION=3 ./linuxdeploy-x86_64.AppImage --appdir AppDir --plugin gtk --library "$LIBOSM_PATH2"
 
 # 5. Modify the AppRun file to add LD_LIBRARY_PATH after the gtk plugin line
 echo "Configuring AppRun file..."
