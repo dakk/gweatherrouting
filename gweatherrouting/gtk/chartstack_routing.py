@@ -137,7 +137,7 @@ class ChartStackRouting:
             # self.builder.get_object('time-adjustment').set_value (res.time)
             Gdk.threads_leave()
 
-        if self.stopRouting or self.currentRouting.end:
+        if self.stopRouting:
             Gdk.threads_enter()
             GObject.timeout_add(3000, self.progressBar.hide)
             self.builder.get_object("stop-routing-button").hide()
@@ -175,7 +175,9 @@ class ChartStackRouting:
         )
         self.updateRoutings()
         self.builder.get_object("stop-routing-button").hide()
-
+        self.isochronesMapLayer.setIsochrones([], res.path)
+        self.map.queue_draw() 
+        
     def updateRoutings(self):
         self.routingStore.clear()
 
