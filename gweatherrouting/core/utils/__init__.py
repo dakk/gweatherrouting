@@ -15,10 +15,7 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 # isort:skip_file
-# import math
 import json
-
-# import latlon
 from geojson_utils import point_in_polygon
 from typing import Dict, Callable
 
