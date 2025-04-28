@@ -18,7 +18,8 @@ import math
 
 import cairo
 import gi
-from weatherrouting import utils
+
+from gweatherrouting.core import utils
 
 gi.require_version("Gtk", "3.0")
 try:
@@ -195,8 +196,16 @@ class ToolsMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
             cr.line_to(x1, y1)
             cr.stroke()
 
-            # Calculate distance and bearing
-            (d, r) = utils.ortodromic(
+            d = utils.pointDistance(
+                self.measureStart[0],
+                self.measureStart[1],
+                self.mousePosition[0],
+                self.mousePosition[1],
+                "nm",
+            )
+
+            # Calculate bearing
+            (_, r) = utils.ortodromic(
                 self.measureStart[0],
                 self.measureStart[1],
                 self.mousePosition[0],

@@ -15,14 +15,13 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 # isort:skip_file
-import math
 import json
-import latlon
 from geojson_utils import point_in_polygon
 from typing import Dict, Callable
 
 from gweatherrouting.common import resource_path
 from gweatherrouting.core.storage import *  # noqa: F401, F403
+from weatherrouting import utils
 
 COUNTRIES = json.load(
     open(resource_path("gweatherrouting", "data/countries.geojson"), "r")
@@ -129,34 +128,20 @@ def uniqueName(name, collection=None):
     return name
 
 
-EARTH_RADIUS = 60.0 * 360 / (2 * math.pi)  # nm
-
-
-def pointDistance(latA, lonA, latB, lonB):
-    p1 = latlon.LatLon(latlon.Latitude(latA), latlon.Longitude(lonA))
-    p2 = latlon.LatLon(latlon.Latitude(latB), latlon.Longitude(lonB))
-    return p1.distance(p2)
+def pointDistance(latA, lonA, latB, lonB, unit="nm"):
+    return utils.pointDistance(latA, lonA, latB, lonB, "nm")
 
 
 def routagePointDistance(latA, lonA, Distanza, Rotta):
-    p = latlon.LatLon(latlon.Latitude(latA), latlon.Longitude(lonA))
-    of = p.offset(math.degrees(Rotta), Distanza).to_string("D")
-    return (float(of[0]), float(of[1]))
+    return utils.routagePointDistance(latA, lonA, Distanza, Rotta, "nm")
 
 
 def reduce360(alfa):
-    if math.isnan(alfa):
-        return 0.0
+    return utils.reduce360(alfa)
 
-    n = int(alfa * 0.5 / math.pi)
-    n = math.copysign(n, 1)
-    if alfa > 2.0 * math.pi:
-        alfa = alfa - n * 2.0 * math.pi
-    if alfa < 0:
-        alfa = (n + 1) * 2.0 * math.pi + alfa
-    if alfa > 2.0 * math.pi or alfa < 0:
-        return 0.0
-    return alfa
+
+def ortodromic(latA, lonA, latB, lonB):
+    return utils.ortodromic(latA, lonA, latB, lonB)
 
 
 class DictCache(dict):

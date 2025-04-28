@@ -331,13 +331,13 @@ class GDALRasterChart(ChartLayer):
             maxRLon = max(bb[0][1], bb[1][1])
 
             xx, yy = gpsmap.convert_geographic_to_screen(
-            	OsmGpsMap.MapPoint.new_degrees(minRLat, minRLon)
+                OsmGpsMap.MapPoint.new_degrees(minRLat, minRLon)
             )
             xx2, yy2 = gpsmap.convert_geographic_to_screen(
-            	OsmGpsMap.MapPoint.new_degrees(maxRLat, maxRLon)
+                OsmGpsMap.MapPoint.new_degrees(maxRLat, maxRLon)
             )
 
-            cr.set_source_rgba(1,0,0,0.6)
+            cr.set_source_rgba(1, 0, 0, 0.6)
             cr.set_line_width(0.3)
             cr.move_to(xx, yy)
             cr.line_to(xx, yy2)
