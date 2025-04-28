@@ -2,6 +2,11 @@
 
 set -e  # Exit on error
 
+# Define variables
+APP_NAME="GWeatherRouting"
+APP_DIR="AppDir"
+DEPLOY_GTK_VERSION=3
+
 # Display disclaimers
 echo -e "\n========== DISCLAIMER ==========\n"
 echo "This script has been tested on Ubuntu. If you are using another Linux distribution,"
@@ -21,28 +26,10 @@ if [[ "$1" != "-y" ]]; then
     fi
 fi
 
-LIBOSM_PATH=$(ldconfig -p | grep "libosmgpsmap-1.0.so.1" | awk '{print $NF}')
+# 0. Detect libraries to manually inject
+LIBOSM_PATHS=$(ldconfig -p | grep "libosmgpsmap-1.0" | awk '{print $NF}' | tr '\n' ' ')
+echo "Using osmmap libraries at: $LIBOSM_PATHS"
 
-if [[ -n "$LIBOSM_PATH" ]]; then
-    echo "Found libosmgpsmap-1.0.so.1 at default location: $LIBOSM_PATH"
-else
-    echo -e "\nCould not find libosmgpsmap-1.0.so.1 at default location."
-    echo "Please provide an alternative path to libosmgpsmap-1.0.so.1"
-    echo "You can find it using: find /usr -name \"libosmgpsmap-1.0.so.1\""
-    read -p "Path to libosmgpsmap-1.0.so.1: " LIBOSM_PATH
-
-    if [ ! -f "$LIBOSM_PATH" ]; then
-        echo "Error: The specified library file does not exist."
-        exit 1
-    fi
-fi
-
-echo "Using library at: $LIBOSM_PATH"
-
-# Define variables
-APP_NAME="GWeatherRouting"
-APP_DIR="AppDir"
-DEPLOY_GTK_VERSION=3
 
 echo -e "\nStarting AppImage creation process..."
 
@@ -54,7 +41,9 @@ cd ..
 
 # 2. Create AppImage Directory Structure
 echo "Creating AppImage directory structure..."
-mkdir -p "$APP_DIR/usr/bin" "$APP_DIR/usr/share/applications" "$APP_DIR/usr/share/icons/hicolor/256x256/apps" "$APP_DIR/usr/local/share/eccodes/"
+mkdir -p "$APP_DIR/usr/bin" "$APP_DIR/usr/share/applications" "$APP_DIR/usr/share/icons/hicolor/256x256/apps" "$APP_DIR/usr/local/share/eccodes/" 
+
+cp -r /usr/share/gdal "$APP_DIR/usr/share/"
 cp -r /usr/local/share/eccodes/definitions "$APP_DIR/usr/local/share/eccodes/"
 cp "gweatherrouting/dist/$APP_NAME" "$APP_DIR/usr/bin/"
 cp "appimage/icon.png" "$APP_DIR/usr/share/icons/hicolor/256x256/apps/"
@@ -68,7 +57,13 @@ chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-gtk.sh
 
 # 4. Add Required Libraries to AppImage Directory
 echo "Adding required libraries to AppImage directory..."
-NO_STRIP=true DEPLOY_GTK_VERSION=3 ./linuxdeploy-x86_64.AppImage --appdir AppDir --plugin gtk --library "$LIBOSM_PATH"
+./linuxdeploy-x86_64.AppImage --appimage-extract
+
+for LIBOSM_PATH in $LIBOSM_PATHS; do
+    #NO_STRIP=true DEPLOY_GTK_VERSION=3 ./linuxdeploy-x86_64.AppImage --appdir $APP_DIR --plugin gtk --library "$LIBOSM_PATH" 
+    NO_STRIP=true DEPLOY_GTK_VERSION=3 ./squashfs-root/AppRun --appdir $APP_DIR --plugin gtk --library "$LIBOSM_PATH"
+done
+rm -rf squashfs-root
 
 # 5. Modify the AppRun file to add LD_LIBRARY_PATH after the gtk plugin line
 echo "Configuring AppRun file..."
@@ -80,7 +75,7 @@ chmod +x "$APP_DIR/AppRun"
 echo "Creating the final AppImage..."
 wget https://github.com/AppImage/AppImageKit/releases/latest/download/appimagetool-x86_64.AppImage
 chmod +x appimagetool-x86_64.AppImage
-./appimagetool-x86_64.AppImage "$APP_DIR"
+./appimagetool-x86_64.AppImage --appimage-extract-and-run "$APP_DIR"
 
 echo -e "\nAppImage creation completed successfully!"
 
@@ -90,6 +85,7 @@ echo "Cleaning up..."
 rm linuxdeploy-plugin-gtk.sh
 rm linuxdeploy-x86_64.AppImage
 rm appimagetool-x86_64.AppImage
+rm -rf squashfs-root
 rm -r gweatherrouting/dist
 rm -r gweatherrouting/build
 rm -r gweatherrouting/GWeatherRouting.spec

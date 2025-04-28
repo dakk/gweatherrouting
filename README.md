@@ -26,10 +26,9 @@ GWeatherRouting is an open-source sailing routing and navigation software writte
     - GeoJSON (coastlines included)
     - GSHHS basemap (download helper included)
     - KAP, GeoTiff charts and other raster formats supported by GDAL
-    - OpenStreetMap seamark rendering
+    - OpenSeaMap seamarks rendering
 - Gtk4 interface
-- NMEA instruments interface
-- Raster Nautical charts (KAP)
+- NMEA instruments support
 - NMEA / GPX log analysys
 
 
@@ -38,7 +37,7 @@ GWeatherRouting is an open-source sailing routing and navigation software writte
 - Customizable routing calculator
 - Ortodromic track render
 - AIS rendering
-- Boat realtime dashboard
+- Boat dashboard and other realtime navigation support
 
 
 ## Installation

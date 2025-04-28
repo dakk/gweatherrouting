@@ -1,14 +1,19 @@
-name: Build AppImage
+name: AppImage
 # on: [push]
 
 on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
   release:
     types: [created]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    name: AppImage generation
+    runs-on: ubuntu-22.04
+    name: AppImage
     steps:
       - uses: actions/checkout@v4
 
@@ -17,7 +22,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install Ubuntu Dependencies (ecCodes by binary)
+      - name: Install Ubuntu Dependencies
         run: |
             bash .github/workflows/script/ubuntu_dep.sh
 
@@ -29,7 +34,6 @@ jobs:
 
       - name: Generate AppImage
         run: |
-            sudo apt-get install libfuse2
             pip install pyinstaller
             cd appimage
             bash appimagegen.sh -y
