@@ -278,7 +278,9 @@ class ChartStackRouting:
             if path.get_depth() == 1:
                 self.selectedRouting = value
 
-                routing = self.core.routingManager.getByName(self.selectedRouting)
+                # Show isochrones
+                # routing = self.core.routingManager.getByName(self.selectedRouting)
+                # self.isochronesMapLayer.setIsochrones(routing.isochrones, None)
             else:
                 self.selectedRouting = None
 
