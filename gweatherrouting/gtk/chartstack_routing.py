@@ -279,7 +279,6 @@ class ChartStackRouting:
                 self.selectedRouting = value
 
                 routing = self.core.routingManager.getByName(self.selectedRouting)
-                self.isochronesMapLayer.setIsochrones(routing.isochrones, None)
             else:
                 self.selectedRouting = None
 
