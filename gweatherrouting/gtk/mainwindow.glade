@@ -47,6 +47,7 @@
   </object>
   <object class="GtkWindow" id="main-window">
     <property name="can-focus">False</property>
+    <property name="icon">../data/icon.png</property>
     <child>
       <object class="GtkStack" id="stack1">
         <property name="visible">True</property>
