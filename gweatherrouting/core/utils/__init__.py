@@ -15,9 +15,10 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 # isort:skip_file
-import math
+# import math
 import json
-import latlon
+
+# import latlon
 from geojson_utils import point_in_polygon
 from typing import Dict, Callable
 
@@ -129,6 +130,7 @@ def uniqueName(name, collection=None):
                 return nname
     return name
 
+
 def pointDistance(latA, lonA, latB, lonB, unit="nm"):
     return utils.pointDistance(latA, lonA, latB, lonB, "nm")
 
@@ -136,12 +138,13 @@ def pointDistance(latA, lonA, latB, lonB, unit="nm"):
 def routagePointDistance(latA, lonA, Distanza, Rotta):
     return utils.routagePointDistance(latA, lonA, Distanza, Rotta, "nm")
 
+
 def reduce360(alfa):
     return utils.reduce360(alfa)
 
+
 def ortodromic(latA, lonA, latB, lonB):
     return utils.ortodromic(latA, lonA, latB, lonB)
-
 
 
 class DictCache(dict):
