@@ -30,7 +30,7 @@ jobs:
         run: |
             bash .github/workflows/script/python_dep.sh
       - name: Instal gww
-        run: pip install .
+        run: pip install --no-cache-dir .
 
       - name: Generate AppImage
         run: |
