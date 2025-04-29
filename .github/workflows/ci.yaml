@@ -30,7 +30,7 @@ jobs:
         bash .github/workflows/script/python_dep.sh
 
     - name: Install gww
-      run: pip install --no-cache-dir .
+      run: pip install .
 
   build-latest:
     runs-on: ubuntu-latest
@@ -54,7 +54,7 @@ jobs:
         bash .github/workflows/script/python_dep.sh
 
     - name: Install gww
-      run: pip install --no-cache-dir .
+      run: pip install .
 
   linters:
     runs-on: ubuntu-latest
