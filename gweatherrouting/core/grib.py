@@ -38,7 +38,7 @@ class MetaGrib:
 
 
 class Grib(weatherrouting.Grib):
-    def __init__(self, path, name, centre, bounds, startTime, lastForecast, timeKey):
+    def __init__(self, path, name, centre, bounds, startTime, lastForecast):
         self.name = name
         self.centre = centre.upper()
         self.bounds = bounds
@@ -46,7 +46,6 @@ class Grib(weatherrouting.Grib):
         self.lastForecast = lastForecast
         self.endTime = self.startTime + datetime.timedelta(hours=self.lastForecast)
         self.path = path
-        self.timeKey = timeKey
         self.dataset = gdal.Open(path)
 
     def _findBandsForTime(self, t):
@@ -201,5 +200,4 @@ class Grib(weatherrouting.Grib):
             meta.bounds,
             meta.startTime,
             meta.lastForecast,
-            "forecastTime",
         )
