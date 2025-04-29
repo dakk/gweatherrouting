@@ -17,7 +17,9 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import datetime
 import logging
 import math
+from functools import lru_cache
 
+import eccodes
 import weatherrouting
 
 from gweatherrouting.core import utils
@@ -50,9 +52,8 @@ class Grib(weatherrouting.Grib):
         self.path = path
         self.timeKey = timeKey
 
+    @lru_cache(maxsize=2048)
     def getRIndexData(self, t):
-        import eccodes
-
         if t in self.rindex_data:
             return self.rindex_data[t]
 
@@ -70,45 +71,38 @@ class Grib(weatherrouting.Grib):
         self.rindex_data[t] = (u, v)
         return u, v
 
-    # Get Wind data from cache if available (speed up the entire simulation)
-    def _getWindDataCached(self, t, bounds):
-        h = "%f%f%f%f%f" % (t, bounds[0][0], bounds[0][1], bounds[1][0], bounds[1][1])
+    def _getWindData(self, t, bounds):
+        try:
+            u, v = self.getRIndexData(t)
+        except Exception as e:
+            logger.debug("Get wind data exception: ", e)
 
-        if h in self.cache:
-            return self.cache[h]
-        else:
-            try:
-                u, v = self.getRIndexData(t)
-            except:  # Exception as _:
-                pass  # print('Get wind data cached exception: ', e)
+        uu1, latuu, lonuu = [], [], []
+        vv1, latvv, lonvv = [], [], []
 
-            uu1, latuu, lonuu = [], [], []
-            vv1, latvv, lonvv = [], [], []
+        for x in u:
+            if (
+                x["lat"] >= bounds[0][0]
+                and x["lat"] <= bounds[1][0]
+                and x["lon"] >= bounds[0][1]
+                and x["lon"] <= bounds[1][1]
+            ):
+                uu1.append(x["value"])
+                latuu.append(x["lat"])
+                lonuu.append(x["lon"])
 
-            for x in u:
-                if (
-                    x["lat"] >= bounds[0][0]
-                    and x["lat"] <= bounds[1][0]
-                    and x["lon"] >= bounds[0][1]
-                    and x["lon"] <= bounds[1][1]
-                ):
-                    uu1.append(x["value"])
-                    latuu.append(x["lat"])
-                    lonuu.append(x["lon"])
+        for x in v:
+            if (
+                x["lat"] >= bounds[0][0]
+                and x["lat"] <= bounds[1][0]
+                and x["lon"] >= bounds[0][1]
+                and x["lon"] <= bounds[1][1]
+            ):
+                vv1.append(x["value"])
+                latvv.append(x["lat"])
+                lonvv.append(x["lon"])
 
-            for x in v:
-                if (
-                    x["lat"] >= bounds[0][0]
-                    and x["lat"] <= bounds[1][0]
-                    and x["lon"] >= bounds[0][1]
-                    and x["lon"] <= bounds[1][1]
-                ):
-                    vv1.append(x["value"])
-                    latvv.append(x["lat"])
-                    lonvv.append(x["lon"])
-
-            self.cache[h] = (uu1, vv1, latuu, lonuu)
-            return self.cache[h]
+        return (uu1, vv1, latuu, lonuu)
 
     def getWind(self, tt, bounds):
         t = self._transformTime(tt)
@@ -136,8 +130,8 @@ class Grib(weatherrouting.Grib):
         # 	otherside = (-180.0, lon2)
 
         bounds = [(bounds[0][0], min(lon1, lon2)), (bounds[1][0], max(lon1, lon2))]
-        (uu1, vv1, latuu, lonuu) = self._getWindDataCached(t1, bounds)
-        (uu2, vv2, latuu2, lonuu2) = self._getWindDataCached(t2, bounds)
+        (uu1, vv1, latuu, lonuu) = self._getWindData(t1, bounds)
+        (uu2, vv2, latuu2, lonuu2) = self._getWindData(t2, bounds)
 
         if otherside:
             bounds = [
@@ -192,8 +186,6 @@ class Grib(weatherrouting.Grib):
 
     @staticmethod
     def parseMetadata(path):
-        import eccodes
-
         f = open(path, "rb")
 
         # TODO: get bounds and timeframe
@@ -244,8 +236,6 @@ class Grib(weatherrouting.Grib):
 
     @staticmethod
     def parse(path):
-        import eccodes
-
         f = open(path, "rb")
 
         # TODO: get bounds and timeframe
