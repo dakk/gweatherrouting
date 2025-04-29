@@ -21,6 +21,7 @@ from functools import lru_cache
 
 import eccodes
 import weatherrouting
+from osgeo import gdal
 
 from gweatherrouting.core import utils
 
@@ -74,8 +75,8 @@ class Grib(weatherrouting.Grib):
     def _getWindData(self, t, bounds):
         try:
             u, v = self.getRIndexData(t)
-        except Exception as e:
-            logger.debug("Get wind data exception: ", e)
+        except: # Exception as e:
+            pass #logger.debug("Get wind data exception: ", e, t, bounds)
 
         uu1, latuu, lonuu = [], [], []
         vv1, latvv, lonvv = [], [], []
@@ -186,53 +187,32 @@ class Grib(weatherrouting.Grib):
 
     @staticmethod
     def parseMetadata(path):
-        f = open(path, "rb")
-
-        # TODO: get bounds and timeframe
-        bounds = [0, 0, 0, 0]
-        hoursForecasted = None
-        startTime = None
+        dataset = gdal.Open(path)
         centre = ""
+        # TODO: get bounds and timeframe
+        bounds = [0, 0, 0, 0] 
+        startTime = None
+        hoursForecasted = None
 
-        while True:
-            msgid = eccodes.codes_grib_new_from_file(f)
+        for bidx in range(1, dataset.RasterCount + 1):
+            band = dataset.GetRasterBand(bidx)
+            metadata = band.GetMetadata()
+            print(metadata)
 
-            if msgid is None:
-                break
+            if metadata.get("GRIB_ELEMENT") in ("UGRD", "VGRD"):
+                centre = metadata.get("GRIB_CENTER", "")
+                forecast_hours = int(metadata.get("GRIB_FORECAST_SECONDS", 0)) // 3600
+                time = datetime.datetime.fromtimestamp(int(metadata.get("GRIB_REF_TIME", 0)))
 
-            name = eccodes.codes_get(msgid, "name")
-            if (
-                name != "10 metre U wind component"
-                and name != "10 metre V wind component"
-            ):
-                continue
+                if startTime is None or time < startTime:
+                    startTime = time
 
-            vcentre = eccodes.codes_get(msgid, "centre")
-            if vcentre:
-                centre = vcentre
+                if hoursForecasted is None or forecast_hours > hoursForecasted:
+                    hoursForecasted = forecast_hours
 
-            try:
-                ft = eccodes.codes_get(msgid, "forecastTime")
-            except:
-                ft = eccodes.codes_get(msgid, "P1")
-
-            startTime = datetime.datetime(
-                int(eccodes.codes_get(msgid, "year")),
-                int(eccodes.codes_get(msgid, "month")),
-                int(eccodes.codes_get(msgid, "day")),
-                int(eccodes.codes_get(msgid, "hour")),
-                int(eccodes.codes_get(msgid, "minute")),
-            )
-
-            if hoursForecasted is None or hoursForecasted < int(ft):
-                hoursForecasted = int(ft)
-
-            eccodes.codes_release(msgid)
-
-        f.close()
-        return MetaGrib(
-            path, path.split("/")[-1], centre, bounds, startTime, hoursForecasted
-        )
+        print(path, path.split("/")[-1], centre, bounds, startTime, hoursForecasted)
+        return MetaGrib(path, path.split("/")[-1], centre, bounds, startTime, hoursForecasted)
+    
 
     @staticmethod
     def parse(path):
