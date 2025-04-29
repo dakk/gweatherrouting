@@ -22,4 +22,4 @@ from .serialdatasource import SerialDataSource  # noqa: F401
 from .networkdatasource import NetworkDataSource  # noqa: F401
 from .connectionmanager import ConnectionManager  # noqa: F401
 from .core import Core  # noqa: F401
-from .utils import DictCache, EventDispatcher  # noqa: F401
+from .utils import EventDispatcher  # noqa: F401

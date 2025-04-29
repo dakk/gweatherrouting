@@ -144,26 +144,6 @@ def ortodromic(latA, lonA, latB, lonB):
     return utils.ortodromic(latA, lonA, latB, lonB)
 
 
-class DictCache(dict):
-    def __init__(self, max_entries=50):
-        self.entries = []
-        self.max_entries = max_entries
-
-    def __setitem__(self, key, value):
-        super(DictCache, self).__setitem__(key, value)
-        self.__dict__.update({key: value})
-        self.entries.append(key)
-
-        if len(self.entries) > self.max_entries:
-            # TODO:? never used # td = self.entries[0]
-            self.entries = self.entries[1::]
-
-    def __delitem__(self, key):
-        super(DictCache, self).__delitem__(key)
-        del self.__dict__[key]
-        self.entries.remove(key)
-
-
 class EventDispatcher:
     handlers: Dict[str, Callable] = {}
 
