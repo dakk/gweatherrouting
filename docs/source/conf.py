@@ -4,7 +4,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 import os
 import sys
-from typing import Dict, Any
+from typing import Any, Dict
 
 sys.path.append(os.path.abspath(os.path.join("..", "..")))
 
@@ -24,17 +24,17 @@ extensions = [
     "sphinx.ext.napoleon",
     "pydata_sphinx_theme",
     "sphinx_design",
-    "myst_parser"
+    "myst_parser",
 ]
 
 # "sphinx_rtd_dark_mode",
 # "sphinx_rtd_theme",
 jupyter_execute_notebooks = "off"
 myst_enable_extensions = [
-    "colon_fence",    
-    "deflist",        
-    "html_admonition", 
-    "html_image", 
+    "colon_fence",
+    "deflist",
+    "html_admonition",
+    "html_image",
 ]
 templates_path = ["_templates"]
 exclude_patterns = []
