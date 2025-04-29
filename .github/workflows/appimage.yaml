@@ -11,7 +11,7 @@ on:
     types: [created]
 
 jobs:
-  build:
+  build-appimage:
     runs-on: ubuntu-22.04
     name: AppImage
     steps:
