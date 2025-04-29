@@ -53,7 +53,6 @@ GWeatherRouting is an open-source sailing routing and navigation software writte
    - py3cairo
    - pygobject3
    - pkg-config
-   - eccodes
    - libgirepository1.0-dev
 
 > [!NOTE]  

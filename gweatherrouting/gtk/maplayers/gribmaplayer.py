@@ -95,7 +95,7 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
         if not data or len(data) == 0:
             return
 
-        scale = int(gpsmap.get_scale() / 500.0)
+        scale = int(gpsmap.get_scale() / 350.0)
         if scale < 1:
             scale = 1
 
