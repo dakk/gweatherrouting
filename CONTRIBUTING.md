@@ -55,7 +55,7 @@ Use short and descriptive commit message, and remember to add tests to check new
 Install `act` and run your workflow:
 
 ```bash
-act -w .github/workflows/appimage.yaml
+act -j build-appimage
 ```
 
 
