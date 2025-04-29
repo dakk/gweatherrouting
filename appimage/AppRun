@@ -13,9 +13,6 @@ export APPDIR="${APPDIR:-$this_dir}"
 # Set library path to use bundled libraries first
 export LD_LIBRARY_PATH="$APPDIR/usr/lib:$LD_LIBRARY_PATH"
 
-# Set the path of eccodes definition
-export ECCODES_DEFINITION_PATH="$APPDIR/usr/local/share/eccodes/definitions"
-
 # Set the path of GDAL data
 export GDAL_DATA="$APPDIR/usr/share/gdal"
 
