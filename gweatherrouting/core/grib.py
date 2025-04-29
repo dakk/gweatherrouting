@@ -134,7 +134,6 @@ class Grib(weatherrouting.Grib):
             lat, lon, uu1, vv1 = uuvv1[j]
             _, _, uu2, vv2 = uuvv2[j]
 
-
             if lon > 180.0:
                 lon = -180.0 + (lon - 180.0)
 
