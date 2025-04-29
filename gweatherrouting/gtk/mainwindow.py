@@ -69,6 +69,7 @@ class MainWindow:
         self.window = self.builder.get_object("main-window")
         self.window.set_title("GWeatherRouting")
         self.window.connect("delete-event", self.quit)
+        self.window.set_default_size(1280, 768)
         self.window.show_all()
         self.window.maximize()
 
