@@ -176,8 +176,8 @@ class ChartStackRouting:
         self.updateRoutings()
         self.builder.get_object("stop-routing-button").hide()
         self.isochronesMapLayer.setIsochrones([], res.path)
-        self.map.queue_draw() 
-        
+        self.map.queue_draw()
+
     def updateRoutings(self):
         self.routingStore.clear()
 

@@ -432,57 +432,8 @@ loaded to created a routing</property>
                     <property name="label" translatable="yes">Grib</property>
                     <property name="use-underline">True</property>
                     <property name="icon-name">weather-windy</property>
-                    <signal name="toggled" handler="onToggleGrib" swapped="no"/>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="homogeneous">True</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkToggleToolButton">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="tooltip-text" translatable="yes">Show / Hide compass</property>
-                    <property name="margin-end">2</property>
-                    <property name="label" translatable="yes">Compass</property>
-                    <property name="use-underline">True</property>
-                    <property name="icon-name">compass</property>
-                    <signal name="toggled" handler="onToggleCompass" swapped="no"/>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="homogeneous">True</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkToggleToolButton">
-                    <property name="use-action-appearance">True</property>
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="tooltip-text" translatable="yes">Show / Hide dashboard</property>
-                    <property name="margin-end">2</property>
-                    <property name="label" translatable="yes">Dashboard</property>
-                    <property name="use-underline">True</property>
-                    <property name="icon-name">kt-speed-limits</property>
-                    <signal name="toggled" handler="onToggleDashboard" swapped="no"/>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="homogeneous">True</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkToggleToolButton">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="tooltip-text" translatable="yes">Show / Hide AIS Targets</property>
-                    <property name="margin-end">2</property>
-                    <property name="label" translatable="yes">AIS</property>
-                    <property name="use-underline">True</property>
-                    <property name="icon-name">eye-open-negative-filled-symbolic</property>
                     <property name="active">True</property>
-                    <signal name="toggled" handler="onToggleAIS" swapped="no"/>
+                    <signal name="toggled" handler="onToggleGrib" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
