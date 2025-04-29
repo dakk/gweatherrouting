@@ -44,6 +44,7 @@ class Grib(weatherrouting.Grib):
         self.bounds = bounds
         self.startTime = startTime
         self.lastForecast = lastForecast
+        self.endTime = self.startTime + datetime.timedelta(hours=self.lastForecast)
         self.path = path
         self.timeKey = timeKey
         self.dataset = gdal.Open(path)
@@ -101,20 +102,13 @@ class Grib(weatherrouting.Grib):
         except Exception:
             return None
 
-        uu1, latuu, lonuu = [], [], []
-        vv1, latvv, lonvv = [], [], []
-
-        for x in uv:
-            if (
-                bounds[0][0] <= x[0] <= bounds[1][0]
-                and bounds[0][1] <= x[1] <= bounds[1][1]
-            ):
-                uu1.append(x[2])
-                vv1.append(x[3])
-                latuu.append(x[0])
-                lonuu.append(x[1])
-
-        return (uu1, vv1, latuu, lonuu)
+        return list(
+            filter(
+                lambda x: bounds[0][0] <= x[0] <= bounds[1][0]
+                and bounds[0][1] <= x[1] <= bounds[1][1],
+                uv,
+            )
+        )
 
     def getWind(self, tt, bounds):
         t = self._transformTime(tt)
@@ -131,20 +125,21 @@ class Grib(weatherrouting.Grib):
         lon2 = max(bounds[0][1], bounds[1][1])
 
         bounds = [(bounds[0][0], lon1), (bounds[1][0], lon2)]
-        (uu1, vv1, latuu, lonuu) = self._getWindData(t1, bounds)
-        (uu2, vv2, latuu2, lonuu2) = self._getWindData(t2, bounds)
+        uuvv1 = self._getWindData(t1, bounds)
+        uuvv2 = self._getWindData(t2, bounds)
 
         data = []
 
-        for j in range(0, len(uu1)):
-            lon = lonuu[j]
-            lat = latuu[j]
+        for j in range(0, len(uuvv1)):
+            lat, lon, uu1, vv1 = uuvv1[j]
+            _, _, uu2, vv2 = uuvv2[j]
+
 
             if lon > 180.0:
                 lon = -180.0 + (lon - 180.0)
 
-            uu = uu1[j] + (uu2[j] - uu1[j]) * (t - t1) / (t2 - t1)
-            vv = vv1[j] + (vv2[j] - vv1[j]) * (t - t1) / (t2 - t1)
+            uu = uu1 + (uu2 - uu1) * (t - t1) / (t2 - t1)
+            vv = vv1 + (vv2 - vv1) * (t - t1) / (t2 - t1)
 
             tws = (uu**2 + vv**2) / 2.0
             twd = math.degrees(utils.reduce360(math.atan2(uu, vv) + math.pi))
@@ -154,7 +149,7 @@ class Grib(weatherrouting.Grib):
         return data
 
     def _transformTime(self, t):
-        if (self.startTime + datetime.timedelta(hours=self.lastForecast)) < t:
+        if self.endTime < t:
             return None
 
         return math.floor((t - self.startTime).total_seconds() / 3600)
@@ -165,8 +160,7 @@ class Grib(weatherrouting.Grib):
             (math.ceil(lat * 2) / 2.0, math.ceil(lon * 2) / 2.0),
         ]
         data = self.getWind(t, bounds)
-        wind = (data[0][0], data[0][1])
-        return wind
+        return (data[0][0], data[0][1])
 
     @staticmethod
     def parseMetadata(path):
