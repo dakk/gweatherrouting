@@ -98,7 +98,8 @@ class Grib(weatherrouting.Grib):
     def _getWindData(self, t, bounds):
         try:
             uv = self.getRIndexData(t)
-        except Exception:
+        except Exception as e:
+            logger.debug(e)
             return None
 
         return list(
