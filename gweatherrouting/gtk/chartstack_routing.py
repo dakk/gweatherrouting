@@ -135,7 +135,7 @@ class ChartStackRouting(ChartStackBase):
             self.progressBar.set_text(str(res.progress) + "%")
 
             self.isochronesMapLayer.setIsochrones(res.isochrones, res.path)
-            self.timeControl.setTime(res.time)
+            self.timeControl.set_time(res.time)
             # self.map.queue_draw ()
             # self.builder.get_object('time-adjustment').set_value (res.time)
             Gdk.threads_leave()

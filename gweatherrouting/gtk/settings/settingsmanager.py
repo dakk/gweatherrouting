@@ -27,4 +27,4 @@ class SettingsManager(Storage):
         self.rasterCharts = []
         self.chartPalette = "cm93"
 
-        self.loadOrSaveDefault()
+        self.load_or_save_default()

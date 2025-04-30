@@ -28,7 +28,7 @@ class CollectionStorage(Storage):
     def __init__(self, name):
         Storage.__init__(self, name)
         self.data = {}
-        self.loadOrSaveDefault()
+        self.load_or_save_default()
 
 
 class Collection(Generic[T]):

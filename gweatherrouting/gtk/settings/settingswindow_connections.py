@@ -71,12 +71,12 @@ class SettingsWindowConnections(SettingsWindowBase):
         data = d.data
         d.destroy()
         if data is not None:
-            self.core.connectionManager.addConnection(data)
+            self.core.connectionManager.add_connection(data)
         self.reloadConnections()
 
     def onConnectionRemove(self, widget):
         if self.selectedConnection is not None:
-            self.core.connectionManager.removeConnection(self.selectedConnection.data)
+            self.core.connectionManager.remove_connection(self.selectedConnection.data)
             self.reloadConnections()
 
     def onConnectionSelected(self, widget, sel):

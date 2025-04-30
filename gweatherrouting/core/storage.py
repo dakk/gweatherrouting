@@ -123,10 +123,10 @@ class Storage(dict):
         del self.__dict__[key]
         self.save()
 
-    def loadData(self, data):
+    def load_data(self, data):
         for x in data:
             # if isinstance(data[x], dict):
-            # 	self[x].loadData(data[x])
+            # 	self[x].load_data(data[x])
             # else:
             self[x] = data[x]
 
@@ -155,12 +155,12 @@ class Storage(dict):
 
         with open(DATA_DIR + "/" + self.__filename + ".json", "r") as f:
             j = json.loads(f.read())
-            self.loadData(j)
+            self.load_data(j)
             logger.debug(
                 "Load configuration from %s/%s.json", DATA_DIR, self.__filename
             )
 
-    def loadOrSaveDefault(self):
+    def load_or_save_default(self):
         try:
             self.load()
             self.__init = True

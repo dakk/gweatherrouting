@@ -73,7 +73,7 @@ class GribManagerWindow:
         Gdk.threads_leave()
 
         try:
-            for x in self.gribManager.getDownloadList():
+            for x in self.gribManager.get_download_list():
                 Gdk.threads_enter()
                 self.gribFilesStore.append(x)
                 Gdk.threads_leave()
@@ -89,17 +89,17 @@ class GribManagerWindow:
         Gdk.threads_leave()
 
     def updateLocalGribs(self):
-        self.gribManager.refreshLocalGribs()
+        self.gribManager.refresh_local_gribs()
         self.gribManagerStore.clear()
 
-        for x in self.gribManager.localGribs:
+        for x in self.gribManager.local_gribs:
             self.gribManagerStore.append(
                 [
                     x.name,
                     x.centre,
-                    str(x.startTime),
-                    x.lastForecast,
-                    self.gribManager.isEnabled(x.name),
+                    str(x.start_time),
+                    x.last_forecast,
+                    self.gribManager.is_enabled(x.name),
                 ]
             )
 
@@ -128,7 +128,7 @@ class GribManagerWindow:
             filepath = dialog.get_filename()
             dialog.destroy()
 
-            if self.gribManager.importGrib(filepath):
+            if self.gribManager.import_grib(filepath):
                 edialog = Gtk.MessageDialog(
                     self.window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done"
                 )
@@ -156,7 +156,7 @@ class GribManagerWindow:
     def onGribToggle(self, widget, i):
         n = self.gribManager.localGribs[int(i)].name
 
-        if self.gribManager.isEnabled(n):
+        if self.gribManager.is_enabled(n):
             self.gribManager.disable(n)
         else:
             self.gribManager.enable(n)

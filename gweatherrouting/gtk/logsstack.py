@@ -306,7 +306,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 
         if len(self.data) % 150 == 0 or (self.recording or len(self.data) % 5000 == 0):
             Gdk.threads_enter()
-            self.timeControl.setTime(data.time)
+            self.timeControl.set_time(data.time)
 
             if len(self.data) % 150 == 0:
                 self.core.logManager.log_history.add(data.lat, data.lon)

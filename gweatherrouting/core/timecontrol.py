@@ -33,10 +33,10 @@ class TimeControl(EventDispatcher):
     def getTime(self):
         return self.time
 
-    def getTimestamp(self) -> int:
+    def get_timestamp(self) -> int:
         return int(self.time.timestamp())
 
-    def setTime(self, v):
+    def set_time(self, v):
         self.time = v
         self.dispatch("time-change", self.time)
 

@@ -29,12 +29,12 @@ logger = logging.getLogger("gweatherrouting")
 
 
 class MetaGrib:
-    def __init__(self, path, name, centre, bounds, startTime, lastForecast):
+    def __init__(self, path, name, centre, bounds, start_time, last_forecast):
         self.name = name
         self.centre = centre.upper()
         self.bounds = bounds
-        self.startTime = startTime
-        self.lastForecast = lastForecast
+        self.start_time = start_time
+        self.last_forecast = last_forecast
         self.path = path
 
 
@@ -45,15 +45,15 @@ class Grib(weatherrouting.Grib):
         name: str,
         centre,
         bounds,
-        startTime: datetime.datetime,
-        lastForecast,
+        start_time: datetime.datetime,
+        last_forecast,
     ):
         self.name = name
         self.centre = centre.upper()
         self.bounds = bounds
-        self.startTime = startTime
-        self.lastForecast = lastForecast
-        self.endTime = self.startTime + datetime.timedelta(hours=self.lastForecast)
+        self.start_time = start_time
+        self.last_forecast = last_forecast
+        self.end_time = self.start_time + datetime.timedelta(hours=self.last_forecast)
         self.path = path
         self.dataset = gdal.Open(path)
 
@@ -104,7 +104,7 @@ class Grib(weatherrouting.Grib):
 
         return uv_data
 
-    def _getWindData(self, t, bounds):
+    def _gwt_windData(self, t, bounds):
         try:
             uv = self.getRIndexData(t)
         except Exception as e:
@@ -119,7 +119,7 @@ class Grib(weatherrouting.Grib):
             )
         )
 
-    def getWind(self, tt, bounds):
+    def gwt_wind(self, tt, bounds):
         t = self._transformTime(tt)
         if t is None:
             return
@@ -134,8 +134,8 @@ class Grib(weatherrouting.Grib):
         lon2 = max(bounds[0][1], bounds[1][1])
 
         bounds = [(bounds[0][0], lon1), (bounds[1][0], lon2)]
-        uuvv1 = self._getWindData(t1, bounds)
-        uuvv2 = self._getWindData(t2, bounds)
+        uuvv1 = self._gwt_windData(t1, bounds)
+        uuvv2 = self._gwt_windData(t2, bounds)
 
         data = []
 
@@ -157,17 +157,17 @@ class Grib(weatherrouting.Grib):
         return data
 
     def _transformTime(self, t) -> Optional[float]:
-        if self.endTime < t:
+        if self.end_time < t:
             return None
 
-        return math.floor((t - self.startTime).total_seconds() / 3600)
+        return math.floor((t - self.start_time).total_seconds() / 3600)
 
-    def getWindAt(self, t, lat: float, lon: float) -> Tuple[float, float]:
+    def gwt_wind_at(self, t, lat: float, lon: float) -> Tuple[float, float]:
         bounds = [
             (math.floor(lat * 2) / 2.0, math.floor(lon * 2) / 2.0),
             (math.ceil(lat * 2) / 2.0, math.ceil(lon * 2) / 2.0),
         ]
-        data = self.getWind(t, bounds)
+        data = self.gwt_wind(t, bounds)
         return (data[0][0], data[0][1])
 
     @staticmethod
@@ -176,7 +176,7 @@ class Grib(weatherrouting.Grib):
         centre = ""
         # TODO: get bounds and timeframe
         bounds = [0, 0, 0, 0]
-        startTime = None
+        start_time = None
         hoursForecasted = None
 
         for bidx in range(1, dataset.RasterCount + 1):
@@ -190,14 +190,14 @@ class Grib(weatherrouting.Grib):
                     int(metadata.get("GRIB_REF_TIME", 0))
                 )
 
-                if startTime is None or time < startTime:
-                    startTime = time
+                if start_time is None or time < start_time:
+                    start_time = time
 
                 if hoursForecasted is None or forecast_hours > hoursForecasted:
                     hoursForecasted = forecast_hours
 
         return MetaGrib(
-            path, path.split("/")[-1], centre, bounds, startTime, hoursForecasted
+            path, path.split("/")[-1], centre, bounds, start_time, hoursForecasted
         )
 
     @staticmethod
@@ -208,6 +208,6 @@ class Grib(weatherrouting.Grib):
             meta.name,
             meta.centre,
             meta.bounds,
-            meta.startTime,
-            meta.lastForecast,
+            meta.start_time,
+            meta.last_forecast,
         )

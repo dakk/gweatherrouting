@@ -18,10 +18,15 @@ import os
 
 import gi
 
-from gweatherrouting.gtk.timepickerdialog import TimePickerDialog
-
 gi.require_version("Gtk", "3.0")
-from gi.repository import GObject, Gtk
+try:
+    gi.require_version("OsmGpsMap", "1.2")
+except:
+    gi.require_version("OsmGpsMap", "1.0")
+from gi.repository import GObject, Gtk, OsmGpsMap
+
+from gweatherrouting.core import TimeControl
+from gweatherrouting.gtk.timepickerdialog import TimePickerDialog
 
 TIME_UNITS = {
     "30s": 30,
@@ -39,7 +44,13 @@ TIME_UNITS = {
 
 
 class TimeTravelWidget(Gtk.Box):
-    def __init__(self, parent, timeControl, map, smallerUnit=False):
+    def __init__(
+        self,
+        parent: Gtk.Window,
+        timeControl: TimeControl,
+        map: OsmGpsMap,
+        smallerUnit=False,
+    ):
         super(TimeTravelWidget, self).__init__()
 
         self.play = False
@@ -109,7 +120,7 @@ class TimeTravelWidget(Gtk.Box):
         response = tp.run()
 
         if response == Gtk.ResponseType.OK:
-            self.timeControl.setTime(tp.getDateTime())
+            self.timeControl.set_time(tp.getDateTime())
 
         tp.destroy()
 
@@ -117,5 +128,5 @@ class TimeTravelWidget(Gtk.Box):
     # 	self.timeAdjust.set_value(int(self.timeControl.time))
 
     def onTimeSlide(self, widget):
-        self.timeControl.setTime(int(self.timeAdjust.get_value()))
+        self.timeControl.set_time(int(self.timeAdjust.get_value()))
         self.map.queue_draw()

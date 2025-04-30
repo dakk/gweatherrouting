@@ -92,8 +92,8 @@ class Core(EventDispatcher):
         self.connectionManager.connect("data", self.dataHandler)
         logger.info("Initialized")
 
-        self.connectionManager.plugAll()
-        self.connectionManager.startPolling()
+        self.connectionManager.plug_all()
+        self.connectionManager.start_polling()
 
     def setBoatPosition(self, lat, lon):
         self.connectionManager.dispatch(
@@ -113,7 +113,7 @@ class Core(EventDispatcher):
 
     def dataHandler(self, dps):
         for x in dps:
-            if x.isPosition():
+            if x.is_position():
                 self.boatInfo.latitude = x.data.latitude
                 self.boatInfo.longitude = x.data.longitude
                 self.dispatch("boatPosition", self.boatInfo)
@@ -122,7 +122,7 @@ class Core(EventDispatcher):
     def createRouting(
         self,
         algorithm,
-        polarFile,
+        polar_file,
         track,
         startDatetime,
         startPosition,
@@ -130,7 +130,7 @@ class Core(EventDispatcher):
         disableCoastlineChecks=False,
     ):
         polar = weatherrouting.Polar(
-            resource_path("gweatherrouting", f"data/polars/{polarFile}")
+            resource_path("gweatherrouting", f"data/polars/{polar_file}")
         )
 
         pval: Optional[Callable] = utils.pointsValidity
@@ -159,7 +159,7 @@ class Core(EventDispatcher):
         return routing
 
     # Import a GPX file (tracks, pois and routings)
-    def importGPX(self, path):
+    def import_gpx(self, path):
         try:
             f = open(path, "r")
             gpx = gpxpy.parse(f)
@@ -177,7 +177,7 @@ class Core(EventDispatcher):
             logger.error(str(e))
             return False
 
-    def exportGPX(self, path):
+    def export_gpx(self, path):
         gpx = gpxpy.gpx.GPX()
 
         for track in self.trackManager:

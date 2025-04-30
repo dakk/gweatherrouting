@@ -173,9 +173,9 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
     def onToggleConnections(self, widget):
         s = widget.get_active()
         if s:
-            self.core.connectionManager.startPolling()
+            self.core.connectionManager.start_polling()
         else:
-            self.core.connectionManager.stopPolling()
+            self.core.connectionManager.stop_polling()
 
     def onToggleAIS(self, widget):
         self.aisMapLayer.setVisible(widget.get_active())
@@ -199,7 +199,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 
     def onMapMouseMove(self, map, event):
         lat, lon = map.convert_screen_to_geographic(event.x, event.y).get_degrees()
-        w = self.core.gribManager.getWindAt(self.timeControl.time, lat, lon)
+        w = self.core.gribManager.gwt_wind_at(self.timeControl.time, lat, lon)
 
         sstr = ""
         if w:
@@ -262,7 +262,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
         if response == Gtk.ResponseType.OK:
             filename = dialog.get_filename()
             dialog.destroy()
-            self.core.exportGPX(filename)
+            self.core.export_gpx(filename)
 
             self.statusbar.push(0, f"Exported as GPX to {filename}")
         else:
@@ -298,7 +298,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
             extension = filepath.split(".")[-1]
 
             if extension in ["gpx"]:
-                if self.core.importGPX(filepath):
+                if self.core.import_gpx(filepath):
                     # self.builder.get_object('header-bar').set_subtitle (filepath)
                     self.updateTrack()
                     self.updatePOI()
@@ -327,7 +327,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
                     edialog.destroy()
 
             elif extension in ["grb", "grb2", "grib"]:
-                if self.core.gribManager.importGrib(filepath):
+                if self.core.gribManager.import_grib(filepath):
                     edialog = Gtk.MessageDialog(
                         self.parent, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done"
                     )

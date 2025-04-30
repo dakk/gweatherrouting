@@ -22,7 +22,7 @@ class DataPacket:
         self.t = t
         self.data = sentence
 
-    def isPosition(self):
+    def is_position(self):
         return "latitude" in self.data and "longitude" in self.data
 
     @staticmethod
@@ -39,7 +39,7 @@ class NMEADataPacket(DataPacket):
     def __init__(self, sentence):
         DataPacket.__init__(self, "nmea", sentence)
 
-    def isPosition(self):
+    def is_position(self):
         return (
             isinstance(self.data, LatLonFix)
             and self.data.latitude != 0.0

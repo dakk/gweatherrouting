@@ -33,33 +33,33 @@ class GribManagerStorage(Storage):
     def __init__(self):
         Storage.__init__(self, "grib-manager")
         self.opened = []
-        self.loadOrSaveDefault()
+        self.load_or_save_default()
 
 
 class GribManager(weatherrouting.Grib):
     def __init__(self):
         self.storage = GribManagerStorage()
-        self.gribFiles = None
+        self.grib_files = None
 
         self.gribs: List[Grib] = []
         self.timeframe = [0, 0]
 
-        self.localGribs = []
-        self.refreshLocalGribs()
+        self.local_gribs = []
+        self.refresh_local_gribs()
 
         for x in self.storage.opened:
             self.enable(x)
 
-    def refreshLocalGribs(self):
-        self.localGribs = []
+    def refresh_local_gribs(self):
+        self.local_gribs = []
         for x in os.listdir(GRIB_DIR):
             if x[-5:] != ".grib" and x[-4:] != ".grb":
                 continue
 
             m = Grib.parseMetadata(GRIB_DIR + "/" + x)
-            self.localGribs.append(m)
+            self.local_gribs.append(m)
 
-    def storeOpenedGribs(self):
+    def store_opened_gribs(self):
         ss: List = []
         for x in self.gribs:
             try:
@@ -72,7 +72,7 @@ class GribManager(weatherrouting.Grib):
         logger.info("Loading grib %s", path)
         self.gribs.append(Grib.parse(path))
 
-    def changeState(self, name, state):
+    def change_state(self, name, state):
         if not state:
             self.disable(name)
         else:
@@ -80,43 +80,43 @@ class GribManager(weatherrouting.Grib):
 
     def enable(self, name):
         self.load(GRIB_DIR + "/" + name)
-        self.storeOpenedGribs()
+        self.store_opened_gribs()
 
     def disable(self, name):
         for x in self.gribs:
             if x.name == name:
                 self.gribs.remove(x)
-                self.storeOpenedGribs()
+                self.store_opened_gribs()
 
-    def isEnabled(self, name) -> bool:
+    def is_enabled(self, name) -> bool:
         for x in self.gribs:
             if x.name == name:
                 return True
         return False
 
-    def hasGrib(self) -> bool:
+    def has_grib(self) -> bool:
         return len(self.gribs) > 0
 
-    def getWindAt(self, t, lat: float, lon: float):
+    def gwt_wind_at(self, t, lat: float, lon: float):
         for x in self.gribs:
             try:
-                return x.getWindAt(t, lat, lon)
+                return x.gwt_wind_at(t, lat, lon)
             except:
                 pass
 
-    def getWind(self, t, bounds) -> List:
+    def gwt_wind(self, t, bounds) -> List:
         # TODO: get the best matching grib for lat/lon at time t
         g: List = []
 
         for x in self.gribs:
             try:
-                g = g + x.getWind(t, bounds)
+                g = g + x.gwt_wind(t, bounds)
             except:
                 pass
         return g
 
-    def getWind2D(self, tt, bounds):
-        dd = sorted(self.getWind(tt, bounds), key=lambda x: x[2][1])
+    def get_wind_2d(self, tt, bounds):
+        dd = sorted(self.gwt_wind(tt, bounds), key=lambda x: x[2][1])
 
         ddict: Dict = {}
         for x in dd:
@@ -130,22 +130,22 @@ class GribManager(weatherrouting.Grib):
 
         return ddlist
 
-    def getDownloadList(self, force=False):
+    def get_download_list(self, force=False):
         from bs4 import BeautifulSoup
 
         # https://openskiron.org/en/openskiron
         # https://openskiron.org/en/openwrf
-        if not self.gribFiles or force:
+        if not self.grib_files or force:
             data = requests.get("https://openskiron.org/en/openskiron").text
             soup = BeautifulSoup(data, "html.parser")
-            self.gribFiles = []
+            self.grib_files = []
 
             for row in soup.find("table").find_all("tr"):
                 r = row.find_all("td")
 
                 if len(r) >= 3:
                     # Name, Source, Size, Time, Link
-                    self.gribFiles.append(
+                    self.grib_files.append(
                         [
                             r[0].text.strip(),
                             "OpenSkiron",
@@ -163,7 +163,7 @@ class GribManager(weatherrouting.Grib):
 
                 if len(r) >= 3:
                     # Name, Source, Size, Time, Link
-                    self.gribFiles.append(
+                    self.grib_files.append(
                         [
                             r[0].text.strip(),
                             "OpenWRF",
@@ -173,14 +173,14 @@ class GribManager(weatherrouting.Grib):
                         ]
                     )
 
-        return self.gribFiles
+        return self.grib_files
 
     def remove(self, name):
-        if self.isEnabled(name):
+        if self.is_enabled(name):
             self.disable(name)
         os.remove(GRIB_DIR + "/" + name)
 
-    def importGrib(self, path):
+    def import_grib(self, path):
         try:
             name = path.split("/")[-1]
             logger.info("Importing grib %s", path)
