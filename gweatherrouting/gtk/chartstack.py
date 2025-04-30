@@ -199,7 +199,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 
     def onMapMouseMove(self, map, event):
         lat, lon = map.convert_screen_to_geographic(event.x, event.y).get_degrees()
-        w = self.core.gribManager.gwt_wind_at(self.timeControl.time, lat, lon)
+        w = self.core.gribManager.get_wind_at(self.timeControl.time, lat, lon)
 
         sstr = ""
         if w:

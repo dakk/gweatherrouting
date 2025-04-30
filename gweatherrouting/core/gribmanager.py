@@ -16,7 +16,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import logging
 import os
 from shutil import copyfile
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 import requests
 import weatherrouting
@@ -97,26 +97,29 @@ class GribManager(weatherrouting.Grib):
     def has_grib(self) -> bool:
         return len(self.gribs) > 0
 
-    def gwt_wind_at(self, t, lat: float, lon: float):
+    def get_wind_at(self, t, lat: float, lon: float):
         for x in self.gribs:
             try:
-                return x.gwt_wind_at(t, lat, lon)
+                return x.get_wind_at(t, lat, lon)
             except:
                 pass
 
-    def gwt_wind(self, t, bounds) -> List:
+    def get_wind(self, t, bounds) -> List:
         # TODO: get the best matching grib for lat/lon at time t
         g: List = []
 
         for x in self.gribs:
             try:
-                g = g + x.gwt_wind(t, bounds)
+                g = g + x.get_wind(t, bounds)
             except:
                 pass
         return g
+    
+    def getWindAt(self, t: float, lat: float, lon: float) -> Tuple[float, float]:
+        return self.get_wind_at(t, lat, lon)
 
     def get_wind_2d(self, tt, bounds):
-        dd = sorted(self.gwt_wind(tt, bounds), key=lambda x: x[2][1])
+        dd = sorted(self.get_wind(tt, bounds), key=lambda x: x[2][1])
 
         ddict: Dict = {}
         for x in dd:

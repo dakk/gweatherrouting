@@ -85,7 +85,7 @@ class Grib(weatherrouting.Grib):
         return u_band, v_band
 
     @lru_cache(maxsize=2048)
-    def getRIndexData(self, t):
+    def get_rindex_data(self, t):
         u_band, v_band = self._findBandsForTime(t)
         if u_band is None or v_band is None:
             raise ValueError(f"Wind data not found for forecast hour {t}")
@@ -104,9 +104,9 @@ class Grib(weatherrouting.Grib):
 
         return uv_data
 
-    def _gwt_windData(self, t, bounds):
+    def _get_wind_data(self, t, bounds):
         try:
-            uv = self.getRIndexData(t)
+            uv = self.get_rindex_data(t)
         except Exception as e:
             logger.debug(e)
             return None
@@ -119,7 +119,7 @@ class Grib(weatherrouting.Grib):
             )
         )
 
-    def gwt_wind(self, tt, bounds):
+    def get_wind(self, tt, bounds):
         t = self._transformTime(tt)
         if t is None:
             return
@@ -134,8 +134,8 @@ class Grib(weatherrouting.Grib):
         lon2 = max(bounds[0][1], bounds[1][1])
 
         bounds = [(bounds[0][0], lon1), (bounds[1][0], lon2)]
-        uuvv1 = self._gwt_windData(t1, bounds)
-        uuvv2 = self._gwt_windData(t2, bounds)
+        uuvv1 = self._get_wind_data(t1, bounds)
+        uuvv2 = self._get_wind_data(t2, bounds)
 
         data = []
 
@@ -162,12 +162,12 @@ class Grib(weatherrouting.Grib):
 
         return math.floor((t - self.start_time).total_seconds() / 3600)
 
-    def gwt_wind_at(self, t, lat: float, lon: float) -> Tuple[float, float]:
+    def get_wind_at(self, t, lat: float, lon: float) -> Tuple[float, float]:
         bounds = [
             (math.floor(lat * 2) / 2.0, math.floor(lon * 2) / 2.0),
             (math.ceil(lat * 2) / 2.0, math.ceil(lon * 2) / 2.0),
         ]
-        data = self.gwt_wind(t, bounds)
+        data = self.get_wind(t, bounds)
         return (data[0][0], data[0][1])
 
     @staticmethod
