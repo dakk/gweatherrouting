@@ -30,7 +30,7 @@ class _POICollection(Collection, Generic[T]):
             self.append(
                 POI(
                     waypoint.name,
-                    [waypoint.latitude, waypoint.longitude],
+                    (waypoint.latitude, waypoint.longitude),
                     collection=self,
                 )
             )

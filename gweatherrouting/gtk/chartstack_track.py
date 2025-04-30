@@ -25,11 +25,10 @@ except:
 
 from gi.repository import GObject, Gtk
 
-from gweatherrouting.core import Core
+from .chartstack_base import ChartStackBase
 
 
-class ChartStackTrack:
-    core: Core
+class ChartStackTrack(ChartStackBase):
     selectedTrackItem = None
 
     def __init__(self):

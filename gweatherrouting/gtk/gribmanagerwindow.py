@@ -135,9 +135,9 @@ class GribManagerWindow:
                 edialog.format_secondary_text("File opened, loaded grib")
                 edialog.run()
                 edialog.destroy()
-                self.statusbar.push(
-                    self.statusbar.get_context_id("Info"), f"Loaded grib {filepath}"
-                )
+                # self.statusbar.push(
+                #     self.statusbar.get_context_id("Info"), f"Loaded grib {filepath}"
+                # )
 
             else:
                 edialog = Gtk.MessageDialog(

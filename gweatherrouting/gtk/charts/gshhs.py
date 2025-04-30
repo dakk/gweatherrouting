@@ -15,7 +15,6 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 # flake8: noqa: E402
 import logging
-import os
 import time
 from threading import Thread
 
@@ -31,7 +30,6 @@ except:
 
 from gi.repository import Gdk, Gtk, OsmGpsMap
 
-from gweatherrouting import log
 from gweatherrouting.common import resource_path
 from gweatherrouting.core.core import LinePointValidityProvider
 from gweatherrouting.core.storage import DATA_DIR, TEMP_DIR
@@ -92,7 +90,7 @@ class OSMDownloadDialog(Gtk.Dialog):
             edialog.destroy()
             self.response(Gtk.ResponseType.OK)
         else:
-            log.error("Error downloading OpenSeaMap")
+            logger.error("Error downloading OpenSeaMap")
 
             edialog = Gtk.MessageDialog(
                 self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error"
@@ -116,14 +114,14 @@ class OSMDownloadDialog(Gtk.Dialog):
             pass
         else:
             dl = 0
-            total_length = int(total_length)
+            total_length_i = int(total_length)
             for data in response.iter_content(chunk_size=4096):
                 dl += len(data)
                 f.write(data)
-                done = int(100 * dl / total_length)
+                done = int(100 * dl / total_length_i)
 
                 if last_signal_percent != done:
-                    self.percentageCallback(done, dl, total_length)
+                    self.percentageCallback(done, dl, total_length_i)
                     last_signal_percent = done
 
         f.close()
@@ -183,7 +181,7 @@ class GSHHSDownloadDialog(Gtk.Dialog):
             edialog.destroy()
             self.response(Gtk.ResponseType.OK)
         else:
-            log.error("Error downloading GSHHS")
+            logger.error("Error downloading GSHHS")
 
             edialog = Gtk.MessageDialog(
                 self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error"
@@ -210,14 +208,14 @@ class GSHHSDownloadDialog(Gtk.Dialog):
             pass
         else:
             dl = 0
-            total_length = int(total_length)
+            total_length_i = int(total_length)
             for data in response.iter_content(chunk_size=4096):
                 dl += len(data)
                 f.write(data)
-                done = int(100 * dl / total_length)
+                done = int(100 * dl / total_length_i)
 
                 if last_signal_percent != done:
-                    self.percentageCallback(done, dl, total_length)
+                    self.percentageCallback(done, dl, total_length_i)
                     last_signal_percent = done
 
         f.close()
@@ -413,7 +411,7 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
 
         t = time.time()
         self.drawer.draw(gpsmap, cr, self.vectorFiles[q + "1"], boundingGeometry)
-        self.lastTime[q] = time.time() - t
+        self.lastTime[q] = int(time.time() - t)
 
         if scale < 4500:
             for c in self.countries:

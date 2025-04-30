@@ -13,7 +13,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-from typing import Generic, TypeVar
+from typing import Generic, Optional, TypeVar
 
 import gpxpy
 
@@ -73,7 +73,7 @@ class Collection(Generic[T]):
             e.collection = self
             self.append(e)
 
-    def getUniqueName(self, baseName=None):
+    def getUniqueName(self, baseName=None) -> str:
         if baseName is None:
             baseName = self.baseName
         return uniqueName(baseName, self.elements)
@@ -101,13 +101,13 @@ class Collection(Generic[T]):
         if c is not None:
             self.remove(c)
 
-    def getByName(self, n):
+    def getByName(self, n) -> Optional[T]:
         for x in self.elements:
             if x.name == n:
                 return x
         return None
 
-    def exists(self, n):
+    def exists(self, n) -> bool:
         for x in self.elements:
             if x.name == n:
                 return True

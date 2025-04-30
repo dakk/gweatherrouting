@@ -18,7 +18,7 @@ import io
 import logging
 import os
 from threading import Thread
-from typing import List
+from typing import List, Optional
 
 import cairo
 import gi
@@ -62,8 +62,8 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
         self.core = core
         self.recording = False
         self.loading = False
-        self.data: List = []
-        self.recordedData = None
+        self.data: List[nt.TrackPoint] = []
+        self.recordedData: Optional[io.TextIOWrapper] = None
         self.toSend: List = []
 
         self.depthChart = False
@@ -73,7 +73,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
         self.hdgChart = True
         self.rwChart = False
 
-        self.highlightedValue = None
+        self.highlightedValue: Optional[nt.TrackPoint] = None
         self.cropA = None
         self.cropB = None
 
@@ -117,8 +117,8 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 
         self.builder.get_object("stop-button").hide()
 
-        self.recordinThread = None
-        self.loadingThread = None
+        self.recordinThread: Optional[Thread] = None
+        self.loadingThread: Optional[Thread] = None
 
         try:
             self.loadingThread = Thread(target=self.loadFromFile, args=(LOG_TEMP_FILE,))
@@ -185,7 +185,8 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
     def __del__(self):
         if self.recording:
             self.stopRecording()
-            self.recordinThread.join()
+            if self.recordinThread:
+                self.recordinThread.join()
 
         if self.loadingThread:
             self.loadingThread.join()
@@ -218,7 +219,9 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
         if self.recordedData:
             self.recordedData.flush()
             self.recordedData.close()
+
         os.system(f"mv {LOG_TEMP_FILE} {LOG_TEMP_FILE}.2")
+
         pip = nt.Pipeline(
             nt.FileInput(LOG_TEMP_FILE + ".2"),
             nt.FileOutput(LOG_TEMP_FILE),
@@ -226,6 +229,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
             [nt.CropPipe(self.cropA, self.cropB)],
         )
         pip.run()
+
         os.system(f"rm {LOG_TEMP_FILE}.2")
         self.cropA = None
         self.cropB = None
@@ -243,7 +247,8 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 
     def onStopRecordingClick(self, widget):
         self.recording = False
-        self.recordedData.close()
+        if self.recordedData:
+            self.recordedData.close()
         self.toSend = []
         logger.debug("Stopping recording...")
 
@@ -251,7 +256,8 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
         self.builder.get_object("stop-button").hide()
         self.statusBar.push(0, "Recording stopped")
 
-        self.recordinThread.join()
+        if self.recordinThread:
+            self.recordinThread.join()
 
     def toggleSpeedChart(self, widget):
         self.speedChart = not self.speedChart
@@ -280,7 +286,8 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
     def dataHandler(self, d):
         if self.recording:
             for x in d:
-                self.recordedData.write(str(x.data) + "\n")
+                if self.recordedData:
+                    self.recordedData.write(str(x.data) + "\n")
                 self.toSend.append(x.data)
 
     def readSentence(self):
@@ -302,9 +309,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
             self.timeControl.setTime(data.time)
 
             if len(self.data) % 150 == 0:
-                self.core.logManager.getByName("log-history").append(
-                    (data.lat, data.lon)
-                )
+                self.core.logManager.log_history.add(data.lat, data.lon)
 
             if self.recording or len(self.data) % 5000 == 0:
                 self.map.set_center_and_zoom(data.lat, data.lon, 12)
@@ -355,7 +360,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
         # ext = filepath.split('.')[-1]
 
         # TODO: support for gpx files
-        self.core.logManager.getByName("log-history").clear()
+        self.core.logManager.log_history.clear()
 
         try:
             fi = nt.FileInput(filepath)
@@ -390,15 +395,15 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
             self.recordedData.close()
         self.recordedData = open(LOG_TEMP_FILE, "w")
         self.toSend = []
-        self.core.logManager.getByName("log-history").clear()
+        self.core.logManager.log_history.clear()
         self.map.queue_draw()
         self.graphArea.queue_draw()
         logger.debug("Data cleared")
 
     def rebuildTrack(self):
-        self.core.logManager.getByName("log-history").clear()
+        self.core.logManager.log_history.clear()
         for x in self.data[0::150]:
-            self.core.logManager.getByName("log-history").append((x.lat, x.lon))
+            self.core.logManager.log_history.add(x.lat, x.lon)
         self.map.queue_draw()
 
     def startRecording(self):
@@ -427,7 +432,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
         a = widget.get_allocation()
         width = a.width
 
-        if self.data == []:
+        if len(self.data) == 0:
             return
 
         import matplotlib.pyplot as plt
@@ -456,7 +461,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
         fig.set_size_inches((width / 100), (a.height / 100.0))
 
         i = 0
-        ii = -1
+        iiv = -1
         self.highlightedValue = None
         self.statusBar.push(0, "")
 
@@ -472,8 +477,8 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
                 )
             )
             try:
-                ii = ii[0][0]
-                self.highlightedValue = y[ii]
+                iiv = ii[0][0]
+                self.highlightedValue = y[iiv]
                 self.toolsMapLayer.gpsAdd(
                     self.highlightedValue.lat,
                     self.highlightedValue.lon,
@@ -493,7 +498,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
                 )
 
             except:
-                ii = -1
+                iiv = -1
 
         def highlight(i, data):
             if ii != -1:
@@ -511,6 +516,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 
             ax1[i].legend()
             i += 1
+
         if self.apparentWindChart or self.trueWindChart:
             if i < nplots - 1:
                 plt.setp(ax1[i].get_xticklabels(), visible=False)

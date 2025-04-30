@@ -17,7 +17,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 # isort:skip_file
 import json
 from geojson_utils import point_in_polygon
-from typing import Dict, Callable
+from typing import Dict, Callable, List
 
 from gweatherrouting.common import resource_path
 from gweatherrouting.core.storage import *  # noqa: F401, F403
@@ -94,7 +94,7 @@ def point_in_bbox(bbox, lat, lon):
 
 
 # Return true if the given point is inside a country
-def pointInCountry(lat, lon):
+def pointInCountry(lat: float, lon: float) -> bool:
     for feature in COUNTRY_SHAPES:
         if point_in_bbox(feature["properties"]["bbox"], lat, lon):
             if point_in_polygon(
@@ -105,12 +105,12 @@ def pointInCountry(lat, lon):
     return False
 
 
-def pointValidity(lat, lon):
+def pointValidity(lat: float, lon: float) -> bool:
     return not pointInCountry(lat, lon)
 
 
 def pointsValidity(latlons):
-    return list(map(pointValidity, latlons))
+    return list(map(lambda ll: pointValidity(ll[0], ll[1]), latlons))
 
 
 def uniqueName(name, collection=None):
@@ -145,7 +145,7 @@ def ortodromic(latA, lonA, latB, lonB):
 
 
 class EventDispatcher:
-    handlers: Dict[str, Callable] = {}
+    handlers: Dict[str, List[Callable]] = {}
 
     def connect(self, evt, f):
         if evt not in self.handlers:

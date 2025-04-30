@@ -190,7 +190,11 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 
     def boatInfoHandler(self, bi):
         self.toolsMapLayer.gpsAdd(bi.latitude, bi.longitude, bi.heading, bi.speed)
-        self.core.logManager.getByName("log").append((bi.latitude, bi.longitude))
+
+        log = self.core.logManager.log
+        if log is not None:
+            log.add(bi.latitude, bi.longitude)
+
         self.map.queue_draw()
 
     def onMapMouseMove(self, map, event):

@@ -53,3 +53,15 @@ class ChartLayer:
     def getBoundingGeometry(self, gpsmap):
         wktbb = self.getBoundingWKT(gpsmap)
         return ogr.CreateGeometryFromWkt(wktbb)
+
+    def do_draw(self, gpsmap, cr):
+        pass
+
+    def do_render(self, gpsmap):
+        pass
+
+    def do_busy(self):
+        return False
+
+    def do_button_press(self, gpsmap, gdkeventbutton):
+        return False

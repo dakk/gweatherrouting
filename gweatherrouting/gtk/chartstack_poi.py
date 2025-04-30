@@ -28,8 +28,10 @@ from gi.repository import GdkPixbuf, Gtk
 
 from gweatherrouting.common import resource_path
 
+from .chartstack_base import ChartStackBase
 
-class ChartStackPOI:
+
+class ChartStackPOI(ChartStackBase):
     selectedPOI = None
 
     def __init__(self):

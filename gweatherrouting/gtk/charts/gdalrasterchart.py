@@ -21,6 +21,7 @@ import time
 from os import listdir
 from os.path import isfile, join
 from threading import Lock, Thread
+from typing import List, Optional
 
 import cairo
 import gi
@@ -200,8 +201,8 @@ class GDALRasterChart(ChartLayer):
 
         return True
 
-    lastRect = None
-    lastRasters = None
+    lastRect: Optional[List] = None
+    lastRasters: List = []
 
     def loadRaster(self, gpsmap, path):
         with self.loadLock:

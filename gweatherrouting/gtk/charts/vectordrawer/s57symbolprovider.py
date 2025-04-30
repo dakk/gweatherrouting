@@ -18,6 +18,7 @@ import json
 import logging
 
 import gi
+from bs4 import BeautifulSoup
 
 gi.require_version("Gtk", "3.0")
 try:
@@ -25,7 +26,6 @@ try:
 except:
     gi.require_version("OsmGpsMap", "1.0")
 
-from bs4 import BeautifulSoup
 from gi.repository import Gdk, GdkPixbuf
 
 from gweatherrouting.common import resource_path

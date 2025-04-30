@@ -13,10 +13,22 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# isort:skip_file
-from .cm93chartdrawer import CM93ChartDrawer  # noqa: F401
-from .osmchartdrawer import OSMChartDrawer  # noqa: F401
-from .s57chartdrawer import S57ChartDrawer  # noqa: F401
-from .s57symbolprovider import S57SymbolProvider  # noqa: F401
-from .simplechartdrawer import SimpleChartDrawer  # noqa: F401
-from .vectorchartdrawer import VectorChartDrawer  # noqa: F401
+# flake8: noqa: E402
+import os
+
+import gi
+
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gtk
+
+from gweatherrouting.core import Core
+
+from .settingsmanager import SettingsManager
+
+
+class SettingsWindowBase:
+    builder: Gtk.Builder
+    core: Core
+    window: Gtk.Window
+    parent: Gtk.Window
+    settingsManager: SettingsManager

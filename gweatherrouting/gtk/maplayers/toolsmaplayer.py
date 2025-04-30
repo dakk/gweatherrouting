@@ -15,11 +15,10 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 # flake8: noqa: E402
 import math
+from typing import Tuple
 
 import cairo
 import gi
-
-from gweatherrouting.core import utils
 
 gi.require_version("Gtk", "3.0")
 try:
@@ -29,6 +28,7 @@ except:
 
 from gi.repository import GObject, OsmGpsMap
 
+from gweatherrouting.core import utils
 from gweatherrouting.gtk.style import Style
 
 
@@ -38,7 +38,7 @@ class ToolsMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 
         self.measuring = False
         self.measureStart = None
-        self.mousePosition = None
+        self.mousePosition: Tuple[float, float, int, int] = (0.0, 0.0, 0, 0)
 
         self.dashboard = False
         self.compass = False
@@ -181,6 +181,9 @@ class ToolsMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
                 cr.stroke()
 
         if self.measuring:
+            if self.measureStart is None:
+                return
+
             x, y = gpsmap.convert_geographic_to_screen(
                 OsmGpsMap.MapPoint.new_degrees(
                     self.measureStart[0], self.measureStart[1]
@@ -234,7 +237,8 @@ class ToolsMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 
         if self.poiMoving and gdkeventbutton.button == 1:
             self.poiMoving = False
-            self.poiMovingCallback(self.mousePosition[0], self.mousePosition[1])
+            if self.poiMovingCallback:
+                self.poiMovingCallback(self.mousePosition[0], self.mousePosition[1])
             return True
 
         return False

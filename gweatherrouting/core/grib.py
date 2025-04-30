@@ -18,6 +18,7 @@ import datetime
 import logging
 import math
 from functools import lru_cache
+from typing import Optional, Tuple
 
 import weatherrouting
 from osgeo import gdal
@@ -38,7 +39,15 @@ class MetaGrib:
 
 
 class Grib(weatherrouting.Grib):
-    def __init__(self, path, name, centre, bounds, startTime, lastForecast):
+    def __init__(
+        self,
+        path: str,
+        name: str,
+        centre,
+        bounds,
+        startTime: datetime.datetime,
+        lastForecast,
+    ):
         self.name = name
         self.centre = centre.upper()
         self.bounds = bounds
@@ -147,13 +156,13 @@ class Grib(weatherrouting.Grib):
 
         return data
 
-    def _transformTime(self, t):
+    def _transformTime(self, t) -> Optional[float]:
         if self.endTime < t:
             return None
 
         return math.floor((t - self.startTime).total_seconds() / 3600)
 
-    def getWindAt(self, t, lat, lon):
+    def getWindAt(self, t, lat: float, lon: float) -> Tuple[float, float]:
         bounds = [
             (math.floor(lat * 2) / 2.0, math.floor(lon * 2) / 2.0),
             (math.ceil(lat * 2) / 2.0, math.ceil(lon * 2) / 2.0),

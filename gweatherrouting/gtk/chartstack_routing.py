@@ -30,17 +30,17 @@ except:
 from gi.repository import Gdk, GObject, Gtk
 from weatherrouting import RoutingNoWindException
 
-from gweatherrouting import log
 from gweatherrouting.core import utils
 from gweatherrouting.core.geo.routing import Routing
 
+from .chartstack_base import ChartStackBase
 from .maplayers import IsochronesMapLayer
 from .routingwizarddialog import RoutingWizardDialog
 
 logger = logging.getLogger("gweatherrouting")
 
 
-class ChartStackRouting:
+class ChartStackRouting(ChartStackBase):
     routingThread = None
     selectedRouting = None
     stopRouting = False
@@ -82,6 +82,9 @@ class ChartStackRouting:
         dialog.destroy()
 
     def onRoutingStep(self):
+        if self.currentRouting is None:
+            return
+
         Gdk.threads_enter()
         self.progressBar.set_fraction(1.0)
         self.progressBar.set_text("1%")
@@ -143,6 +146,9 @@ class ChartStackRouting:
             self.builder.get_object("stop-routing-button").hide()
             self.isochronesMapLayer.setIsochrones([], [])
             Gdk.threads_leave()
+            return
+
+        if res is None:
             return
 
         tr = []
@@ -215,6 +221,9 @@ class ChartStackRouting:
 
     def onRoutingExport(self, widget):
         routing = self.core.routingManager.getByName(self.selectedRouting)
+
+        if routing is None:
+            return
 
         dialog = Gtk.FileChooserDialog(
             "Please select a destination",

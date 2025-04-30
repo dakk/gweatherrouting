@@ -75,6 +75,9 @@ class PolarStack(Gtk.Box):
 
         p = self.polarWidget.polar
 
+        if p is None:
+            return
+
         twaStep = 1
         if len(p.twa) > 20:
             twaStep = int(len(p.twa) / 10)

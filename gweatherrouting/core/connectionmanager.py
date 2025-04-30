@@ -54,7 +54,9 @@ class ConnectionManager(EventDispatcher):
     def stopPolling(self):
         logger.info("Polling stopped")
         self.running = False
-        self.thread.join()
+        if self.thread:
+            self.thread.join()
+            self.thread = None
 
     @property
     def connections(self):

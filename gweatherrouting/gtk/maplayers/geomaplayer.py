@@ -43,26 +43,24 @@ class GeoMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
         self.hlRouting = name
 
     def do_draw(self, gpsmap, cr):
-        log = self.core.logManager.getByName("log")
-        if log:
-            prevx = None
-            prevy = None
-            prevp = None
+        prevx = None
+        prevy = None
+        prevp = None
 
-            for p in log:
-                x, y = gpsmap.convert_geographic_to_screen(
-                    OsmGpsMap.MapPoint.new_degrees(p[0], p[1])
-                )
+        for p in self.core.logManager.log:
+            x, y = gpsmap.convert_geographic_to_screen(
+                OsmGpsMap.MapPoint.new_degrees(p[0], p[1])
+            )
 
-                if prevx is not None and prevy is not None:
-                    Style.Track.LogTrack.apply(cr)
-                    cr.move_to(prevx, prevy)
-                    cr.line_to(x, y)
-                    cr.stroke()
+            if prevx is not None and prevy is not None:
+                Style.Track.LogTrack.apply(cr)
+                cr.move_to(prevx, prevy)
+                cr.line_to(x, y)
+                cr.stroke()
 
-                prevx = x
-                prevy = y
-                prevp = p
+            prevx = x
+            prevy = y
+            prevp = p
 
         for tr in self.core.routingManager:
             highlight = False

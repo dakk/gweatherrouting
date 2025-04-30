@@ -28,11 +28,11 @@ class SerialDataSource(DataSource):
         DataSource.__init__(self, protocol, direction)
         self.port = port
         self.baudrate = baudrate
-        self.s = None
+        self.serial_conn = None
 
     def connect(self):
         try:
-            self.s = serial.Serial(self.port, baudrate=self.baudrate)
+            self.serial_conn = serial.Serial(self.port, baudrate=self.baudrate)
             self.connected = True
             return True
         except:
@@ -54,10 +54,15 @@ class SerialDataSource(DataSource):
         return devices
 
     def _read(self):
-        if self.s.inWaiting() > 0:
-            return self.s.read(self.s.inWaiting()).decode("ascii").split("\n")
+        if self.serial_conn and self.serial_conn.inWaiting() > 0:
+            return (
+                self.serial_conn.read(self.serial_conn.inWaiting())
+                .decode("ascii")
+                .split("\n")
+            )
 
         return []
 
     def _write(self, msg):
-        self.s.write(msg.encode("ascii"))
+        if self.serial_conn:
+            self.serial_conn.write(msg.encode("ascii"))

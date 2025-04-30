@@ -18,9 +18,9 @@ import datetime
 import os
 
 import gi
+import weatherrouting
 
 gi.require_version("Gtk", "3.0")
-import weatherrouting
 from gi.repository import Gtk
 
 from gweatherrouting.common import resource_path

@@ -1,6 +1,22 @@
+# -*- coding: utf-8 -*-
+# Copyright (C) 2017-2025 Davide Gessa
+"""
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+For detail about GNU see <http://www.gnu.org/licenses/>.
+"""
 import logging
 import os
 from shutil import copyfile
+from typing import Dict, List
 
 import requests
 import weatherrouting
@@ -25,7 +41,7 @@ class GribManager(weatherrouting.Grib):
         self.storage = GribManagerStorage()
         self.gribFiles = None
 
-        self.gribs = []
+        self.gribs: List[Grib] = []
         self.timeframe = [0, 0]
 
         self.localGribs = []
@@ -37,14 +53,14 @@ class GribManager(weatherrouting.Grib):
     def refreshLocalGribs(self):
         self.localGribs = []
         for x in os.listdir(GRIB_DIR):
-            if (x[-5:] != ".grib" and x[-4:] != ".grb"):
+            if x[-5:] != ".grib" and x[-4:] != ".grb":
                 continue
 
             m = Grib.parseMetadata(GRIB_DIR + "/" + x)
             self.localGribs.append(m)
 
     def storeOpenedGribs(self):
-        ss = []
+        ss: List = []
         for x in self.gribs:
             try:
                 ss.index(x.name)
@@ -72,25 +88,25 @@ class GribManager(weatherrouting.Grib):
                 self.gribs.remove(x)
                 self.storeOpenedGribs()
 
-    def isEnabled(self, name):
+    def isEnabled(self, name) -> bool:
         for x in self.gribs:
             if x.name == name:
                 return True
         return False
 
-    def hasGrib(self):
+    def hasGrib(self) -> bool:
         return len(self.gribs) > 0
 
-    def getWindAt(self, t, lat, lon):
+    def getWindAt(self, t, lat: float, lon: float):
         for x in self.gribs:
             try:
                 return x.getWindAt(t, lat, lon)
             except:
                 pass
 
-    def getWind(self, t, bounds):
+    def getWind(self, t, bounds) -> List:
         # TODO: get the best matching grib for lat/lon at time t
-        g = []
+        g: List = []
 
         for x in self.gribs:
             try:
@@ -102,7 +118,7 @@ class GribManager(weatherrouting.Grib):
     def getWind2D(self, tt, bounds):
         dd = sorted(self.getWind(tt, bounds), key=lambda x: x[2][1])
 
-        ddict = {}
+        ddict: Dict = {}
         for x in dd:
             if x[2][1] not in ddict:
                 ddict[x[2][1]] = []
@@ -189,11 +205,11 @@ class GribManager(weatherrouting.Grib):
             pass
         else:
             dl = 0
-            total_length = int(total_length)
+            total_length_i = int(total_length)
             for data in response.iter_content(chunk_size=4096):
                 dl += len(data)
                 f.write(data)
-                done = int(100 * dl / total_length)
+                done = int(100 * dl / total_length_i)
 
                 if last_signal_percent != done:
                     percentageCallback(done)

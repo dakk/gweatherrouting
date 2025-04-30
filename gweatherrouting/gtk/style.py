@@ -92,7 +92,9 @@ class Style:
         Font = CairoStyle(color=(0, 0, 0, 1), fontSize=10)
 
     class Track:
-        LogTrack = CairoStyle(color=(1, 0, 0, 1), lineWidth=1)
+        Mob = CairoStyle(color=(1, 0, 0, 1), lineWidth=1)
+
+        LogTrack = CairoStyle(color=(0, 0.5, 0.5, 0.5), lineWidth=1)
 
         TrackActive = CairoStyle(
             color=(0x91 / 255.0, 0x32 / 255.0, 0x1C / 255.0, 1), lineWidth=1, dash=8.0

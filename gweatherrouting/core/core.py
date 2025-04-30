@@ -14,6 +14,7 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 import logging
+from typing import Callable, Optional
 
 import gpxpy
 import weatherrouting
@@ -22,7 +23,12 @@ from gweatherrouting.common import resource_path
 from gweatherrouting.core import GribManager, utils
 from gweatherrouting.core.connectionmanager import ConnectionManager
 from gweatherrouting.core.datasource import DataPacket
-from gweatherrouting.core.geo import POICollection, RoutingCollection, TrackCollection
+from gweatherrouting.core.geo import (
+    POICollection,
+    RoutingCollection,
+    Track,
+    TrackCollection,
+)
 from gweatherrouting.core.utils import EventDispatcher
 
 logger = logging.getLogger("gweatherrouting")
@@ -46,6 +52,33 @@ class BoatInfo:
         return self.latitude != 0.0 and self.longitude != 0.0
 
 
+class LogTrackCollection(TrackCollection):
+    def __init__(self):
+        super().__init__("log")
+        self.log_history
+        self.log
+
+    @property
+    def log_history(self) -> Track:
+        "log-history is the loaded from log tab"
+        if not self.exists("log-history"):
+            e = self.newElement()
+            e.name = "log-history"
+            return e
+
+        return self.getByName("log-history")  # type: ignore
+
+    @property
+    def log(self) -> Track:
+        "log is the boat track"
+        if not self.exists("log"):
+            e = self.newElement()
+            e.name = "log"
+            return e
+
+        return self.getByName("log")  # type: ignore
+
+
 class Core(EventDispatcher):
     def __init__(self):
         self.connectionManager = ConnectionManager()
@@ -54,16 +87,7 @@ class Core(EventDispatcher):
         self.poiManager = POICollection()
         self.gribManager = GribManager()
         self.boatInfo = BoatInfo()
-        self.logManager = TrackCollection("log")
-
-        # "log" is the boat track
-        if not self.logManager.exists("log"):
-            e = self.logManager.newElement()
-            e.name = "log"
-        # "log-history" is the loaded from log tab
-        if not self.logManager.exists("log-history"):
-            e = self.logManager.newElement()
-            e.name = "log-history"
+        self.logManager = LogTrackCollection()
 
         self.connectionManager.connect("data", self.dataHandler)
         logger.info("Initialized")
@@ -109,8 +133,8 @@ class Core(EventDispatcher):
             resource_path("gweatherrouting", f"data/polars/{polarFile}")
         )
 
-        pval = utils.pointsValidity
-        lval = None
+        pval: Optional[Callable] = utils.pointsValidity
+        lval: Optional[Callable] = None
 
         if len(validityProviders) > 0:
             # pval is a function that checks all pointsValidity of validityProviders

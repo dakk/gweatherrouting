@@ -13,11 +13,10 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+# flake8: noqa: E402
 import logging
 import os
-
-# flake8: noqa: E402
-from typing import List
+from typing import List, Optional
 
 import gi
 
@@ -52,8 +51,8 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
     def __init__(self, settingsManager):
         GObject.GObject.__init__(self)
         self.charts: List[ChartLayer] = []
-        self.gshhsLayer: GSHHSVectorChart = None
-        self.osmLayer: GDALVectorChart = None
+        self.gshhsLayer: Optional[GSHHSVectorChart] = None
+        self.osmLayer: Optional[GDALVectorChart] = None
         self.settingsManager: SettingsManager = settingsManager
         self.maps: List[OsmGpsMap] = []
 
@@ -65,7 +64,7 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
         self.maps.append(m)
 
     def getLinePointValidityProviders(self):
-        lpvp = []
+        lpvp: List[LinePointValidityProvider] = []
         for x in filter(lambda x: x.enabled, self.charts):
             if isinstance(x, LinePointValidityProvider):
                 lpvp += [x]

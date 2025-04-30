@@ -24,13 +24,9 @@ from gi.repository import Gtk
 from gweatherrouting.core import SerialDataSource
 
 ctypes = ["Network", "Serial"]
-
 ntypes = ["TCP", "UDP"]
-
 directions = ["In", "Out", "Both"]
-
 protocols = ["NMEA0183"]
-
 baudrates = [9600, 19200, 38400, 57600, 115200]
 
 
@@ -81,8 +77,8 @@ class ConnectionEditDialog:
         self.serialDataPortCombo.set_active(0)
 
         self.serialBaudrateCombo = self.builder.get_object("serial-baudrate-combo")
-        for x in baudrates:
-            self.serialBaudrateCombo.append_text(str(x))
+        for xb in baudrates:
+            self.serialBaudrateCombo.append_text(str(xb))
         self.serialBaudrateCombo.set_active(0)
 
         if self.data is not None:
@@ -93,20 +89,20 @@ class ConnectionEditDialog:
                     self.data["data-port"]
                 )
                 self.serialBaudrateCombo.set_active(
-                    map(lower, baudrates).index(self.data["baudrate"])
+                    list(map(lower, baudrates)).index(self.data["baudrate"])
                 )
             elif self.data["type"] == "network":
                 self.typeCombo.set_active(1)
                 self.networkTypeCombo.set_active(
-                    map(lower, ntypes).index(self.data["network"])
+                    list(map(lower, ntypes)).index(self.data["network"])
                 )
                 self.builder.get_object("network-host").set_text(self.data["host"])
                 self.builder.get_object("network-port").set_text(str(self.data["port"]))
             self.protocolCombo.set_active(
-                map(lower, protocols).index(self.data["protocol"])
+                list(map(lower, protocols)).index(self.data["protocol"])
             )
             self.directionCombo.set_active(
-                map(lower, directions).index(self.data["direction"])
+                list(map(lower, directions)).index(self.data["direction"])
             )
 
     def run(self):

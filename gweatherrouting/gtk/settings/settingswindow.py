@@ -21,12 +21,17 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
+from gweatherrouting.core import Core
+
+from .settingsmanager import SettingsManager
 from .settingswindow_charts import SettingsWindowCharts
 from .settingswindow_connections import SettingsWindowConnections
 
 
 class SettingsWindow(SettingsWindowConnections, SettingsWindowCharts):
-    def __init__(self, parent, settingsManager, core):
+    def __init__(
+        self, parent: Gtk.Window, settingsManager: SettingsManager, core: Core
+    ):
         self.parent = parent
         self.core = core
         self.settingsManager = settingsManager
@@ -52,8 +57,8 @@ class SettingsWindow(SettingsWindowConnections, SettingsWindowCharts):
             self.settingsManager.gribArrowOpacity
         )
 
-        SettingsWindowConnections.__init__(self, self.parent, settingsManager, core)
-        SettingsWindowCharts.__init__(self, self.parent, settingsManager, core)
+        SettingsWindowConnections.__init__(self)
+        SettingsWindowCharts.__init__(self)
 
     def show(self):
         self.window.show_all()

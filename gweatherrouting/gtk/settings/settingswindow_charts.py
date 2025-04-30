@@ -21,11 +21,13 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gdk, Gtk
 
+from .settingswindow_base import SettingsWindowBase
+
 PALETTES = {"cm93": 0, "navionics": 1, "dark": 2}
 
 
-class SettingsWindowCharts:
-    def __init__(self, parent, settingsManager, core):
+class SettingsWindowCharts(SettingsWindowBase):
+    def __init__(self):
         self.builder.get_object("chart-progress").hide()
         self.reloadChart()
 

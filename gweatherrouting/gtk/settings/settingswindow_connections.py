@@ -14,14 +14,13 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 # flake8: noqa: E402
-from threading import Thread
-
 import gi
-
-from .connectioneditdialog import ConnectionEditDialog
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
+
+from .connectioneditdialog import ConnectionEditDialog
+from .settingswindow_base import SettingsWindowBase
 
 
 class ConnectionListBoxRow(Gtk.ListBoxRow):
@@ -50,8 +49,8 @@ class ConnectionListBoxRow(Gtk.ListBoxRow):
         self.add(label)
 
 
-class SettingsWindowConnections:
-    def __init__(self, parent, settingsManager, core):
+class SettingsWindowConnections(SettingsWindowBase):
+    def __init__(self):
         self.selectedConnection = None
         self.connectionListBox = self.builder.get_object("connections-listbox")
         self.reloadConnections()
@@ -83,13 +82,13 @@ class SettingsWindowConnections:
     def onConnectionSelected(self, widget, sel):
         self.selectedConnection = sel
 
-    def onConnectionEdit(self, widget):
-        d = ConnectionEditDialog(self.window)
-        d.run()
-        data = d.data
-        d.destroy()
-        if data is not None:
-            self.core.connectionManager.editConnection(data)
+    # def onConnectionEdit(self, widget):
+    #     d = ConnectionEditDialog(self.window)
+    #     d.run()
+    #     data = d.data
+    #     d.destroy()
+    #     if data is not None:
+    #         self.core.connectionManager.editConnection(data)
 
     def onConnectionClick(self, widget, event):
         if event.button == 3:
