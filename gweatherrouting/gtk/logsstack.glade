@@ -26,7 +26,7 @@
                 <property name="label" translatable="yes">Record</property>
                 <property name="use-underline">True</property>
                 <property name="icon-name">gtk-media-record</property>
-                <signal name="clicked" handler="onRecordingClick" swapped="no"/>
+                <signal name="clicked" handler="on_recording_click" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -39,7 +39,7 @@
                 <property name="label" translatable="yes">Stop</property>
                 <property name="use-underline">True</property>
                 <property name="icon-name">gtk-stop</property>
-                <signal name="clicked" handler="onStopRecordingClick" swapped="no"/>
+                <signal name="clicked" handler="on_stop_recording_click" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -53,7 +53,7 @@
                 <property name="label" translatable="yes">Load</property>
                 <property name="use-underline">True</property>
                 <property name="icon-name">gtk-open</property>
-                <signal name="clicked" handler="onLoadClick" swapped="no"/>
+                <signal name="clicked" handler="on_load_click" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -67,7 +67,7 @@
                 <property name="label" translatable="yes">Save</property>
                 <property name="use-underline">True</property>
                 <property name="icon-name">gtk-save</property>
-                <signal name="clicked" handler="onSaveClick" swapped="no"/>
+                <signal name="clicked" handler="on_save_click" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -81,7 +81,7 @@
                 <property name="label" translatable="yes">Clear</property>
                 <property name="use-underline">True</property>
                 <property name="icon-name">gtk-delete</property>
-                <signal name="clicked" handler="clearData" swapped="no"/>
+                <signal name="clicked" handler="clear_data" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -106,7 +106,7 @@
                 <property name="label" translatable="yes">Crop</property>
                 <property name="use-underline">True</property>
                 <property name="icon-name">gtk-cut</property>
-                <signal name="clicked" handler="cropData" swapped="no"/>
+                <signal name="clicked" handler="crop_data" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -120,7 +120,7 @@
                 <property name="tooltip-text" translatable="yes">Set current cursor as start point</property>
                 <property name="label" translatable="yes">A</property>
                 <property name="use-underline">True</property>
-                <signal name="clicked" handler="setCropA" swapped="no"/>
+                <signal name="clicked" handler="set_crop_a" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -134,7 +134,7 @@
                 <property name="tooltip-text" translatable="yes">Set current cursor as end point</property>
                 <property name="label" translatable="yes">B</property>
                 <property name="use-underline">True</property>
-                <signal name="clicked" handler="setCropB" swapped="no"/>
+                <signal name="clicked" handler="set_crop_b" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -174,7 +174,7 @@
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
                 <property name="active">True</property>
-                <signal name="toggled" handler="toggleSpeedChart" swapped="no"/>
+                <signal name="toggled" handler="toggle_speed_chart" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -188,7 +188,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
-                <signal name="toggled" handler="toggleApparentWindChart" swapped="no"/>
+                <signal name="toggled" handler="toggle_apparent_wind_chart" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -203,7 +203,7 @@
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
                 <property name="active">True</property>
-                <signal name="toggled" handler="toggleTrueWindChart" swapped="no"/>
+                <signal name="toggled" handler="toggle_true_wind_chart" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -217,7 +217,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
-                <signal name="toggled" handler="toggleDepthChart" swapped="no"/>
+                <signal name="toggled" handler="toggle_depth_chart" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -232,7 +232,7 @@
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
                 <property name="active">True</property>
-                <signal name="toggled" handler="toggleHDGChart" swapped="no"/>
+                <signal name="toggled" handler="toggle_hdg_chart" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -247,7 +247,7 @@
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
                 <property name="tooltip-text" translatable="yes">Toggle wind angles relative to bow</property>
-                <signal name="toggled" handler="toggleRWChart" swapped="no"/>
+                <signal name="toggled" handler="toggle_rw_chart" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -285,7 +285,7 @@
       <object class="GtkDrawingArea" id="grapharea">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-        <signal name="draw" handler="onGraphDraw" swapped="no"/>
+        <signal name="draw" handler="on_graph_draw" swapped="no"/>
       </object>
       <packing>
         <property name="expand">True</property>

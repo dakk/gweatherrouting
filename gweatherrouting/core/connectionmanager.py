@@ -33,7 +33,7 @@ class ConnectionManagerStorage(Storage):
     def __init__(self):
         Storage.__init__(self, "conn-manager")
         self.connections = []
-        self.loadOrSaveDefault()
+        self.load_or_save_default()
 
 
 # { type: 'serial|network', protocol: 'nmea0183', direction: 'in|out|both' }
@@ -51,16 +51,18 @@ class ConnectionManager(EventDispatcher):
     def __del__(self):
         self.running = False
 
-    def stopPolling(self):
+    def stop_polling(self):
         logger.info("Polling stopped")
         self.running = False
-        self.thread.join()
+        if self.thread:
+            self.thread.join()
+            self.thread = None
 
     @property
     def connections(self):
         return self.storage.connections
 
-    def plugAll(self):
+    def plug_all(self):
         logger.info("Plugging all connections")
         self.sources = {}
         for x in self.storage.connections:
@@ -78,7 +80,7 @@ class ConnectionManager(EventDispatcher):
                 if self.sources[x["host"] + ":" + str(x["port"])].connect():
                     logger.info("Data source %s:%d connected", x["host"], x["port"])
 
-    def addConnection(self, d):
+    def add_connection(self, d):
         if d["type"] == "serial":
             if not list(
                 filter(
@@ -100,12 +102,12 @@ class ConnectionManager(EventDispatcher):
                 self.storage.connections.append(d)
 
         self.storage.save()
-        self.plugAll()
+        self.plug_all()
 
-    def removeConnection(self, d):
+    def remove_connection(self, d):
         self.storage.connections.remove(d)
         self.storage.save()
-        self.plugAll()
+        self.plug_all()
 
     def poll(self):
         dd = []
@@ -129,11 +131,11 @@ class ConnectionManager(EventDispatcher):
 
         if rf < len(self.sources):
             time.sleep(30)
-            self.plugAll()
+            self.plug_all()
 
         return len(dd)
 
-    def pollLoop(self, b):
+    def poll_loop(self, b):
         while self.running:
             try:
                 n = self.poll()
@@ -145,8 +147,8 @@ class ConnectionManager(EventDispatcher):
             else:
                 time.sleep(0.5)
 
-    def startPolling(self):
+    def start_polling(self):
         logger.info("Polling started")
         self.running = True
-        self.thread = Thread(target=self.pollLoop, args=(True,))
+        self.thread = Thread(target=self.poll_loop, args=(True,))
         self.thread.start()

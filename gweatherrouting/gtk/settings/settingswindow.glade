@@ -12,7 +12,7 @@
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Remove</property>
         <property name="use-underline">True</property>
-        <signal name="activate" handler="onRemoveChart" swapped="no"/>
+        <signal name="activate" handler="on_remove_chart" swapped="no"/>
       </object>
     </child>
   </object>
@@ -35,7 +35,7 @@
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Remove</property>
         <property name="use-underline">True</property>
-        <signal name="activate" handler="onConnectionRemove" swapped="no"/>
+        <signal name="activate" handler="on_connection_remove" swapped="no"/>
       </object>
     </child>
   </object>
@@ -44,7 +44,7 @@
     <property name="value">0.80</property>
     <property name="step-increment">0.01</property>
     <property name="page-increment">0.10</property>
-    <signal name="value-changed" handler="onGribArrowOpacityChange" swapped="no"/>
+    <signal name="value-changed" handler="on_grib_arrow_opacity_change" swapped="no"/>
   </object>
   <object class="GtkWindow" id="settings-window">
     <property name="can-focus">False</property>
@@ -157,7 +157,7 @@
                                               <item translatable="yes">Navionics</item>
                                               <item translatable="yes">Dark</item>
                                             </items>
-                                            <signal name="changed" handler="onPaletteChange" swapped="no"/>
+                                            <signal name="changed" handler="on_palette_change" swapped="no"/>
                                           </object>
                                           <packing>
                                             <property name="expand">True</property>
@@ -223,10 +223,10 @@
                                             <property name="visible">True</property>
                                             <property name="can-focus">True</property>
                                             <property name="model">chart-store</property>
-                                            <signal name="button-press-event" handler="onChartClick" swapped="no"/>
+                                            <signal name="button-press-event" handler="on_chart_click" swapped="no"/>
                                             <child internal-child="selection">
                                               <object class="GtkTreeSelection">
-                                                <signal name="changed" handler="onChartSelect" swapped="no"/>
+                                                <signal name="changed" handler="on_chart_select" swapped="no"/>
                                               </object>
                                             </child>
                                             <child>
@@ -258,7 +258,7 @@
                                                 <property name="title" translatable="yes">Enabled</property>
                                                 <child>
                                                   <object class="GtkCellRendererToggle">
-                                                    <signal name="toggled" handler="onChartToggleEnabler" swapped="no"/>
+                                                    <signal name="toggled" handler="on_chart_toggle_enabler" swapped="no"/>
                                                   </object>
                                                   <attributes>
                                                     <attribute name="active">1</attribute>
@@ -300,7 +300,7 @@
                                             <property name="margin-end">4</property>
                                             <property name="margin-top">4</property>
                                             <property name="margin-bottom">4</property>
-                                            <signal name="clicked" handler="onAddVectorChart" swapped="no"/>
+                                            <signal name="clicked" handler="on_add_vector_chart" swapped="no"/>
                                           </object>
                                           <packing>
                                             <property name="expand">True</property>
@@ -317,7 +317,7 @@
                                             <property name="margin-start">4</property>
                                             <property name="margin-top">4</property>
                                             <property name="margin-bottom">4</property>
-                                            <signal name="clicked" handler="onAddRasterChart" swapped="no"/>
+                                            <signal name="clicked" handler="on_add_raster_chart" swapped="no"/>
                                           </object>
                                           <packing>
                                             <property name="expand">True</property>
@@ -409,7 +409,7 @@
                                       <object class="GtkSwitch" id="grib-arrow-onground">
                                         <property name="visible">True</property>
                                         <property name="can-focus">True</property>
-                                        <signal name="state-set" handler="onGribArrowOnGroundChange" swapped="no"/>
+                                        <signal name="state-set" handler="on_grib_arrow_on_ground_change" swapped="no"/>
                                       </object>
                                       <packing>
                                         <property name="expand">False</property>
@@ -524,8 +524,8 @@
                                   <object class="GtkListBox" id="connections-listbox">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
-                                    <signal name="button-press-event" handler="onConnectionClick" swapped="no"/>
-                                    <signal name="row-selected" handler="onConnectionSelected" swapped="no"/>
+                                    <signal name="button-press-event" handler="on_connection_click" swapped="no"/>
+                                    <signal name="row-selected" handler="on_connection_selected" swapped="no"/>
                                   </object>
                                 </child>
                               </object>
@@ -547,7 +547,7 @@
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="receives-default">True</property>
-                                <signal name="clicked" handler="onAddConnection" swapped="no"/>
+                                <signal name="clicked" handler="on_add_connection" swapped="no"/>
                               </object>
                               <packing>
                                 <property name="expand">True</property>

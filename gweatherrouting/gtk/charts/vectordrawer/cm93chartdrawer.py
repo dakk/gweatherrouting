@@ -17,5 +17,5 @@ from .vectorchartdrawer import VectorChartDrawer
 
 
 class CM93ChartDrawer(VectorChartDrawer):
-    def draw(self, gpsmap, cr, vectorFile, bounding):
+    def draw(self, gpsmap, cr, vector_file, bounding):
         pass

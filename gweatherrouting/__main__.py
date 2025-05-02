@@ -21,7 +21,7 @@ from gweatherrouting.core import Core
 logger = logging.getLogger("gweatherrouting")
 
 
-def startUIGtk():
+def start_ui_gtk():
     import gi
 
     gi.require_version("Gtk", "3.0")
@@ -34,4 +34,4 @@ def startUIGtk():
 
 
 if __name__ == "__main__":
-    startUIGtk()
+    start_ui_gtk()

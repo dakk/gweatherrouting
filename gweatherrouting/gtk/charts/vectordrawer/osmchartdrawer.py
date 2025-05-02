@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 import logging
 
 import gi
@@ -34,16 +33,16 @@ MIN_ZOOM = 300
 
 
 class OSMChartDrawer(VectorChartDrawer):
-    def __init__(self, settingsManager):
-        super().__init__(settingsManager)
+    def __init__(self, settings_manager):
+        super().__init__(settings_manager)
         self.featureCache = {}
 
-    def draw(self, gpsmap, cr, vectorFile, bounding):
+    def draw(self, gpsmap, cr, vector_file, bounding):
         if gpsmap.get_scale() > MIN_ZOOM:
             return
 
-        for i in range(vectorFile.GetLayerCount()):
-            layer = vectorFile.GetLayerByIndex(i)
+        for i in range(vector_file.GetLayerCount()):
+            layer = vector_file.GetLayerByIndex(i)
             layer.SetSpatialFilter(bounding)
 
             # Iterate over features
@@ -54,13 +53,13 @@ class OSMChartDrawer(VectorChartDrawer):
 
                 geom = feat.GetGeometryRef()
                 try:
-                    self.featureRender(gpsmap, cr, geom, feat, layer)
-                except Exception as _:
+                    self.feature_render(gpsmap, cr, geom, feat, layer)
+                except:
                     logger.debug("Failed to render OSM feature:", exc_info=True)
 
                 feat = layer.GetNextFeature()
 
-    def featureRender(self, gpsmap, cr, geom, feat, layer):
+    def feature_render(self, gpsmap, cr, geom, feat, layer):  # noqa: C901
         tags = {}
         name = None
         iid = None
@@ -118,7 +117,7 @@ class OSMChartDrawer(VectorChartDrawer):
             if scale > MIN_ZOOM:
                 return
 
-            self.symbolProvider.drawLight(cr, xx, yy, tags, True)
+            self.symbolProvider.draw_light(cr, xx, yy, tags, True)
 
         elif scale > 100:
             return

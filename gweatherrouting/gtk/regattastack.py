@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 import logging
 import os
 
@@ -31,13 +30,13 @@ logger = logging.getLogger("gweatherrouting")
 
 
 class RegattaStack(Gtk.Box):
-    def __init__(self, parent, chartManager, core):
+    def __init__(self, parent, chart_manager, core):
         Gtk.Widget.__init__(self)
 
         self.parent = parent
         self.core = core
 
-        # self.core.connectionManager.connect("data", self.dataHandler)
+        # self.core.connectionManager.connect("data", self.data_handler)
 
         self.builder = Gtk.Builder()
         self.builder.add_from_file(
@@ -50,7 +49,7 @@ class RegattaStack(Gtk.Box):
 
         self.map = self.builder.get_object("map")
         self.map.set_center_and_zoom(39.0, 9.0, 6)
-        # self.map.layer_add (chartManager)
-        # self.chartManager.addMap(self.map)
+        # self.map.layer_add (chart_manager)
+        # self.chart_manager.add_map(self.map)
 
         self.show_all()

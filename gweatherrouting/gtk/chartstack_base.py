@@ -13,6 +13,8 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+from typing import Callable
+
 import gi
 
 gi.require_version("Gtk", "3.0")
@@ -21,29 +23,23 @@ try:
 except:
     gi.require_version("OsmGpsMap", "1.0")
 
-from gi.repository import GObject, OsmGpsMap
+from gi.repository import Gtk, OsmGpsMap
+
+from gweatherrouting.core import Core, TimeControl
+
+from .charts.chartmanager import ChartManager
+from .maplayers import GeoMapLayer, ToolsMapLayer
 
 
-class AISMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
-    def __init__(self, core):
-        GObject.GObject.__init__(self)
-        self.visible = True
-
-    def set_visible(self, visible):
-        self.visible = visible
-
-    def do_draw(self, gpsmap, cr):
-        if not self.visible:
-            return
-
-    def do_render(self, gpsmap):
-        pass
-
-    def do_busy(self):
-        return False
-
-    def do_button_press(self, gpsmap, gdkeventbutton):
-        return False
-
-
-GObject.type_register(AISMapLayer)
+class ChartStackBase:
+    builder: Gtk.Builder
+    core: Core
+    map: OsmGpsMap
+    parent: Gtk.Widget
+    status_bar: Gtk.Statusbar
+    progress_bar: Gtk.ProgressBar
+    tools_map_layer: ToolsMapLayer
+    time_control: TimeControl
+    geo_map_layer: GeoMapLayer
+    update_track: Callable
+    chart_manager: ChartManager

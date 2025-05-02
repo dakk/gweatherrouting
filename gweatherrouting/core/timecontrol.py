@@ -23,20 +23,20 @@ class TimeControl(EventDispatcher):
     DFORMAT = "%Y/%m/%d, %H:%M"
 
     def __init__(self):
-        self.time = None
+        self.time: datetime.datetime
         self.now()
 
     def now(self):
         self.time = datetime.datetime.now().replace(minute=0, second=0, microsecond=0)
         self.dispatch("time-change", self.time)
 
-    def getTime(self):
+    def get_time(self):
         return self.time
 
-    def getTimestamp(self):
-        return datetime.timestamp(self.time)
+    def get_timestamp(self) -> int:
+        return int(self.time.timestamp())
 
-    def setTime(self, v):
+    def set_time(self, v):
         self.time = v
         self.dispatch("time-change", self.time)
 

@@ -6,7 +6,7 @@
     <property name="upper">100</property>
     <property name="step-increment">1</property>
     <property name="page-increment">10</property>
-    <signal name="changed" handler="onTimeSlide" swapped="no"/>
+    <signal name="changed" handler="on_time_slide" swapped="no"/>
   </object>
   <object class="GtkBox" id="timetravel">
     <property name="visible">True</property>
@@ -20,7 +20,7 @@
         <property name="receives-default">True</property>
         <property name="margin-start">3</property>
         <property name="always-show-image">True</property>
-        <signal name="clicked" handler="onBackwardClick" swapped="no"/>
+        <signal name="clicked" handler="on_backward_click" swapped="no"/>
         <child>
           <object class="GtkImage">
             <property name="visible">True</property>
@@ -42,7 +42,7 @@
         <property name="receives-default">True</property>
         <property name="margin-start">3</property>
         <property name="always-show-image">True</property>
-        <signal name="clicked" handler="onStopClick" swapped="no"/>
+        <signal name="clicked" handler="on_stop_click" swapped="no"/>
         <child>
           <object class="GtkImage">
             <property name="visible">True</property>
@@ -64,7 +64,7 @@
         <property name="receives-default">True</property>
         <property name="margin-start">3</property>
         <property name="always-show-image">True</property>
-        <signal name="clicked" handler="onPlayClick" swapped="no"/>
+        <signal name="clicked" handler="on_play_click" swapped="no"/>
         <child>
           <object class="GtkImage">
             <property name="visible">True</property>
@@ -86,7 +86,7 @@
         <property name="receives-default">True</property>
         <property name="margin-start">3</property>
         <property name="always-show-image">True</property>
-        <signal name="clicked" handler="onFowardClick" swapped="no"/>
+        <signal name="clicked" handler="on_foward_click" swapped="no"/>
         <child>
           <object class="GtkImage">
             <property name="visible">True</property>
@@ -108,7 +108,7 @@
         <property name="receives-default">True</property>
         <property name="tooltip-text" translatable="yes">Select now</property>
         <property name="margin-start">3</property>
-        <signal name="clicked" handler="onTimeNow" swapped="no"/>
+        <signal name="clicked" handler="on_time_now" swapped="no"/>
         <child>
           <object class="GtkImage">
             <property name="visible">True</property>
@@ -131,7 +131,7 @@
         <property name="tooltip-text" translatable="yes">Manual set date and time</property>
         <property name="margin-start">3</property>
         <property name="margin-end">3</property>
-        <signal name="clicked" handler="onTimeSelect" swapped="no"/>
+        <signal name="clicked" handler="on_time_select" swapped="no"/>
         <child>
           <object class="GtkImage">
             <property name="visible">True</property>
@@ -175,7 +175,7 @@
           <item translatable="yes">12h</item>
           <item translatable="yes">24h</item>
         </items>
-        <signal name="changed" handler="onTimeUnitComboChange" swapped="no"/>
+        <signal name="changed" handler="on_time_unit_combo_change" swapped="no"/>
       </object>
       <packing>
         <property name="expand">True</property>

@@ -17,18 +17,20 @@ from .s57symbolprovider import S57SymbolProvider
 
 
 class VectorChartDrawer:
-    def __init__(self, settingsManager):
-        self.onChartPaletteChanged(settingsManager.chartPalette)
-        settingsManager.register_on_change("chartPalette", self.onChartPaletteChanged)
+    def __init__(self, settings_manager):
+        self.on_chart_palette_changed(settings_manager.chartPalette)
+        settings_manager.register_on_change(
+            "chartPalette", self.on_chart_palette_changed
+        )
 
-        self.symbolProvider = S57SymbolProvider(settingsManager)
+        self.symbolProvider = S57SymbolProvider(settings_manager)
 
     # TODO: this will handle object queries
-    def onQueryPoint(self, lat, lon):
+    def on_query_point(self, lat, lon):
         raise Exception("Not implemented")
 
-    def onChartPaletteChanged(self, v):
+    def on_chart_palette_changed(self, v):
         self.palette = v
 
-    def draw(self, gpsmap, cr, vectorFile, bounding):
+    def draw(self, gpsmap, cr, vector_file, bounding):
         raise Exception("Not implemented")

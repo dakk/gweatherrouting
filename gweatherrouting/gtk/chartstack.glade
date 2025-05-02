@@ -12,7 +12,7 @@
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Export POIs as NMEA</property>
         <property name="use-underline">True</property>
-        <signal name="activate" handler="exportPOIsAsNMEAPFEC" swapped="no"/>
+        <signal name="activate" handler="export_pois_as_nmea_pfec" swapped="no"/>
       </object>
     </child>
     <child>
@@ -21,7 +21,7 @@
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Export as GPX</property>
         <property name="use-underline">True</property>
-        <signal name="activate" handler="exportAsGPX" swapped="no"/>
+        <signal name="activate" handler="export_as_gpx" swapped="no"/>
       </object>
     </child>
   </object>
@@ -35,7 +35,7 @@
         <property name="tooltip-text" translatable="yes">Add this point to the track</property>
         <property name="label" translatable="yes">Add to track</property>
         <property name="use-underline">True</property>
-        <signal name="activate" handler="addTrackPoint" swapped="no"/>
+        <signal name="activate" handler="add_track_point" swapped="no"/>
       </object>
     </child>
     <child>
@@ -44,7 +44,7 @@
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Add POI</property>
         <property name="use-underline">True</property>
-        <signal name="activate" handler="addPOI" swapped="no"/>
+        <signal name="activate" handler="add_poi" swapped="no"/>
       </object>
     </child>
     <child>
@@ -59,7 +59,7 @@
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Measure</property>
         <property name="use-underline">True</property>
-        <signal name="activate" handler="onMeasure" swapped="no"/>
+        <signal name="activate" handler="on_measure" swapped="no"/>
       </object>
     </child>
     <child>
@@ -82,7 +82,7 @@
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Move boat here</property>
         <property name="use-underline">True</property>
-        <signal name="activate" handler="onMoveBoatHere" swapped="no"/>
+        <signal name="activate" handler="on_move_boat_here" swapped="no"/>
       </object>
     </child>
   </object>
@@ -95,7 +95,7 @@
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Move</property>
         <property name="use-underline">True</property>
-        <signal name="activate" handler="onPOIMove" swapped="no"/>
+        <signal name="activate" handler="on_poi_move" swapped="no"/>
       </object>
     </child>
     <child>
@@ -110,7 +110,7 @@
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Remove</property>
         <property name="use-underline">True</property>
-        <signal name="activate" handler="onPOIRemove" swapped="no"/>
+        <signal name="activate" handler="on_poi_remove" swapped="no"/>
       </object>
     </child>
   </object>
@@ -158,7 +158,7 @@ to create a routing path</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Remove</property>
         <property name="use-underline">True</property>
-        <signal name="activate" handler="onRoutingRemove" swapped="no"/>
+        <signal name="activate" handler="on_routing_remove" swapped="no"/>
       </object>
     </child>
     <child>
@@ -167,7 +167,7 @@ to create a routing path</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Export GPX</property>
         <property name="use-underline">True</property>
-        <signal name="activate" handler="onRoutingExport" swapped="no"/>
+        <signal name="activate" handler="on_routing_export" swapped="no"/>
       </object>
     </child>
   </object>
@@ -219,7 +219,7 @@ loaded to created a routing</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Move</property>
         <property name="use-underline">True</property>
-        <signal name="activate" handler="onTrackItemMove" swapped="no"/>
+        <signal name="activate" handler="on_track_item_move" swapped="no"/>
       </object>
     </child>
     <child>
@@ -228,7 +228,7 @@ loaded to created a routing</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Move Up</property>
         <property name="use-underline">True</property>
-        <signal name="activate" handler="onTrackItemMoveUp" swapped="no"/>
+        <signal name="activate" handler="on_track_item_move_up" swapped="no"/>
       </object>
     </child>
     <child>
@@ -237,7 +237,7 @@ loaded to created a routing</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Move Down</property>
         <property name="use-underline">True</property>
-        <signal name="activate" handler="onTrackItemMoveDown" swapped="no"/>
+        <signal name="activate" handler="on_track_item_move_down" swapped="no"/>
       </object>
     </child>
     <child>
@@ -252,7 +252,7 @@ loaded to created a routing</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Remove</property>
         <property name="use-underline">True</property>
-        <signal name="activate" handler="onTrackItemRemove" swapped="no"/>
+        <signal name="activate" handler="on_track_item_remove" swapped="no"/>
       </object>
     </child>
     <child>
@@ -261,7 +261,7 @@ loaded to created a routing</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Duplicate</property>
         <property name="use-underline">True</property>
-        <signal name="activate" handler="onTrackItemDuplicate" swapped="no"/>
+        <signal name="activate" handler="on_track_item_duplicate" swapped="no"/>
       </object>
     </child>
   </object>
@@ -274,7 +274,7 @@ loaded to created a routing</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Remove</property>
         <property name="use-underline">True</property>
-        <signal name="activate" handler="onTrackRemove" swapped="no"/>
+        <signal name="activate" handler="on_track_remove" swapped="no"/>
       </object>
     </child>
     <child>
@@ -283,7 +283,7 @@ loaded to created a routing</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Export</property>
         <property name="use-underline">True</property>
-        <signal name="activate" handler="onTrackExport" swapped="no"/>
+        <signal name="activate" handler="on_track_export" swapped="no"/>
       </object>
     </child>
   </object>
@@ -335,7 +335,7 @@ loaded to created a routing</property>
                     <property name="label" translatable="yes">Import</property>
                     <property name="use-underline">True</property>
                     <property name="icon-name">gtk-add</property>
-                    <signal name="clicked" handler="onImport" swapped="no"/>
+                    <signal name="clicked" handler="on_import" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -350,7 +350,7 @@ loaded to created a routing</property>
                     <property name="label" translatable="yes">New</property>
                     <property name="use-underline">True</property>
                     <property name="icon-name">gtk-file</property>
-                    <signal name="clicked" handler="onNew" swapped="no"/>
+                    <signal name="clicked" handler="on_new" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -365,7 +365,7 @@ loaded to created a routing</property>
                     <property name="label" translatable="yes">Route...</property>
                     <property name="use-underline">True</property>
                     <property name="icon-name">gtk-execute</property>
-                    <signal name="clicked" handler="onRoutingCreate" swapped="no"/>
+                    <signal name="clicked" handler="on_routing_create" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -380,7 +380,7 @@ loaded to created a routing</property>
                     <property name="label" translatable="yes">Export</property>
                     <property name="use-underline">True</property>
                     <property name="icon-name">gtk-save</property>
-                    <signal name="clicked" handler="onExport" swapped="no"/>
+                    <signal name="clicked" handler="on_export" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -398,7 +398,7 @@ loaded to created a routing</property>
                     <property name="use-underline">True</property>
                     <property name="icon-name">gtk-fullscreen</property>
                     <property name="active">True</property>
-                    <signal name="toggled" handler="onToggleNotebook" swapped="no"/>
+                    <signal name="toggled" handler="on_toggle_notebook" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -416,7 +416,7 @@ loaded to created a routing</property>
                     <property name="use-underline">True</property>
                     <property name="icon-name">gnome-dev-wavelan</property>
                     <property name="active">True</property>
-                    <signal name="toggled" handler="onToggleConnections" swapped="no"/>
+                    <signal name="toggled" handler="on_toggle_connections" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -433,7 +433,7 @@ loaded to created a routing</property>
                     <property name="use-underline">True</property>
                     <property name="icon-name">weather-windy</property>
                     <property name="active">True</property>
-                    <signal name="toggled" handler="onToggleGrib" swapped="no"/>
+                    <signal name="toggled" handler="on_toggle_grib" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -457,7 +457,7 @@ loaded to created a routing</property>
                     <property name="label" translatable="yes">Stop Routing</property>
                     <property name="use-underline">True</property>
                     <property name="icon-name">gtk-stop</property>
-                    <signal name="clicked" handler="onRoutingStop" swapped="no"/>
+                    <signal name="clicked" handler="on_routing_stop" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -472,7 +472,7 @@ loaded to created a routing</property>
                     <property name="label" translatable="yes">MOB</property>
                     <property name="use-underline">True</property>
                     <property name="icon-name">flag-red</property>
-                    <signal name="clicked" handler="onMob" swapped="no"/>
+                    <signal name="clicked" handler="on_mob" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -555,11 +555,11 @@ loaded to created a routing</property>
                             <property name="enable-search">False</property>
                             <property name="show-expanders">False</property>
                             <property name="enable-grid-lines">horizontal</property>
-                            <signal name="button-press-event" handler="onTrackClick" swapped="no"/>
+                            <signal name="button-press-event" handler="on_track_click" swapped="no"/>
                             <child internal-child="selection">
                               <object class="GtkTreeSelection" id="track-list-selection">
                                 <property name="mode">browse</property>
-                                <signal name="changed" handler="onSelectTrack" swapped="no"/>
+                                <signal name="changed" handler="on_select_track" swapped="no"/>
                               </object>
                             </child>
                             <child>
@@ -568,7 +568,7 @@ loaded to created a routing</property>
                                 <child>
                                   <object class="GtkCellRendererText">
                                     <property name="editable">True</property>
-                                    <signal name="edited" handler="onTrackNameEdit" swapped="no"/>
+                                    <signal name="edited" handler="on_track_name_edit" swapped="no"/>
                                   </object>
                                   <attributes>
                                     <attribute name="text">0</attribute>
@@ -603,7 +603,7 @@ loaded to created a routing</property>
                                 <property name="title" translatable="yes">Visible</property>
                                 <child>
                                   <object class="GtkCellRendererToggle">
-                                    <signal name="toggled" handler="onTrackToggle" swapped="no"/>
+                                    <signal name="toggled" handler="on_track_toggle" swapped="no"/>
                                   </object>
                                   <attributes>
                                     <attribute name="active">3</attribute>
@@ -641,10 +641,10 @@ loaded to created a routing</property>
                                 <property name="search-column">0</property>
                                 <property name="show-expanders">False</property>
                                 <property name="enable-grid-lines">horizontal</property>
-                                <signal name="button-press-event" handler="onTrackItemClick" swapped="no"/>
+                                <signal name="button-press-event" handler="on_track_item_click" swapped="no"/>
                                 <child internal-child="selection">
                                   <object class="GtkTreeSelection">
-                                    <signal name="changed" handler="onSelectTrackItem" swapped="no"/>
+                                    <signal name="changed" handler="on_select_track_item" swapped="no"/>
                                   </object>
                                 </child>
                                 <child>
@@ -695,7 +695,7 @@ loaded to created a routing</property>
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="receives-default">True</property>
-                            <signal name="clicked" handler="showTrackPointPopover" swapped="no"/>
+                            <signal name="clicked" handler="show_track_point_popover" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -738,10 +738,10 @@ loaded to created a routing</property>
                             <property name="can-focus">True</property>
                             <property name="model">routing-store</property>
                             <property name="level-indentation">1</property>
-                            <signal name="button-press-event" handler="onRoutingClick" swapped="no"/>
+                            <signal name="button-press-event" handler="on_routing_click" swapped="no"/>
                             <child internal-child="selection">
                               <object class="GtkTreeSelection">
-                                <signal name="changed" handler="onSelectRouting" swapped="no"/>
+                                <signal name="changed" handler="on_select_routing" swapped="no"/>
                               </object>
                             </child>
                             <child>
@@ -750,7 +750,7 @@ loaded to created a routing</property>
                                 <child>
                                   <object class="GtkCellRendererText">
                                     <property name="editable">True</property>
-                                    <signal name="edited" handler="onRoutingNameEdit" swapped="no"/>
+                                    <signal name="edited" handler="on_routing_name_edit" swapped="no"/>
                                   </object>
                                   <attributes>
                                     <attribute name="text">0</attribute>
@@ -822,7 +822,7 @@ loaded to created a routing</property>
                               <object class="GtkTreeViewColumn">
                                 <child>
                                   <object class="GtkCellRendererToggle">
-                                    <signal name="toggled" handler="onRoutingToggle" swapped="no"/>
+                                    <signal name="toggled" handler="on_routing_toggle" swapped="no"/>
                                   </object>
                                   <attributes>
                                     <attribute name="visible">10</attribute>
@@ -866,10 +866,10 @@ loaded to created a routing</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="model">poi-store</property>
-                        <signal name="button-press-event" handler="onPOIClick" swapped="no"/>
+                        <signal name="button-press-event" handler="on_poi_click" swapped="no"/>
                         <child internal-child="selection">
                           <object class="GtkTreeSelection">
-                            <signal name="changed" handler="onSelectPOI" swapped="no"/>
+                            <signal name="changed" handler="on_select_poi" swapped="no"/>
                           </object>
                         </child>
                         <child>
@@ -878,7 +878,7 @@ loaded to created a routing</property>
                             <child>
                               <object class="GtkCellRendererText">
                                 <property name="editable">True</property>
-                                <signal name="edited" handler="onPOINameEdit" swapped="no"/>
+                                <signal name="edited" handler="on_poi_name_edit" swapped="no"/>
                               </object>
                               <attributes>
                                 <attribute name="text">0</attribute>
@@ -913,7 +913,7 @@ loaded to created a routing</property>
                             <property name="title" translatable="yes">Visible</property>
                             <child>
                               <object class="GtkCellRendererToggle">
-                                <signal name="toggled" handler="onPOIToggle" swapped="no"/>
+                                <signal name="toggled" handler="on_poi_toggle" swapped="no"/>
                               </object>
                               <attributes>
                                 <attribute name="active">3</attribute>
@@ -981,8 +981,8 @@ loaded to created a routing</property>
                     <property name="can-focus">True</property>
                     <property name="repo-uri">none://</property>
                     <property name="tile-cache">/home/dakk/.cache/osmgpsmap/b487b51738b9962abcc425a3dcb26b4d</property>
-                    <signal name="button-press-event" handler="onMapClick" swapped="no"/>
-                    <signal name="motion-notify-event" handler="onMapMouseMove" swapped="no"/>
+                    <signal name="button-press-event" handler="on_map_click" swapped="no"/>
+                    <signal name="motion-notify-event" handler="on_map_mouse_move" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -1099,7 +1099,7 @@ loaded to created a routing</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
             <property name="margin-top">5</property>
-            <signal name="clicked" handler="addTrackPoint" swapped="no"/>
+            <signal name="clicked" handler="add_track_point" swapped="no"/>
           </object>
           <packing>
             <property name="expand">False</property>

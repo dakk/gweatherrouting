@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 import logging
 import math
 
@@ -37,33 +36,33 @@ class PolarWidget(Gtk.DrawingArea):
         self.connect("draw", self.draw)
         self.polar = None
 
-        self.connect("motion-notify-event", self.onMouseMove)
+        self.connect("motion-notify-event", self.on_mouse_move)
         self.add_events(Gdk.EventMask.POINTER_MOTION_MASK)
 
         self.mousePos = None
 
-    def onMouseMove(self, widget, event):
+    def on_mouse_move(self, widget, event):
         p = self.get_pointer()
         self.mousePos = (p.x, p.y)
         # self.queue_draw()
 
-    def loadPolar(self, polarFile):
+    def load_polar(self, polar_file):
         polar = None
         try:
-            polar = Polar(resource_path("gweatherrouting", f"data/polars/{polarFile}"))
+            polar = Polar(resource_path("gweatherrouting", f"data/polars/{polar_file}"))
         except:
             try:
-                polar = Polar(polarFile)
+                polar = Polar(polar_file)
             except:
-                logger.error("Error loading polar file %s", polarFile)
+                logger.error("Error loading polar file %s", polar_file)
 
-        self.setPolar(polar)
+        self.set_polar(polar)
 
-    def setPolar(self, polar):
+    def set_polar(self, polar):
         self.polar = polar
         self.queue_draw()
 
-    def draw(self, area, cr):
+    def draw(self, area, cr):  # noqa: C901
         if not self.polar:
             return
 
@@ -85,11 +84,11 @@ class PolarWidget(Gtk.DrawingArea):
             cr.arc(100.0, 100.0, x * 3, math.radians(-90), math.radians(90.0))
             cr.stroke()
 
-        twsStep = 1
+        tws_step = 1
         if len(self.polar.tws) > 7:
-            twsStep = 2
+            tws_step = 2
 
-        for x in self.polar.tws[::twsStep]:
+        for x in self.polar.tws[::tws_step]:
             cr.set_source_rgb(1, 1, 1)
             cr.set_font_size(7)
             cr.move_to(80.0, 100.0 - x * 3)
@@ -97,16 +96,16 @@ class PolarWidget(Gtk.DrawingArea):
 
         cr.set_source_rgba(1, 1, 1, 0.6)
 
-        twaStep = 1
+        twa_step = 1
         if len(self.polar.twa) > 20:
-            twaStep = int(len(self.polar.twa) / 10)
+            twa_step = int(len(self.polar.twa) / 10)
 
-        for x in self.polar.twa[::twaStep]:
+        for x in self.polar.twa[::twa_step]:
             cr.move_to(100.0, 100.0)
             cr.line_to(100 + math.sin(x) * 100.0, 100 - math.cos(x) * 80.0)
             cr.stroke()
 
-        for x in self.polar.twa[::twaStep]:
+        for x in self.polar.twa[::twa_step]:
             cr.set_source_rgb(1, 1, 1)
             cr.set_font_size(7)
             cr.move_to(100 + math.sin(x) * 100.0, 100 - math.cos(x) * 90.0)
@@ -123,27 +122,33 @@ class PolarWidget(Gtk.DrawingArea):
         cr.move_to(100.0, 100.0)
         for i in range(0, len(self.polar.tws), 1):
             for j in range(0, len(self.polar.twa), 1):
-                if len(self.polar.speedTable[j]) <= i:
+                if len(self.polar.speed_table[j]) <= i:
                     continue
 
                 cr.line_to(
-                    100 + 5 * self.polar.speedTable[j][i] * math.sin(self.polar.twa[j]),
-                    100 - 5 * self.polar.speedTable[j][i] * math.cos(self.polar.twa[j]),
+                    100
+                    + 5 * self.polar.speed_table[j][i] * math.sin(self.polar.twa[j]),
+                    100
+                    - 5 * self.polar.speed_table[j][i] * math.cos(self.polar.twa[j]),
                 )
                 cr.stroke()
                 cr.move_to(
-                    100 + 5 * self.polar.speedTable[j][i] * math.sin(self.polar.twa[j]),
-                    100 - 5 * self.polar.speedTable[j][i] * math.cos(self.polar.twa[j]),
+                    100
+                    + 5 * self.polar.speed_table[j][i] * math.sin(self.polar.twa[j]),
+                    100
+                    - 5 * self.polar.speed_table[j][i] * math.cos(self.polar.twa[j]),
                 )
 
         # cr.move_to (100.0, 100.0)
-        # for i in range (0, len (self.polar.tws), 1):
-        # 	for j in range (0, len (self.polar.twa), 1):
-        # 		cr.line_to (100 - 5 * self.polar.speedTable [j][i]
-        # 			* math.sin (self.polar.twa[j]), 100 - 5 * self.polar.speedTable [j][i] * math.cos (self.polar.twa[j]))
+        # for i in range (0, len(self.polar.tws), 1):
+        # 	for j in range (0, len(self.polar.twa), 1):
+        # 		cr.line_to (100 - 5 * self.polar.speed_table [j][i]
+        # 			* math.sin (self.polar.twa[j]), 100 - 5 * self.polar.speed_table
+        #  [j][i] * math.cos (self.polar.twa[j]))
         # 		cr.stroke ()
-        # 		cr.move_to (100 - 5 * self.polar.speedTable [j][i]
-        # 			* math.sin (self.polar.twa[j]), 100 - 5 * self.polar.speedTable [j][i] * math.cos (self.polar.twa[j]))
+        # 		cr.move_to (100 - 5 * self.polar.speed_table [j][i]
+        # 			* math.sin (self.polar.twa[j]), 100 - 5 * self.polar.speed_table
+        # [j][i] * math.cos (self.polar.twa[j]))
 
         # 200 : 0.8 = height : x
         # x = height * 0.8 / 200

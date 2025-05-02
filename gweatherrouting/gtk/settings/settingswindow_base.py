@@ -13,18 +13,19 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+import gi
 
-from gweatherrouting.core.utils import Storage
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gtk
+
+from gweatherrouting.core import Core
+
+from .settingsmanager import SettingsManager
 
 
-class SettingsManager(Storage):
-    def __init__(self):
-        Storage.__init__(self, "settings")
-
-        self.gribArrowOpacity = 0.4
-        self.gribArrowOnGround = False
-        self.vectorCharts = []
-        self.rasterCharts = []
-        self.chartPalette = "cm93"
-
-        self.load_or_save_default()
+class SettingsWindowBase:
+    builder: Gtk.Builder
+    core: Core
+    window: Gtk.Window
+    parent: Gtk.Window
+    settings_manager: SettingsManager

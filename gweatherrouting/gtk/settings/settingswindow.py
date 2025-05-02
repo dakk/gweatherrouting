@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 import os
 
 import gi
@@ -21,15 +20,20 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
+from gweatherrouting.core import Core
+
+from .settingsmanager import SettingsManager
 from .settingswindow_charts import SettingsWindowCharts
 from .settingswindow_connections import SettingsWindowConnections
 
 
 class SettingsWindow(SettingsWindowConnections, SettingsWindowCharts):
-    def __init__(self, parent, settingsManager, core):
+    def __init__(
+        self, parent: Gtk.Window, settings_manager: SettingsManager, core: Core
+    ):
         self.parent = parent
         self.core = core
-        self.settingsManager = settingsManager
+        self.settings_manager = settings_manager
 
         self.builder = Gtk.Builder()
         self.builder.add_from_file(
@@ -46,14 +50,14 @@ class SettingsWindow(SettingsWindowConnections, SettingsWindowCharts):
         # self.dialog.show_all ()
 
         self.builder.get_object("grib-arrow-onground").set_active(
-            self.settingsManager.gribArrowOnGround
+            self.settings_manager.gribArrowOnGround
         )
         self.builder.get_object("grib-arrow-opacity-adjustment").set_value(
-            self.settingsManager.gribArrowOpacity
+            self.settings_manager.gribArrowOpacity
         )
 
-        SettingsWindowConnections.__init__(self, self.parent, settingsManager, core)
-        SettingsWindowCharts.__init__(self, self.parent, settingsManager, core)
+        SettingsWindowConnections.__init__(self)
+        SettingsWindowCharts.__init__(self)
 
     def show(self):
         self.window.show_all()
@@ -63,8 +67,8 @@ class SettingsWindow(SettingsWindowConnections, SettingsWindowCharts):
     def close(self):
         self.window.hide()
 
-    def onGribArrowOnGroundChange(self, widget, v):
-        self.settingsManager.gribArrowOnGround = widget.get_active()
+    def on_grib_arrow_on_ground_change(self, widget, v):
+        self.settings_manager.gribArrowOnGround = widget.get_active()
 
-    def onGribArrowOpacityChange(self, v):
-        self.settingsManager.gribArrowOpacity = v.get_value()
+    def on_grib_arrow_opacity_change(self, v):
+        self.settings_manager.gribArrowOpacity = v.get_value()

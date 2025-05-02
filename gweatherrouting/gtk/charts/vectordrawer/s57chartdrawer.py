@@ -18,9 +18,9 @@ from .vectorchartdrawer import VectorChartDrawer
 
 
 class S57ChartDrawer(VectorChartDrawer):
-    def draw(self, gpsmap, cr, vectorFile, bounding):
-        for i in range(vectorFile.GetLayerCount()):
-            layer = vectorFile.GetLayerByIndex(i)
+    def draw(self, gpsmap, cr, vector_file, bounding):
+        for i in range(vector_file.GetLayerCount()):
+            layer = vector_file.GetLayerByIndex(i)
             layer.SetSpatialFilter(bounding)
 
             print(i, layer.GetName())

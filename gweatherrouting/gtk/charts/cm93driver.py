@@ -16,7 +16,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 # https://github.com/OpenCPN/OpenCPN/blob/master/src/cm93.cpp
 
 
-def loadCM93Dictionary(path):
+def load_cm93_dictionary(path):
     with open(path, "r") as f:
         d = f.read().split("\n")
         dd = list(map(lambda x: x.split("|"), d))
@@ -27,9 +27,9 @@ class CM93Driver:
     def __init__(self):
         return
 
-    def Open(self, path):
-        attrDict = loadCM93Dictionary(path + "CM93ATTR.DIC")  # noqa: F841
-        objDict = loadCM93Dictionary(path + "CM93OBJ.DIC")  # noqa: F841
-        limitsDict = loadCM93Dictionary(path + "LIMITS.DIC")  # noqa: F841
+    def Open(self, path):  # noqa: N802
+        attr_dict = load_cm93_dictionary(path + "CM93ATTR.DIC")  # noqa: F841
+        obj_dict = load_cm93_dictionary(path + "CM93OBJ.DIC")  # noqa: F841
+        limits_dict = load_cm93_dictionary(path + "LIMITS.DIC")  # noqa: F841
 
         return None

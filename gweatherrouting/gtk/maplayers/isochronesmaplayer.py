@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 import math
 
 import cairo
@@ -37,7 +36,7 @@ class IsochronesMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
         self.isochrones = []
         self.path = []
 
-    def setIsochrones(self, isoc, path):
+    def set_isochrones(self, isoc, path):
         self.isochrones = isoc
         self.path = path
 
@@ -54,7 +53,7 @@ class IsochronesMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
         if self.path:
             for p in self.path:
                 if not isinstance(p, list):
-                    p = p.toList()
+                    p = p.to_list()
                 i += 1
                 x, y = gpsmap.convert_geographic_to_screen(
                     OsmGpsMap.MapPoint.new_degrees(p[0], p[1])
@@ -87,7 +86,7 @@ class IsochronesMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
         # Render isochrones
         i = 0
         for ic in self.isochrones:
-            # cr.set_source_rgba (0,0,0, 1.0 - i / len (self.isochrones))
+            # cr.set_source_rgba (0,0,0, 1.0 - i / len(self.isochrones))
             prev = None
             for icpoint in ic:
                 cr.set_source_rgba(0, 0, 0.8, 0.5)
@@ -126,7 +125,8 @@ class IsochronesMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
             # cr.set_source_rgba (0,0,0,0.3)
             # cr.set_line_width (1)
             # cr.move_to (prev[0], prev[1])
-            # x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees (ic[0][0], ic[0][1]))
+            # x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees
+            #  (ic[0][0], ic[0][1]))
             # # cr.line_to (x, y)
             # cr.move_to (x, y)
             # cr.stroke ()

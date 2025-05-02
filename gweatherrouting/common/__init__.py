@@ -19,7 +19,7 @@ from os import fspath, sep
 from importlib.resources import files, as_file
 
 
-def windColor(wspeed):  # noqa: C901
+def wind_color(wspeed):  # noqa: C901
     color = "0000CC"
     if wspeed >= 0 and wspeed < 2:
         color = "0000CC"

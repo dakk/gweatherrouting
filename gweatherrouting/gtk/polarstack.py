@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 
 import logging
 import math
@@ -37,13 +36,13 @@ logger = logging.getLogger("gweatherrouting")
 
 
 class PolarStack(Gtk.Box):
-    def __init__(self, parent, core, settingsManager):
+    def __init__(self, parent, core, settings_manager):
         Gtk.Widget.__init__(self)
 
         self.parent = parent
         self.core = core
 
-        # self.core.connectionManager.connect("data", self.dataHandler)
+        # self.core.connectionManager.connect("data", self.data_handler)
 
         self.builder = Gtk.Builder()
         self.builder.add_from_file(
@@ -63,8 +62,8 @@ class PolarStack(Gtk.Box):
         self.table = None
         boatselect.set_active(1)
 
-    def loadPolar(self, pn):
-        self.polarWidget.loadPolar(pn)
+    def load_polar(self, pn):
+        self.polarWidget.load_polar(pn)
         self.builder.get_object("polarwidgetcontainer").pack_start(
             self.polarWidget, True, True, 0
         )
@@ -75,46 +74,51 @@ class PolarStack(Gtk.Box):
 
         p = self.polarWidget.polar
 
-        twaStep = 1
+        if p is None:
+            return
+
+        twa_step = 1
         if len(p.twa) > 20:
-            twaStep = int(len(p.twa) / 10)
+            twa_step = int(len(p.twa) / 10)
 
         self.table = Gtk.Table(
-            n_rows=len(p.tws), n_columns=len(p.twa) / twaStep, homogeneous=False
+            n_rows=len(p.tws), n_columns=len(p.twa) / twa_step, homogeneous=False
         )
         cc.pack_start(self.table, False, False, 0)
 
         self.table.set_col_spacings(5)
         self.table.set_row_spacings(5)
 
-        l = Gtk.Label(str("TWA/TWS"))
-        l.set_markup("<b>TWA/TWS</b>")
-        self.table.attach(l, 0, 1, 0, 1)
+        label = Gtk.Label(str("TWA/TWS"))
+        label.set_markup("<b>TWA/TWS</b>")
+        self.table.attach(label, 0, 1, 0, 1)
 
         i = 1
         for x in p.tws:
-            l = Gtk.Label()
-            l.set_markup("<b>" + str(int(x)) + "</b>")
-            self.table.attach(l, i, i + 1, 0, 1)
+            label = Gtk.Label()
+            label.set_markup("<b>" + str(int(x)) + "</b>")
+            self.table.attach(label, i, i + 1, 0, 1)
             i += 1
 
         i = 1
 
-        for x in p.twa[::twaStep]:
-            l = Gtk.Label()
-            l.set_markup("<b>" + str(int(math.degrees(x))) + "°</b>")
-            self.table.attach(l, 0, 1, i, i + 1)
+        for x in p.twa[::twa_step]:
+            label = Gtk.Label()
+            label.set_markup("<b>" + str(int(math.degrees(x))) + "°</b>")
+            self.table.attach(label, 0, 1, i, i + 1)
             i += 1
 
         for i in range(0, len(p.tws), 1):
-            for j in range(0, len(p.twa), twaStep):
-                if len(p.speedTable[j]) <= i:
+            for j in range(0, len(p.twa), twa_step):
+                if len(p.speed_table[j]) <= i:
                     continue
 
-                l = Gtk.Label(str(p.speedTable[j][i]))
-                self.table.attach(l, i + 1, i + 2, (j / twaStep) + 1, (j / twaStep) + 2)
+                label = Gtk.Label(str(p.speed_table[j][i]))
+                self.table.attach(
+                    label, i + 1, i + 2, (j / twa_step) + 1, (j / twa_step) + 2
+                )
 
         self.show_all()
 
-    def onBoatSelect(self, widget):
-        self.loadPolar(self.polars[widget.get_active()])
+    def on_boat_select(self, widget):
+        self.load_polar(self.polars[widget.get_active()])

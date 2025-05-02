@@ -19,3 +19,4 @@ from .osmchartdrawer import OSMChartDrawer  # noqa: F401
 from .s57chartdrawer import S57ChartDrawer  # noqa: F401
 from .s57symbolprovider import S57SymbolProvider  # noqa: F401
 from .simplechartdrawer import SimpleChartDrawer  # noqa: F401
+from .vectorchartdrawer import VectorChartDrawer  # noqa: F401

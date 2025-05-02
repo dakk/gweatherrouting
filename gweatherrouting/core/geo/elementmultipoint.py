@@ -22,17 +22,17 @@ class ElementMultiPoint(Element):
         super().__init__(name, visible, collection)
         self.points = points
 
-    def toGPXObject(self):
+    def to_gpx_object(self):
         raise Exception("Not implemented")
 
-    def toJSON(self):
-        c = super().toJSON()
+    def to_json(self):
+        c = super().to_json()
         c["points"] = self.points
         return c
 
     @staticmethod
-    def fromJSON(j):
-        d = Element.fromJSON(j)
+    def from_json(j):
+        d = Element.from_json(j)
         return ElementMultiPoint(d.name, j["points"], d.visible)
 
     def __len__(self):
@@ -59,19 +59,19 @@ class ElementMultiPoint(Element):
         d = 0.0
         prev = self.points[0]
         for x in self.points[1::]:
-            d += utils.pointDistance(prev[0], prev[1], x[0], x[1])
+            d += utils.point_distance(prev[0], prev[1], x[0], x[1])
             prev = x
 
         return d
 
-    def moveUp(self, i):
+    def move_up(self, i):
         if i > 0 and i < len(self):
             sw = self.points[i - 1]
             self.points[i - 1] = self.points[i]
             self.points[i] = sw
             self.collection.save()
 
-    def moveDown(self, i):
+    def move_down(self, i):
         if i < len(self) - 1 and i >= 0:
             sw = self.points[i + 1]
             self.points[i + 1] = self.points[i]

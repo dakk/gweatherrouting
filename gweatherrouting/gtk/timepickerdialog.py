@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 import datetime
 import os
 
@@ -48,18 +47,18 @@ class TimePickerDialog:
 
         self.dialog.show_all()
 
-    def setDateTime(self, date):
+    def set_date_time(self, date):
         d = dateutil.parser.parse(date)
-        self.setFromDateTime(d)
+        self.set_from_date_time(d)
 
-    def setFromDateTime(self, d):
+    def set_from_date_time(self, d):
         self.year.set_text(str(d.year))
         self.month.set_text(str(d.month))
         self.day.set_text(str(d.day))
         self.hour.set_text(str(d.hour))
         self.minute.set_text(str(d.minute))
 
-    def getDateTime(self):
+    def get_date_time(self):
         return datetime.datetime(
             int(self.year.get_text()),
             int(self.month.get_text()),
@@ -71,7 +70,7 @@ class TimePickerDialog:
     def run(self):
         return self.dialog.run()
 
-    def responseCancel(self, widget):
+    def response_cancel(self, widget):
         self.dialog.response(Gtk.ResponseType.CANCEL)
 
     def destroy(self):

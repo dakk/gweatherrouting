@@ -52,10 +52,10 @@
                 <property name="search-column">0</property>
                 <property name="show-expanders">False</property>
                 <property name="tooltip-column">0</property>
-                <signal name="button-press-event" handler="onGribClick" swapped="no"/>
+                <signal name="button-press-event" handler="on_grib_click" swapped="no"/>
                 <child internal-child="selection">
                   <object class="GtkTreeSelection">
-                    <signal name="changed" handler="onGribSelect" swapped="no"/>
+                    <signal name="changed" handler="on_grib_select" swapped="no"/>
                   </object>
                 </child>
                 <child>
@@ -128,10 +128,10 @@
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="model">grib-manager-store</property>
-            <signal name="button-press-event" handler="onLocalGribClick" swapped="no"/>
+            <signal name="button-press-event" handler="on_local_grib_click" swapped="no"/>
             <child internal-child="selection">
               <object class="GtkTreeSelection">
-                <signal name="changed" handler="onLocalGribSelect" swapped="no"/>
+                <signal name="changed" handler="on_local_grib_select" swapped="no"/>
               </object>
             </child>
             <child>
@@ -140,7 +140,7 @@
                 <property name="clickable">True</property>
                 <child>
                   <object class="GtkCellRendererToggle">
-                    <signal name="toggled" handler="onGribToggle" swapped="no"/>
+                    <signal name="toggled" handler="on_grib_toggle" swapped="no"/>
                   </object>
                   <attributes>
                     <attribute name="active">4</attribute>
@@ -213,7 +213,7 @@
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
-            <signal name="clicked" handler="onOpen" swapped="no"/>
+            <signal name="clicked" handler="on_open" swapped="no"/>
           </object>
         </child>
       </object>
@@ -227,7 +227,7 @@
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Remove</property>
-        <signal name="activate" handler="onRemoveLocalGrib" swapped="no"/>
+        <signal name="activate" handler="on_remove_local_grib" swapped="no"/>
       </object>
     </child>
   </object>
@@ -239,7 +239,7 @@
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Download</property>
-        <signal name="activate" handler="onGribDownload" swapped="no"/>
+        <signal name="activate" handler="on_grib_download" swapped="no"/>
       </object>
     </child>
   </object>

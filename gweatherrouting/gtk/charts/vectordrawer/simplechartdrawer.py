@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 import cairo
 import gi
 
@@ -31,17 +30,17 @@ from .vectorchartdrawer import VectorChartDrawer
 
 
 class SimpleChartDrawer(VectorChartDrawer):
-    def draw(self, gpsmap, cr, vectorFile, bounding):
-        strokeStyle = Style.chartPalettes[self.palette].LandStroke
-        fillStyle = Style.chartPalettes[self.palette].LandFill
-        seaStyle = Style.chartPalettes[self.palette].Sea
-        contournStyle = Style.chartPalettes[self.palette].ShallowSea
+    def draw(self, gpsmap, cr, vector_file, bounding):
+        stroke_style = Style.chart_palettes[self.palette].land_stroke
+        fill_style = Style.chart_palettes[self.palette].land_fill
+        sea_style = Style.chart_palettes[self.palette].sea
+        contourn_style = Style.chart_palettes[self.palette].shallow_sea
 
-        self.backgroundRender(gpsmap, cr, seaStyle)
+        self.background_render(gpsmap, cr, sea_style)
         cr.set_line_join(cairo.LINE_JOIN_ROUND)
 
-        for i in range(vectorFile.GetLayerCount()):
-            layer = vectorFile.GetLayerByIndex(i)
+        for i in range(vector_file.GetLayerCount()):
+            layer = vector_file.GetLayerByIndex(i)
             layer.SetSpatialFilter(bounding)
 
             # Iterate over features
@@ -52,29 +51,36 @@ class SimpleChartDrawer(VectorChartDrawer):
 
                 geom = feat.GetGeometryRef()
                 geom = bounding.Intersection(geom)
-                self.featureRender(
-                    gpsmap, cr, geom, feat, layer, strokeStyle, fillStyle, contournStyle
+                self.feature_render(
+                    gpsmap,
+                    cr,
+                    geom,
+                    feat,
+                    layer,
+                    stroke_style,
+                    fill_style,
+                    contourn_style,
                 )
                 feat = layer.GetNextFeature()
 
-    def backgroundRender(self, gpsmap, cr, seaStyle):
+    def background_render(self, gpsmap, cr, sea_style):
         width = float(gpsmap.get_allocated_width())
         height = float(gpsmap.get_allocated_height())
-        seaStyle.apply(cr)
+        sea_style.apply(cr)
         cr.rectangle(0, 0, width, height)
         cr.stroke_preserve()
         cr.fill()
 
-    def featureRender(
-        self, gpsmap, cr, geom, feat, layer, strokeStyle, fillStyle, contournStyle
+    def feature_render(
+        self, gpsmap, cr, geom, feat, layer, stroke_style, fill_style, contourn_style
     ):
         for i in range(0, geom.GetGeometryCount()):
-            strokeStyle.apply(cr)
+            stroke_style.apply(cr)
             g = geom.GetGeometryRef(i)
 
             if g.GetGeometryName() == "POLYGON":
-                self.featureRender(
-                    gpsmap, cr, g, feat, layer, strokeStyle, fillStyle, contournStyle
+                self.feature_render(
+                    gpsmap, cr, g, feat, layer, stroke_style, fill_style, contourn_style
                 )
 
             for ii in range(0, g.GetPointCount()):
@@ -86,5 +92,5 @@ class SimpleChartDrawer(VectorChartDrawer):
 
             cr.close_path()
             cr.stroke_preserve()
-            fillStyle.apply(cr)
+            fill_style.apply(cr)
             cr.fill()
