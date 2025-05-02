@@ -25,15 +25,15 @@ class ElementPoint(Element):
         super().__init__(name, visible, collection)
         self.position = position
 
-    def toJSON(self):
-        c = super().toJSON()
+    def to_json(self):
+        c = super().to_json()
         c["position"] = self.position
         return c
 
     @staticmethod
-    def fromJSON(j):
-        d = Element.fromJSON(j)
+    def from_json(j):
+        d = Element.from_json(j)
         return ElementPoint(d.name, j["position"], d.visible)
 
-    def toGPXObject(self):
+    def to_gpx_object(self):
         raise Exception("Not implemented")

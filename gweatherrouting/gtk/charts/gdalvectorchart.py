@@ -28,44 +28,44 @@ from .vectordrawer import (
 
 
 class GDALVectorChart(ChartLayer):
-    def __init__(self, path, settingsManager, metadata=None, enabled=True):
-        super().__init__(path, "vector", settingsManager, metadata, enabled)
+    def __init__(self, path, settings_manager, metadata=None, enabled=True):
+        super().__init__(path, "vector", settings_manager, metadata, enabled)
 
         self.drawer: VectorChartDrawer
 
         if path.find("geojson") != -1:
-            drvName = "GeoJSON"
-            self.drawer = SimpleChartDrawer(settingsManager)
+            drv_name = "GeoJSON"
+            self.drawer = SimpleChartDrawer(settings_manager)
         elif path.find("shp") != -1:
-            drvName = "ESRI Shapefile"
-            self.drawer = SimpleChartDrawer(settingsManager)
+            drv_name = "ESRI Shapefile"
+            self.drawer = SimpleChartDrawer(settings_manager)
         elif path.find(".000") != -1:
-            drvName = "S57"
-            self.drawer = S57ChartDrawer(settingsManager)
+            drv_name = "S57"
+            self.drawer = S57ChartDrawer(settings_manager)
         elif path.find("Cm93") != -1:
-            drvName = "CM93"
-            self.drawer = CM93ChartDrawer(settingsManager)
+            drv_name = "CM93"
+            self.drawer = CM93ChartDrawer(settings_manager)
         elif path.find("osm") != -1 or path.find("pbf") != -1:
-            drvName = "OSM"
-            self.drawer = OSMChartDrawer(self.settingsManager)
+            drv_name = "OSM"
+            self.drawer = OSMChartDrawer(self.settings_manager)
         else:
             raise Exception("Invalid format")
 
-        if drvName == "CM93":
+        if drv_name == "CM93":
             drv = CM93Driver()
         else:
-            drv = ogr.GetDriverByName(drvName)
-        self.vectorFile = drv.Open(path)
+            drv = ogr.GetDriverByName(drv_name)
+        self.vector_file = drv.Open(path)
 
-        if self.vectorFile is None:
+        if self.vector_file is None:
             raise Exception("Unable to open vector map %s" % path)
 
-    def onRegister(self, onTickHandler=None):
+    def on_register(self, on_tick_handler=None):
         pass
 
     def do_draw(self, gpsmap, cr):
-        boundingGeometry = self.getBoundingGeometry(gpsmap)
-        self.drawer.draw(gpsmap, cr, self.vectorFile, boundingGeometry)
+        bounding_geometry = self.get_bounding_geometry(gpsmap)
+        self.drawer.draw(gpsmap, cr, self.vector_file, bounding_geometry)
 
     def do_render(self, gpsmap):
         pass

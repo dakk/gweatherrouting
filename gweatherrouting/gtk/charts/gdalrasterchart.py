@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 
 import logging
 import multiprocessing
@@ -43,21 +42,21 @@ logger = logging.getLogger("gweatherrouting")
 # https://gdal.org/tutorials/raster_api_tut.html
 
 
-def datasetBBox(dataset):
+def dataset_bbox(dataset):
     old_cs = osr.SpatialReference()
     old_cs.ImportFromWkt(dataset.GetProjectionRef())
 
     wgs84_wkt = """
-	GEOGCS["WGS 84",
-		DATUM["WGS_1984",
-			SPHEROID["WGS 84",6378137,298.257223563,
-				AUTHORITY["EPSG","7030"]],
-			AUTHORITY["EPSG","6326"]],
-		PRIMEM["Greenwich",0,
-			AUTHORITY["EPSG","8901"]],
-		UNIT["degree",0.01745329251994328,
-			AUTHORITY["EPSG","9122"]],
-		AUTHORITY["EPSG","4326"]]"""
+    GEOGCS["WGS 84",
+        DATUM["WGS_1984",
+            SPHEROID["WGS 84",6378137,298.257223563,
+                AUTHORITY["EPSG","7030"]],
+            AUTHORITY["EPSG","6326"]],
+        PRIMEM["Greenwich",0,
+            AUTHORITY["EPSG","8901"]],
+        UNIT["degree",0.01745329251994328,
+            AUTHORITY["EPSG","9122"]],
+        AUTHORITY["EPSG","4326"]]"""
     new_cs = osr.SpatialReference()
     new_cs.ImportFromWkt(wgs84_wkt)
 
@@ -81,13 +80,13 @@ def datasetBBox(dataset):
 
 class GDALSingleRasterChart:
     @staticmethod
-    def getFileInfo(path):
+    def get_file_info(path):
         dataset = gdal.Open(path, gdal.GA_ReadOnly)
 
         if not dataset:
             raise Exception(f"Unable to open raster chart {path}")
 
-        bbox = datasetBBox(dataset)
+        bbox = dataset_bbox(dataset)
 
         return (path, bbox, dataset.RasterXSize, dataset.RasterYSize)
 
@@ -106,11 +105,11 @@ class GDALSingleRasterChart:
 
         self.geotransform = geotransform
         self.dataset = dataset
-        self.bbox = datasetBBox(dataset)
+        self.bbox = dataset_bbox(dataset)
 
         def worker(i, return_dict):
             try:
-                return_dict["surface"] = self.bandToSurface(i)
+                return_dict["surface"] = self.band_to_surface(i)
             except:
                 # Fixes error on quit
                 logger.warning(f"Interrupted band to surface process on {i}")
@@ -120,17 +119,17 @@ class GDALSingleRasterChart:
         self.process = multiprocessing.Process(target=worker, args=(1, return_dict))
         self.process.start()
         self.process.join()
-        surface, bandXSize, bandYSize = return_dict["surface"]
+        surface, band_x_size, band_y_size = return_dict["surface"]
         surf = cairo.ImageSurface.create_for_data(
             surface,
             cairo.Format.ARGB32,
-            bandXSize,
-            bandYSize,
-            cairo.Format.RGB24.stride_for_width(bandXSize),
+            band_x_size,
+            band_y_size,
+            cairo.Format.RGB24.stride_for_width(band_x_size),
         )
         self.surface = surf
 
-    def bandToSurface(self, i):
+    def band_to_surface(self, i):
         band = self.dataset.GetRasterBand(i)
 
         mmin = band.GetMinimum()
@@ -169,42 +168,42 @@ class GDALSingleRasterChart:
 
 
 class GDALRasterChart(ChartLayer):
-    def __init__(self, path, settingsManager, metadata=None, enabled=True):
-        super().__init__(path, "raster", settingsManager, metadata, enabled)
+    def __init__(self, path, settings_manager, metadata=None, enabled=True):
+        super().__init__(path, "raster", settings_manager, metadata, enabled)
         self.cached = {}
         self.loadLock = Lock()
 
         if metadata:
-            self.onMetadataUpdate()
+            self.on_metadata_update()
 
-    def onMetadataUpdate(self):
+    def on_metadata_update(self):
         pass
 
-    def onRegister(self, onTickHandler=None):
+    def on_register(self, on_tick_handler=None):
         self.metadata = []
 
         files = [f for f in listdir(self.path) if isfile(join(self.path, f))]
         i = 0
 
         for x in files:
-            finfo = GDALSingleRasterChart.getFileInfo(self.path + x)
+            finfo = GDALSingleRasterChart.get_file_info(self.path + x)
             self.metadata.append(finfo)
 
             i += 1
-            if onTickHandler:
-                onTickHandler(i / len(files))
+            if on_tick_handler:
+                on_tick_handler(i / len(files))
 
-        self.onMetadataUpdate()
+        self.on_metadata_update()
 
-        if onTickHandler:
-            onTickHandler(1.0)
+        if on_tick_handler:
+            on_tick_handler(1.0)
 
         return True
 
-    lastRect: Optional[List] = None
-    lastRasters: List = []
+    last_rect: Optional[List] = None
+    last_rasters: List = []
 
-    def loadRaster(self, gpsmap, path):
+    def load_raster(self, gpsmap, path):
         with self.loadLock:
             logger.debug("Loading raster file %s", path)
             try:
@@ -222,7 +221,7 @@ class GDALRasterChart(ChartLayer):
             Gdk.threads_enter()
             gpsmap.queue_draw()
             Gdk.threads_leave()
-            self.lastRasters.append(r)
+            self.last_rasters.append(r)
 
     def do_draw(self, gpsmap, cr):
         p1, p2 = gpsmap.get_bbox()
@@ -230,59 +229,59 @@ class GDALRasterChart(ChartLayer):
         p2lat, p2lon = p2.get_degrees()
 
         # Check if bounds hasn't changed
-        if self.lastRasters and self.lastRect == [p1lat, p1lon, p2lat, p2lon]:
-            for x in self.lastRasters:
+        if self.last_rasters and self.last_rect == [p1lat, p1lon, p2lat, p2lon]:
+            for x in self.last_rasters:
                 x.do_draw(gpsmap, cr)
             return
 
         # Estimate which raster is necessary given bound and zoom
-        minBLat = min(p1lat, p2lat)
-        maxBLat = max(p1lat, p2lat)
-        minBLon = min(p1lon, p2lon)
-        maxBLon = max(p1lon, p2lon)
+        min_b_lat = min(p1lat, p2lat)
+        max_b_lat = max(p1lat, p2lat)
+        min_b_lon = min(p1lon, p2lon)
+        max_b_lon = max(p1lon, p2lon)
 
         toload = []
         for x in self.metadata:
             bb, path = x[1], x[0]  # sizeX, sizeY x[2], x[3]
 
-            minRLat = min(bb[0][0], bb[1][0])
-            maxRLat = max(bb[0][0], bb[1][0])
-            minRLon = min(bb[0][1], bb[1][1])
-            maxRLon = max(bb[0][1], bb[1][1])
+            min_r_lat = min(bb[0][0], bb[1][0])
+            max_r_lat = max(bb[0][0], bb[1][0])
+            min_r_lon = min(bb[0][1], bb[1][1])
+            max_r_lon = max(bb[0][1], bb[1][1])
 
             inside = (
-                minRLat > minBLat
-                and maxRLat < maxBLat
-                and minRLon > minBLon
-                and maxRLon < maxBLon
+                min_r_lat > min_b_lat
+                and max_r_lat < max_b_lat
+                and min_r_lon > min_b_lon
+                and max_r_lon < max_b_lon
             )
             a = (
-                minRLat < minBLat
-                and maxRLat > maxBLat
-                and minRLon > minBLon
-                and minRLon < maxBLon
+                min_r_lat < min_b_lat
+                and max_r_lat > max_b_lat
+                and min_r_lon > min_b_lon
+                and min_r_lon < max_b_lon
             )
             b = (
-                minRLat < minBLat
-                and maxRLat > maxBLat
-                and minRLon < minBLon
-                and maxRLon > minBLon
+                min_r_lat < min_b_lat
+                and max_r_lat > max_b_lat
+                and min_r_lon < min_b_lon
+                and max_r_lon > min_b_lon
             )
             c = (
-                minRLat < minBLat
-                and maxRLat > minBLat
-                and minRLon < minBLon
-                and maxRLon > maxBLon
+                min_r_lat < min_b_lat
+                and max_r_lat > min_b_lat
+                and min_r_lon < min_b_lon
+                and max_r_lon > max_b_lon
             )
             d = (
-                minRLat < maxBLat
-                and maxRLat > maxBLat
-                and minRLon < minBLon
-                and maxRLon > maxBLon
+                min_r_lat < max_b_lat
+                and max_r_lat > max_b_lat
+                and min_r_lon < min_b_lon
+                and max_r_lon > max_b_lon
             )
 
-            area = (((maxRLat + 90) - (minRLat + 90))) * (
-                ((maxRLon + 180) - (minRLon + 180))
+            area = (((max_r_lat + 90) - (min_r_lat + 90))) * (
+                ((max_r_lon + 180) - (min_r_lon + 180))
             )
 
             if a or b or c or d:
@@ -303,7 +302,7 @@ class GDALRasterChart(ChartLayer):
             self.cached[x[0]] = "loading"
 
             t = Thread(
-                target=self.loadRaster,
+                target=self.load_raster,
                 args=(
                     gpsmap,
                     x[0],
@@ -313,8 +312,8 @@ class GDALRasterChart(ChartLayer):
             t.start()
 
         # Save and render
-        self.lastRect = [p1lat, p1lon, p2lat, p2lon]
-        self.lastRasters = rasters
+        self.last_rect = [p1lat, p1lon, p2lat, p2lon]
+        self.last_rasters = rasters
 
         # print ('rendering',len(rasters))
         for x in rasters:
@@ -326,16 +325,16 @@ class GDALRasterChart(ChartLayer):
 
             bb = x[1]
 
-            minRLat = min(bb[0][0], bb[1][0])
-            maxRLat = max(bb[0][0], bb[1][0])
-            minRLon = min(bb[0][1], bb[1][1])
-            maxRLon = max(bb[0][1], bb[1][1])
+            min_r_lat = min(bb[0][0], bb[1][0])
+            max_r_lat = max(bb[0][0], bb[1][0])
+            min_r_lon = min(bb[0][1], bb[1][1])
+            max_r_lon = max(bb[0][1], bb[1][1])
 
             xx, yy = gpsmap.convert_geographic_to_screen(
-                OsmGpsMap.MapPoint.new_degrees(minRLat, minRLon)
+                OsmGpsMap.MapPoint.new_degrees(min_r_lat, min_r_lon)
             )
             xx2, yy2 = gpsmap.convert_geographic_to_screen(
-                OsmGpsMap.MapPoint.new_degrees(maxRLat, maxRLon)
+                OsmGpsMap.MapPoint.new_degrees(max_r_lat, max_r_lon)
             )
 
             cr.set_source_rgba(1, 0, 0, 0.6)

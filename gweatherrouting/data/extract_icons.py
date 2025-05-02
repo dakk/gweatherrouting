@@ -1,18 +1,18 @@
 import os
 
-gladeFiles = []
+glade_files = []
 
 for x in os.walk("../gtk"):
     for y in x[2]:
         if y.find(".glade") == -1 or y.find("glade~") != -1:
             continue
 
-        gladeFiles += [os.path.join(x[0], y)]
+        glade_files += [os.path.join(x[0], y)]
 
 
 icons = []
 
-for g_file in gladeFiles:
+for g_file in glade_files:
     f = open(g_file, "r")
     data = f.read()
     f.close()
@@ -20,15 +20,15 @@ for g_file in gladeFiles:
     # Get all strings surrounded by property
     strings = []
 
-    dataIName = data.split('<property name="icon-name">')[1:]
-    for iprop in dataIName:
+    data_iname = data.split('<property name="icon-name">')[1:]
+    for iprop in data_iname:
         if iprop.find("</property>") == -1:
             continue
 
         strings += [iprop.split("</property>")[0]]
 
-    dataStock = data.split('<property name="icon-name">')[1:]
-    for data in dataStock:
+    data_stock = data.split('<property name="icon-name">')[1:]
+    for data in data_stock:
         if data.find("</property>") == -1:
             continue
 
@@ -41,7 +41,7 @@ for g_file in gladeFiles:
         icons += [y]
 
 
-def findIcon(x):
+def find_icon(x):
     # search x in /usr/share/icons/WhiteSur-dark/ recursively: if it is a link,
     # get the original path
     for y in os.walk("/usr/share/icons/WhiteSur-dark/"):
@@ -51,7 +51,7 @@ def findIcon(x):
 
 
 for icn in icons:
-    l_icn = findIcon(icn + ".svg")
+    l_icn = find_icon(icn + ".svg")
     if not l_icn:
         print("NOTFOUND:", icn)
         continue

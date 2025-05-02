@@ -29,20 +29,20 @@ COUNTRIES = json.load(
 COUNTRY_SHAPES = []
 
 
-def extractCoordinates(coord):
+def extract_coordinates(coord):
     c = []
     for x in coord:
         if isinstance(x[0], float):
             return coord
         else:
-            for xx in extractCoordinates(x):
+            for xx in extract_coordinates(x):
                 c.append(xx)
     return c
 
 
 for feature in COUNTRIES["features"]:
     # Calculate bbox for every feature
-    c = extractCoordinates(feature["geometry"]["coordinates"])
+    c = extract_coordinates(feature["geometry"]["coordinates"])
     c2 = [x[0] for x in c]
     c1 = [x[1] for x in c]
 
@@ -94,7 +94,7 @@ def point_in_bbox(bbox, lat, lon):
 
 
 # Return true if the given point is inside a country
-def pointInCountry(lat: float, lon: float) -> bool:
+def point_in_country(lat: float, lon: float) -> bool:
     for feature in COUNTRY_SHAPES:
         if point_in_bbox(feature["properties"]["bbox"], lat, lon):
             if point_in_polygon(
@@ -105,15 +105,15 @@ def pointInCountry(lat: float, lon: float) -> bool:
     return False
 
 
-def pointValidity(lat: float, lon: float) -> bool:
-    return not pointInCountry(lat, lon)
+def point_validity(lat: float, lon: float) -> bool:
+    return not point_in_country(lat, lon)
 
 
-def pointsValidity(latlons):
-    return list(map(lambda ll: pointValidity(ll[0], ll[1]), latlons))
+def points_validity(latlons):
+    return list(map(lambda ll: point_validity(ll[0], ll[1]), latlons))
 
 
-def uniqueName(name, collection=None):
+def unique_name(name, collection=None):
     if not collection:
         return name
 
@@ -128,20 +128,20 @@ def uniqueName(name, collection=None):
     return name
 
 
-def pointDistance(latA, lonA, latB, lonB, unit="nm"):
-    return utils.pointDistance(latA, lonA, latB, lonB, "nm")
+def point_distance(lat_a, lon_a, lat_b, lon_b, unit="nm"):
+    return utils.point_distance(lat_a, lon_a, lat_b, lon_b, unit)
 
 
-def routagePointDistance(latA, lonA, Distanza, Rotta):
-    return utils.routagePointDistance(latA, lonA, Distanza, Rotta, "nm")
+def routage_point_distance(lat_a, lon_a, distanza, rotta, unit="nm"):
+    return utils.routage_point_distance(lat_a, lon_a, distanza, rotta, unit)
 
 
 def reduce360(alfa):
     return utils.reduce360(alfa)
 
 
-def ortodromic(latA, lonA, latB, lonB):
-    return utils.ortodromic(latA, lonA, latB, lonB)
+def ortodromic(lat_a, lon_a, lat_b, lon_b):
+    return utils.ortodromic(lat_a, lon_a, lat_b, lon_b)
 
 
 class EventDispatcher:
@@ -163,7 +163,7 @@ class EventDispatcher:
             x(e)
 
 
-class dotdict(dict):
+class DotDict(dict):
     """dot.notation access to dictionary attributes"""
 
     __getattr__ = dict.get  # type: ignore

@@ -13,9 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
-import os
-
 import gi
 
 gi.require_version("Gtk", "3.0")
@@ -31,4 +28,4 @@ class SettingsWindowBase:
     core: Core
     window: Gtk.Window
     parent: Gtk.Window
-    settingsManager: SettingsManager
+    settings_manager: SettingsManager

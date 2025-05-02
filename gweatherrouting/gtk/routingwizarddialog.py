@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 import datetime
 import os
 
@@ -68,7 +67,7 @@ class RoutingWizardDialog:
         self.builder.get_object("boat-select").set_active(0)
 
         routing_store = self.builder.get_object("routing-store")
-        for r in weatherrouting.listRoutingAlgorithms():
+        for r in weatherrouting.list_routing_algorithms():
             routing_store.append([r["name"]])
         self.builder.get_object("routing-select").set_active(0)
 
@@ -86,14 +85,14 @@ class RoutingWizardDialog:
     def run(self):
         return self.dialog.run()
 
-    def responseCancel(self, widget):
+    def response_cancel(self, widget):
         self.dialog.response(Gtk.ResponseType.CANCEL)
 
     def destroy(self):
         return self.dialog.destroy()
 
-    def onRoutingAlgoSelect(self, widget):
-        ralgo = weatherrouting.listRoutingAlgorithms()[
+    def on_routing_algo_select(self, widget):
+        ralgo = weatherrouting.list_routing_algorithms()[
             self.builder.get_object("routing-select").get_active()
         ]["class"]
 
@@ -137,7 +136,7 @@ class RoutingWizardDialog:
                 e = Gtk.SpinButton(adjustment=adj, digits=0)
 
             e.set_tooltip_text(p.tooltip)
-            e.connect("changed", self.onParamChange)
+            e.connect("changed", self.on_param_change)
             self.paramWidgets[e] = p
             cb.add(e)
 
@@ -145,56 +144,56 @@ class RoutingWizardDialog:
 
         self.builder.get_object("router-params").show_all()
 
-    def onParamChange(self, widget):
+    def on_param_change(self, widget):
         p = self.paramWidgets[widget]
         p.value = float(widget.get_text())
 
-    def onBoatSelect(self, widget):
+    def on_boat_select(self, widget):
         pfile = self.polars[self.builder.get_object("boat-select").get_active()]
         self.polar = weatherrouting.Polar(
             resource_path("gweatherrouting", f"data/polars/{pfile}")
         )
-        self.polarWidget.setPolar(self.polar)
+        self.polarWidget.set_polar(self.polar)
 
-    def onTimeSelect(self, widget):
+    def on_time_select(self, widget):
         tp = TimePickerDialog(self.dialog)
-        tp.setDateTime(self.builder.get_object("time-entry").get_text())
+        tp.set_date_time(self.builder.get_object("time-entry").get_text())
         response = tp.run()
 
         if response == Gtk.ResponseType.OK:
             self.builder.get_object("time-entry").set_text(
-                tp.getDateTime().strftime(TimeControl.DFORMAT)
+                tp.get_date_time().strftime(TimeControl.DFORMAT)
             )
 
         tp.destroy()
 
-    def getCoastlineChecks(self):
+    def get_coastline_checks(self):
         return self.builder.get_object("coastline-check").get_active()
 
-    def getStartDateTime(self):
+    def get_start_datetime(self):
         return datetime.datetime.strptime(
             self.builder.get_object("time-entry").get_text(), TimeControl.DFORMAT
         )
 
-    def getSelectedTrack(self):
+    def get_selected_track(self):
         return self.core.trackManager[
             self.builder.get_object("track-select").get_active()
         ]
 
-    def getSelectedAlgorithm(self):
-        return weatherrouting.listRoutingAlgorithms()[
+    def get_selected_algorithm(self):
+        return weatherrouting.list_routing_algorithms()[
             self.builder.get_object("routing-select").get_active()
         ]["class"]
 
-    def getSelectedPolar(self):
+    def get_selected_polar(self):
         return self.polars[self.builder.get_object("boat-select").get_active()]
 
-    def getSelectedStartPoint(self):
+    def get_selected_start_point(self):
         s = self.builder.get_object("start-select").get_active()
         if s == 0:
             return None
         elif s == 1:
-            if self.core.boatInfo.isValid():
+            if self.core.boatInfo.is_valid():
                 return [self.core.boatInfo.latitude, self.core.boatInfo.longitude]
             else:
                 return None

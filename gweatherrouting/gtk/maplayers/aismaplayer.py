@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 import gi
 
 gi.require_version("Gtk", "3.0")
@@ -30,7 +29,7 @@ class AISMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
         GObject.GObject.__init__(self)
         self.visible = True
 
-    def setVisible(self, visible):
+    def set_visible(self, visible):
         self.visible = visible
 
     def do_draw(self, gpsmap, cr):

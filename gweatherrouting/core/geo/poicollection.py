@@ -25,7 +25,7 @@ class _POICollection(Collection, Generic[T]):
     def __init__(self):
         super().__init__(POI, "poi")
 
-    def importFromGPX(self, gpx):
+    def import_from_gpx(self, gpx):
         for waypoint in gpx.waypoints:
             self.append(
                 POI(
@@ -35,20 +35,20 @@ class _POICollection(Collection, Generic[T]):
                 )
             )
 
-    def toNMEAPFEC(self):
+    def to_nmea_fpec(self):
         s = ""
         for x in self.elements:
-            s += x.toNMEAPFEC() + "\n"
+            s += x.to_nmea_fpec() + "\n"
         s += "$PFEC,GPxfr,CTL,E"
         return s
 
     def move(self, name, lat, lon):
-        c = self.getByName(name)
+        c = self.get_by_name(name)
         if c is not None:
             c.position = (lat, lon)
 
     def create(self, position: Tuple[float, float]):
-        e = POI(self.getUniqueName(), position=position, collection=self)
+        e = POI(self.get_unique_name(), position=position, collection=self)
         self.append(e)
         self.save()
         return e

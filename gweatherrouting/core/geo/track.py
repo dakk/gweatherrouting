@@ -25,11 +25,11 @@ class Track(ElementMultiPoint):
         super().__init__(name, points, visible, collection)
 
     @staticmethod
-    def fromJSON(j: Dict) -> "Track":
-        d = ElementMultiPoint.fromJSON(j)
+    def from_json(j: Dict) -> "Track":
+        d = ElementMultiPoint.from_json(j)
         return Track(d.name, d.points, d.visible)
 
-    def toGPXObject(self):
+    def to_gpx_object(self):
         gpx_track = gpxpy.gpx.GPXTrack()
         gpx_segment = gpxpy.gpx.GPXTrackSegment()
         gpx_track.segments.append(gpx_segment)
@@ -39,5 +39,5 @@ class Track(ElementMultiPoint):
 
         return gpx_track
 
-    def toList(self) -> List[Tuple[float, float]]:
+    def to_list(self) -> List[Tuple[float, float]]:
         return [(x[0], x[1]) for x in self.points]

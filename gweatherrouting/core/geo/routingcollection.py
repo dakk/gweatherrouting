@@ -25,7 +25,7 @@ class _RoutingCollection(CollectionWithActiveElement, Generic[T]):
     def __init__(self):
         super().__init__(Routing, "routing")
 
-    def importFromGPX(self, gpx):
+    def import_from_gpx(self, gpx):
         for track in gpx.routes:
             waypoints = []
 

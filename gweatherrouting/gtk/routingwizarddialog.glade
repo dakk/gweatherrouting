@@ -31,7 +31,7 @@
   <object class="GtkDialog" id="routing-wizard-dialog">
     <property name="can-focus">False</property>
     <property name="type-hint">normal</property>
-    <signal name="close" handler="responseCancel" swapped="no"/>
+    <signal name="close" handler="response_cancel" swapped="no"/>
     <child internal-child="vbox">
       <object class="GtkBox">
         <property name="can-focus">False</property>
@@ -87,7 +87,7 @@
                                 <property name="model">boat-store</property>
                                 <property name="active">0</property>
                                 <property name="id-column">0</property>
-                                <signal name="changed" handler="onBoatSelect" swapped="no"/>
+                                <signal name="changed" handler="on_boat_select" swapped="no"/>
                                 <child>
                                   <object class="GtkCellRendererText" id="Name"/>
                                   <attributes>
@@ -169,7 +169,7 @@
                             <property name="model">routing-store</property>
                             <property name="active">0</property>
                             <property name="id-column">0</property>
-                            <signal name="changed" handler="onRoutingAlgoSelect" swapped="no"/>
+                            <signal name="changed" handler="on_routing_algo_select" swapped="no"/>
                             <child>
                               <object class="GtkCellRendererText" id="Name2"/>
                               <attributes>
@@ -268,7 +268,7 @@
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="editable">False</property>
-                            <signal name="activate" handler="onTimeSelect" swapped="no"/>
+                            <signal name="activate" handler="on_time_select" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">True</property>
@@ -281,7 +281,7 @@
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="receives-default">True</property>
-                            <signal name="clicked" handler="onTimeSelect" swapped="no"/>
+                            <signal name="clicked" handler="on_time_select" swapped="no"/>
                             <child>
                               <object class="GtkImage">
                                 <property name="visible">True</property>

@@ -16,7 +16,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import logging
 import os
 from shutil import copyfile
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 import requests
 import weatherrouting
@@ -56,7 +56,7 @@ class GribManager(weatherrouting.Grib):
             if x[-5:] != ".grib" and x[-4:] != ".grb":
                 continue
 
-            m = Grib.parseMetadata(GRIB_DIR + "/" + x)
+            m = Grib.parse_metadata(GRIB_DIR + "/" + x)
             self.local_gribs.append(m)
 
     def store_opened_gribs(self):
@@ -114,9 +114,6 @@ class GribManager(weatherrouting.Grib):
             except:
                 pass
         return g
-    
-    def getWindAt(self, t: float, lat: float, lon: float) -> Tuple[float, float]:
-        return self.get_wind_at(t, lat, lon)
 
     def get_wind_2d(self, tt, bounds):
         dd = sorted(self.get_wind(tt, bounds), key=lambda x: x[2][1])
@@ -193,7 +190,7 @@ class GribManager(weatherrouting.Grib):
         except Exception as e:
             logger.error(str(e))
 
-    def download(self, uri, percentageCallback, callback):
+    def download(self, uri, percentage_callback, callback):
         import bz2
 
         name = uri.split("/")[-1]
@@ -215,7 +212,7 @@ class GribManager(weatherrouting.Grib):
                 done = int(100 * dl / total_length_i)
 
                 if last_signal_percent != done:
-                    percentageCallback(done)
+                    percentage_callback(done)
                     last_signal_percent = done
 
         f.close()

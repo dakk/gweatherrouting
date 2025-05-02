@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 import io
 
 import gi
@@ -33,7 +32,7 @@ class MPLWidget(Gtk.DrawingArea):
         # self.set_size_request(-1, 30)
         self.connect("draw", self.draw)
 
-    def plotDrawer(self, w, h, plt, s):
+    def plot_drawer(self, w, h, plt, s):
         return None
 
     def draw(self, area, ctx):
@@ -44,7 +43,7 @@ class MPLWidget(Gtk.DrawingArea):
         plt.style.use("dark_background")
         plt.rcParams.update({"font.size": 8})
 
-        fig = self.plotDrawer(a.width, a.height, plt, self)
+        fig = self.plot_drawer(a.width, a.height, plt, self)
 
         plt.tight_layout()
         buf = io.BytesIO()

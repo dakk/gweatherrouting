@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 import math
 
 import gi
@@ -26,30 +25,30 @@ except:
 
 from gi.repository import GObject, OsmGpsMap
 
-from gweatherrouting.common import windColor
-from gweatherrouting.core.utils import pointInCountry
+from gweatherrouting.common import wind_color
+from gweatherrouting.core.utils import point_in_country
 
 
 class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
-    def __init__(self, gribManager, timeControl, settingsManager):
+    def __init__(self, grib_manager, time_control, settings_manager):
         GObject.GObject.__init__(self)
         self.visible = True
-        self.gribManager = gribManager
-        self.timeControl = timeControl
-        self.timeControl.connect("time-change", self.onTimeChange)
-        self.settingsManager = settingsManager
+        self.grib_manager = grib_manager
+        self.time_control = time_control
+        self.time_control.connect("time-change", self.on_time_change)
+        self.settings_manager = settings_manager
 
-    def setVisible(self, visible):
+    def set_visible(self, visible):
         self.visible = visible
 
-    def onTimeChange(self, t):
+    def on_time_change(self, t):
         pass
 
-    def drawWindArrow(self, cr, x, y, wdir, wspeed):
+    def draw_wind_arrow(self, cr, x, y, wdir, wspeed):
         wdir = -math.radians(wdir)
 
-        a, b, c = windColor(wspeed)
-        cr.set_source_rgba(a, b, c, self.settingsManager.gribArrowOpacity)
+        a, b, c = wind_color(wspeed)
+        cr.set_source_rgba(a, b, c, self.settings_manager.gribArrowOpacity)
 
         length = 15
 
@@ -79,8 +78,8 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
         p1lat, p1lon = p1.get_degrees()
         p2lat, p2lon = p2.get_degrees()
 
-        width = float(gpsmap.get_allocated_width())
-        height = float(gpsmap.get_allocated_height())
+        # width = float(gpsmap.get_allocated_width())
+        # height = float(gpsmap.get_allocated_height())
 
         cr.set_line_width(1)
         cr.set_source_rgb(1, 0, 0)
@@ -90,7 +89,7 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
             (min(p1lat, p2lat), min(p1lon, p2lon)),
             (max(p1lat, p2lat), max(p1lon, p2lon)),
         )
-        data = self.gribManager.get_wind_2d(self.timeControl.time, bounds)
+        data = self.grib_manager.get_wind_2d(self.time_control.time, bounds)
 
         if not data or len(data) == 0:
             return
@@ -105,14 +104,14 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
         # Draw arrows
         for x in data[::scale]:
             for y in x[::scale]:
-                if not self.settingsManager.gribArrowOnGround:
-                    if pointInCountry(y[2][0], y[2][1]):
+                if not self.settings_manager.gribArrowOnGround:
+                    if point_in_country(y[2][0], y[2][1]):
                         continue
 
                 xx, yy = gpsmap.convert_geographic_to_screen(
                     OsmGpsMap.MapPoint.new_degrees(y[2][0], y[2][1])
                 )
-                self.drawWindArrow(cr, xx, yy, y[0], y[1])
+                self.draw_wind_arrow(cr, xx, yy, y[0], y[1])
 
         # Draw gradients
         # for i in range(0, len(data) - scale, scale):
@@ -123,7 +122,8 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 
         # 		try:
         # 			xx2, yy2 = gpsmap.convert_geographic_to_screen(
-        # 				OsmGpsMap.MapPoint.new_degrees(data[i+scale][j+scale][2][0], data[i+scale][j+scale][2][1])
+        # 				OsmGpsMap.MapPoint.new_degrees(data[i+scale][j+scale][2][0],
+        #  data[i+scale][j+scale][2][1])
         # 			)
         # 		except:
         # 			continue
@@ -138,13 +138,13 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
         # 		pat.line_to(dx+xx, yy+dy)
         # 		pat.line_to(dx, yy+dy)
 
-        # 		a, b, c = windColor(data[i][j][1])
+        # 		a, b, c = wind_color(data[i][j][1])
         # 		pat.set_corner_color_rgba(0, a, b, c, 0.6)
-        # 		a, b, c = windColor(data[i][j+1][1])
+        # 		a, b, c = wind_color(data[i][j+1][1])
         # 		pat.set_corner_color_rgba(1, a, b, c, 0.6)
-        # 		a, b, c = windColor(data[i+1][j+1][1])
+        # 		a, b, c = wind_color(data[i+1][j+1][1])
         # 		pat.set_corner_color_rgba(2, a, b, c, 0.6)
-        # 		a, b, c = windColor(data[i+1][j][1])
+        # 		a, b, c = wind_color(data[i+1][j][1])
         # 		pat.set_corner_color_rgba(3, a, b, c, 0.6)
         # 		pat.end_patch()
 

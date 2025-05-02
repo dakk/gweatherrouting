@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 import os
 
 import gi
@@ -47,15 +46,15 @@ class TimeTravelWidget(Gtk.Box):
     def __init__(
         self,
         parent: Gtk.Window,
-        timeControl: TimeControl,
+        time_control: TimeControl,
         map: OsmGpsMap,
-        smallerUnit=False,
+        smaller_unit=False,
     ):
         super(TimeTravelWidget, self).__init__()
 
         self.play = False
         self.parent = parent
-        self.timeControl = timeControl
+        self.time_control = time_control
         self.map = map
 
         self.builder = Gtk.Builder()
@@ -71,62 +70,62 @@ class TimeTravelWidget(Gtk.Box):
         # self.timeAdjust = self.builder.get_object('time-adjustment')
         self.timeLabel = self.builder.get_object("time-label")
         self.timeUnitCombo = self.builder.get_object("time-unit-combo")
-        self.timeControl.connect("time-change", self.onTimeChange)
-        self.onTimeChange(self.timeControl.time)
+        self.time_control.connect("time-change", self.on_time_change)
+        self.on_time_change(self.time_control.time)
 
-        self.seconds = smallerUnit
-        if smallerUnit:
+        self.seconds = smaller_unit
+        if smaller_unit:
             self.timeUnitCombo.set_active(2)
         else:
             self.timeUnitCombo.set_active(3)
 
-    def getChangeUnit(self):
+    def get_change_unit(self):
         return self.seconds
 
-    def onTimeUnitComboChange(self, widget):
+    def on_time_unit_combo_change(self, widget):
         u = self.timeUnitCombo.get_active_text()
         self.seconds = TIME_UNITS[u]
 
-    def onTimeChange(self, t):
+    def on_time_change(self, t):
         self.timeLabel.set_text("%s" % str(t))
         self.map.queue_draw()
 
-    def onTimeNow(self, event):
-        self.timeControl.now()
+    def on_time_now(self, event):
+        self.time_control.now()
 
-    def onPlayClick(self, event):
+    def on_play_click(self, event):
         self.play = True
-        GObject.timeout_add(10, self.onPlayStep)
+        GObject.timeout_add(10, self.on_play_step)
 
-    def onPlayStep(self):
-        self.onFowardClick(None)
+    def on_play_step(self):
+        self.on_foward_click(None)
         if self.play:
-            GObject.timeout_add(1000, self.onPlayStep)
+            GObject.timeout_add(1000, self.on_play_step)
 
-    def onStopClick(self, event):
+    def on_stop_click(self, event):
         self.play = False
 
-    def onFowardClick(self, event):
-        self.timeControl.increase(seconds=self.seconds)
+    def on_foward_click(self, event):
+        self.time_control.increase(seconds=self.seconds)
         self.map.queue_draw()
 
-    def onBackwardClick(self, event):
-        # if self.timeControl.time > 0:
-        self.timeControl.decrease(seconds=self.seconds)
+    def on_backward_click(self, event):
+        # if self.time_control.time > 0:
+        self.time_control.decrease(seconds=self.seconds)
 
-    def onTimeSelect(self, event):
+    def on_time_select(self, event):
         tp = TimePickerDialog(self.parent)
-        tp.setFromDateTime(self.timeControl.time)
+        tp.set_from_date_time(self.time_control.time)
         response = tp.run()
 
         if response == Gtk.ResponseType.OK:
-            self.timeControl.set_time(tp.getDateTime())
+            self.time_control.set_time(tp.get_date_time())
 
         tp.destroy()
 
     # def updateTimeSlider(self):
-    # 	self.timeAdjust.set_value(int(self.timeControl.time))
+    # 	self.timeAdjust.set_value(int(self.time_control.time))
 
-    def onTimeSlide(self, widget):
-        self.timeControl.set_time(int(self.timeAdjust.get_value()))
+    def on_time_slide(self, widget):
+        self.time_control.set_time(int(self.timeAdjust.get_value()))
         self.map.queue_draw()

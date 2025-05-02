@@ -18,7 +18,7 @@
               <object class="GtkComboBoxText" id="boat-select">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <signal name="changed" handler="onBoatSelect" swapped="no"/>
+                <signal name="changed" handler="on_boat_select" swapped="no"/>
               </object>
             </child>
           </object>

@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 import os
 
 import gi
@@ -111,7 +110,7 @@ class ConnectionEditDialog:
     def destroy(self):
         return self.dialog.destroy()
 
-    def onTypeChange(self, widget):
+    def on_type_change(self, widget):
         if self.typeCombo.get_active() == 0:
             self.builder.get_object("network-frame").show()
             self.builder.get_object("serial-frame").hide()
@@ -119,7 +118,7 @@ class ConnectionEditDialog:
             self.builder.get_object("network-frame").hide()
             self.builder.get_object("serial-frame").show()
 
-    def saveData(self):
+    def save_data(self):
         self.data = {
             "type": lower(self.typeCombo.get_active_text()),
             "protocol": lower(self.protocolCombo.get_active_text()),
@@ -133,11 +132,11 @@ class ConnectionEditDialog:
             self.data["host"] = self.builder.get_object("network-host").get_text()
             self.data["port"] = int(self.builder.get_object("network-port").get_text())
 
-    def onSave(self, widget):
+    def on_save(self, widget):
         try:
-            self.saveData()
+            self.save_data()
             self.dialog.response(Gtk.ResponseType.OK)
-        except Exception as _:
+        except:
             dialog = Gtk.MessageDialog(
                 self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error"
             )
@@ -145,5 +144,5 @@ class ConnectionEditDialog:
             dialog.run()
             dialog.destroy()
 
-    def onClose(self, widget):
+    def on_close(self, widget):
         self.dialog.response(Gtk.ResponseType.CANCEL)

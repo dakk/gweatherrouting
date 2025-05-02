@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 import logging
 import time
 from threading import Thread
@@ -63,8 +62,8 @@ class OSMDownloadDialog(Gtk.Dialog):
         self.set_border_width(10)
         self.pb = Gtk.ProgressBar()
         b = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.l = Gtk.Label(label="Download in progress")
-        b.pack_start(self.l, True, True, 20)
+        self.label = Gtk.Label(label="Download in progress")
+        b.pack_start(self.label, True, True, 20)
         b.pack_start(self.pb, True, True, 20)
         box = self.get_content_area()
         box.add(b)
@@ -73,10 +72,10 @@ class OSMDownloadDialog(Gtk.Dialog):
         self.thread = Thread(target=self.download, args=())
         self.thread.start()
 
-    def percentageCallback(self, percentage, d, t):
+    def percentage_callback(self, percentage, d, t):
         Gdk.threads_enter()
         self.pb.set_fraction(percentage / 100)
-        self.l.set_text(f"Downloading: {percentage}%")
+        self.label.set_text(f"Downloading: {percentage}%")
         Gdk.threads_leave()
 
     def callback(self, success):
@@ -121,7 +120,7 @@ class OSMDownloadDialog(Gtk.Dialog):
                 done = int(100 * dl / total_length_i)
 
                 if last_signal_percent != done:
-                    self.percentageCallback(done, dl, total_length_i)
+                    self.percentage_callback(done, dl, total_length_i)
                     last_signal_percent = done
 
         f.close()
@@ -154,8 +153,8 @@ class GSHHSDownloadDialog(Gtk.Dialog):
         self.set_border_width(10)
         self.pb = Gtk.ProgressBar()
         b = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.l = Gtk.Label(label="Download in progress")
-        b.pack_start(self.l, True, True, 20)
+        self.label = Gtk.Label(label="Download in progress")
+        b.pack_start(self.label, True, True, 20)
         b.pack_start(self.pb, True, True, 20)
         box = self.get_content_area()
         box.add(b)
@@ -164,10 +163,10 @@ class GSHHSDownloadDialog(Gtk.Dialog):
         self.thread = Thread(target=self.download, args=())
         self.thread.start()
 
-    def percentageCallback(self, percentage, d, t):
+    def percentage_callback(self, percentage, d, t):
         Gdk.threads_enter()
         self.pb.set_fraction(percentage / 100)
-        self.l.set_text(f"Downloading: {percentage}%")
+        self.label.set_text(f"Downloading: {percentage}%")
         Gdk.threads_leave()
 
     def callback(self, success):
@@ -195,8 +194,12 @@ class GSHHSDownloadDialog(Gtk.Dialog):
     def download(self):
         import zipfile
 
-        # uri = "https://www.ngdc.noaa.gov/mgg/shorelines/data/gshhg/oldversions/version2.3.6/gshhg-shp-2.3.6.zip"
-        uri = "https://github.com/dakk/gweatherrouting/releases/download/gshhs2.3.6/gshhg-shp-2.3.6.zip"
+        # uri = "https://www.ngdc.noaa.gov/mgg/shorelines/data/gshhg/oldversions/" +
+        # "version2.3.6/gshhg-shp-2.3.6.zip"
+        uri = (
+            "https://github.com/dakk/gweatherrouting/releases/download/"
+            + "gshhs2.3.6/gshhg-shp-2.3.6.zip"
+        )
         logger.info("Downloading gshhs base map")
 
         response = requests.get(uri, stream=True)
@@ -215,7 +218,7 @@ class GSHHSDownloadDialog(Gtk.Dialog):
                 done = int(100 * dl / total_length_i)
 
                 if last_signal_percent != done:
-                    self.percentageCallback(done, dl, total_length_i)
+                    self.percentage_callback(done, dl, total_length_i)
                     last_signal_percent = done
 
         f.close()
@@ -260,22 +263,22 @@ from .vectordrawer.simplechartdrawer import SimpleChartDrawer
 
 
 class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
-    def __init__(self, path, settingsManager, metadata=None):
-        super().__init__(path, "vector", settingsManager, metadata)
+    def __init__(self, path, settings_manager, metadata=None):
+        super().__init__(path, "vector", settings_manager, metadata)
 
-        self.lastTime = {"c": 0, "l": 0, "i": 0, "h": 0, "f": 0}
-        self.forceDownscale = False
+        self.last_time = {"c": 0, "l": 0, "i": 0, "h": 0, "f": 0}
+        self.force_downscale = False
 
-        self.drawer = SimpleChartDrawer(settingsManager)
+        self.drawer = SimpleChartDrawer(settings_manager)
         drv = ogr.GetDriverByName("ESRI Shapefile")
-        self.vectorFiles = {}
+        self.vector_files = {}
         for x in ["f", "h", "i", "l", "c"]:
             for y in [1]:  # ,2,3,4,5,6]:
                 f = drv.Open(
                     path + "/GSHHS_shp/" + x + "/GSHHS_" + x + "_L" + str(y) + ".shp"
                 )
                 if f is not None:
-                    self.vectorFiles[x + str(y)] = f
+                    self.vector_files[x + str(y)] = f
 
         self.lpvFile = drv.Open(path + "/GSHHS_shp/h/GSHHS_h_L1.shp")
 
@@ -290,10 +293,10 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
         )
         f.close()
 
-    def onRegister(self, onTickHandler=None):
+    def on_register(self, on_tick_handler=None):
         pass
 
-    def pointsValidity(self, latlons):
+    def points_validity(self, latlons):
         vf = self.lpvFile
 
         points = ogr.Geometry(ogr.wkbLinearRing)
@@ -308,15 +311,15 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
         points.AddPoint(latlons[0][1], latlons[0][0])
 
         ev = points.GetEnvelope()
-        boundingGeometry = ogr.CreateGeometryFromWkt(
-            self.getBoundingWKTOfCoords(
+        bounding_geometry = ogr.CreateGeometryFromWkt(
+            self.get_bounding_wkt_of_coords(
                 ev[1] - 0.1, ev[0] - 0.1, ev[3] + 0.1, ev[2] + 0.1
             )
         )
 
         for i in range(vf.GetLayerCount()):
             layer = vf.GetLayerByIndex(i)
-            layer.SetSpatialFilter(boundingGeometry)
+            layer.SetSpatialFilter(bounding_geometry)
 
             feat = layer.GetNextFeature()
             while feat is not None:
@@ -324,7 +327,7 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
                     continue
 
                 geom = feat.GetGeometryRef()
-                geom = boundingGeometry.Intersection(geom)
+                geom = bounding_geometry.Intersection(geom)
 
                 for ii, x in enumerate(pointsa):
                     if not res[ii]:
@@ -343,7 +346,7 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
 
         return res
 
-    def linesValidity(self, latlons):
+    def lines_validity(self, latlons):
         vf = self.lpvFile
 
         lines = ogr.Geometry(ogr.wkbLinearRing)
@@ -359,15 +362,15 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
         lines.AddPoint(latlons[0][1], latlons[0][0])
 
         ev = lines.GetEnvelope()
-        boundingGeometry = ogr.CreateGeometryFromWkt(
-            self.getBoundingWKTOfCoords(
+        bounding_geometry = ogr.CreateGeometryFromWkt(
+            self.get_bounding_wkt_of_coords(
                 ev[1] - 0.1, ev[0] - 0.1, ev[3] + 0.1, ev[2] + 0.1
             )
         )
 
         for i in range(vf.GetLayerCount()):
             layer = vf.GetLayerByIndex(i)
-            layer.SetSpatialFilter(boundingGeometry)
+            layer.SetSpatialFilter(bounding_geometry)
 
             feat = layer.GetNextFeature()
             while feat is not None:
@@ -394,28 +397,28 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
         return res
 
     def do_draw(self, gpsmap, cr):
-        boundingGeometry = self.getBoundingGeometry(gpsmap)
+        bounding_geometry = self.get_bounding_geometry(gpsmap)
 
         # Get the correct quality for zoom level
         scale = gpsmap.get_scale()
         if scale > 5000:
             q = "c"
-        elif scale > 500:  # or self.lastTime['i'] > 1.0:
+        elif scale > 500:  # or self.last_time['i'] > 1.0:
             q = "l"
-        elif scale > 200 or self.forceDownscale:  # or self.lastTime['h'] > 1.0
+        elif scale > 200 or self.force_downscale:  # or self.last_time['h'] > 1.0
             q = "i"
-        elif scale >= 15 or self.lastTime["f"] > 0.25:
+        elif scale >= 15 or self.last_time["f"] > 0.25:
             q = "h"
         elif scale < 15:
             q = "f"
 
         t = time.time()
-        self.drawer.draw(gpsmap, cr, self.vectorFiles[q + "1"], boundingGeometry)
-        self.lastTime[q] = int(time.time() - t)
+        self.drawer.draw(gpsmap, cr, self.vector_files[q + "1"], bounding_geometry)
+        self.last_time[q] = int(time.time() - t)
 
         if scale < 4500:
             for c in self.countries:
-                # TODO: check if x[2],x[3] is inside the boundingGeometry
+                # TODO: check if x[2],x[3] is inside the bounding_geometry
 
                 # render country name
                 cr.set_source_rgba(0, 0, 0, 0.8)

@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 import json
 import logging
 
@@ -35,8 +34,8 @@ logger = logging.getLogger("gweatherrouting")
 
 
 class S57SymbolProvider:
-    def __init__(self, settingsManager):
-        self.settingsManager = settingsManager
+    def __init__(self, settings_manager):
+        self.settings_manager = settings_manager
         self.symbols = {}
 
         self.p_day = GdkPixbuf.Pixbuf.new_from_file(
@@ -47,8 +46,10 @@ class S57SymbolProvider:
         )
 
         self.p_select = self.p_day
-        self.onChartPaletteChanged(settingsManager.chartPalette)
-        settingsManager.register_on_change("chartPalette", self.onChartPaletteChanged)
+        self.on_chart_palette_changed(settings_manager.chartPalette)
+        settings_manager.register_on_change(
+            "chartPalette", self.on_chart_palette_changed
+        )
 
         # Try to load cached data
         try:
@@ -101,7 +102,7 @@ class S57SymbolProvider:
             f.close()
             logger.debug("Saved cached S57 symbols")
 
-    def onChartPaletteChanged(self, v):
+    def on_chart_palette_changed(self, v):
         if v == "dark":
             self.p_select = self.p_dark
         else:
@@ -115,7 +116,7 @@ class S57SymbolProvider:
         Gdk.cairo_set_source_pixbuf(cr, img, xx - s["pivot"][0], yy - s["pivot"][1])
         cr.paint()
 
-    def drawLight(self, cr, xx, yy, tags, major):
+    def draw_light(self, cr, xx, yy, tags, major):
         cr.move_to(xx + 12, yy + 4)
         try:
             txt = (

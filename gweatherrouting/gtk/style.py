@@ -16,21 +16,21 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 
 class CairoStyle:
-    def __init__(self, color=None, lineWidth=None, fontSize=None, dash=None):
+    def __init__(self, color=None, line_width=None, font_size=None, dash=None):
         self.color = color
-        self.lineWidth = lineWidth
-        self.fontSize = fontSize
+        self.line_width = line_width
+        self.font_size = font_size
         self.dash = dash
 
-    def withLineWidth(self, lineWidth):
-        self.lineWidth = lineWidth
+    def with_line_width(self, line_width):
+        self.line_width = line_width
         return self
 
     def apply(self, cr):
-        if self.lineWidth:
-            cr.set_line_width(self.lineWidth)
-        if self.fontSize:
-            cr.set_font_size(self.fontSize)
+        if self.line_width:
+            cr.set_line_width(self.line_width)
+        if self.font_size:
+            cr.set_font_size(self.font_size)
 
         if self.dash is not None and type(self.dash) is float:
             cr.set_dash([self.dash])
@@ -45,18 +45,18 @@ class CairoStyle:
 
 class ChartPalette:
     def __init__(self, shallow, sea, landstroke, landfill):
-        self.ShallowSea = shallow
-        self.Sea = sea
-        self.LandStroke = landstroke
-        self.LandFill = landfill
+        self.shallow_sea = shallow
+        self.sea = sea
+        self.land_stroke = landstroke
+        self.land_fill = landfill
 
 
 class Style:
     @staticmethod
-    def resetDash(cr):
+    def reset_dash(cr):
         cr.set_dash([])
 
-    chartPalettes = {
+    chart_palettes = {
         "cm93": ChartPalette(
             CairoStyle(color=(0x73 / 255, 0xB6 / 255, 0xEF / 255, 1.0)),
             CairoStyle(color=(0xD4 / 255, 0xEA / 255, 0xEE / 255, 1.0)),
@@ -84,56 +84,56 @@ class Style:
     }
 
     class Measure:
-        Line = CairoStyle(color=(0, 0, 0, 1), lineWidth=0.6)
-        Font = CairoStyle(color=(0, 0, 0, 1), fontSize=10)
+        Line = CairoStyle(color=(0, 0, 0, 1), line_width=0.6)
+        Font = CairoStyle(color=(0, 0, 0, 1), font_size=10)
 
     class Compass:
-        Line = CairoStyle(color=(0, 0, 0, 0.3), lineWidth=0.6)
-        Font = CairoStyle(color=(0, 0, 0, 1), fontSize=10)
+        Line = CairoStyle(color=(0, 0, 0, 0.3), line_width=0.6)
+        Font = CairoStyle(color=(0, 0, 0, 1), font_size=10)
 
     class Track:
-        Mob = CairoStyle(color=(1, 0, 0, 1), lineWidth=1)
+        Mob = CairoStyle(color=(1, 0, 0, 1), line_width=1)
 
-        LogTrack = CairoStyle(color=(0, 0.5, 0.5, 0.5), lineWidth=1)
+        LogTrack = CairoStyle(color=(0, 0.5, 0.5, 0.5), line_width=1)
 
         TrackActive = CairoStyle(
-            color=(0x91 / 255.0, 0x32 / 255.0, 0x1C / 255.0, 1), lineWidth=1, dash=8.0
+            color=(0x91 / 255.0, 0x32 / 255.0, 0x1C / 255.0, 1), line_width=1, dash=8.0
         )
         TrackActiveFont = CairoStyle(
-            color=(0x11 / 255, 0x11 / 255, 0x11 / 255, 0.7), fontSize=10
+            color=(0x11 / 255, 0x11 / 255, 0x11 / 255, 0.7), font_size=10
         )
         TrackActivePoiFont = CairoStyle(
-            color=(0x11 / 255, 0x11 / 255, 0x11 / 255, 0.7), fontSize=10
+            color=(0x11 / 255, 0x11 / 255, 0x11 / 255, 0.7), font_size=10
         )
 
         TrackInactive = CairoStyle(
             color=(0x91 / 255.0, 0x4A / 255.0, 0x7C / 255.0, 0.6),
-            lineWidth=0.8,
+            line_width=0.8,
             dash=8.0,
         )
         TrackInactiveFont = CairoStyle(
-            color=(0x11 / 255, 0x11 / 255, 0x11 / 255, 0.7), fontSize=10
+            color=(0x11 / 255, 0x11 / 255, 0x11 / 255, 0.7), font_size=10
         )
         TrackInactivePoiFont = CairoStyle(
-            color=(0x11 / 255, 0x11 / 255, 0x11 / 255, 0.3), fontSize=10
+            color=(0x11 / 255, 0x11 / 255, 0x11 / 255, 0.3), font_size=10
         )
 
-        RoutingTrack = CairoStyle(color=(1, 0, 0, 0.8), lineWidth=1)
+        RoutingTrack = CairoStyle(color=(1, 0, 0, 0.8), line_width=1)
         RoutingTrackFont = CairoStyle(
-            color=(0x11 / 255, 0x11 / 255, 0x11 / 255, 0.7), fontSize=10
+            color=(0x11 / 255, 0x11 / 255, 0x11 / 255, 0.7), font_size=10
         )
-        RoutingTrackCircle = CairoStyle(color=(1, 1, 1, 1), lineWidth=1)
+        RoutingTrackCircle = CairoStyle(color=(1, 1, 1, 1), line_width=1)
 
-        RoutingTrackHL = CairoStyle(color=(1, 0, 0, 1), lineWidth=2)
+        RoutingTrackHL = CairoStyle(color=(1, 0, 0, 1), line_width=2)
         RoutingTrackFontHL = CairoStyle(
-            color=(0x11 / 255, 0x11 / 255, 0x11 / 255, 0.7), fontSize=10
+            color=(0x11 / 255, 0x11 / 255, 0x11 / 255, 0.7), font_size=10
         )
-        RoutingTrackCircleHL = CairoStyle(color=(1, 1, 1, 1), lineWidth=2)
+        RoutingTrackCircleHL = CairoStyle(color=(1, 1, 1, 1), line_width=2)
 
-        RoutingBoat = CairoStyle(color=(0, 0.4, 0, 1.0), lineWidth=5)
+        RoutingBoat = CairoStyle(color=(0, 0.4, 0, 1.0), line_width=5)
 
     class Poi:
         Dot = CairoStyle(color=(0x11 / 255, 0x11 / 255, 0x11 / 255, 1))
-        Quad = CairoStyle(color=(0x11 / 255, 0x11 / 255, 0x11 / 255, 1), lineWidth=0.3)
+        Quad = CairoStyle(color=(0x11 / 255, 0x11 / 255, 0x11 / 255, 1), line_width=0.3)
         QuadInt = CairoStyle(color=(0xFF / 255, 0xFF / 255, 0xFF / 255, 0.5))
-        Font = CairoStyle(color=(0x11 / 255, 0x11 / 255, 0x11 / 255, 0.7), fontSize=10)
+        Font = CairoStyle(color=(0x11 / 255, 0x11 / 255, 0x11 / 255, 0.7), font_size=10)

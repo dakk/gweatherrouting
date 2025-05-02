@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 import math
 
 import dateutil.parser
@@ -32,17 +31,17 @@ from gweatherrouting.gtk.style import Style
 
 
 class GeoMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
-    def __init__(self, core: Core, timeControl: TimeControl):
+    def __init__(self, core: Core, time_control: TimeControl):
         GObject.GObject.__init__(self)
 
         self.core = core
-        self.timeControl = timeControl
-        self.hlRouting = None
+        self.time_control = time_control
+        self.hl_routing = None
 
-    def hightlightRouting(self, name):
-        self.hlRouting = name
+    def highlight_routing(self, name):
+        self.hl_routing = name
 
-    def do_draw(self, gpsmap, cr):
+    def do_draw(self, gpsmap, cr):  # noqa: C901
         prevx = None
         prevy = None
         prevp = None
@@ -68,7 +67,7 @@ class GeoMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
             if not tr.visible:
                 continue
 
-            if tr.name == self.hlRouting:
+            if tr.name == self.hl_routing:
                 highlight = True
 
             prevx = None
@@ -96,15 +95,18 @@ class GeoMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
                     tprev = dateutil.parser.parse(prevp[2])
                     tcurr = dateutil.parser.parse(p[2])
 
-                    if tcurr >= self.timeControl.time and tprev < self.timeControl.time:
+                    if (
+                        tcurr >= self.time_control.time
+                        and tprev < self.time_control.time
+                    ):
                         dt = (tcurr - tprev).total_seconds()
                         dl = (
-                            utils.pointDistance(prevp[0], prevp[1], p[0], p[1])
+                            utils.point_distance(prevp[0], prevp[1], p[0], p[1])
                             / dt
-                            * (self.timeControl.time - tprev).total_seconds()
+                            * (self.time_control.time - tprev).total_seconds()
                         )
 
-                        rp = utils.routagePointDistance(
+                        rp = utils.routage_point_distance(
                             prevp[0], prevp[1], dl, math.radians(p[6])
                         )
 
@@ -141,7 +143,7 @@ class GeoMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
             if not tr.visible:
                 continue
 
-            active = self.core.trackManager.isActive(tr)
+            active = self.core.trackManager.is_active(tr)
 
             prevx = None
             prevy = None
@@ -187,7 +189,7 @@ class GeoMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
                 else:
                     Style.Track.TrackInactive.apply(cr)
 
-                Style.resetDash(cr)
+                Style.reset_dash(cr)
 
                 cr.arc(x, y, 5, 0, 2 * math.pi)
                 cr.stroke()

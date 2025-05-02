@@ -59,34 +59,34 @@ class POI(ElementPoint):
         super().__init__(name, position, visible, collection)
         self.symbol = None
 
-    def toJSON(self):
-        c = super().toJSON()
+    def to_json(self):
+        c = super().to_json()
         c["symbol"] = self.symbol
         return c
 
     @staticmethod
-    def fromJSON(j):
-        d = ElementPoint.fromJSON(j)
+    def from_json(j):
+        d = ElementPoint.from_json(j)
         return POI(d.name, d.position, j["symbol"], d.visible)
 
-    def toGPXObject(self):
+    def to_gpx_object(self):
         # TODO: add symbol , sym=self.symb
         return gpxpy.gpx.GPXWaypoint(
             latitude=self.position[0], longitude=self.position[1], name=self.name
         )
 
-    def toNMEAPFEC(self):
+    def to_nmea_fpec(self):
         """Export POI as PFEC NMEA sentence"""
 
         # convert coordinate from signed degree to dddmm.mmmm
-        def formatCoordinate(v):
+        def format_coordinate(v):
             d = (v - int(v)) * 60
             return "{:d}{}".format(int(v), "%05.2f" % d)
 
-        lat = formatCoordinate(self.position[0])
+        lat = format_coordinate(self.position[0])
         latns = "N" if self.position[0] >= 0 else "S"
 
-        lon = formatCoordinate(self.position[1])
+        lon = format_coordinate(self.position[1])
         lonew = "E" if self.position[1] >= 0 else "W"
 
         name = self.name.ljust(6)[:6]

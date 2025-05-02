@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 import logging
 import os
 from typing import List, Optional
@@ -48,48 +47,48 @@ logger = logging.getLogger("gweatherrouting")
 
 
 class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
-    def __init__(self, settingsManager):
+    def __init__(self, settings_manager):
         GObject.GObject.__init__(self)
         self.charts: List[ChartLayer] = []
         self.gshhsLayer: Optional[GSHHSVectorChart] = None
         self.osmLayer: Optional[GDALVectorChart] = None
-        self.settingsManager: SettingsManager = settingsManager
+        self.settings_manager: SettingsManager = settings_manager
         self.maps: List[OsmGpsMap] = []
 
-        self.settingsManager.register_on_change(
-            "chartPalette", self.onChartPaletteChanged
+        self.settings_manager.register_on_change(
+            "chartPalette", self.on_chart_palette_changed
         )
 
-    def addMap(self, m: OsmGpsMap):
+    def add_map(self, m: OsmGpsMap):
         self.maps.append(m)
 
-    def getLinePointValidityProviders(self):
+    def get_line_point_validity_providers(self):
         lpvp: List[LinePointValidityProvider] = []
         for x in filter(lambda x: x.enabled, self.charts):
             if isinstance(x, LinePointValidityProvider):
                 lpvp += [x]
         return lpvp
 
-    def onChartPaletteChanged(self, v):
+    def on_chart_palette_changed(self, v):
         for m in self.maps:
             m.map_redraw_idle()
 
-    def _loadBaseGSHHS(self):
+    def _load_base_gshhs(self):
         if os.path.exists(DATA_DIR + "/gshhs"):
             self.gshhsLayer = GSHHSVectorChart(
-                DATA_DIR + "/gshhs", self.settingsManager
+                DATA_DIR + "/gshhs", self.settings_manager
             )
             self.charts = [self.gshhsLayer] + self.charts
 
-    def _loadBaseOSM(self):
+    def _load_base_osm(self):
         if os.path.exists(DATA_DIR + "/seamarks.pbf"):
             self.osmLayer = GDALVectorChart(
-                DATA_DIR + "/seamarks.pbf", self.settingsManager
+                DATA_DIR + "/seamarks.pbf", self.settings_manager
             )
             self.charts = self.charts + [self.osmLayer]
 
-    def loadBaseChart(self, parent):
-        self._loadBaseGSHHS()
+    def load_base_chart(self, parent):
+        self._load_base_gshhs()
 
         if not self.gshhsLayer:
             logger.info("GSHHS files not found, open a dialog asking for download")
@@ -104,12 +103,12 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
                     r = down_diag.run()
                     down_diag.destroy()
                     if r == Gtk.ResponseType.OK:
-                        self._loadBaseGSHHS()
+                        self._load_base_gshhs()
                 else:
                     self.charts = [
                         GDALVectorChart(
                             resource_path("gweatherrouting", "data/countries.geojson"),
-                            self.settingsManager,
+                            self.settings_manager,
                         )
                     ] + self.charts
 
@@ -117,7 +116,7 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
 
             GObject.timeout_add(10, f)
 
-        self._loadBaseOSM()
+        self._load_base_osm()
 
         if not self.osmLayer:
             logger.info("OSM file not found, open a dialog asking for download")
@@ -132,38 +131,38 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
                     r = down_diag.run()
                     down_diag.destroy()
                     if r == Gtk.ResponseType.OK:
-                        self._loadBaseOSM()
+                        self._load_base_osm()
 
                 Gdk.threads_leave()
 
             GObject.timeout_add(10, ff)
 
-    def loadVectorLayer(self, path, metadata=None, enabled=True):
+    def load_vector_layer(self, path, metadata=None, enabled=True):
         logger.info("Loading vector chart %s", path)
-        l = GDALVectorChart(
-            path, self.settingsManager, metadata=metadata, enabled=enabled
+        chart = GDALVectorChart(
+            path, self.settings_manager, metadata=metadata, enabled=enabled
         )
-        self.charts += [l]
+        self.charts += [chart]
 
         if self.osmLayer and enabled:
             self.osmLayer.enabled = False
         if self.gshhsLayer and enabled:
-            self.gshhsLayer.forceDownscale = True
+            self.gshhsLayer.force_downscale = True
 
-        return l
+        return chart
 
-    def loadRasterLayer(self, path, metadata=None, enabled=True):
+    def load_raster_layer(self, path, metadata=None, enabled=True):
         logger.info("Loading raster chart %s", path)
-        l = GDALRasterChart(
-            path, self.settingsManager, metadata=metadata, enabled=enabled
+        chart = GDALRasterChart(
+            path, self.settings_manager, metadata=metadata, enabled=enabled
         )
-        self.charts += [l]
+        self.charts += [chart]
 
         if self.osmLayer and enabled:
             self.osmLayer.enabled = False
         if self.gshhsLayer and enabled:
-            self.gshhsLayer.forceDownscale = True
-        return l
+            self.gshhsLayer.force_downscale = True
+        return chart
 
     def do_draw(self, gpsmap, cr):
         for x in filter(lambda x: x.enabled, self.charts):

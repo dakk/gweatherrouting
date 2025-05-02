@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 
 import logging
 import traceback
@@ -28,7 +27,7 @@ except:
     gi.require_version("OsmGpsMap", "1.0")
 
 from gi.repository import Gdk, GObject, Gtk
-from weatherrouting import RoutingNoWindException
+from weatherrouting import RoutingNoWindError
 
 from gweatherrouting.core import utils
 from gweatherrouting.core.geo.routing import Routing
@@ -41,9 +40,9 @@ logger = logging.getLogger("gweatherrouting")
 
 
 class ChartStackRouting(ChartStackBase):
-    routingThread = None
-    selectedRouting = None
-    stopRouting = False
+    routing_thread = None
+    selected_routing = None
+    stop_routing = False
 
     def __init__(self):
         self.currentRouting = None
@@ -52,54 +51,54 @@ class ChartStackRouting(ChartStackBase):
         self.isochronesMapLayer = IsochronesMapLayer()
         self.map.layer_add(self.isochronesMapLayer)
 
-        self.updateRoutings()
+        self.update_routings()
 
     def __del__(self):
-        if self.routingThread:
-            self.stopRouting = True
+        if self.routing_thread:
+            self.stop_routing = True
 
-    def onRoutingCreate(self, event):
+    def on_routing_create(self, event):
         dialog = RoutingWizardDialog(self.core, self.parent)
         response = dialog.run()
 
-        polarFile = dialog.getSelectedPolar()
+        polar_file = dialog.get_selected_polar()
         if response == Gtk.ResponseType.OK:
-            self.stopRouting = False
-            self.currentRouting = self.core.createRouting(
-                dialog.getSelectedAlgorithm(),
-                polarFile,
-                dialog.getSelectedTrack(),
-                dialog.getStartDateTime(),
-                dialog.getSelectedStartPoint(),
-                self.chartManager.getLinePointValidityProviders(),
-                not dialog.getCoastlineChecks(),
+            self.stop_routing = False
+            self.currentRouting = self.core.create_routing(
+                dialog.get_selected_algorithm(),
+                polar_file,
+                dialog.get_selected_track(),
+                dialog.get_start_datetime(),
+                dialog.get_selected_start_point(),
+                self.chart_manager.get_line_point_validity_providers(),
+                not dialog.get_coastline_checks(),
             )
-            self.currentRouting.name = "routing-" + polarFile.split(".")[0]
-            self.routingThread = Thread(target=self.onRoutingStep, args=())
-            self.routingThread.start()
+            self.currentRouting.name = "routing-" + polar_file.split(".")[0]
+            self.routing_thread = Thread(target=self.on_routing_step, args=())
+            self.routing_thread.start()
             self.builder.get_object("stop-routing-button").show()
 
         dialog.destroy()
 
-    def onRoutingStep(self):
+    def on_routing_step(self):
         if self.currentRouting is None:
             return
 
         Gdk.threads_enter()
-        self.progressBar.set_fraction(1.0)
-        self.progressBar.set_text("1%")
-        self.progressBar.show()
+        self.progress_bar.set_fraction(1.0)
+        self.progress_bar.set_text("1%")
+        self.progress_bar.show()
         Gdk.threads_leave()
 
         res = None
 
-        while (not self.currentRouting.end) and (not self.stopRouting):
+        while (not self.currentRouting.end) and (not self.stop_routing):
             try:
                 res = self.currentRouting.step()
                 logger.debug("Routing step: %s", str(res))
 
             # This exception is not raised by the algorithm
-            except RoutingNoWindException as _:
+            except RoutingNoWindError:
                 Gdk.threads_enter()
                 edialog = Gtk.MessageDialog(
                     self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error"
@@ -109,9 +108,9 @@ class ChartStackRouting(ChartStackBase):
                 )
                 edialog.run()
                 edialog.destroy()
-                self.progressBar.hide()
+                self.progress_bar.hide()
                 Gdk.threads_leave()
-                self.isochronesMapLayer.setIsochrones([], [])
+                self.isochronesMapLayer.set_isochrones([], [])
                 self.builder.get_object("stop-routing-button").hide()
                 return None
 
@@ -123,28 +122,28 @@ class ChartStackRouting(ChartStackBase):
                 edialog.format_secondary_text("Error: " + str(e))
                 edialog.run()
                 edialog.destroy()
-                self.progressBar.hide()
+                self.progress_bar.hide()
                 Gdk.threads_leave()
-                self.isochronesMapLayer.setIsochrones([], [])
+                self.isochronesMapLayer.set_isochrones([], [])
                 self.builder.get_object("stop-routing-button").hide()
                 traceback.print_exc()
                 return None
 
             Gdk.threads_enter()
-            self.progressBar.set_fraction(res.progress / 100.0)
-            self.progressBar.set_text(str(res.progress) + "%")
+            self.progress_bar.set_fraction(res.progress / 100.0)
+            self.progress_bar.set_text(str(res.progress) + "%")
 
-            self.isochronesMapLayer.setIsochrones(res.isochrones, res.path)
-            self.timeControl.set_time(res.time)
+            self.isochronesMapLayer.set_isochrones(res.isochrones, res.path)
+            self.time_control.set_time(res.time)
             # self.map.queue_draw ()
             # self.builder.get_object('time-adjustment').set_value (res.time)
             Gdk.threads_leave()
 
-        if self.stopRouting:
+        if self.stop_routing:
             Gdk.threads_enter()
-            GObject.timeout_add(3000, self.progressBar.hide)
+            GObject.timeout_add(3000, self.progress_bar.hide)
             self.builder.get_object("stop-routing-button").hide()
-            self.isochronesMapLayer.setIsochrones([], [])
+            self.isochronesMapLayer.set_isochrones([], [])
             Gdk.threads_leave()
             return
 
@@ -166,25 +165,25 @@ class ChartStackRouting(ChartStackBase):
             )
 
         Gdk.threads_enter()
-        self.progressBar.set_fraction(1.0)
-        self.progressBar.set_text("100%")
-        GObject.timeout_add(3000, self.progressBar.hide)
+        self.progress_bar.set_fraction(1.0)
+        self.progress_bar.set_text("100%")
+        GObject.timeout_add(3000, self.progress_bar.hide)
         Gdk.threads_leave()
 
         self.core.routingManager.append(
             Routing(
-                name=self.core.routingManager.getUniqueName(self.currentRouting.name),
+                name=self.core.routingManager.get_unique_name(self.currentRouting.name),
                 points=tr,
                 isochrones=res.isochrones,
                 collection=self.core.routingManager,
             )
         )
-        self.updateRoutings()
+        self.update_routings()
         self.builder.get_object("stop-routing-button").hide()
-        self.isochronesMapLayer.setIsochrones([], res.path)
+        self.isochronesMapLayer.set_isochrones([], res.path)
         self.map.queue_draw()
 
-    def updateRoutings(self):
+    def update_routings(self):
         self.routingStore.clear()
 
         for r in self.core.routingManager:
@@ -201,26 +200,26 @@ class ChartStackRouting(ChartStackBase):
         self.map.queue_draw()
         self.core.trackManager.save()
 
-    def onRoutingToggle(self, widget, i):
+    def on_routing_toggle(self, widget, i):
         self.core.routingManager[int(i)].visible = not self.core.routingManager[
             int(i)
         ].visible
-        self.updateRoutings()
-        self.updateTrack()
+        self.update_routings()
+        self.update_track()
 
-    def onRoutingNameEdit(self, widget, i, name):
-        self.core.routingManager[int(i)].name = utils.uniqueName(
+    def on_routing_name_edit(self, widget, i, name):
+        self.core.routingManager[int(i)].name = utils.unique_name(
             name, self.core.routingManager
         )
-        self.updateRoutings()
+        self.update_routings()
 
-    def onRoutingRemove(self, widget):
-        self.core.routingManager.removeByName(self.selectedRouting)
-        self.updateRoutings()
+    def on_routing_remove(self, widget):
+        self.core.routingManager.remove_by_name(self.selected_routing)
+        self.update_routings()
         self.map.queue_draw()
 
-    def onRoutingExport(self, widget):
-        routing = self.core.routingManager.getByName(self.selectedRouting)
+    def on_routing_export(self, widget):
+        routing = self.core.routingManager.get_by_name(self.selected_routing)
 
         if routing is None:
             return
@@ -252,14 +251,14 @@ class ChartStackRouting(ChartStackBase):
                 filepath += ".gpx"
 
             if routing.export(filepath):
-                self.statusbar.push(
-                    self.statusbar.get_context_id("Info"),
-                    f"Saved {len (routing)} waypoints",
+                self.status_bar.push(
+                    self.status_bar.get_context_id("Info"),
+                    f"Saved {len(routing)} waypoints",
                 )
                 edialog = Gtk.MessageDialog(
                     self.parent, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Saved"
                 )
-                edialog.format_secondary_text(f"Saved {len (routing)} waypoints")
+                edialog.format_secondary_text(f"Saved {len(routing)} waypoints")
                 edialog.run()
                 edialog.destroy()
             else:
@@ -272,30 +271,30 @@ class ChartStackRouting(ChartStackBase):
 
         dialog.destroy()
 
-    def onRoutingStop(self, widget):
-        self.stopRouting = True
+    def on_routing_stop(self, widget):
+        self.stop_routing = True
 
-    def onSelectRouting(self, selection):
+    def on_select_routing(self, selection):
         store, pathlist = selection.get_selected_rows()
         for path in pathlist:
             tree_iter = store.get_iter(path)
             value = store.get_value(tree_iter, 0)
-            self.geoMapLayer.hightlightRouting(value)
+            self.geo_map_layer.highlight_routing(value)
 
             self.map.queue_draw()
 
             if path.get_depth() == 1:
-                self.selectedRouting = value
+                self.selected_routing = value
 
                 # Show isochrones
-                # routing = self.core.routingManager.getByName(self.selectedRouting)
-                # self.isochronesMapLayer.setIsochrones(routing.isochrones, None)
+                # routing = self.core.routingManager.get_by_name(self.selected_routing)
+                # self.isochronesMapLayer.set_isochrones(routing.isochrones, None)
             else:
-                self.selectedRouting = None
+                self.selected_routing = None
 
-    def onRoutingClick(self, item, event):
+    def on_routing_click(self, item, event):
         if (
-            self.selectedRouting is not None
+            self.selected_routing is not None
             and event.button == 3
             and len(self.core.routingManager) > 0
         ):

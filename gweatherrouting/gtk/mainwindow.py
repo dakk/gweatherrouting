@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 
 # TODO:
 # https://eeperry.wordpress.com/2013/01/05/pygtk-new-style-python-class-using-builder/
@@ -31,7 +30,7 @@ except:
 
 from gi.repository import Gdk, Gtk
 
-from gweatherrouting import log
+from gweatherrouting import log  # noqa: F401
 from gweatherrouting.common import resource_path
 
 from .charts import ChartManager
@@ -48,7 +47,7 @@ logger = logging.getLogger("gweatherrouting")
 class MainWindow:
     def __init__(self, core):
         self.core = core
-        self.settingsManager = SettingsManager()
+        self.settings_manager = SettingsManager()
 
         # Add custom icon path
         Gtk.IconTheme.get_default().append_search_path(
@@ -76,37 +75,37 @@ class MainWindow:
         self.builder.get_object("project-properties-button").hide()
 
         # Initialize chart manager
-        self.chartManager = ChartManager(self.settingsManager)
-        self.chartManager.loadBaseChart(self.window)
+        self.chart_manager = ChartManager(self.settings_manager)
+        self.chart_manager.load_base_chart(self.window)
 
-        for x in self.settingsManager.vectorCharts:
-            self.chartManager.loadVectorLayer(x["path"], x["metadata"], x["enabled"])
+        for x in self.settings_manager.vectorCharts:
+            self.chart_manager.load_vector_layer(x["path"], x["metadata"], x["enabled"])
 
-        for x in self.settingsManager.rasterCharts:
-            self.chartManager.loadRasterLayer(x["path"], x["metadata"], x["enabled"])
+        for x in self.settings_manager.rasterCharts:
+            self.chart_manager.load_raster_layer(x["path"], x["metadata"], x["enabled"])
 
         Gdk.threads_init()
 
         self.chartStack = ChartStack(
-            self.window, self.chartManager, self.core, self.settingsManager
+            self.window, self.chart_manager, self.core, self.settings_manager
         )
         self.builder.get_object("chartcontainer").pack_start(
             self.chartStack, True, True, 0
         )
 
         self.logsStack = LogsStack(
-            self.window, self.chartManager, self.core, self.settingsManager
+            self.window, self.chart_manager, self.core, self.settings_manager
         )
         self.builder.get_object("logscontainer").pack_start(
             self.logsStack, True, True, 0
         )
 
         self.builder.get_object("regattacontainertop").hide()
-        # self.regattaStack = RegattaStack(self.window, self.chartManager, self.core)
+        # self.regattaStack = RegattaStack(self.window, self.chart_manager, self.core)
         # self.builder.get_object("regattacontainer").pack_start(self.regattaStack, True, True, 0)
 
         # self.builder.get_object("polarcontainertop").hide()
-        self.polarStack = PolarStack(self.window, self.core, self.settingsManager)
+        self.polarStack = PolarStack(self.window, self.core, self.settings_manager)
         self.builder.get_object("polarcontainer").pack_start(
             self.polarStack, True, True, 0
         )
@@ -116,19 +115,19 @@ class MainWindow:
         Gtk.main_quit()
         self.core.connectionManager.stop_polling()
 
-    def onAbout(self, item):
+    def on_about(self, item):
         dialog = self.builder.get_object("about-dialog")
         dialog.run()
         dialog.hide()
 
-    def onSettings(self, event):
-        w = SettingsWindow(self, self.settingsManager, self.core)
+    def on_settings(self, event):
+        w = SettingsWindow(self, self.settings_manager, self.core)
         w.show()
 
-    def onProjectProperties(self, event):
+    def on_project_properties(self, event):
         w = ProjectPropertiesWindow()
         w.show()
 
-    def onGribManager(self, event):
-        w = GribManagerWindow(self.core.gribManager)
+    def on_grib_manager(self, event):
+        w = GribManagerWindow(self.core.grib_manager)
         w.show()

@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 
 import logging
 import os
@@ -37,9 +36,9 @@ GribFileFilter.add_pattern("*.grb2")
 
 
 class GribManagerWindow:
-    def __init__(self, gribManager):
-        self.gribManager = gribManager
-        self.selectedGrib = None
+    def __init__(self, grib_manager):
+        self.grib_manager = grib_manager
+        self.selected_grib = None
         self.selectedLocalGrib = None
 
         self.builder = Gtk.Builder()
@@ -52,11 +51,11 @@ class GribManagerWindow:
         self.window.set_default_size(550, 300)
 
         self.gribFilesStore = self.builder.get_object("grib-files-store")
-        self.gribManagerStore = self.builder.get_object("grib-manager-store")
+        self.grib_managerStore = self.builder.get_object("grib-manager-store")
 
-        self.updateLocalGribs()
+        self.update_local_gribs()
 
-        Thread(target=self.downloadList, args=()).start()
+        Thread(target=self.download_list, args=()).start()
 
     def show(self):
         self.window.show_all()
@@ -64,7 +63,7 @@ class GribManagerWindow:
     def close(self):
         self.window.hide()
 
-    def downloadList(self):
+    def download_list(self):
         Gdk.threads_enter()
 
         self.builder.get_object("download-progress").show()
@@ -73,7 +72,7 @@ class GribManagerWindow:
         Gdk.threads_leave()
 
         try:
-            for x in self.gribManager.get_download_list():
+            for x in self.grib_manager.get_download_list():
                 Gdk.threads_enter()
                 self.gribFilesStore.append(x)
                 Gdk.threads_leave()
@@ -88,26 +87,26 @@ class GribManagerWindow:
         self.builder.get_object("download-progress").hide()
         Gdk.threads_leave()
 
-    def updateLocalGribs(self):
-        self.gribManager.refresh_local_gribs()
-        self.gribManagerStore.clear()
+    def update_local_gribs(self):
+        self.grib_manager.refresh_local_gribs()
+        self.grib_managerStore.clear()
 
-        for x in self.gribManager.local_gribs:
-            self.gribManagerStore.append(
+        for x in self.grib_manager.local_gribs:
+            self.grib_managerStore.append(
                 [
                     x.name,
                     x.centre,
                     str(x.start_time),
                     x.last_forecast,
-                    self.gribManager.is_enabled(x.name),
+                    self.grib_manager.is_enabled(x.name),
                 ]
             )
 
-    def onRemoveLocalGrib(self, widget):
-        self.gribManager.remove(self.selectedLocalGrib)
-        self.updateLocalGribs()
+    def on_remove_local_grib(self, widget):
+        self.grib_manager.remove(self.selectedLocalGrib)
+        self.update_local_gribs()
 
-    def onOpen(self, widget):
+    def on_open(self, widget):
         dialog = Gtk.FileChooserDialog(
             "Please choose a file",
             self.window,
@@ -128,15 +127,15 @@ class GribManagerWindow:
             filepath = dialog.get_filename()
             dialog.destroy()
 
-            if self.gribManager.import_grib(filepath):
+            if self.grib_manager.import_grib(filepath):
                 edialog = Gtk.MessageDialog(
                     self.window, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done"
                 )
                 edialog.format_secondary_text("File opened, loaded grib")
                 edialog.run()
                 edialog.destroy()
-                # self.statusbar.push(
-                #     self.statusbar.get_context_id("Info"), f"Loaded grib {filepath}"
+                # self.status_bar.push(
+                #     self.status_bar.get_context_id("Info"), f"Loaded grib {filepath}"
                 # )
 
             else:
@@ -153,59 +152,60 @@ class GribManagerWindow:
         else:
             dialog.destroy()
 
-    def onGribToggle(self, widget, i):
-        n = self.gribManager.localGribs[int(i)].name
+    def on_grib_toggle(self, widget, i):
+        n = self.grib_manager.local_gribs[int(i)].name
 
-        if self.gribManager.is_enabled(n):
-            self.gribManager.disable(n)
+        if self.grib_manager.is_enabled(n):
+            self.grib_manager.disable(n)
         else:
-            self.gribManager.enable(n)
+            self.grib_manager.enable(n)
 
-        self.updateLocalGribs()
+        self.update_local_gribs()
 
-    def onGribDownloadPercentage(self, percentage):
+    def on_grib_download_percentage(self, percentage):
         if percentage % 10 == 0:
             logger.info("Downloading grib: %d%% completed", percentage)
         self.builder.get_object("download-progress").set_fraction(percentage / 100.0)
         self.builder.get_object("download-progress").set_text(f"{percentage}%")
-        # self.statusbar.push (self.statusbar.get_context_id ('Info'), 'Downloading grib: %d%% completed' % percentage)
+        # self.status_bar.push (self.status_bar.get_context_id ('Info'),
+        #  'Downloading grib: %d%% completed' % percentage)
 
-    def onGribDownloadCompleted(self, status):
+    def on_grib_download_completed(self, status):
         self.builder.get_object("download-progress").set_text("Download completed!")
-        self.updateLocalGribs()
+        self.update_local_gribs()
 
         GObject.timeout_add(3000, self.builder.get_object("download-progress").hide)
 
-    def onGribClick(self, widget, event):
+    def on_grib_click(self, widget, event):
         if event.button == 3:
             menu = self.builder.get_object("remote-grib-menu")
             menu.popup(None, None, None, None, event.button, event.time)
 
-    def onGribSelect(self, selection):
+    def on_grib_select(self, selection):
         store, pathlist = selection.get_selected_rows()
         for path in pathlist:
             tree_iter = store.get_iter(path)
-            self.selectedGrib = store.get_value(tree_iter, 4)
+            self.selected_grib = store.get_value(tree_iter, 4)
 
-    def onLocalGribSelect(self, selection):
+    def on_local_grib_select(self, selection):
         store, pathlist = selection.get_selected_rows()
         for path in pathlist:
             tree_iter = store.get_iter(path)
             self.selectedLocalGrib = store.get_value(tree_iter, 0)
 
-    def onLocalGribClick(self, widget, event):
+    def on_local_grib_click(self, widget, event):
         if event.button == 3:
             menu = self.builder.get_object("local-grib-menu")
             menu.popup(None, None, None, None, event.button, event.time)
 
-    def onGribDownload(self, widget):
+    def on_grib_download(self, widget):
         self.builder.get_object("download-progress").show()
         t = Thread(
-            target=self.gribManager.download,
+            target=self.grib_manager.download,
             args=(
-                self.selectedGrib,
-                self.onGribDownloadPercentage,
-                self.onGribDownloadCompleted,
+                self.selected_grib,
+                self.on_grib_download_percentage,
+                self.on_grib_download_completed,
             ),
         )
         t.start()

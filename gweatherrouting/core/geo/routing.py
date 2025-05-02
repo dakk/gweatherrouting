@@ -24,7 +24,7 @@ class Routing(Track):
         super().__init__(name, points, visible, collection)
         self.isochrones = isochrones
 
-    def toGPXObject(self):
+    def to_gpx_object(self):
         gpx_route = gpxpy.gpx.GPXRoute()
 
         for x in self.points:
@@ -32,15 +32,15 @@ class Routing(Track):
 
         return gpx_route
 
-    def toJSON(self):
-        c = super().toJSON()
+    def to_json(self):
+        c = super().to_json()
         c["isochrones"] = list(
-            map(lambda x: list(map(lambda y: y.toList(), x)), self.isochrones)
+            map(lambda x: list(map(lambda y: y.to_list(), x)), self.isochrones)
         )
         return c
 
     @staticmethod
-    def fromJSON(j):
-        d = Track.fromJSON(j)
-        ic = list(map(lambda x: list(map(IsoPoint.fromList, x)), j["isochrones"]))
+    def from_json(j):
+        d = Track.from_json(j)
+        ic = list(map(lambda x: list(map(IsoPoint.from_list, x)), j["isochrones"]))
         return Routing(d.name, d.points, ic, d.visible)

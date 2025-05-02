@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 from typing import Callable
 
 import gi
@@ -37,10 +36,10 @@ class ChartStackBase:
     core: Core
     map: OsmGpsMap
     parent: Gtk.Widget
-    statusbar: Gtk.Statusbar
-    progressBar: Gtk.ProgressBar
-    toolsMapLayer: ToolsMapLayer
-    timeControl: TimeControl
-    geoMapLayer: GeoMapLayer
-    updateTrack: Callable
-    chartManager: ChartManager
+    status_bar: Gtk.Statusbar
+    progress_bar: Gtk.ProgressBar
+    tools_map_layer: ToolsMapLayer
+    time_control: TimeControl
+    geo_map_layer: GeoMapLayer
+    update_track: Callable
+    chart_manager: ChartManager

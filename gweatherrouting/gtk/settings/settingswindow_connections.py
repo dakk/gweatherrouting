@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 import gi
 
 gi.require_version("Gtk", "3.0")
@@ -53,9 +52,9 @@ class SettingsWindowConnections(SettingsWindowBase):
     def __init__(self):
         self.selectedConnection = None
         self.connectionListBox = self.builder.get_object("connections-listbox")
-        self.reloadConnections()
+        self.reload_connections()
 
-    def reloadConnections(self):
+    def reload_connections(self):
         self.connectionListBox.set_selection_mode(Gtk.SelectionMode.SINGLE)
         for x in self.connectionListBox.get_children():
             self.connectionListBox.remove(x)
@@ -65,24 +64,24 @@ class SettingsWindowConnections(SettingsWindowBase):
             self.connectionListBox.add(clbr)
         self.connectionListBox.show_all()
 
-    def onAddConnection(self, widget):
+    def on_add_connection(self, widget):
         d = ConnectionEditDialog(self.window, None)
         d.run()
         data = d.data
         d.destroy()
         if data is not None:
             self.core.connectionManager.add_connection(data)
-        self.reloadConnections()
+        self.reload_connections()
 
-    def onConnectionRemove(self, widget):
+    def on_connection_remove(self, widget):
         if self.selectedConnection is not None:
             self.core.connectionManager.remove_connection(self.selectedConnection.data)
-            self.reloadConnections()
+            self.reload_connections()
 
-    def onConnectionSelected(self, widget, sel):
+    def on_connection_selected(self, widget, sel):
         self.selectedConnection = sel
 
-    # def onConnectionEdit(self, widget):
+    # def on_connection_edit(self, widget):
     #     d = ConnectionEditDialog(self.window)
     #     d.run()
     #     data = d.data
@@ -90,7 +89,7 @@ class SettingsWindowConnections(SettingsWindowBase):
     #     if data is not None:
     #         self.core.connectionManager.editConnection(data)
 
-    def onConnectionClick(self, widget, event):
+    def on_connection_click(self, widget, event):
         if event.button == 3:
             menu = self.builder.get_object("connection-menu")
             menu.popup(None, None, None, None, event.button, event.time)

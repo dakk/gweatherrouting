@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 import logging
 import os
 
@@ -45,21 +44,21 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
     def __init__(
         self,
         parent,
-        chartManager: ChartManager,
+        chart_manager: ChartManager,
         core: Core,
-        settingsManager: SettingsManager,
+        settings_manager: SettingsManager,
     ):
         Gtk.Widget.__init__(self)
 
         # Keybinder.init()
-        # Keybinder.bind('m', self.onMeasure)
+        # Keybinder.bind('m', self.on_measure)
 
         self.parent = parent
-        self.chartManager = chartManager
+        self.chart_manager = chart_manager
         self.core = core
 
-        self.timeControl = TimeControl()
-        self.settingsManager = settingsManager
+        self.time_control = TimeControl()
+        self.settings_manager = settings_manager
 
         self.builder = Gtk.Builder()
         self.builder.add_from_file(
@@ -89,47 +88,48 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
             OsmGpsMap.MapKey_t.RIGHT, Gdk.keyval_from_name("Right")
         )
 
-        self.map.layer_add(self.chartManager)
-        self.chartManager.addMap(self.map)
+        self.map.layer_add(self.chart_manager)
+        self.chart_manager.add_map(self.map)
 
         self.gribMapLayer = GribMapLayer(
-            self.core.gribManager, self.timeControl, self.settingsManager
+            self.core.grib_manager, self.time_control, self.settings_manager
         )
         self.map.layer_add(self.gribMapLayer)
 
-        self.toolsMapLayer = ToolsMapLayer(core)
-        self.map.layer_add(self.toolsMapLayer)
+        self.tools_map_layer = ToolsMapLayer(core)
+        self.map.layer_add(self.tools_map_layer)
 
-        self.aisMapLayer = AISMapLayer(core)
-        self.map.layer_add(self.aisMapLayer)
+        self.ais_map_layer = AISMapLayer(core)
+        self.map.layer_add(self.ais_map_layer)
 
-        self.geoMapLayer = GeoMapLayer(self.core, self.timeControl)
-        self.map.layer_add(self.geoMapLayer)
+        self.geo_map_layer = GeoMapLayer(self.core, self.time_control)
+        self.map.layer_add(self.geo_map_layer)
 
         # This causes rendering problem
-        # self.map.layer_add (OsmGpsMap.MapOsd (show_scale=True, show_dpad=False, show_zoom=False, show_crosshair=False))
+        # self.map.layer_add (OsmGpsMap.MapOsd (show_scale=True, show_dpad=False,
+        # show_zoom=False, show_crosshair=False))
 
-        self.statusbar = self.builder.get_object("status-bar")
+        self.status_bar = self.builder.get_object("status-bar")
 
         ChartStackRouting.__init__(self)
         ChartStackTrack.__init__(self)
         ChartStackPOI.__init__(self)
 
-        self.core.connect("boatPosition", self.boatInfoHandler)
+        self.core.connect("boatPosition", self.boat_info_handler)
 
-        self.timetravelWidget = TimeTravelWidget(
-            self.parent, self.timeControl, self.map
+        self.timetravel_widget = TimeTravelWidget(
+            self.parent, self.time_control, self.map
         )
         self.builder.get_object("timetravelcontainer").pack_start(
-            self.timetravelWidget, True, True, 0
+            self.timetravel_widget, True, True, 0
         )
 
         self.show_all()
 
         self.builder.get_object("mob-button").hide()
         self.builder.get_object("stop-routing-button").hide()
-        self.progressBar = self.builder.get_object("progressbar")
-        self.progressBar.hide()
+        self.progress_bar = self.builder.get_object("progressbar")
+        self.progress_bar.hide()
 
     def on_map_clicked(self, widget, event):
         # First grab focus for the map
@@ -141,55 +141,55 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
         # Widget is now visible on screen, safe to grab focus
         self.map.grab_focus()
 
-    def getLatLon(self):
+    def get_lat_lon(self):
         lat = self.builder.get_object("track-add-point-lat").get_text()
         lon = self.builder.get_object("track-add-point-lon").get_text()
         return (float(lat), float(lon))
 
-    def onMoveBoatHere(self, widget):
-        lat, lon = self.getLatLon()
-        self.core.setBoatPosition(lat, lon)
-        # self.toolsMapLayer.gpsAdd(lat, lon)
+    def on_move_boat_here(self, widget):
+        lat, lon = self.get_lat_lon()
+        self.core.set_boat_position(lat, lon)
+        # self.tools_map_layer.gps_add(lat, lon)
         # self.map.queue_draw()
 
-    def onMob(self, widget):
-        lat, lon = self.getLatLon()
-        self.toolsMapLayer.toggleMob(lat, lon)
+    def on_mob(self, widget):
+        lat, lon = self.get_lat_lon()
+        self.tools_map_layer.toggle_mob(lat, lon)
         self.map.queue_draw()
 
-    def onMeasure(self, widget):
-        lat, lon = self.getLatLon()
-        self.toolsMapLayer.enableMeasure(lat, lon)
+    def on_measure(self, widget):
+        lat, lon = self.get_lat_lon()
+        self.tools_map_layer.enable_measure(lat, lon)
         self.map.queue_draw()
 
-    def onToggleCompass(self, widget):
-        self.toolsMapLayer.setCompassVisible(widget.get_active())
+    def on_toggle_compass(self, widget):
+        self.tools_map_layer.set_compass_visible(widget.get_active())
         self.map.queue_draw()
 
-    def onToggleGrib(self, widget):
-        self.gribMapLayer.setVisible(widget.get_active())
+    def on_toggle_grib(self, widget):
+        self.gribMapLayer.set_visible(widget.get_active())
         self.map.queue_draw()
 
-    def onToggleConnections(self, widget):
+    def on_toggle_connections(self, widget):
         s = widget.get_active()
         if s:
             self.core.connectionManager.start_polling()
         else:
             self.core.connectionManager.stop_polling()
 
-    def onToggleAIS(self, widget):
-        self.aisMapLayer.setVisible(widget.get_active())
+    def on_toggle_ais(self, widget):
+        self.ais_map_layer.set_visible(widget.get_active())
         self.map.queue_draw()
 
-    def onToggleDashboard(self, widget):
-        self.toolsMapLayer.setDashboardVisible(widget.get_active())
+    def on_toggle_dashboard(self, widget):
+        self.tools_map_layer.set_dashboard_visible(widget.get_active())
         self.map.queue_draw()
 
-    def onToggleNotebook(self, widget):
+    def on_toggle_notebook(self, widget):
         self.builder.get_object("notebook").set_visible(widget.get_active())
 
-    def boatInfoHandler(self, bi):
-        self.toolsMapLayer.gpsAdd(bi.latitude, bi.longitude, bi.heading, bi.speed)
+    def boat_info_handler(self, bi):
+        self.tools_map_layer.gps_add(bi.latitude, bi.longitude, bi.heading, bi.speed)
 
         log = self.core.logManager.log
         if log is not None:
@@ -197,26 +197,26 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 
         self.map.queue_draw()
 
-    def onMapMouseMove(self, map, event):
+    def on_map_mouse_move(self, map, event):
         lat, lon = map.convert_screen_to_geographic(event.x, event.y).get_degrees()
-        w = self.core.gribManager.get_wind_at(self.timeControl.time, lat, lon)
+        w = self.core.grib_manager.get_wind_at(self.time_control.time, lat, lon)
 
         sstr = ""
         if w:
             sstr += "Wind %.1f°, %.1f kts - " % (w[0], w[1])
         sstr += "Latitude: %f, Longitude: %f" % (lat, lon)
 
-        self.statusbar.push(self.statusbar.get_context_id("Info"), sstr)
+        self.status_bar.push(self.status_bar.get_context_id("Info"), sstr)
 
-        if self.toolsMapLayer.onMouseMove(lat, lon, event.x, event.y):
+        if self.tools_map_layer.on_mouse_move(lat, lon, event.x, event.y):
             self.map.queue_draw()
 
-    def onMapClick(self, map, event):
+    def on_map_click(self, map, event):
         lat, lon = map.get_event_location(event).get_degrees()
         self.builder.get_object("track-add-point-lat").set_text(str(lat))
         self.builder.get_object("track-add-point-lon").set_text(str(lon))
-        self.statusbar.push(
-            self.statusbar.get_context_id("Info"),
+        self.status_bar.push(
+            self.status_bar.get_context_id("Info"),
             "Clicked on " + str(lat) + " " + str(lon),
         )
 
@@ -225,20 +225,20 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
             menu.popup(None, None, None, None, event.button, event.time)
         self.map.queue_draw()
 
-    def onNew(self, widget):
-        e = self.core.trackManager.newElement(points=[])
-        self.core.trackManager.setActive(e)
-        self.updateTrack()
-        self.selectLastTrack()
+    def on_new(self, widget):
+        e = self.core.trackManager.new_element(points=[])
+        self.core.trackManager.set_active(e)
+        self.update_track()
+        self.select_last_track()
         self.map.queue_draw()
 
-    def onExport(self, widget):
+    def on_export(self, widget):
         menu = self.builder.get_object("export-menu")
         menu.popup_at_widget(
             widget, Gdk.Gravity.SOUTH_WEST, Gdk.Gravity.NORTH_WEST, None
         )
 
-    def exportAsGPX(self, widget):
+    def export_as_gpx(self, widget):
         dialog = Gtk.FileChooserDialog(
             "Export as GPX",
             self.parent,
@@ -264,11 +264,11 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
             dialog.destroy()
             self.core.export_gpx(filename)
 
-            self.statusbar.push(0, f"Exported as GPX to {filename}")
+            self.status_bar.push(0, f"Exported as GPX to {filename}")
         else:
             dialog.destroy()
 
-    def onImport(self, widget):
+    def on_import(self, widget):
         dialog = Gtk.FileChooserDialog(
             "Please choose a file",
             self.parent,
@@ -300,8 +300,8 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
             if extension in ["gpx"]:
                 if self.core.import_gpx(filepath):
                     # self.builder.get_object('header-bar').set_subtitle (filepath)
-                    self.updateTrack()
-                    self.updatePOI()
+                    self.update_track()
+                    self.update_poi()
 
                     edialog = Gtk.MessageDialog(
                         self.parent, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done"
@@ -309,9 +309,10 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
                     edialog.format_secondary_text("GPX file opened and loaded")
                     edialog.run()
                     edialog.destroy()
-                    self.statusbar.push(
-                        self.statusbar.get_context_id("Info"),
-                        f"Loaded {filepath} with {len (self.core.trackManager.getActive())} waypoints",
+                    self.status_bar.push(
+                        self.status_bar.get_context_id("Info"),
+                        f"Loaded {filepath} with {len(self.core.trackManager.get_active())}"
+                        + " waypoints",
                     )
 
                 else:
@@ -327,15 +328,16 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
                     edialog.destroy()
 
             elif extension in ["grb", "grb2", "grib"]:
-                if self.core.gribManager.import_grib(filepath):
+                if self.core.grib_manager.import_grib(filepath):
                     edialog = Gtk.MessageDialog(
                         self.parent, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done"
                     )
                     edialog.format_secondary_text("File opened, loaded grib")
                     edialog.run()
                     edialog.destroy()
-                    self.statusbar.push(
-                        self.statusbar.get_context_id("Info"), f"Loaded grib {filepath}"
+                    self.status_bar.push(
+                        self.status_bar.get_context_id("Info"),
+                        f"Loaded grib {filepath}",
                     )
 
                 else:

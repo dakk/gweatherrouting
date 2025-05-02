@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 import io
 import logging
 import os
@@ -52,9 +51,9 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
     def __init__(
         self,
         parent,
-        chartManager: ChartManager,
+        chart_manager: ChartManager,
         core: Core,
-        settingsManager: SettingsManager,
+        settings_manager: SettingsManager,
     ):
         Gtk.Widget.__init__(self)
 
@@ -77,7 +76,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
         self.cropA = None
         self.cropB = None
 
-        self.core.connectionManager.connect("data", self.dataHandler)
+        self.core.connectionManager.connect("data", self.data_handler)
 
         self.builder = Gtk.Builder()
         self.builder.add_from_file(
@@ -94,24 +93,24 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 
         self.map = self.builder.get_object("map")
         self.map.set_center_and_zoom(39.0, 9.0, 6)
-        self.map.layer_add(chartManager)
-        chartManager.addMap(self.map)
+        self.map.layer_add(chart_manager)
+        chart_manager.add_map(self.map)
 
-        self.toolsMapLayer = ToolsMapLayer(self.core)
-        self.map.layer_add(self.toolsMapLayer)
+        self.tools_map_layer = ToolsMapLayer(self.core)
+        self.map.layer_add(self.tools_map_layer)
 
-        self.timeControl = TimeControl()
-        self.selectedTime = self.timeControl.getTime()
-        self.timetravelWidget = TimeTravelWidget(
-            self.parent, self.timeControl, self.map, True
+        self.time_control = TimeControl()
+        self.selectedTime = self.time_control.get_time()
+        self.timetravel_widget = TimeTravelWidget(
+            self.parent, self.time_control, self.map, True
         )
-        self.timeControl.connect("time-change", self.onTimeChange)
+        self.time_control.connect("time-change", self.on_time_change)
         self.builder.get_object("timetravelcontainer").pack_start(
-            self.timetravelWidget, True, True, 0
+            self.timetravel_widget, True, True, 0
         )
 
-        self.geoMapLayer = GeoMapLayer(self.core, self.timeControl)
-        self.map.layer_add(self.geoMapLayer)
+        self.geo_map_layer = GeoMapLayer(self.core, self.time_control)
+        self.map.layer_add(self.geo_map_layer)
 
         self.show_all()
 
@@ -121,18 +120,20 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
         self.loadingThread: Optional[Thread] = None
 
         try:
-            self.loadingThread = Thread(target=self.loadFromFile, args=(LOG_TEMP_FILE,))
+            self.loadingThread = Thread(
+                target=self.load_from_file, args=(LOG_TEMP_FILE,)
+            )
             self.loadingThread.start()
         except:
             pass
 
-    def onTimeChange(self, time):
+    def on_time_change(self, time):
         self.selectedTime = time
         if not self.recording and not self.loading:
             self.graphArea.queue_draw()
             self.map.queue_draw()
 
-    def onLoadClick(self, widget):
+    def on_load_click(self, widget):
         dialog = Gtk.FileChooserDialog(
             "Please choose a file",
             self.parent,
@@ -165,7 +166,9 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 
             try:
                 self.statusBar.push(0, f"Loading {filepath}")
-                self.loadingThread = Thread(target=self.loadFromFile, args=(filepath,))
+                self.loadingThread = Thread(
+                    target=self.load_from_file, args=(filepath,)
+                )
                 self.loadingThread.start()
             except Exception as e:
                 print(e)
@@ -191,15 +194,15 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
         if self.loadingThread:
             self.loadingThread.join()
 
-    def setCropA(self, widget):
+    def set_crop_a(self, widget):
         self.cropA = self.selectedTime
         self.graphArea.queue_draw()
 
-    def setCropB(self, widget):
+    def set_crop_b(self, widget):
         self.cropB = self.selectedTime
         self.graphArea.queue_draw()
 
-    def cropData(self, widget):
+    def crop_data(self, widget):
         if self.cropA is None and self.cropB is None:
             return
 
@@ -213,7 +216,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
             d for d in self.data if d.time >= self.cropA and d.time <= self.cropB
         ]
 
-        self.rebuildTrack()
+        self.rebuild_track()
         self.graphArea.queue_draw()
 
         if self.recordedData:
@@ -234,7 +237,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
         self.cropA = None
         self.cropB = None
 
-    def onRecordingClick(self, widget):
+    def on_recording_click(self, widget):
         if self.recording:
             return
 
@@ -242,10 +245,10 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
         self.builder.get_object("stop-button").show()
 
         self.statusBar.push(0, "Recording from devices...")
-        self.recordinThread = Thread(target=self.startRecording, args=())
+        self.recordinThread = Thread(target=self.stop_recording, args=())
         self.recordinThread.start()
 
-    def onStopRecordingClick(self, widget):
+    def on_stop_recording_click(self, widget):
         self.recording = False
         if self.recordedData:
             self.recordedData.close()
@@ -259,38 +262,38 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
         if self.recordinThread:
             self.recordinThread.join()
 
-    def toggleSpeedChart(self, widget):
+    def toggle_speed_chart(self, widget):
         self.speedChart = not self.speedChart
         self.graphArea.queue_draw()
 
-    def toggleApparentWindChart(self, widget):
+    def toggle_apparent_wind_chart(self, widget):
         self.apparentWindChart = not self.apparentWindChart
         self.graphArea.queue_draw()
 
-    def toggleTrueWindChart(self, widget):
+    def toggle_true_wind_chart(self, widget):
         self.trueWindChart = not self.trueWindChart
         self.graphArea.queue_draw()
 
-    def toggleDepthChart(self, widget):
+    def toggle_depth_chart(self, widget):
         self.depthChart = not self.depthChart
         self.graphArea.queue_draw()
 
-    def toggleHDGChart(self, widget):
+    def toggle_hdg_chart(self, widget):
         self.hdgChart = not self.hdgChart
         self.graphArea.queue_draw()
 
-    def toggleRWChart(self, widget):
+    def toggle_rw_chart(self, widget):
         self.rwChart = not self.rwChart
         self.graphArea.queue_draw()
 
-    def dataHandler(self, d):
+    def data_handler(self, d):
         if self.recording:
             for x in d:
                 if self.recordedData:
                     self.recordedData.write(str(x.data) + "\n")
                 self.toSend.append(x.data)
 
-    def readSentence(self):
+    def read_sentence(self):
         if len(self.toSend) > 0:
             return self.toSend.pop(0)
         return None
@@ -306,7 +309,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 
         if len(self.data) % 150 == 0 or (self.recording or len(self.data) % 5000 == 0):
             Gdk.threads_enter()
-            self.timeControl.set_time(data.time)
+            self.time_control.set_time(data.time)
 
             if len(self.data) % 150 == 0:
                 self.core.logManager.log_history.add(data.lat, data.lon)
@@ -331,7 +334,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
         self.loading = False
         Gdk.threads_leave()
 
-    def onSaveClick(self, widget):
+    def on_save_click(self, widget):
         dialog = Gtk.FileChooserDialog(
             "Save log",
             self.parent,
@@ -354,7 +357,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
         else:
             dialog.destroy()
 
-    def loadFromFile(self, filepath):
+    def load_from_file(self, filepath):
         self.loading = True
         self.data = []
         # ext = filepath.split('.')[-1]
@@ -385,10 +388,10 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
             os.system(f"cp {filepath} {LOG_TEMP_FILE}")
         # self.statusBar.push(0, "Load completed!")
 
-    def saveToFile(self, filepath):
+    def save_to_file(self, filepath):
         pass
 
-    def clearData(self, widget):
+    def clear_data(self, widget):
         self.data = []
 
         if self.recordedData:
@@ -400,13 +403,13 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
         self.graphArea.queue_draw()
         logger.debug("Data cleared")
 
-    def rebuildTrack(self):
+    def rebuild_track(self):
         self.core.logManager.log_history.clear()
         for x in self.data[0::150]:
             self.core.logManager.log_history.add(x.lat, x.lon)
         self.map.queue_draw()
 
-    def startRecording(self):
+    def stop_recording(self):
         logger.debug("Recording started")
         self.recording = True
         self.recordedData = open(LOG_TEMP_FILE, "w")
@@ -427,7 +430,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
             r = pip.runOnce()
         logger.debug("Recording stopped")
 
-    def onGraphDraw(self, widget, ctx):
+    def on_graph_draw(self, widget, ctx):  # noqa: C901
         s = 20
         a = widget.get_allocation()
         width = a.width
@@ -472,14 +475,16 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
                     x
                     < (
                         numpy.datetime64(self.selectedTime)
-                        + numpy.timedelta64(self.timetravelWidget.getChangeUnit(), "s")
+                        + numpy.timedelta64(
+                            self.timetravel_widget.get_change_unit(), "s"
+                        )
                     )
                 )
             )
             try:
                 iiv = ii[0][0]
                 self.highlightedValue = y[iiv]
-                self.toolsMapLayer.gpsAdd(
+                self.tools_map_layer.gps_add(
                     self.highlightedValue.lat,
                     self.highlightedValue.lon,
                     self.highlightedValue.hdg,
@@ -489,7 +494,8 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
                 self.statusBar.push(
                     0,
                     f"Time: {self.selectedTime}, "
-                    + f"Position: ({self.highlightedValue.lat:.2f}, {self.highlightedValue.lon:.2f}), "
+                    + f"Position: ({self.highlightedValue.lat:.2f}, "
+                    + f"{self.highlightedValue.lon:.2f}), "
                     + f"Speed: {self.highlightedValue.speed:.1f}kn, "
                     + f"Heading: {self.highlightedValue.hdg}, "
                     + f"TWS: {self.highlightedValue.tws:.1f}kn, TWA: {self.highlightedValue.twa}, "
@@ -588,7 +594,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
                         < (
                             numpy.datetime64(self.cropA)
                             + numpy.timedelta64(
-                                self.timetravelWidget.getChangeUnit(), "s"
+                                self.timetravel_widget.get_change_unit(), "s"
                             )
                         )
                     )
@@ -607,7 +613,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
                         < (
                             numpy.datetime64(self.cropB)
                             + numpy.timedelta64(
-                                self.timetravelWidget.getChangeUnit(), "s"
+                                self.timetravel_widget.get_change_unit(), "s"
                             )
                         )
                     )

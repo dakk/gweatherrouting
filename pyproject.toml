@@ -21,7 +21,7 @@ dependencies = [
     "numpy",
     "nmeatoolkit",
     "matplotlib",
-    "weatherrouting>=0.1.13",
+    "weatherrouting>=0.2.1",
     "PyGObject==3.50.0",
     "GDAL[numpy]==3.9.2;sys_platform == 'darwin'",
     "GDAL[numpy]==3.8.4;sys_platform == 'linux'"
@@ -43,7 +43,7 @@ Documentation = "https://github.com/dakk/gweatherrouting"
 Source = "https://github.com/dakk/gweatherrouting"
 
 [project.scripts]
-gweatherrouting = "gweatherrouting.__main__:startUIGtk"
+gweatherrouting = "gweatherrouting.__main__:start_ui_gtk"
 
 [tool.setuptools]
 packages = [

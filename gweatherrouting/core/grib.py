@@ -57,7 +57,7 @@ class Grib(weatherrouting.Grib):
         self.path = path
         self.dataset = gdal.Open(path)
 
-    def _findBandsForTime(self, t):
+    def _find_bands_for_time(self, t):
         """Find bands for U and V wind components at a given time."""
         u_band = None
         v_band = None
@@ -86,7 +86,7 @@ class Grib(weatherrouting.Grib):
 
     @lru_cache(maxsize=2048)
     def get_rindex_data(self, t):
-        u_band, v_band = self._findBandsForTime(t)
+        u_band, v_band = self._find_bands_for_time(t)
         if u_band is None or v_band is None:
             raise ValueError(f"Wind data not found for forecast hour {t}")
 
@@ -120,7 +120,7 @@ class Grib(weatherrouting.Grib):
         )
 
     def get_wind(self, tt, bounds):
-        t = self._transformTime(tt)
+        t = self._transform_time(tt)
         if t is None:
             return
 
@@ -156,7 +156,7 @@ class Grib(weatherrouting.Grib):
 
         return data
 
-    def _transformTime(self, t) -> Optional[float]:
+    def _transform_time(self, t) -> Optional[float]:
         if self.end_time < t:
             return None
 
@@ -171,13 +171,13 @@ class Grib(weatherrouting.Grib):
         return (data[0][0], data[0][1])
 
     @staticmethod
-    def parseMetadata(path):
+    def parse_metadata(path):
         dataset = gdal.Open(path)
         centre = ""
         # TODO: get bounds and timeframe
         bounds = [0, 0, 0, 0]
         start_time = None
-        hoursForecasted = None
+        hours_forecasted = None
 
         for bidx in range(1, dataset.RasterCount + 1):
             band = dataset.GetRasterBand(bidx)
@@ -193,16 +193,16 @@ class Grib(weatherrouting.Grib):
                 if start_time is None or time < start_time:
                     start_time = time
 
-                if hoursForecasted is None or forecast_hours > hoursForecasted:
-                    hoursForecasted = forecast_hours
+                if hours_forecasted is None or forecast_hours > hours_forecasted:
+                    hours_forecasted = forecast_hours
 
         return MetaGrib(
-            path, path.split("/")[-1], centre, bounds, start_time, hoursForecasted
+            path, path.split("/")[-1], centre, bounds, start_time, hours_forecasted
         )
 
     @staticmethod
     def parse(path):
-        meta = Grib.parseMetadata(path)
+        meta = Grib.parse_metadata(path)
         return Grib(
             path,
             meta.name,

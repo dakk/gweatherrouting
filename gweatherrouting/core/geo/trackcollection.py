@@ -25,7 +25,7 @@ class _TrackCollection(CollectionWithActiveElement, Generic[T]):
     def __init__(self, name="track"):
         super().__init__(Track, name)
 
-    def importFromGPX(self, gpx):
+    def import_from_gpx(self, gpx):
         for track in gpx.tracks:
             waypoints = []
 

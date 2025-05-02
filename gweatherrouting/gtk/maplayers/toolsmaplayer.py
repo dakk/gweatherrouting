@@ -13,7 +13,6 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
-# flake8: noqa: E402
 import math
 from typing import Tuple
 
@@ -53,9 +52,9 @@ class ToolsMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
         self.poiMovingCallback = None
 
         # TODO: need to create a new class for data
-        core.connect("data", self.dataHandler)
+        core.connect("data", self.data_handler)
 
-    def toggleMob(self, lat, lon):
+    def toggle_mob(self, lat, lon):
         if self.mob:
             self.mob = False
             self.mobPosition = None
@@ -63,34 +62,34 @@ class ToolsMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
             self.mob = True
             self.mobPosition = (float(lat), float(lon))
 
-    def dataHandler(self, bi):
+    def data_handler(self, bi):
         self.boatInfo = bi
 
-    def gpsClear(self):
+    def gps_clear(self):
         self.gps = None
 
-    def gpsAdd(self, lat, lon, hdg=0, speed=None):
+    def gps_add(self, lat, lon, hdg=0, speed=None):
         self.gps = (float(lat), float(lon), hdg, speed)
 
-    def enablePOIMoving(self, callback):
+    def enable_poi_moving(self, callback):
         self.poiMoving = True
         self.poiMovingCallback = callback
 
-    def enableMeasure(self, lat, lon):
+    def enable_measure(self, lat, lon):
         self.measuring = True
         self.measureStart = (float(lat), float(lon))
 
-    def onMouseMove(self, lat, lon, x, y):
+    def on_mouse_move(self, lat, lon, x, y):
         self.mousePosition = (float(lat), float(lon), x, y)
         return self.measuring or self.poiMoving
 
-    def setCompassVisible(self, v):
+    def set_compass_visible(self, v):
         self.compass = v
 
-    def setDashboardVisible(self, v):
+    def set_dashboard_visible(self, v):
         self.dashboard = v
 
-    def do_draw(self, gpsmap, cr):
+    def do_draw(self, gpsmap, cr):  # noqa: C901
         if self.poiMoving:
             # Draw a black dot with a red circle around
             cr.move_to(self.mousePosition[2], self.mousePosition[3])
@@ -144,7 +143,6 @@ class ToolsMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
             hdg = math.radians(self.gps[2])
             r = 6
             r2 = 12
-            mr = max(3 * r, r2)
 
             if r2 > 0:
                 cr.set_line_width(1.5)
@@ -199,7 +197,7 @@ class ToolsMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
             cr.line_to(x1, y1)
             cr.stroke()
 
-            d = utils.pointDistance(
+            d = utils.point_distance(
                 self.measureStart[0],
                 self.measureStart[1],
                 self.mousePosition[0],

@@ -22,21 +22,21 @@ class Element:
         self.visible = visible
         self.collection = collection
 
-    def toGPXObject(self):
+    def to_gpx_object(self):
         raise Exception("Not implemented")
 
-    def toJSON(self):
+    def to_json(self):
         return {"name": self.name, "visible": self.visible}
 
     @staticmethod
-    def fromJSON(j):
+    def from_json(j):
         return Element(name=j["name"], visible=j["visible"])
 
     def export(self, dest, format="gpx"):
         if format == "gpx":
             gpx = gpxpy.gpx.GPX()
 
-            ob = self.toGPXObject()
+            ob = self.to_gpx_object()
             if isinstance(ob, gpxpy.gpx.GPXTrack):
                 gpx.tracks.append(ob)
             elif isinstance(ob, gpxpy.gpx.GPXRoute):

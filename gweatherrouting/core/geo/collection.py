@@ -19,7 +19,7 @@ import gpxpy
 
 from gweatherrouting.core.geo.element import Element
 from gweatherrouting.core.storage import Storage
-from gweatherrouting.core.utils import uniqueName
+from gweatherrouting.core.utils import unique_name
 
 T = TypeVar("T", bound=Element)
 
@@ -32,17 +32,17 @@ class CollectionStorage(Storage):
 
 
 class Collection(Generic[T]):
-    def __init__(self, of, baseName):
-        self.storage = CollectionStorage(baseName)
+    def __init__(self, of, base_name):
+        self.storage = CollectionStorage(base_name)
         self.of = of
         self.elements: list[T] = []
-        self.baseName = baseName
+        self.base_name = base_name
 
         if self.storage.data is not None:
-            self.loadJSON(self.storage.data)
+            self.load_json(self.storage.data)
 
     def save(self):
-        self.storage.data = self.toJSON()
+        self.storage.data = self.to_json()
 
     def __iter__(self):
         return iter(self.elements)
@@ -59,27 +59,27 @@ class Collection(Generic[T]):
     def __delitem__(self, i):
         del self.elements[i]
 
-    def toJSON(self):
-        return {"elements": [x.toJSON() for x in self.elements]}
+    def to_json(self):
+        return {"elements": [x.to_json() for x in self.elements]}
 
-    def loadJSON(self, j):
+    def load_json(self, j):
         self.clear()
 
         if "elements" not in j:
             return
 
         for x in j["elements"]:
-            e = self.of.fromJSON(x)
+            e = self.of.from_json(x)
             e.collection = self
             self.append(e)
 
-    def getUniqueName(self, baseName=None) -> str:
-        if baseName is None:
-            baseName = self.baseName
-        return uniqueName(baseName, self.elements)
+    def get_unique_name(self, base_name=None) -> str:
+        if base_name is None:
+            base_name = self.base_name
+        return unique_name(base_name, self.elements)
 
-    def newElement(self, **kwargs):
-        e = self.of(self.getUniqueName(), collection=self, **kwargs)
+    def new_element(self, **kwargs):
+        e = self.of(self.get_unique_name(), collection=self, **kwargs)
         self.append(e)
         self.save()
         return e
@@ -96,12 +96,12 @@ class Collection(Generic[T]):
         self.elements.remove(element)
         self.save()
 
-    def removeByName(self, name):
-        c = self.getByName(name)
+    def remove_by_name(self, name):
+        c = self.get_by_name(name)
         if c is not None:
             self.remove(c)
 
-    def getByName(self, n) -> Optional[T]:
+    def get_by_name(self, n) -> Optional[T]:
         for x in self.elements:
             if x.name == n:
                 return x
@@ -113,11 +113,11 @@ class Collection(Generic[T]):
                 return True
         return False
 
-    def toGPXObject(self):
+    def to_gpx_object(self):
         gpx = gpxpy.gpx.GPX()
 
         for x in self.elements:
-            ob = x.toGPXObject()
+            ob = x.to_gpx_object()
             if isinstance(gpx.GPXTrack, ob):
                 gpx.tracks.append(ob)
             elif isinstance(gpx.GPXRoute, ob):
@@ -129,7 +129,7 @@ class Collection(Generic[T]):
 
     def export(self, dest, fmt="gpx"):
         if fmt == "gpx":
-            gpx = self.toGPXObject()
+            gpx = self.to_gpx_object()
 
             try:
                 f = open(dest, "w")
@@ -139,36 +139,36 @@ class Collection(Generic[T]):
 
 
 class CollectionWithActiveElement(Collection):
-    def __init__(self, of, baseName):
+    def __init__(self, of, base_name):
         self.activeElement = None
 
-        super().__init__(of, baseName)
+        super().__init__(of, base_name)
 
-    def toJSON(self):
-        c = super().toJSON()
+    def to_json(self):
+        c = super().to_json()
         c["activeElement"] = self.activeElement.name if self.activeElement else None
         return c
 
-    def loadJSON(self, j):
-        super().loadJSON(j)
+    def load_json(self, j):
+        super().load_json(j)
         self.activeElement = (
-            self.getByName(j["activeElement"]) if "activeElement" in j else None
+            self.get_by_name(j["activeElement"]) if "activeElement" in j else None
         )
 
-    def hasActive(self):
+    def has_active(self):
         return self.activeElement is not None
 
-    def getActive(self):
+    def get_active(self):
         return self.activeElement
 
-    def setActive(self, element):
+    def set_active(self, element):
         self.activeElement = element
         self.save()
 
     def activate(self, name):
-        self.setActive(self.getByName(name))
+        self.set_active(self.get_by_name(name))
 
-    def isActive(self, element):
+    def is_active(self, element):
         return self.activeElement == element
 
     def remove(self, element):

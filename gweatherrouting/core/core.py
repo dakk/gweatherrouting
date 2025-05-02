@@ -35,10 +35,10 @@ logger = logging.getLogger("gweatherrouting")
 
 
 class LinePointValidityProvider:
-    def pointsValidity(self, latlons):
+    def points_validity(self, latlons):
         raise Exception("Not implemented")
 
-    def linesValidity(self, latlons):
+    def lines_validity(self, latlons):
         raise Exception("Not implemented")
 
 
@@ -48,7 +48,7 @@ class BoatInfo:
     speed = 0.0
     heading = 0.0
 
-    def isValid(self):
+    def is_valid(self):
         return self.latitude != 0.0 and self.longitude != 0.0
 
 
@@ -62,21 +62,21 @@ class LogTrackCollection(TrackCollection):
     def log_history(self) -> Track:
         "log-history is the loaded from log tab"
         if not self.exists("log-history"):
-            e = self.newElement()
+            e = self.new_element()
             e.name = "log-history"
             return e
 
-        return self.getByName("log-history")  # type: ignore
+        return self.get_by_name("log-history")  # type: ignore
 
     @property
     def log(self) -> Track:
         "log is the boat track"
         if not self.exists("log"):
-            e = self.newElement()
+            e = self.new_element()
             e.name = "log"
             return e
 
-        return self.getByName("log")  # type: ignore
+        return self.get_by_name("log")  # type: ignore
 
 
 class Core(EventDispatcher):
@@ -85,23 +85,23 @@ class Core(EventDispatcher):
         self.trackManager = TrackCollection()
         self.routingManager = RoutingCollection()
         self.poiManager = POICollection()
-        self.gribManager = GribManager()
+        self.grib_manager = GribManager()
         self.boatInfo = BoatInfo()
         self.logManager = LogTrackCollection()
 
-        self.connectionManager.connect("data", self.dataHandler)
+        self.connectionManager.connect("data", self.data_handler)
         logger.info("Initialized")
 
         self.connectionManager.plug_all()
         self.connectionManager.start_polling()
 
-    def setBoatPosition(self, lat, lon):
+    def set_boat_position(self, lat, lon):
         self.connectionManager.dispatch(
             "data",
             [
                 DataPacket(
                     "position",
-                    utils.dotdict(
+                    utils.DotDict(
                         {
                             "latitude": lat,
                             "longitude": lon,
@@ -111,7 +111,7 @@ class Core(EventDispatcher):
             ],
         )
 
-    def dataHandler(self, dps):
+    def data_handler(self, dps):
         for x in dps:
             if x.is_position():
                 self.boatInfo.latitude = x.data.latitude
@@ -119,42 +119,42 @@ class Core(EventDispatcher):
                 self.dispatch("boatPosition", self.boatInfo)
 
     # Simulation
-    def createRouting(
+    def create_routing(
         self,
         algorithm,
         polar_file,
         track,
-        startDatetime,
-        startPosition,
-        validityProviders,
-        disableCoastlineChecks=False,
+        start_datetime,
+        start_position,
+        validity_providers,
+        disable_coastline_checks=False,
     ):
         polar = weatherrouting.Polar(
             resource_path("gweatherrouting", f"data/polars/{polar_file}")
         )
 
-        pval: Optional[Callable] = utils.pointsValidity
+        pval: Optional[Callable] = utils.points_validity
         lval: Optional[Callable] = None
 
-        if len(validityProviders) > 0:
-            # pval is a function that checks all pointsValidity of validityProviders
-            pval = validityProviders[0].pointsValidity
-            # lval is a function that checks all linesValidity of validityProviders
-            lval = validityProviders[0].linesValidity
+        if len(validity_providers) > 0:
+            # pval is a function that checks all points_validity of validity_providers
+            pval = validity_providers[0].points_validity
+            # lval is a function that checks all lines_validity of validity_providers
+            lval = validity_providers[0].lines_validity
 
-        if disableCoastlineChecks:
+        if disable_coastline_checks:
             lval = None
             pval = None
 
         routing = weatherrouting.Routing(
             algorithm,
             polar,
-            track.toList(),
-            self.gribManager,
-            startDatetime=startDatetime,
-            startPosition=startPosition,
-            pointsValidity=pval,
-            linesValidity=lval,
+            track.to_list(),
+            self.grib_manager,
+            start_datetime=start_datetime,
+            start_position=start_position,
+            points_validity=pval,
+            lines_validity=lval,
         )
         return routing
 
@@ -165,12 +165,12 @@ class Core(EventDispatcher):
             gpx = gpxpy.parse(f)
 
             # Tracks
-            self.trackManager.importFromGPX(gpx)
+            self.trackManager.import_from_gpx(gpx)
 
             # Routes
 
             # POI
-            self.poiManager.importFromGPX(gpx)
+            self.poiManager.import_from_gpx(gpx)
 
             return True
         except Exception as e:
