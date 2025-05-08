@@ -129,6 +129,7 @@
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
                         <property name="halign">baseline</property>
+                        <signal name="clicked" handler="on_open" swapped="no"/>
                       </object>
                       <packing>
                         <property name="left-attach">2</property>
