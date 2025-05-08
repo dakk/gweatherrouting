@@ -36,8 +36,9 @@ GribFileFilter.add_pattern("*.grb2")
 
 
 class GribManagerWindow:
-    def __init__(self, grib_manager):
+    def __init__(self, grib_manager, refresh_map_callback=None):
         self.grib_manager = grib_manager
+        self.refresh_map_callback = refresh_map_callback
         self.selected_grib = None
         self.selectedLocalGrib = None
 
@@ -90,7 +91,7 @@ class GribManagerWindow:
     def update_local_gribs(self):
         self.grib_manager.refresh_local_gribs()
         self.grib_managerStore.clear()
-
+        
         for x in self.grib_manager.local_gribs:
             self.grib_managerStore.append(
                 [
@@ -101,6 +102,7 @@ class GribManagerWindow:
                     self.grib_manager.is_enabled(x.name),
                 ]
             )
+        self.refresh_map_callback()
 
     def on_remove_local_grib(self, widget):
         self.grib_manager.remove(self.selectedLocalGrib)

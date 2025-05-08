@@ -129,5 +129,12 @@ class MainWindow:
         w.show()
 
     def on_grib_manager(self, event):
-        w = GribManagerWindow(self.core.grib_manager)
+        w = GribManagerWindow(self.core.grib_manager, self.refresh_map)
         w.show()
+    
+    def refresh_map(self):
+        if self.chartStack.map:
+            self.chartStack.map.queue_draw()
+            logger.debug("Map refresh requested")
+        else:
+            logger.warning("Could not refresh map: chartStack or map not available.")
