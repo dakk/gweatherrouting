@@ -16,7 +16,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import logging
 import time
-from threading import Thread
+from threading import Thread, Event
 
 from gweatherrouting.core import NetworkDataSource, SerialDataSource
 from gweatherrouting.core.utils import EventDispatcher, Storage
@@ -44,16 +44,16 @@ class ConnectionManagerStorage(Storage):
 class ConnectionManager(EventDispatcher):
     def __init__(self):
         self.storage = ConnectionManagerStorage()
-        self.running = True
+        self.stop_event = Event()
         self.sources = {}
         self.thread = None
 
     def __del__(self):
-        self.running = False
+        self.stop_event.set()
 
     def stop_polling(self):
         logger.info("Polling stopped")
-        self.running = False
+        self.stop_event.set()
         if self.thread:
             self.thread.join()
             self.thread = None
@@ -130,13 +130,13 @@ class ConnectionManager(EventDispatcher):
             self.dispatch("data", dd)
 
         if rf < len(self.sources):
-            time.sleep(30)
+            self.stop_event.wait(timeout=30)
             self.plug_all()
 
         return len(dd)
 
     def poll_loop(self, b):
-        while self.running:
+        while not self.stop_event.is_set():
             try:
                 n = self.poll()
             except Exception as e:
@@ -149,6 +149,6 @@ class ConnectionManager(EventDispatcher):
 
     def start_polling(self):
         logger.info("Polling started")
-        self.running = True
+        self.stop_event.clear()
         self.thread = Thread(target=self.poll_loop, args=(True,))
         self.thread.start()
