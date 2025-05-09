@@ -15,12 +15,13 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
 import logging
-import traceback
 import os
-from gweatherrouting.core.storage import POLAR_DIR
+import traceback
 from threading import Thread
 
 import gi
+
+from gweatherrouting.core.storage import POLAR_DIR
 
 gi.require_version("Gtk", "3.0")
 try:

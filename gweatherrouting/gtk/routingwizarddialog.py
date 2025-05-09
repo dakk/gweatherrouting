@@ -16,11 +16,11 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import datetime
 import os
 import re
+import shutil
 
 import gi
 import weatherrouting
 
-import shutil
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
@@ -34,6 +34,7 @@ from .widgets.polar import PolarWidget
 PolFileFilter = Gtk.FileFilter()
 PolFileFilter.set_name("Polar file")
 PolFileFilter.add_pattern("*.pol")
+
 
 class RoutingWizardDialog:
     def __init__(self, core, parent):
@@ -227,7 +228,7 @@ class RoutingWizardDialog:
                 Gtk.ResponseType.OK,
             ),
         )
-        
+
         dialog.add_filter(PolFileFilter)
 
         response = dialog.run()
@@ -236,7 +237,9 @@ class RoutingWizardDialog:
             dialog.destroy()
             valid_polar, issue_message = validate_polar_file(filepath)
             if valid_polar:
-                shutil.copyfile(filepath, os.path.join(POLAR_DIR, os.path.basename(filepath)))
+                shutil.copyfile(
+                    filepath, os.path.join(POLAR_DIR, os.path.basename(filepath))
+                )
                 self.polars.append(os.path.basename(filepath))
                 self.boat_store.append([os.path.basename(filepath)])
                 self.builder.get_object("boat-select").set_active(len(self.polars) - 1)
@@ -265,47 +268,50 @@ class RoutingWizardDialog:
             for p in default_polar:
                 target_filepath = os.path.join(POLAR_DIR, p)
                 polar_file_path = resource_path("gweatherrouting", f"data/polars/{p}")
-                shutil.copyfile(polar_file_path,target_filepath)
+                shutil.copyfile(polar_file_path, target_filepath)
 
 
 @staticmethod
 def validate_polar_file(filepath):
     try:
         # Read the file content
-        with open(filepath, 'r') as f:
+        with open(filepath, "r") as f:
             content = f.read()
-            lines = content.strip().split('\n')
-        
+            lines = content.strip().split("\n")
+
         # Check if file is empty
         if len(lines) == 0:
             return False, "File is empty"
-        
+
         # Parse header to get wind speeds
-        header_parts = re.split(r'\s+', lines[0].strip())
-        
+        header_parts = re.split(r"\s+", lines[0].strip())
+
         # Try to parse wind speeds (should be numeric)
         try:
             tws = [float(ws) for ws in header_parts[1:]]
         except ValueError:
             return False, "Wind speeds in header must be numeric values"
-        
+
         # Check for increasing wind speeds
-        if not all(tws[i] <= tws[i+1] for i in range(len(tws)-1)):
+        if not all(tws[i] <= tws[i + 1] for i in range(len(tws) - 1)):
             return False, "Warning: Wind speeds are not strictly increasing"
-        
+
         # Check data rows
         expected_columns = len(header_parts)
         for i, line in enumerate(lines[1:], start=1):
-            parts = re.split(r'\s+', line.strip())
-            
+            parts = re.split(r"\s+", line.strip())
+
             # Skip empty lines
             if not parts or (len(parts) == 1 and not parts[0]):
                 return False, f"Line {i+1}: Empty line"
-                
+
             # Check number of columns
             if len(parts) != expected_columns:
-                return False, f"Line {i+1}: Expected {expected_columns} columns, but found {len(parts)}"
-            
+                return (
+                    False,
+                    f"Line {i+1}: Expected {expected_columns} columns, but found {len(parts)}",
+                )
+
             # Check if TWA is in valid range
             try:
                 twa = float(parts[0])
@@ -313,22 +319,28 @@ def validate_polar_file(filepath):
                     return False, f"Line {i+1}: TWA value {twa} is out of range (0-180)"
             except ValueError:
                 return False, f"Line {i+1}: TWA value '{parts[0]}' is not numeric"
-            
+
             # Check if boat speeds are non-negative
             for j, speed in enumerate(parts[1:], start=1):
                 # Skip empty values or specific placeholders
-                if speed in ['', '-', 'NaN', 'NULL']:
+                if speed in ["", "-", "NaN", "NULL"]:
                     return False, f"Line {i+1}: Contains empty value"
 
                 try:
                     boat_speed = float(speed)
                     if boat_speed < 0:
-                        return False, f"Line {i+1}: Contains negative speed value ({boat_speed}) at column {j+1}"
+                        return (
+                            False,
+                            f"Line {i+1}: Contains negative speed value ({boat_speed}) at column {j+1}",
+                        )
                 except ValueError:
-                    return False, f"Line {i+1}: Boat speed '{speed}' at column {j+1} is not numeric"
-        
+                    return (
+                        False,
+                        f"Line {i+1}: Boat speed '{speed}' at column {j+1} is not numeric",
+                    )
+
         # If we get here, the file is valid
         return True, "File is valid"
-        
+
     except Exception as e:
         return False, f"Error processing file: {str(e)}"
