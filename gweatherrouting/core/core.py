@@ -131,9 +131,7 @@ class Core(EventDispatcher):
         validity_providers,
         disable_coastline_checks=False,
     ):
-        polar = weatherrouting.Polar(
-            os.path.join(POLAR_DIR, polar_file)
-        )
+        polar =  weatherrouting.Polar(polar_file)
 
         pval: Optional[Callable] = utils.points_validity
         lval: Optional[Callable] = None
