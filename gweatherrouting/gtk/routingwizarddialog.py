@@ -40,14 +40,8 @@ class RoutingWizardDialog:
         self.polar = None
 
         self.paramWidgets = {}
-        default_polar = os.listdir(resource_path("gweatherrouting", "data/polars/"))
-        self.polars = []
-        if os.path.exists(resource_path("gweatherrouting", "data/polars/")):
-            for p in default_polar:
-                target_filepath = os.path.join(POLAR_DIR, p)
-                polar_file_path = resource_path("gweatherrouting", f"data/polars/{p}")
-                shutil.copyfile(polar_file_path,target_filepath)
-                self.polars.append(p)                 
+        self.load_default_pol()
+        self.polars = os.listdir(POLAR_DIR)
 
         self.builder = Gtk.Builder()
         self.builder.add_from_file(
@@ -73,9 +67,9 @@ class RoutingWizardDialog:
             start_store.append(["POI: " + p.name, "poi-" + p.name])
         self.builder.get_object("start-select").set_active(0)
 
-        boat_store = self.builder.get_object("boat-store")
+        self.boat_store = self.builder.get_object("boat-store")
         for polar in self.polars:
-            boat_store.append([polar])
+            self.boat_store.append([polar])
         self.builder.get_object("boat-select").set_active(0)
 
         routing_store = self.builder.get_object("routing-store")
@@ -162,9 +156,7 @@ class RoutingWizardDialog:
 
     def on_boat_select(self, widget):
         pfile = self.polars[self.builder.get_object("boat-select").get_active()]
-        self.polar = weatherrouting.Polar(
-            resource_path("gweatherrouting", f"data/polars/{pfile}")
-        )
+        self.polar = weatherrouting.Polar(os.path.join(POLAR_DIR, pfile))
         self.polarWidget.set_polar(self.polar)
 
     def on_time_select(self, widget):
@@ -241,6 +233,17 @@ class RoutingWizardDialog:
         if response == Gtk.ResponseType.OK:
             filepath = dialog.get_filename()
             dialog.destroy()
-            self.add_custom_polar_file(filepath)
+            shutil.copyfile(filepath, os.path.join(POLAR_DIR, os.path.basename(filepath)))
+            self.polars.append(os.path.basename(filepath))
+            self.boat_store.append([os.path.basename(filepath)])
+            self.builder.get_object("boat-select").set_active(len(self.polars) - 1)
         else:
             dialog.destroy()
+
+    def load_default_pol(self):
+        if not os.listdir(POLAR_DIR):
+            default_polar = os.listdir(resource_path("gweatherrouting", "data/polars/"))
+            for p in default_polar:
+                target_filepath = os.path.join(POLAR_DIR, p)
+                polar_file_path = resource_path("gweatherrouting", f"data/polars/{p}")
+                shutil.copyfile(polar_file_path,target_filepath)
