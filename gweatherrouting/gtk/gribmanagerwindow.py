@@ -91,7 +91,7 @@ class GribManagerWindow:
     def update_local_gribs(self):
         self.grib_manager.refresh_local_gribs()
         self.grib_managerStore.clear()
-        
+
         for x in self.grib_manager.local_gribs:
             self.grib_managerStore.append(
                 [

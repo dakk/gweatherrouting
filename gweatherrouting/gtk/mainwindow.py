@@ -131,7 +131,7 @@ class MainWindow:
     def on_grib_manager(self, event):
         w = GribManagerWindow(self.core.grib_manager, self.refresh_map)
         w.show()
-    
+
     def refresh_map(self):
         if self.chartStack.map:
             self.chartStack.map.queue_draw()

@@ -19,7 +19,6 @@ from typing import Callable, Optional
 import gpxpy
 import weatherrouting
 
-from gweatherrouting.common import resource_path
 from gweatherrouting.core import GribManager, utils
 from gweatherrouting.core.connectionmanager import ConnectionManager
 from gweatherrouting.core.datasource import DataPacket
@@ -129,9 +128,7 @@ class Core(EventDispatcher):
         validity_providers,
         disable_coastline_checks=False,
     ):
-        polar = weatherrouting.Polar(
-            resource_path("gweatherrouting", f"data/polars/{polar_file}")
-        )
+        polar = weatherrouting.Polar(polar_file)
 
         pval: Optional[Callable] = utils.points_validity
         lval: Optional[Callable] = None
