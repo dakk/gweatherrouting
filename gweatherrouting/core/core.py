@@ -14,13 +14,11 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 import logging
-import os
 from typing import Callable, Optional
 
 import gpxpy
 import weatherrouting
 
-from gweatherrouting.common import resource_path
 from gweatherrouting.core import GribManager, utils
 from gweatherrouting.core.connectionmanager import ConnectionManager
 from gweatherrouting.core.datasource import DataPacket
@@ -30,7 +28,6 @@ from gweatherrouting.core.geo import (
     Track,
     TrackCollection,
 )
-from gweatherrouting.core.storage import POLAR_DIR
 from gweatherrouting.core.utils import EventDispatcher
 
 logger = logging.getLogger("gweatherrouting")

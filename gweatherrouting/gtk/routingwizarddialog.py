@@ -253,7 +253,8 @@ class RoutingWizardDialog:
                     text="Polar file is invalid",
                 )
                 warning_dialog.format_secondary_text(
-                    f"The polar file '{os.path.basename(filepath)}' is invalid and cannot be import.\n\n"
+                    f"The polar file '{os.path.basename(filepath)}'"
+                    "is invalid and cannot be import.\n\n"
                     f"{filepath}\n"
                     f"{issue_message}"
                 )
@@ -303,40 +304,44 @@ def validate_polar_file(filepath):
 
             # Skip empty lines
             if not parts or (len(parts) == 1 and not parts[0]):
-                return False, f"Line {i+1}: Empty line"
+                return False, f"Line {i + 1}: Empty line"
 
             # Check number of columns
             if len(parts) != expected_columns:
                 return (
                     False,
-                    f"Line {i+1}: Expected {expected_columns} columns, but found {len(parts)}",
+                    f"Line {i + 1}: Expected {expected_columns} columns, but found {len(parts)}",
                 )
 
             # Check if TWA is in valid range
             try:
                 twa = float(parts[0])
                 if twa < 0 or twa > 180:
-                    return False, f"Line {i+1}: TWA value {twa} is out of range (0-180)"
+                    return (
+                        False,
+                        f"Line {i + 1}: TWA value {twa} is out of range (0-180)",
+                    )
             except ValueError:
-                return False, f"Line {i+1}: TWA value '{parts[0]}' is not numeric"
+                return False, f"Line {i + 1}: TWA value '{parts[0]}' is not numeric"
 
             # Check if boat speeds are non-negative
             for j, speed in enumerate(parts[1:], start=1):
                 # Skip empty values or specific placeholders
                 if speed in ["", "-", "NaN", "NULL"]:
-                    return False, f"Line {i+1}: Contains empty value"
+                    return False, f"Line {i + 1}: Contains empty value"
 
                 try:
                     boat_speed = float(speed)
                     if boat_speed < 0:
                         return (
                             False,
-                            f"Line {i+1}: Contains negative speed value ({boat_speed}) at column {j+1}",
+                            f"Line {i + 1}: Contains negative speed"
+                            "value ({boat_speed}) at column {j + 1}",
                         )
                 except ValueError:
                     return (
                         False,
-                        f"Line {i+1}: Boat speed '{speed}' at column {j+1} is not numeric",
+                        f"Line {i + 1}: Boat speed '{speed}' at column {j + 1} is not numeric",
                     )
 
         # If we get here, the file is valid
