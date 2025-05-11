@@ -15,7 +15,6 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 import datetime
 import os
-import re
 import shutil
 
 import gi
