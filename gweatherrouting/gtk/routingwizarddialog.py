@@ -15,6 +15,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 import datetime
 import os
+import shutil
 
 import gi
 import weatherrouting
@@ -24,9 +25,14 @@ from gi.repository import Gtk
 
 from gweatherrouting.common import resource_path
 from gweatherrouting.core import TimeControl
+from gweatherrouting.core.storage import POLAR_DIR
 
 from .timepickerdialog import TimePickerDialog
 from .widgets.polar import PolarWidget
+
+PolFileFilter = Gtk.FileFilter()
+PolFileFilter.set_name("Polar file")
+PolFileFilter.add_pattern("*.pol")
 
 
 class RoutingWizardDialog:
@@ -35,7 +41,8 @@ class RoutingWizardDialog:
         self.polar = None
 
         self.paramWidgets = {}
-        self.polars = os.listdir(resource_path("gweatherrouting", "data/polars/"))
+        self.load_default_pol()
+        self.polars = os.listdir(POLAR_DIR)
 
         self.builder = Gtk.Builder()
         self.builder.add_from_file(
@@ -61,9 +68,9 @@ class RoutingWizardDialog:
             start_store.append(["POI: " + p.name, "poi-" + p.name])
         self.builder.get_object("start-select").set_active(0)
 
-        boat_store = self.builder.get_object("boat-store")
+        self.boat_store = self.builder.get_object("boat-store")
         for polar in self.polars:
-            boat_store.append([polar])
+            self.boat_store.append([polar])
         self.builder.get_object("boat-select").set_active(0)
 
         routing_store = self.builder.get_object("routing-store")
@@ -150,9 +157,7 @@ class RoutingWizardDialog:
 
     def on_boat_select(self, widget):
         pfile = self.polars[self.builder.get_object("boat-select").get_active()]
-        self.polar = weatherrouting.Polar(
-            resource_path("gweatherrouting", f"data/polars/{pfile}")
-        )
+        self.polar = weatherrouting.Polar(os.path.join(POLAR_DIR, pfile))
         self.polarWidget.set_polar(self.polar)
 
     def on_time_select(self, widget):
@@ -200,3 +205,46 @@ class RoutingWizardDialog:
         else:
             s -= 2
             return self.core.poiManager[s].position
+
+    def add_custom_polar_file(self, polar_path):
+        polar_filename = os.path.basename(polar_path)
+        target_filepath = os.path.join(POLAR_DIR, polar_filename)
+        shutil.copyfile(polar_path, target_filepath)
+        self.polars.append(polar_filename)
+        self.builder.get_object("boat-select").set_active(len(self.polars) - 1)
+        self.polarWidget.set_polar(self.polar)
+
+    def on_open(self, widget):
+        parent_window = self.dialog
+        dialog = Gtk.FileChooserDialog(
+            "Please choose a file",
+            parent_window,
+            Gtk.FileChooserAction.OPEN,
+            (
+                Gtk.STOCK_CANCEL,
+                Gtk.ResponseType.CANCEL,
+                Gtk.STOCK_OPEN,
+                Gtk.ResponseType.OK,
+            ),
+        )
+
+        dialog.add_filter(PolFileFilter)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            filepath = dialog.get_filename()
+            dialog.destroy()
+            shutil.copyfile(
+                filepath, os.path.join(POLAR_DIR, os.path.basename(filepath))
+            )
+            self.polars.append(os.path.basename(filepath))
+            self.boat_store.append([os.path.basename(filepath)])
+            self.builder.get_object("boat-select").set_active(len(self.polars) - 1)
+
+    def load_default_pol(self):
+        if not os.listdir(POLAR_DIR):
+            default_polar = os.listdir(resource_path("gweatherrouting", "data/polars/"))
+            for p in default_polar:
+                target_filepath = os.path.join(POLAR_DIR, p)
+                polar_file_path = resource_path("gweatherrouting", f"data/polars/{p}")
+                shutil.copyfile(polar_file_path, target_filepath)

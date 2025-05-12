@@ -16,7 +16,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import logging
 import time
-from threading import Thread, Event
+from threading import Event, Thread
 
 from gweatherrouting.core import NetworkDataSource, SerialDataSource
 from gweatherrouting.core.utils import EventDispatcher, Storage

@@ -15,10 +15,13 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
 import logging
+import os
 import traceback
 from threading import Thread
 
 import gi
+
+from gweatherrouting.core.storage import POLAR_DIR
 
 gi.require_version("Gtk", "3.0")
 try:
@@ -66,7 +69,7 @@ class ChartStackRouting(ChartStackBase):
             self.stop_routing = False
             self.currentRouting = self.core.create_routing(
                 dialog.get_selected_algorithm(),
-                polar_file,
+                os.path.join(POLAR_DIR, polar_file),
                 dialog.get_selected_track(),
                 dialog.get_start_datetime(),
                 dialog.get_selected_start_point(),
