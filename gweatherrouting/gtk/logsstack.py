@@ -16,6 +16,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import io
 import logging
 import os
+import time
 from threading import Thread
 from typing import List, Optional
 
@@ -100,11 +101,11 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
         self.map.layer_add(self.tools_map_layer)
 
         self.time_control = TimeControl()
-        self.selectedTime = self.time_control.get_time()
+        self.selectedTime = self.time_control.time
         self.timetravel_widget = TimeTravelWidget(
             self.parent, self.time_control, self.map, True
         )
-        self.time_control.connect("time-change", self.on_time_change)
+        self.time_control.connect("time_change", self.on_time_change)
         self.builder.get_object("timetravelcontainer").pack_start(
             self.timetravel_widget, True, True, 0
         )
@@ -245,7 +246,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
         self.builder.get_object("stop-button").show()
 
         self.statusBar.push(0, "Recording from devices...")
-        self.recordinThread = Thread(target=self.stop_recording, args=())
+        self.recordinThread = Thread(target=self.start_recording, args=())
         self.recordinThread.start()
 
     def on_stop_recording_click(self, widget):
@@ -315,7 +316,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
                 self.core.logManager.log_history.add(data.lat, data.lon)
 
             if self.recording or len(self.data) % 5000 == 0:
-                self.map.set_center_and_zoom(data.lat, data.lon, 12)
+                # self.map.set_center_and_zoom(data.lat, data.lon, 12)
                 logger.debug("Recorded %d points", len(self.data))
                 self.statusBar.push(0, f"{len(self.data)} track points")
 
@@ -409,7 +410,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
             self.core.logManager.log_history.add(x.lat, x.lon)
         self.map.queue_draw()
 
-    def stop_recording(self):
+    def start_recording(self):
         logger.debug("Recording started")
         self.recording = True
         self.recordedData = open(LOG_TEMP_FILE, "w")
@@ -428,6 +429,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
         r = True
         while self.recording and r:
             r = pip.run_once()
+            time.sleep(0.01)
         logger.debug("Recording stopped")
 
     def on_graph_draw(self, widget, ctx):  # noqa: C901
@@ -464,11 +466,13 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
         fig.set_size_inches((width / 100), (a.height / 100.0))
 
         i = 0
-        iiv = -1
+        ii = -1
         self.highlightedValue = None
         self.statusBar.push(0, "")
 
         if not self.recording and not self.loading:
+            x = list(map(lambda x: x.replace(tzinfo=None), x))
+
             ii = numpy.where(
                 (x > (numpy.datetime64(self.selectedTime)))
                 & (
@@ -482,8 +486,8 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
                 )
             )
             try:
-                iiv = ii[0][0]
-                self.highlightedValue = y[iiv]
+                ii = ii[0][0]  # type: ignore
+                self.highlightedValue = y[ii]
                 self.tools_map_layer.gps_add(
                     self.highlightedValue.lat,
                     self.highlightedValue.lon,
@@ -503,11 +507,12 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
                     + f"Depth: {self.highlightedValue.depth:.2f}",
                 )
 
-            except:
-                iiv = -1
+            except Exception as e:
+                print(e)
+                ii = -1
 
         def highlight(i, data):
-            if iiv != -1:
+            if ii != -1:
                 ax1[i].plot(x[ii], data[ii], color="#f00", marker="o", markersize=4)
                 # ax1[i].axvline(x=ii)
 

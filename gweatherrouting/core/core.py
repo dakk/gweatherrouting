@@ -14,7 +14,7 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 import logging
-from typing import Callable, Optional
+from typing import Callable, List, Optional
 
 import gpxpy
 import weatherrouting
@@ -85,7 +85,7 @@ class Core(EventDispatcher):
         self.routingManager = RoutingCollection()
         self.poiManager = POICollection()
         self.grib_manager = GribManager()
-        self.boatInfo = BoatInfo()
+        self.boat_info = BoatInfo()
         self.logManager = LogTrackCollection()
 
         self.connectionManager.connect("data", self.data_handler)
@@ -110,12 +110,14 @@ class Core(EventDispatcher):
             ],
         )
 
-    def data_handler(self, dps):
+    def data_handler(self, dps: List[DataPacket]):
         for x in dps:
             if x.is_position():
-                self.boatInfo.latitude = x.data.latitude
-                self.boatInfo.longitude = x.data.longitude
-                self.dispatch("boatPosition", self.boatInfo)
+                self.boat_info.latitude = x.data.latitude
+                self.boat_info.longitude = x.data.longitude
+                self.dispatch("boat_position", self.boat_info)
+            elif x.is_heading():
+                self.boat_info.heading = x.data.heading
 
     # Simulation
     def create_routing(

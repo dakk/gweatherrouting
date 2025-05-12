@@ -41,7 +41,7 @@ class ToolsMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 
         self.dashboard = False
         self.compass = False
-        self.boatInfo = None
+        self.boat_info = None
 
         self.gps = None
 
@@ -63,7 +63,7 @@ class ToolsMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
             self.mobPosition = (float(lat), float(lon))
 
     def data_handler(self, bi):
-        self.boatInfo = bi
+        self.boat_info = bi
 
     def gps_clear(self):
         self.gps = None
@@ -100,7 +100,7 @@ class ToolsMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
             cr.arc(self.mousePosition[2], self.mousePosition[3], 16, 0, 2 * math.pi)
             cr.stroke()
 
-        if self.dashboard and self.boatInfo:
+        if self.dashboard and self.boat_info:
             pass
 
         if self.mob and self.mobPosition:

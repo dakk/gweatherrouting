@@ -13,17 +13,28 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+import logging
+from typing import List
+
 import pynmea2
 from pynmea2.nmea_utils import LatLonFix
 
+logger = logging.getLogger("gweatherrouting")
+
 
 class DataPacket:
-    def __init__(self, t, sentence):
+    def __init__(self, t, sentence: pynmea2.NMEASentence):
         self.t = t
         self.data = sentence
 
     def is_position(self):
         return "latitude" in self.data and "longitude" in self.data
+
+    def is_heading(self):
+        try:
+            return getattr(self.data, "heading") is not None
+        except:
+            return False
 
     @staticmethod
     def parse(data):
@@ -65,6 +76,9 @@ class DataSource:
         else:
             raise NotImplementedError
 
+    def connect(self):
+        return False
+
     def write(self, packet):
         if not self.connected:
             return False
@@ -74,9 +88,9 @@ class DataSource:
 
         return self._write(packet.serialize())
 
-    def read(self):
+    def read(self) -> List[NMEADataPacket]:
         if not self.connected:
-            return None
+            return []
 
         if self.direction == "out":
             return []
@@ -94,7 +108,7 @@ class DataSource:
             try:
                 msgs.append(self.parser.parse(msg))
             except Exception as e:
-                print("Unable to parse data:", e)
+                logger.warning(f"Unable to parse data: {e}")
         return msgs
 
     def _read(self):

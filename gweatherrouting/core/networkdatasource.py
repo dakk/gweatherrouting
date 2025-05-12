@@ -15,6 +15,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 import logging
 import socket
+import time
 
 from gweatherrouting.core import DataSource
 
@@ -48,8 +49,12 @@ class NetworkDataSource(DataSource):
     def _read(self):
         dd = self.cached
 
-        while dd.find("\n") != -1 or dd.find("\r") != -1:
+        while dd.find("\n") == -1 and dd.find("\r") == -1:
             d = self.s.recv(128).decode("ascii")
+
+            if len(dd) == 0:
+                time.sleep(0.5)
+
             dd += d
 
         cc = dd.split("\n")

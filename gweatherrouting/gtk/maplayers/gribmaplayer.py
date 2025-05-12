@@ -35,7 +35,7 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
         self.visible = True
         self.grib_manager = grib_manager
         self.time_control = time_control
-        self.time_control.connect("time-change", self.on_time_change)
+        self.time_control.connect("time_change", self.on_time_change)
         self.settings_manager = settings_manager
 
     def set_visible(self, visible):

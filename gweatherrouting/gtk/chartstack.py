@@ -115,7 +115,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
         ChartStackTrack.__init__(self)
         ChartStackPOI.__init__(self)
 
-        self.core.connect("boatPosition", self.boat_info_handler)
+        self.core.connect("boat_position", self.boat_info_handler)
 
         self.timetravel_widget = TimeTravelWidget(
             self.parent, self.time_control, self.map

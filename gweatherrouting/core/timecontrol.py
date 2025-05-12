@@ -23,27 +23,28 @@ class TimeControl(EventDispatcher):
     DFORMAT = "%Y/%m/%d, %H:%M"
 
     def __init__(self):
-        self.time: datetime.datetime
+        self._time: datetime.datetime
         self.now()
 
     def now(self):
-        self.time = datetime.datetime.now().replace(minute=0, second=0, microsecond=0)
-        self.dispatch("time-change", self.time)
+        self._time = datetime.datetime.now().replace(minute=0, second=0, microsecond=0)
+        self.dispatch("time_change", self.time)
 
-    def get_time(self):
-        return self.time
+    @property
+    def time(self):
+        return self._time.replace(tzinfo=None)  # datetime.timezone.utc)
 
     def get_timestamp(self) -> int:
         return int(self.time.timestamp())
 
     def set_time(self, v):
-        self.time = v
-        self.dispatch("time-change", self.time)
+        self._time = v
+        self.dispatch("time_change", self.time)
 
     def decrease(self, hours=0, minutes=0, seconds=0):
-        self.time -= datetime.timedelta(hours=hours, minutes=minutes, seconds=seconds)
-        self.dispatch("time-change", self.time)
+        self._time -= datetime.timedelta(hours=hours, minutes=minutes, seconds=seconds)
+        self.dispatch("time_change", self.time)
 
     def increase(self, hours=0, minutes=0, seconds=0):
-        self.time += datetime.timedelta(hours=hours, minutes=minutes, seconds=seconds)
-        self.dispatch("time-change", self.time)
+        self._time += datetime.timedelta(hours=hours, minutes=minutes, seconds=seconds)
+        self.dispatch("time_change", self.time)

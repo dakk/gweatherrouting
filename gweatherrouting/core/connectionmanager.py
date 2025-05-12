@@ -17,8 +17,9 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import logging
 import time
 from threading import Event, Thread
+from typing import Dict
 
-from gweatherrouting.core import NetworkDataSource, SerialDataSource
+from gweatherrouting.core import DataSource, NetworkDataSource, SerialDataSource
 from gweatherrouting.core.utils import EventDispatcher, Storage
 
 logger = logging.getLogger("gweatherrouting")
@@ -45,7 +46,7 @@ class ConnectionManager(EventDispatcher):
     def __init__(self):
         self.storage = ConnectionManagerStorage()
         self.stop_event = Event()
-        self.sources = {}
+        self.sources: Dict[str, DataSource] = {}
         self.thread = None
 
     def __del__(self):
@@ -142,6 +143,7 @@ class ConnectionManager(EventDispatcher):
             except Exception as e:
                 print(e)
                 logger.error("Error polling data")
+                n = 0
             if n > 0:
                 time.sleep(0.05)
             else:

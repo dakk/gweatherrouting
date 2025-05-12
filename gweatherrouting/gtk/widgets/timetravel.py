@@ -70,7 +70,7 @@ class TimeTravelWidget(Gtk.Box):
         # self.timeAdjust = self.builder.get_object('time-adjustment')
         self.timeLabel = self.builder.get_object("time-label")
         self.timeUnitCombo = self.builder.get_object("time-unit-combo")
-        self.time_control.connect("time-change", self.on_time_change)
+        self.time_control.connect("time_change", self.on_time_change)
         self.on_time_change(self.time_control.time)
 
         self.seconds = smaller_unit

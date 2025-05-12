@@ -198,8 +198,8 @@ class RoutingWizardDialog:
         if s == 0:
             return None
         elif s == 1:
-            if self.core.boatInfo.is_valid():
-                return [self.core.boatInfo.latitude, self.core.boatInfo.longitude]
+            if self.core.boat_info.is_valid():
+                return [self.core.boat_info.latitude, self.core.boat_info.longitude]
             else:
                 return None
         else:
