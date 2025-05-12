@@ -427,7 +427,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 
         r = True
         while self.recording and r:
-            r = pip.runOnce()
+            r = pip.run_once()
         logger.debug("Recording stopped")
 
     def on_graph_draw(self, widget, ctx):  # noqa: C901
@@ -507,7 +507,7 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
                 iiv = -1
 
         def highlight(i, data):
-            if ii != -1:
+            if iiv != -1:
                 ax1[i].plot(x[ii], data[ii], color="#f00", marker="o", markersize=4)
                 # ax1[i].axvline(x=ii)
 

@@ -48,16 +48,13 @@ class NetworkDataSource(DataSource):
     def _read(self):
         dd = self.cached
 
-        while True:
-            try:
-                d = self.s.recv(128).decode("ascii")
-                dd += d
-                if dd.find("\n") != -1 or dd.find("\r") != -1:
-                    cc = dd.split("\n")
-                    self.cached = cc[-1]
-                    return cc[0:-1]
-            except:
-                pass
+        while dd.find("\n") != -1 or dd.find("\r") != -1:
+            d = self.s.recv(128).decode("ascii")
+            dd += d
+
+        cc = dd.split("\n")
+        self.cached = cc[-1]
+        return cc[0:-1]
 
     def _write(self, data):
         self.s.send(data.encode("ascii"))

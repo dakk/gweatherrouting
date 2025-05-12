@@ -19,7 +19,7 @@ dependencies = [
     "pynmea2",
     "gpxpy",
     "numpy",
-    "nmeatoolkit",
+    "nmeatoolkit>=0.2",
     "matplotlib",
     "weatherrouting>=0.2.1",
     "PyGObject==3.50.0",

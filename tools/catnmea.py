@@ -1,5 +1,5 @@
 f = (
-    open("/home/dakk/MEGA/GeoTracks/Boat/First/MDC2021_2/data_12_12_2021.nmea", "r")
+    open("/home/dakk/MEGA/GeoTracks/Boat/2021/MDC2021_2/data_12_12_2021.nmea", "r")
     .read()
     .split("\n")
 )
@@ -20,7 +20,7 @@ with conn:
             try:
                 conn.send(x.encode("ascii") + "\n".encode("ascii"))
                 print(x)
-                time.sleep(0.01)
+                time.sleep(0.1)
             except:
                 conn.close()
                 s.close()
