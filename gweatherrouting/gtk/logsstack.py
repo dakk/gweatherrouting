@@ -502,7 +502,8 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
                     + f"{self.highlighted_value.lon:.2f}), "
                     + f"Speed: {self.highlighted_value.speed:.1f}kn, "
                     + f"Heading: {self.highlighted_value.hdg}, "
-                    + f"TWS: {self.highlighted_value.tws:.1f}kn, TWA: {self.highlighted_value.twa}, "
+                    + f"TWS: {self.highlighted_value.tws:.1f}kn, "
+                    + f"TWA: {self.highlighted_value.twa}, "
                     + f"TWD: {(self.highlighted_value.twa + self.highlighted_value.hdg) % 360}, "
                     + f"Depth: {self.highlighted_value.depth:.2f}",
                 )
