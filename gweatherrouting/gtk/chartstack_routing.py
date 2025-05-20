@@ -70,7 +70,7 @@ class ChartStackRouting(ChartStackBase):
             self.currentRouting = self.core.create_routing(
                 dialog.get_selected_algorithm(),
                 os.path.join(POLAR_DIR, polar_file),
-                dialog.get_selected_track(),
+                dialog.get_selected_track_or_poi(),
                 dialog.get_start_datetime(),
                 dialog.get_selected_start_point(),
                 self.chart_manager.get_line_point_validity_providers(),

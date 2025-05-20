@@ -78,10 +78,12 @@ class RoutingWizardDialog:
             routing_store.append([r["name"]])
         self.builder.get_object("routing-select").set_active(0)
 
-        track_store = self.builder.get_object("track-store")
+        track_poi_store = self.builder.get_object("track-poi-store")
         for r in self.core.trackManager:
-            track_store.append([r.name])
-        self.builder.get_object("track-select").set_active(0)
+            track_poi_store.append([r.name, f'track-{r.name}'])
+        for r in self.core.poiManager:
+            track_poi_store.append(["POI: " + r.name, f'poi-{r.name}'])
+        self.builder.get_object("track-poi-select").set_active(0)
 
         self.builder.get_object("time-entry").set_text(
             datetime.datetime.today().strftime(TimeControl.DFORMAT)
@@ -180,10 +182,13 @@ class RoutingWizardDialog:
             self.builder.get_object("time-entry").get_text(), TimeControl.DFORMAT
         )
 
-    def get_selected_track(self):
-        return self.core.trackManager[
-            self.builder.get_object("track-select").get_active()
-        ]
+    def get_selected_track_or_poi(self):
+        s = self.builder.get_object("track-poi-select").get_active()
+
+        if s >= len(self.core.trackManager):
+            return self.core.poiManager[s - len(self.core.trackManager)]
+        else:
+            return self.core.trackManager[s]
 
     def get_selected_algorithm(self):
         return weatherrouting.list_routing_algorithms()[

@@ -124,7 +124,7 @@ class Core(EventDispatcher):
         self,
         algorithm,
         polar_file,
-        track,
+        track_or_poi,
         start_datetime,
         start_position,
         validity_providers,
@@ -148,7 +148,11 @@ class Core(EventDispatcher):
         routing = weatherrouting.Routing(
             algorithm,
             polar,
-            track.to_list(),
+            (
+                track_or_poi.to_list()
+                if isinstance(track_or_poi, Track)
+                else [track_or_poi.position]
+            ),
             self.grib_manager,
             start_datetime=start_datetime,
             start_position=start_position,
