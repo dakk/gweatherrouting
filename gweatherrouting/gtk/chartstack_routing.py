@@ -60,6 +60,17 @@ class ChartStackRouting(ChartStackBase):
         if self.routing_thread:
             self.stop_routing = True
 
+    def on_route_to(self, widget):
+        lat, lon = self.get_lat_lon()
+        poi = self.core.poiManager.create(
+            (
+                lat,
+                lon,
+            )
+        )
+        self.on_routing_create(None)
+        self.core.poiManager.remove(poi)
+
     def on_routing_create(self, event):
         dialog = RoutingWizardDialog(self.core, self.parent)
         response = dialog.run()
@@ -70,7 +81,7 @@ class ChartStackRouting(ChartStackBase):
             self.currentRouting = self.core.create_routing(
                 dialog.get_selected_algorithm(),
                 os.path.join(POLAR_DIR, polar_file),
-                dialog.get_selected_track(),
+                dialog.get_selected_track_or_poi(),
                 dialog.get_start_datetime(),
                 dialog.get_selected_start_point(),
                 self.chart_manager.get_line_point_validity_providers(),
