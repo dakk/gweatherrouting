@@ -60,6 +60,17 @@ class ChartStackRouting(ChartStackBase):
         if self.routing_thread:
             self.stop_routing = True
 
+    def on_route_to(self, widget):
+        lat, lon = self.get_lat_lon()
+        poi = self.core.poiManager.create(
+            (
+                lat,
+                lon,
+            )
+        )
+        self.on_routing_create(None)
+        self.core.poiManager.remove(poi)
+
     def on_routing_create(self, event):
         dialog = RoutingWizardDialog(self.core, self.parent)
         response = dialog.run()

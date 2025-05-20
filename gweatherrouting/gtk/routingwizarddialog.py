@@ -66,7 +66,9 @@ class RoutingWizardDialog:
 
         for p in self.core.poiManager:
             start_store.append(["POI: " + p.name, "poi-" + p.name])
-        self.builder.get_object("start-select").set_active(0)
+
+        if len(self.core.trackManager) == 0:
+            self.builder.get_object("start-select").set_active(1)
 
         self.boat_store = self.builder.get_object("boat-store")
         for polar in self.polars:
@@ -80,10 +82,10 @@ class RoutingWizardDialog:
 
         track_poi_store = self.builder.get_object("track-poi-store")
         for r in self.core.trackManager:
-            track_poi_store.append([r.name, f'track-{r.name}'])
+            track_poi_store.append([r.name, f"track-{r.name}"])
         for r in self.core.poiManager:
-            track_poi_store.append(["POI: " + r.name, f'poi-{r.name}'])
-        self.builder.get_object("track-poi-select").set_active(0)
+            track_poi_store.append(["POI: " + r.name, f"poi-{r.name}"])
+        self.builder.get_object("track-poi-select").set_active(len(track_poi_store) - 1)
 
         self.builder.get_object("time-entry").set_text(
             datetime.datetime.today().strftime(TimeControl.DFORMAT)
