@@ -1,0 +1,56 @@
+
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+name: Build Flatpak
+
+jobs:
+  prepare-deps:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.12
+
+    - name: Create wheels directory
+      run: mkdir -p flatpak/wheels
+
+    - name: Download Python dependencies
+      run: |
+        pip install --upgrade pip wheel
+        pip download -r flatpak/requirements.txt -d flatpak/wheels
+
+    - name: Upload wheels
+      uses: actions/upload-artifact@v4
+      with:
+        name: wheels
+        path: flatpak/wheels
+
+  flatpak-build:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-48
+      options: --privileged
+    needs: prepare-deps
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download wheels
+      uses: actions/download-artifact@v4
+      with:
+        name: wheels
+        path: flatpak/wheels
+
+    - name: Setup Flatpak builder
+      uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+      with:
+        bundle: gweatherrouting.flatpak
+        manifest-path: flatpak/org.gweatherrouting.app.yml
+        cache-key: flatpak-builder-${{ github.sha }}
