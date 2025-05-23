@@ -1,8 +1,12 @@
+name: Build Flatpak
+
 on:
   push:
     branches: [main]
   pull_request:
-name: Build Flatpak
+    types: [opened, synchronize, reopened]
+  release:
+    types: [created]
 
 jobs:
   prepare-deps:
@@ -49,6 +53,6 @@ jobs:
     - name: Setup Flatpak builder
       uses: flatpak/flatpak-github-actions/flatpak-builder@v6
       with:
-        bundle: gweatherrouting.flatpak
+        bundle: GWeatherRouting-linux-x86_64.flatpak
         manifest-path: flatpak/org.gweatherrouting.app.yml
         cache-key: flatpak-builder-${{ github.sha }}
