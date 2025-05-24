@@ -57,3 +57,9 @@ jobs:
         bundle: GWeatherRouting-linux-x86_64.flatpak
         manifest-path: flatpak/org.gweatherrouting.app.yml
         cache-key: flatpak-builder-${{ github.sha }}
+
+    - name: Upload Flatpak
+      uses: actions/upload-artifact@v4
+      with:
+        name: GWeatherRouting-linux-x86_64.flatpak
+        path: flatpak/org.gweatherrouting.app.flatpak
