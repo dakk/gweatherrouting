@@ -1,0 +1,16 @@
+vext
+ruamel.yaml
+ruamel.yaml.clib
+requests
+colorlog
+geojson_utils
+beautifulsoup4
+pyserial
+pynmea2
+gpxpy
+numpy
+matplotlib
+nmeatoolkit
+weatherrouting
+setuptools
+setuptools_scm[toml]
