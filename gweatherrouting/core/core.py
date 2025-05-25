@@ -184,11 +184,11 @@ class Core(EventDispatcher):
         gpx = gpxpy.gpx.GPX()
 
         for track in self.trackManager:
-            gpx_track = track.toGPXTrack()
+            gpx_track = track.to_gpx_object()
             gpx.tracks.append(gpx_track)
 
         for track in self.routingManager:
-            gpx_track = track.toGPXTrack()
+            gpx_track = track.to_gpx_object()
             gpx.tracks.append(gpx_track)
 
         for poi in self.poiManager:
