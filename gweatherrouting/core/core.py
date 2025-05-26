@@ -192,7 +192,7 @@ class Core(EventDispatcher):
             gpx.tracks.append(gpx_track)
 
         for poi in self.poiManager:
-            gpx.waypoints.append(poi.toGPXWaypoint())
+            gpx.waypoints.append(poi.to_gpx_object())
 
         try:
             f = open(path, "w")
