@@ -85,6 +85,15 @@
         <signal name="activate" handler="on_move_boat_here" swapped="no"/>
       </object>
     </child>
+    <child>
+      <object class="GtkMenuItem">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Route to...</property>
+        <property name="use-underline">True</property>
+        <signal name="activate" handler="on_route_to" swapped="no"/>
+      </object>
+    </child>
   </object>
   <object class="GtkMenu" id="poi-menu">
     <property name="visible">True</property>
