@@ -130,9 +130,8 @@ class PolarStack(Gtk.Box):
 
         self.show_all()
 
-    def on_polar_list_cursor_changed(self, treeview):
-        selection = treeview.get_selection()
-        model, treeiter = selection.get_selected()
-        if treeiter is not None:
-            polar_name = model[treeiter][0]
-            self.load_polar(polar_name)
+    def on_boat_select(self, widget):
+        self.load_polar(self.polars[widget.get_active()])
+
+    def on_orcdata(self,event):
+        pass
