@@ -122,3 +122,6 @@ class PolarStack(Gtk.Box):
 
     def on_boat_select(self, widget):
         self.load_polar(self.polars[widget.get_active()])
+    
+    def on_orcdata(self,event):
+        pass
