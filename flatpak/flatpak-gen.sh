@@ -2,16 +2,23 @@
 
 set -e
 
+DIR="${PWD}"
+
 sudo apt install -y flatpak flatpak-builder
 flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 flatpak install -y flathub org.gnome.Platform//48 flathub org.gnome.Sdk//48
 
-mkdir -p wheels
-rm wheels/*
+if [ ! -d "wheels" ]; then
+	mkdir wheels
+fi
+if [ ! - "requirements.txt" ]; then
+	
+fi
+rm wheels
 
 flatpak run \
 	--command=sh --devel \
-	--filesystem=flatpak:rw \
+	--filesystem="$DIR":rw \
 	--share=network \
 	org.gnome.Sdk//48 \
 	-c 'pip3 download -r requirements.txt -d wheels'

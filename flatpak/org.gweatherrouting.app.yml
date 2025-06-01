@@ -5,6 +5,8 @@ sdk: org.gnome.Sdk
 command: gweatherrouting
 finish-args:
   - --share=network
+  - --filesystem=/etc/ssl/certs:ro
+  - --filesystem=xdg-documents
   - --filesystem=xdg-download
   - --socket=wayland
   - --socket=x11
@@ -141,7 +143,7 @@ modules:
     build-commands:
       - pip3 install --no-deps --no-index --find-links=${PWD}/../python-deps/wheels --prefix=/app --no-build-isolation .
       - install -Dm644 gweatherrouting/data/icon.png /app/share/icons/hicolor/256x256/apps/org.gweatherrouting.app.png
-      - install -Dm644 tools/org.gweatherrouting.app.desktop /app/share/applications/
+      - install -Dm644 tools/org.gweatherrouting.app.desktop /app/share/applications/org.gweatherrouting.app.desktop
     sources:
       - type: git
         url: https://github.com/dakk/gweatherrouting.git
