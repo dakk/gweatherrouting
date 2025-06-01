@@ -38,4 +38,4 @@ flatpak run \
 	org.gnome.Sdk//48 \
 	-c 'pip3 download -r requirements.txt -d wheels'
 
-flatpak-builder --user --install --force-clean build-dir manifest.yaml
+flatpak-builder --user --install --force-clean build-dir org.gweatherrouting.app.yml
