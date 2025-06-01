@@ -140,8 +140,8 @@ modules:
     buildsystem: simple
     build-commands:
       - pip3 install --no-deps --no-index --find-links=${PWD}/../python-deps/wheels --prefix=/app --no-build-isolation .
-      - install -D gweatherrouting/data/icon.png /app/share/icons/hicolor/256x256/apps/org.gweatherrouting.app.png
-      - install -D tools/org.gweatherrouting.app.desktop /app/share/applications/
+      - install -Dm644 gweatherrouting/data/icon.png /app/share/icons/hicolor/256x256/apps/org.gweatherrouting.app.png
+      - install -Dm644 tools/org.gweatherrouting.app.desktop /app/share/applications/
     sources:
       - type: git
         url: https://github.com/dakk/gweatherrouting.git
