@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Name=GWeatherRouting
+Exec=gweatherrouting
+Icon=org.gweatherrouting.app
+StartupNotify=true
+Terminal=true
+Type=Application
+Categories=Education;Science;Geography
+Keywords=GPS;Navigation;Chart

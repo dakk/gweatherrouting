@@ -1,6 +1,3 @@
-vext
-ruamel.yaml
-ruamel.yaml.clib
 requests
 colorlog
 geojson_utils
