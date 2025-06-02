@@ -5,7 +5,6 @@ sdk: org.gnome.Sdk
 command: gweatherrouting
 finish-args:
   - --share=network
-  - --filesystem=/etc/ssl/certs:ro
   - --filesystem=xdg-documents
   - --filesystem=xdg-download
   - --socket=wayland
