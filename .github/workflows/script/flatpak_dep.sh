@@ -5,7 +5,7 @@ set -e
 VERSION=$1
 DIR="${PWD}"
 
-mkdir -p "$DIR/flatpak/wheels"
+mkdir -p flatpak/wheels
 
 flatpak run \
 	--command=sh --devel \
