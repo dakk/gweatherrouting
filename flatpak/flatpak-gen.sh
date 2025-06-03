@@ -25,7 +25,7 @@ case "$os" in
 esac
 
 flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-flatpak install -y flathub org.gnome.Platform//48 flathub org.gnome.Sdk//48
+flatpak install -y flathub org.gnome.Platform//46 flathub org.gnome.Sdk//46
 
 if [ ! -d "wheels" ]; then
 	mkdir wheels
@@ -35,7 +35,7 @@ flatpak run \
 	--command=sh --devel \
 	--filesystem="$DIR":rw \
 	--share=network \
-	org.gnome.Sdk//48 \
+	org.gnome.Sdk//46 \
 	-c 'pip3 download -r requirements.txt -d wheels'
 
 flatpak-builder --user --install --force-clean build-dir org.gweatherrouting.app.yml
