@@ -18,20 +18,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Prepare wheels dir in shared path
-      run: |
-        mkdir -p /tmp/flatpak/wheels
-        cp flatpak/requirements.txt /tmp/flatpak/
-        ls /tmp/flatpak
-
     - name: Download wheels with Flatpak
-      run: |
-        flatpak run \
-        --command=sh --devel \
-        --filesystem=/tmp/flatpak:rw \
-        --share=network \
-        org.gnome.Sdk//46 \
-        -c 'ls && pip3 download -r requirements.txt -d wheels'
+      run: bash .github/workflows/scripts/flatpak-dep.sh
 
     - name: Copy wheels back to workspace
       run: |

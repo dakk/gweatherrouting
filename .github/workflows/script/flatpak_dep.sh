@@ -3,13 +3,16 @@
 set -e
 
 VERSION=$1
-DIR="${PWD}"
 
-mkdir -p "$DIR"/flatpak/wheels
+mkdir -p /tmp/flatpak/wheels
+cp flatpak/requirements.txt /tmp/flatpak/
+ls /tmp/flatpak
 
 flatpak run \
     --command=sh --devel \
-    --filesystem="$DIR"/flatpak:rw \
+    --filesystem=/tmp/flatpak:rw \
     --share=network \
     org.gnome.Sdk//"$VERSION" \
 	-c 'pip3 download -r requirements.txt -d wheels'
+
+cp -r /tmp/flatpak/wheels/* flatpak/wheels
