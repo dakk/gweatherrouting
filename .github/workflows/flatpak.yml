@@ -27,7 +27,7 @@ jobs:
       run: |
         flatpak run \
         --command=sh --devel \
-        --filesystem=/tmp/repo/flatpak:rw \
+        --filesystem=/tmp/flatpak:rw \
         --share=network \
         org.gnome.Sdk//46 \
         -c 'pip3 download -r requirements.txt -d wheels'
