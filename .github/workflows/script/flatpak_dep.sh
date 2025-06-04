@@ -4,7 +4,7 @@ set -e
 
 VERSION=$1
 
-mkdir -p /tmp/flatpak/wheels
+mkdir -p flatpak/wheels /tmp/flatpak/wheels
 cp flatpak/requirements.txt /tmp/flatpak/
 ls /tmp/flatpak
 
