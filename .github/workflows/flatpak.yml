@@ -19,12 +19,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Download wheels with Flatpak
-      run: bash .github/workflows/scripts/flatpak-dep.sh
-
-    - name: Copy wheels back to workspace
-      run: |
-        mkdir -p flatpak/wheels
-        cp -r /tmp/flatpak/wheels/* flatpak/wheels/
+      run: bash .github/workflows/scripts/flatpak-dep.sh 46
 
     - name: Setup Flatpak builder
       uses: flatpak/flatpak-github-actions/flatpak-builder@v6
