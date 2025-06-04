@@ -20,8 +20,9 @@ jobs:
 
     - name: Prepare wheels dir in shared path
       run: |
-        mkdir -p /tmp/flatpak
+        mkdir -p /tmp/flatpak/wheels
         cp flatpak/requirements.txt /tmp/flatpak/
+        ls /tmp/flatpak
 
     - name: Download wheels with Flatpak
       run: |
@@ -30,7 +31,7 @@ jobs:
         --filesystem=/tmp/flatpak:rw \
         --share=network \
         org.gnome.Sdk//46 \
-        -c 'pip3 download -r requirements.txt -d wheels'
+        -c 'ls && pip3 download -r requirements.txt -d wheels'
 
     - name: Copy wheels back to workspace
       run: |
