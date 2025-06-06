@@ -19,7 +19,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Download wheels with Flatpak
-      run: bash .github/workflows/script/flatpak-dep.sh 47
+      run: bash .github/workflows/script/flatpak_dep.sh 47
 
     - name: Setup Flatpak builder
       uses: flatpak/flatpak-github-actions/flatpak-builder@v6
