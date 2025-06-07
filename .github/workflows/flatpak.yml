@@ -19,7 +19,6 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Download wheels with Flatpak
-#      run: bash .github/workflows/script/flatpak_dep.sh 46
       run: |
         mkdir -p flatpak/wheels /tmp/flatpak/wheels
         cp flatpak/requirements.txt /tmp/flatpak/
@@ -38,4 +37,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: GWeatherRouting-linux-x86_64.flatpak
-        path: flatpak
+        path: GWeatherRouting-linux-x86_64.flatpak
