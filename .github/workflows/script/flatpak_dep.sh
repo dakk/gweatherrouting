@@ -14,13 +14,6 @@ flatpak run \
     --filesystem=/tmp/flatpak:rw \
     --share=network \
     org.gnome.Sdk//"$VERSION" \
-	-c 'ls'
-
-flatpak run \
-    --command=sh --devel \
-    --filesystem=/tmp/flatpak:rw \
-    --share=network \
-    org.gnome.Sdk//"$VERSION" \
-	-c 'pip3 download -r requirements.txt -d wheels'
+	-c 'pip3 download -r /tmp/flatpak/requirements.txt -d /tmp/flatpak/wheels'
 
 cp -r /tmp/flatpak/wheels/* flatpak/wheels
