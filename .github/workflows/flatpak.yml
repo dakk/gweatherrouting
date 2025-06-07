@@ -13,13 +13,19 @@ jobs:
   flatpak-build:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-47
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-46
       options: --privileged
     steps:
     - uses: actions/checkout@v4
 
     - name: Download wheels with Flatpak
-      run: bash .github/workflows/script/flatpak_dep.sh 47
+#      run: bash .github/workflows/script/flatpak_dep.sh 46
+      run: |
+        mkdir -p flatpak/wheels /tmp/flatpak/wheels
+        cp flatpak/requirements.txt /tmp/flatpak/
+        flatpak run --command=sh --devel --filesystem=/tmp/flatpak:rw --share=network org.gnome.Sdk//46 \
+        -c 'pip3 download -r /tmp/flatpak/requirements.txt -d /tmp/flatpak/wheels'
+        cp -r /tmp/flatpak/wheels/* flatpak/wheels
 
     - name: Setup Flatpak builder
       uses: flatpak/flatpak-github-actions/flatpak-builder@v6
