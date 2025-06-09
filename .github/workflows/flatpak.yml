@@ -10,11 +10,19 @@ on:
   workflow_dispatch:
 
 jobs:
-  flatpak-build:
-    runs-on: ubuntu-latest
+  flatpak:
+    name: "flatpak"
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-46
       options: --privileged
+    strategy:
+      matrix:
+        variant:
+          - arch: x86_64
+            runner: ubuntu-latest
+          - arch: aarch64
+            runner: ubuntu-latest-arm
+    runs-on: ${{ matrix.variant.runner }}
     steps:
     - uses: actions/checkout@v4
 
@@ -29,12 +37,13 @@ jobs:
     - name: Setup Flatpak builder
       uses: flatpak/flatpak-github-actions/flatpak-builder@v6
       with:
-        bundle: GWeatherRouting-linux-x86_64.flatpak
+        bundle: GWeatherRouting-linux.flatpak
         manifest-path: flatpak/org.gweatherrouting.app.yml
         cache-key: flatpak-builder-${{ github.sha }}
+        arch: ${{ matrix.variant.arch }}
 
     - name: Upload Flatpak
       uses: actions/upload-artifact@v4
       with:
-        name: GWeatherRouting-linux-x86_64.flatpak
-        path: GWeatherRouting-linux-x86_64.flatpak
+        name: GWeatherRouting-linux-${{ matrix.variant.arch }}.flatpak
+        path: GWeatherRouting-linux-${{ matrix.variant.arch }}.flatpak
