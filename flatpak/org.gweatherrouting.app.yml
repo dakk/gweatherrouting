@@ -145,7 +145,7 @@ modules:
       - install -Dm644 tools/org.gweatherrouting.app.desktop /app/share/applications/org.gweatherrouting.app.desktop
     sources:
       - type: git
-        url: https://github.com/Eresia999/gweatherrouting.git
+        url: https://github.com/dakk/gweatherrouting.git
         branch: master
 
 cleanup:
