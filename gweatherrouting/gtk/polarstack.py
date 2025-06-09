@@ -20,13 +20,14 @@ import os
 
 import gi
 
+from gweatherrouting.core.polarmanager import PolarManager
 gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
 
 from gweatherrouting.core.storage import POLAR_DIR
 
-from .orcmanagerwindow import OrcManagerWindow
+from .polarmanagerwindow import PolarManagerWindow
 from .widgets.polar import POLAR_COLORS, PolarWidget
 
 logger = logging.getLogger("gweatherrouting")
@@ -64,9 +65,8 @@ class PolarStack(Gtk.Box):
 
         self.polarWidget = PolarWidget(self.parent)
         self.table = None
+        boatselect.set_active(1)
 
-        if self.polars:
-            polar_list.set_cursor(0)
 
     def load_polar(self, pn):
         self.polarWidget.load_polar(pn)
@@ -132,5 +132,5 @@ class PolarStack(Gtk.Box):
         self.load_polar(self.polars[widget.get_active()])
 
     def on_orcdata(self, event):
-        w = OrcManagerWindow()
+        w = PolarManagerWindow()
         w.show()

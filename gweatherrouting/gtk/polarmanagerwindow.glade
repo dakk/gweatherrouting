@@ -2,8 +2,7 @@
 <!-- Generated with glade 3.40.0 -->
 <interface>
   <requires lib="gtk+" version="3.24"/>
-  <object class="GtkEntryCompletion" id="entrycompletion1"/>
-  <object class="GtkMenu" id="local-orc-menu">
+  <object class="GtkMenu" id="local-polar-menu">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <child>
@@ -11,11 +10,11 @@
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Remove</property>
-        <signal name="activate" handler="on_remove_local_orc" swapped="no"/>
+        <signal name="activate" handler="on_remove_local_polar" swapped="no"/>
       </object>
     </child>
   </object>
-  <object class="GtkListStore" id="orc-files-store">
+  <object class="GtkListStore" id="orc-list-store">
     <columns>
       <!-- column-name sail -->
       <column type="gchararray"/>
@@ -25,7 +24,19 @@
       <column type="gchararray"/>
     </columns>
   </object>
-  <object class="GtkListStore" id="orc-manager-store">
+  <object class="GtkMenu" id="orc-polar-menu">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <child>
+      <object class="GtkMenuItem">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Download</property>
+        <signal name="activate" handler="on_orc_download" swapped="no"/>
+      </object>
+    </child>
+  </object>
+  <object class="GtkListStore" id="polar-manager-store">
     <columns>
       <!-- column-name sail -->
       <column type="gchararray"/>
@@ -35,7 +46,7 @@
       <column type="gchararray"/>
     </columns>
   </object>
-  <object class="GtkWindow" id="orc-manager-window">
+  <object class="GtkWindow" id="polar-manager-window">
     <property name="can-focus">False</property>
     <property name="window-position">center-always</property>
     <child>
@@ -53,14 +64,14 @@
               <object class="GtkTreeView">
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
-                <property name="model">orc-files-store</property>
+                <property name="model">orc-list-store</property>
                 <property name="search-column">1</property>
                 <property name="show-expanders">False</property>
                 <property name="tooltip-column">0</property>
-                <signal name="button-press-event" handler="on_orc_click" swapped="no"/>
+                <signal name="button-press-event" handler="on_polar_click" swapped="no"/>
                 <child internal-child="selection">
                   <object class="GtkTreeSelection">
-                    <signal name="changed" handler="on_orc_select" swapped="no"/>
+                    <signal name="changed" handler="on_polar_select" swapped="no"/>
                   </object>
                 </child>
                 <child>
@@ -124,11 +135,11 @@
           <object class="GtkTreeView">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
-            <property name="model">orc-manager-store</property>
-            <signal name="button-press-event" handler="on_local_orc_click" swapped="no"/>
+            <property name="model">polar-manager-store</property>
+            <signal name="button-press-event" handler="on_local_polar_click" swapped="no"/>
             <child internal-child="selection">
               <object class="GtkTreeSelection">
-                <signal name="changed" handler="on_local_orc_select" swapped="no"/>
+                <signal name="changed" handler="on_local_polar_select" swapped="no"/>
               </object>
             </child>
             <child>
@@ -137,7 +148,7 @@
                 <property name="clickable">True</property>
                 <child>
                   <object class="GtkCellRendererToggle">
-                    <signal name="toggled" handler="on_orc_toggle" swapped="no"/>
+                    <signal name="toggled" handler="on_polar_toggle" swapped="no"/>
                   </object>
                   <attributes>
                     <attribute name="active">4</attribute>
@@ -191,21 +202,9 @@
       <object class="GtkHeaderBar">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-        <property name="title" translatable="yes">ORC Polar Manager</property>
+        <property name="title" translatable="yes">Polar Manager</property>
         <property name="spacing">0</property>
         <property name="show-close-button">True</property>
-      </object>
-    </child>
-  </object>
-  <object class="GtkMenu" id="remote-orc-menu">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <child>
-      <object class="GtkMenuItem">
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
-        <property name="label" translatable="yes">Download</property>
-        <signal name="activate" handler="on_orc_download" swapped="no"/>
       </object>
     </child>
   </object>
