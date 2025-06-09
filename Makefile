@@ -13,5 +13,8 @@ build-appimage:
 	pip install pyinstaller
 	cd appimage && bash appimagegen.sh -y
 
+build-flatpak:
+	cd flatpak && bash flatpak-gen.sh -y
+
 docs:
 	make -C docs html
