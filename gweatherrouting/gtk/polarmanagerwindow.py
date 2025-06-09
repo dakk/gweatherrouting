@@ -1,0 +1,100 @@
+import logging
+import os
+from threading import Thread
+
+import gi
+import requests
+import shutil
+gi.require_version("Gtk", "3.0")
+from gi.repository import Gdk, GObject, Gtk
+from gweatherrouting.core.storage import POLAR_DIR, Storage
+from gweatherrouting.common import resource_path
+from gweatherrouting.core.polarmanager import PolarManager
+
+logger = logging.getLogger("gweatherrouting")
+
+class PolarManagerWindow:
+    def __init__(self):
+        self.selected_polar = None
+        self.selectedLocal_polar = None
+
+        self.builder = Gtk.Builder()
+        self.builder.add_from_file(
+            os.path.abspath(os.path.dirname(__file__)) + "/polarmanagerwindow.glade"
+        )
+        self.builder.connect_signals(self)
+
+        self.window = self.builder.get_object("polar-manager-window")
+        self.window.set_default_size(550, 300)
+
+        self.orc_ListStore = self.builder.get_object("orc-list-store")
+        self.polar_managerStore = self.builder.get_object("polar-manager-store")
+
+        Thread(target=self.download_orc_list, args=()).start()
+
+    def show(self):
+        self.window.show_all()
+
+    def close(self):
+        self.window.hide()
+
+    def on_remove_local_polar(self, widget):
+        pass
+
+    def on_polar_select(self, selection):
+        store, pathlist = selection.get_selected_rows()
+        tree_iter = store.get_iter(pathlist[0])
+        self.selected_ORCboat = store.get_value(tree_iter, 0)
+
+
+    def on_polar_click(self, widget, event):
+        if event.button == 3:
+            menu = self.builder.get_object("orc-polar-menu")
+            menu.popup(None, None, None, None, event.button, event.time)
+
+    def on_local_polar_select(self, selection):
+        pass
+
+    def on_polar_toggle(self, widget, i):
+        pass
+
+    def on_local_polar_click(self, widget, event):
+        pass
+
+    def on_orc_download(self, widget):
+        Thread(target=self.download_orc, args=()).start()
+     
+    def download_orc_list(self):
+        Gdk.threads_enter()
+        self.builder.get_object("download-progress").show()
+        Gdk.threads_leave()
+        orc_url = (
+            "https://raw.githubusercontent.com/jieter/orc-data/refs/heads/master/site/index.json"
+        )
+        Gdk.threads_enter()
+        try:
+            r = requests.get(orc_url)
+            orc_data = r.json()
+            for d in orc_data:
+                self.orc_ListStore.append(d)
+        except:
+            logger.error(f"Failed to download orc data file list from {orc_url}")
+            self.builder.get_object("download-progress").set_text(
+                "Failed to download orc data list"
+            )
+
+            dialog = Gtk.MessageDialog(
+                transient_for=self.window,
+                flags=0,
+                message_type=Gtk.MessageType.ERROR,
+                buttons=Gtk.ButtonsType.OK,
+                text="Download failed",
+            )
+            dialog.format_secondary_text("Failed to download orc data list")
+            dialog.run()
+            dialog.destroy()
+
+        Gdk.threads_leave()
+
+    def download_orc(self):
+        print("Download orc")

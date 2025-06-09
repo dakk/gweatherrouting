@@ -9,49 +9,34 @@ from gweatherrouting.core.storage import POLAR_DIR, Storage
 
 logger = logging.getLogger("gweatherrouting")
 
+class PolarManagerStorage(Storage):
+    def __init__(self):
+        Storage.__init__(self, "polar-manager")
+        self.opened = []
+        self.load_or_save_default()
 
 class PolarManager():
     def __init__(self):
-        self.polar_files = None
+        self.storage = PolarManagerStorage()
+        self.polars_files = None
 
         self.polars = []
-
-        self.local_polar = []
         self.refresh_local_polars()
 
+        for x in self.storage.opened:
+            self.enable(x)
+    
     def refresh_local_polars(self):
-        self.local_polars = os.listdir(POLAR_DIR)
-
-
-    def change_state(self, name, state):
-        if not state:
-            self.disable(name)
-        else:
-            self.enable(name)
-
-    def enable(self, name):
-        self.load(POLAR_DIR + "/" + name)
-        self.store_opened_polars()
-
-    def disable(self, name):
+        self.local_polars = []
+        for x in os.listdir(POLAR_DIR):
+            if x[-4:] == ".pol":
+                self.local_polars.append(x)
+    
+    def store_opened_polars(self):
+        ss: List = []
         for x in self.polars:
-            if x.name == name:
-                self.gribs.remove(x)
-                self.store_opened_polars()
-
-    def is_enabled(self, name) -> bool:
-        for x in self.polars:
-            if x.name == name:
-                return True
-        return False
-
-    def remove(self, name):
-        if self.is_enabled(name):
-            self.disable(name)
-        os.remove(POLAR_DIR + "/" + name)
-
-    def import_polar(self, path):
-        polar_filename = os.path.basename(path)
-        target_filepath = os.path.join(POLAR_DIR, polar_filename)
-        shutil.copyfile(path, target_filepath)
-        self.polars.append(polar_filename)
+            try:
+                ss.index(x.name)
+            except:
+                ss.append(x.name)
+        self.storage.opened = ss
