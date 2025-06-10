@@ -43,3 +43,4 @@ class ChartStackBase:
     geo_map_layer: GeoMapLayer
     update_track: Callable
     chart_manager: ChartManager
+    get_lat_lon: Callable

@@ -124,7 +124,7 @@ class Core(EventDispatcher):
         self,
         algorithm,
         polar_file,
-        track,
+        track_or_poi,
         start_datetime,
         start_position,
         validity_providers,
@@ -148,7 +148,11 @@ class Core(EventDispatcher):
         routing = weatherrouting.Routing(
             algorithm,
             polar,
-            track.to_list(),
+            (
+                track_or_poi.to_list()
+                if isinstance(track_or_poi, Track)
+                else [track_or_poi.position]
+            ),
             self.grib_manager,
             start_datetime=start_datetime,
             start_position=start_position,
@@ -180,15 +184,15 @@ class Core(EventDispatcher):
         gpx = gpxpy.gpx.GPX()
 
         for track in self.trackManager:
-            gpx_track = track.toGPXTrack()
+            gpx_track = track.to_gpx_object()
             gpx.tracks.append(gpx_track)
 
         for track in self.routingManager:
-            gpx_track = track.toGPXTrack()
+            gpx_track = track.to_gpx_object()
             gpx.tracks.append(gpx_track)
 
         for poi in self.poiManager:
-            gpx.waypoints.append(poi.toGPXWaypoint())
+            gpx.waypoints.append(poi.to_gpx_object())
 
         try:
             f = open(path, "w")

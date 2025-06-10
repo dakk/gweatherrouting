@@ -68,7 +68,7 @@ class ChartStackPOI(ChartStackBase):
 
     def on_poi_remove(self, widget):
         if self.selected_poi is not None:
-            self.core.poiManager.remove(self.selected_poi)
+            self.core.poiManager.remove_by_name(self.selected_poi)
             self.update_poi()
 
     def on_poi_toggle(self, widget, i):
