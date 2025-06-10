@@ -1,0 +1,43 @@
+name: Flatpak
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, synchronize, reopened]
+  release:
+    types: [created]
+  workflow_dispatch:
+
+jobs:
+  flatpak:
+    name: "flatpak"
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-46
+      options: --privileged
+    strategy:
+      matrix:
+        variant:
+          - arch: x86_64
+            runner: ubuntu-latest
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.variant.runner }}
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Download wheels with Flatpak
+      run: |
+        mkdir -p flatpak/wheels /tmp/flatpak/wheels
+        cp flatpak/requirements.txt /tmp/flatpak/
+        flatpak run --command=sh --devel --filesystem=/tmp/flatpak:rw --share=network org.gnome.Sdk//46 \
+        -c 'pip3 download -r /tmp/flatpak/requirements.txt -d /tmp/flatpak/wheels'
+        cp -r /tmp/flatpak/wheels/* flatpak/wheels
+
+    - name: Setup Flatpak builder
+      uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+      with:
+        bundle: GWeatherRouting-linux.flatpak
+        manifest-path: flatpak/org.gweatherrouting.app.yml
+        cache-key: flatpak-builder-${{ github.sha }}
+        arch: ${{ matrix.variant.arch }}
