@@ -37,7 +37,7 @@ jobs:
     - name: Setup Flatpak builder
       uses: flatpak/flatpak-github-actions/flatpak-builder@v6
       with:
-        bundle: GWeatherRouting-linux-${{ matrix.variant.arch }}.flatpak
+        bundle: GWeatherRouting-linux
         manifest-path: flatpak/org.gweatherrouting.app.yml
         cache-key: flatpak-builder-${{ github.sha }}
         arch: ${{ matrix.variant.arch }}
