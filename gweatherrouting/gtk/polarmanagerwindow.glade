@@ -205,6 +205,15 @@
         <property name="title" translatable="yes">Polar Manager</property>
         <property name="spacing">0</property>
         <property name="show-close-button">True</property>
+        <child>
+          <object class="GtkButton">
+            <property name="label" translatable="yes">Open</property>
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">True</property>
+            <signal name="clicked" handler="on_open" swapped="no"/>
+          </object>
+        </child>
       </object>
     </child>
   </object>

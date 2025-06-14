@@ -19,7 +19,7 @@ from typing import Callable, List, Optional
 import gpxpy
 import weatherrouting
 
-from gweatherrouting.core import GribManager, utils
+from gweatherrouting.core import GribManager, utils, PolarManager
 from gweatherrouting.core.connectionmanager import ConnectionManager
 from gweatherrouting.core.datasource import DataPacket
 from gweatherrouting.core.geo import (
@@ -85,6 +85,7 @@ class Core(EventDispatcher):
         self.routingManager = RoutingCollection()
         self.poiManager = POICollection()
         self.grib_manager = GribManager()
+        self.polar_manager = PolarManager()
         self.boat_info = BoatInfo()
         self.logManager = LogTrackCollection()
 

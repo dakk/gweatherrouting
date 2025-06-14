@@ -40,7 +40,7 @@ logger = logging.getLogger("gweatherrouting")
 class PolarStack(Gtk.Box):
     def __init__(self, parent, core, settings_manager):
         Gtk.Widget.__init__(self)
-
+        self.polar_manager = core.polar_manager
         self.parent = parent
         self.core = core
 
@@ -54,8 +54,10 @@ class PolarStack(Gtk.Box):
         self.pack_start(self.builder.get_object("polarcontent"), True, True, 0)
 
         self.statusBar = self.builder.get_object("statusbar")
+        
+        self.polars = self.polar_manager.polars
+        self.polar_manager.connect("polars-list-updated", self.polars_list_updated)
 
-        self.polars = os.listdir(POLAR_DIR)
         boatselect = self.builder.get_object("boat-select")
         for polar in self.polars:
             boatselect.insert_text(0, polar)
@@ -126,6 +128,9 @@ class PolarStack(Gtk.Box):
     def on_boat_select(self, widget):
         self.load_polar(self.polars[widget.get_active()])
 
-    def on_orcdata(self, event):
-        w = PolarManagerWindow()
+    def on_polar_manager(self, event):
+        w = PolarManagerWindow(self.core.polar_manager)
         w.show()
+
+    def polars_list_updated(self, event):
+        print('AAAA')

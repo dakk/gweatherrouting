@@ -31,9 +31,9 @@
           <object class="GtkToolButton">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="label" translatable="yes">Get from orc-data</property>
+            <property name="label" translatable="yes">Polar manager</property>
             <property name="use-underline">True</property>
-            <signal name="clicked" handler="on_orcdata" swapped="no"/>
+            <signal name="clicked" handler="on_polar_manager" swapped="no"/>
           </object>
           <packing>
             <property name="expand">False</property>
