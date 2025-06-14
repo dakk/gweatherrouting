@@ -10,11 +10,17 @@ from gi.repository import Gdk, GObject, Gtk
 from gweatherrouting.core.storage import POLAR_DIR, Storage
 from gweatherrouting.common import resource_path
 from gweatherrouting.core.polarmanager import PolarManager
-
+ 
 logger = logging.getLogger("gweatherrouting")
 
+PolFileFilter = Gtk.FileFilter()
+PolFileFilter.set_name("Polar file")
+PolFileFilter.add_pattern("*.pol")
+
 class PolarManagerWindow:
-    def __init__(self):
+    def __init__(self,  polar_manager):
+        self.polar_manager = polar_manager
+        print(self.polar_manager.polars)
         self.selected_polar = None
         self.selectedLocal_polar = None
 
@@ -29,7 +35,6 @@ class PolarManagerWindow:
 
         self.orc_ListStore = self.builder.get_object("orc-list-store")
         self.polar_managerStore = self.builder.get_object("polar-manager-store")
-
         Thread(target=self.download_orc_list, args=()).start()
 
     def show(self):
@@ -98,3 +103,26 @@ class PolarManagerWindow:
 
     def download_orc(self):
         print("Download orc")
+    
+    def on_open(self, widget):
+        parent_window = self.window
+        dialog = Gtk.FileChooserDialog(
+            "Please choose a file",
+            parent_window,
+            Gtk.FileChooserAction.OPEN,
+            (
+                Gtk.STOCK_CANCEL,
+                Gtk.ResponseType.CANCEL,
+                Gtk.STOCK_OPEN,
+                Gtk.ResponseType.OK,
+            ),
+        )
+
+        dialog.add_filter(PolFileFilter)
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            filepath = dialog.get_filename()
+            self.polar_manager.add_polar_file(filepath)
+            dialog.destroy()
+            

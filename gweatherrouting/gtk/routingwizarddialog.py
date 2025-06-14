@@ -28,23 +28,19 @@ from gi.repository import Gtk
 from gweatherrouting.common import resource_path
 from gweatherrouting.core import TimeControl
 from gweatherrouting.core.storage import POLAR_DIR
+from gweatherrouting.core.polarmanager import PolarManager
 
 from .timepickerdialog import TimePickerDialog
 from .widgets.polar import PolarWidget
 
-PolFileFilter = Gtk.FileFilter()
-PolFileFilter.set_name("Polar file")
-PolFileFilter.add_pattern("*.pol")
-
-
 class RoutingWizardDialog:
     def __init__(self, core, parent):
         self.core = core
+        self.polars = PolarManager().polars
         self.polar = None
 
         self.paramWidgets = {}
-        self.load_default_pol()
-        self.polars = os.listdir(POLAR_DIR)
+
 
         self.builder = Gtk.Builder()
         self.builder.add_from_file(
@@ -226,108 +222,3 @@ class RoutingWizardDialog:
             s -= 2
             return self.core.poiManager[s].position
 
-    def add_custom_polar_file(self, polar_path):
-        polar_filename = os.path.basename(polar_path)
-        target_filepath = os.path.join(POLAR_DIR, polar_filename)
-        shutil.copyfile(polar_path, target_filepath)
-        self.polars.append(polar_filename)
-        self.builder.get_object("boat-select").set_active(len(self.polars) - 1)
-        self.polarWidget.set_polar(self.polar)
-
-    def on_open(self, widget):
-        parent_window = self.dialog
-        dialog = Gtk.FileChooserDialog(
-            "Please choose a file",
-            parent_window,
-            Gtk.FileChooserAction.OPEN,
-            (
-                Gtk.STOCK_CANCEL,
-                Gtk.ResponseType.CANCEL,
-                Gtk.STOCK_OPEN,
-                Gtk.ResponseType.OK,
-            ),
-        )
-
-        dialog.add_filter(PolFileFilter)
-
-        response = dialog.run()
-        if response == Gtk.ResponseType.OK:
-            filepath = dialog.get_filename()
-            dialog.destroy()
-            shutil.copyfile(
-                filepath, os.path.join(POLAR_DIR, os.path.basename(filepath))
-            )
-            self.polars.append(os.path.basename(filepath))
-            self.boat_store.append([os.path.basename(filepath)])
-            self.builder.get_object("boat-select").set_active(len(self.polars) - 1)
-
-    def _parse_csv_floats(self, widget_id):
-        """Parse a comma-separated string of floats from a GtkEntry."""
-        text = self.builder.get_object(widget_id).get_text().strip()
-        if not text:
-            return []
-        values = []
-        for part in text.split(","):
-            part = part.strip()
-            if part:
-                values.append(float(part))
-        return values
-
-    def get_comparison_scenarios(self):
-        """Return a list of scenario dicts (cartesian product of enabled axes).
-
-        Each dict has keys: time_offset_hours, wind_speed_pct,
-        wind_dir_offset, polar_efficiency_pct.
-        Returns an empty list if no comparison axis is enabled.
-        """
-        time_enabled = self.builder.get_object("compare-time-enable").get_active()
-        wind_speed_enabled = self.builder.get_object(
-            "compare-wind-speed-enable"
-        ).get_active()
-        wind_dir_enabled = self.builder.get_object(
-            "compare-wind-dir-enable"
-        ).get_active()
-        polar_enabled = self.builder.get_object("compare-polar-enable").get_active()
-
-        if not any([time_enabled, wind_speed_enabled, wind_dir_enabled, polar_enabled]):
-            return []
-
-        time_offsets = (
-            self._parse_csv_floats("compare-time-values") if time_enabled else [0]
-        )
-        wind_speed_pcts = (
-            self._parse_csv_floats("compare-wind-speed-values")
-            if wind_speed_enabled
-            else [0]
-        )
-        wind_dir_offsets = (
-            self._parse_csv_floats("compare-wind-dir-values")
-            if wind_dir_enabled
-            else [0]
-        )
-        polar_efficiencies = (
-            self._parse_csv_floats("compare-polar-values") if polar_enabled else [100]
-        )
-
-        scenarios = []
-        for t, ws, wd, pe in itertools.product(
-            time_offsets, wind_speed_pcts, wind_dir_offsets, polar_efficiencies
-        ):
-            scenarios.append(
-                {
-                    "time_offset_hours": t,
-                    "wind_speed_pct": ws,
-                    "wind_dir_offset": wd,
-                    "polar_efficiency_pct": pe,
-                }
-            )
-
-        return scenarios
-
-    def load_default_pol(self):
-        if not os.listdir(POLAR_DIR):
-            default_polar = os.listdir(resource_path("gweatherrouting", "data/polars/"))
-            for p in default_polar:
-                target_filepath = os.path.join(POLAR_DIR, p)
-                polar_file_path = resource_path("gweatherrouting", f"data/polars/{p}")
-                shutil.copyfile(polar_file_path, target_filepath)
