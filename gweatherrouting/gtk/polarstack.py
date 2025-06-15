@@ -58,20 +58,21 @@ class PolarStack(Gtk.Box):
         self.polars = self.polar_manager.polars
         self.polar_manager.connect("polars-list-updated", self.polars_list_updated)
 
-        boatselect = self.builder.get_object("boat-select")
+        self.boatselect = self.builder.get_object("boat-select")
         for polar in self.polars:
-            boatselect.insert_text(0, polar)
+            self.boatselect.append_text(polar)
 
-        self.polarWidget = PolarWidget(self.parent)
+        self.polarWidget = PolarWidget(self.parent, self.core)
         self.table = None
-        boatselect.set_active(1)
+        self.boatselect.set_active(0)
         
 
-    def load_polar(self, pn):
-        self.polarWidget.load_polar(pn)
-        self.builder.get_object("polarwidgetcontainer").pack_start(
-            self.polarWidget, True, True, 0
-        )
+    def load_polar(self, polar_file):
+        polarwidgetcontainer = self.builder.get_object("polarwidgetcontainer")
+        for child in polarwidgetcontainer.get_children():
+            polarwidgetcontainer.remove(child)
+        self.polarWidget.load_polar(polar_file)
+        polarwidgetcontainer.pack_start(self.polarWidget, True, True, 0)
 
         cc = self.builder.get_object("polartablecontainer")
         if self.table:
@@ -124,7 +125,7 @@ class PolarStack(Gtk.Box):
                 )
 
         self.show_all()
-
+    
     def on_boat_select(self, widget):
         self.load_polar(self.polars[widget.get_active()])
 
@@ -133,4 +134,8 @@ class PolarStack(Gtk.Box):
         w.show()
 
     def polars_list_updated(self, event):
-        print('AAAA')
+        self.polars = self.polar_manager.polars
+        self.boatselect.get_model().clear()  
+        for polar in self.polars:
+            self.boatselect.append_text(polar)
+        self.boatselect.set_active(0)

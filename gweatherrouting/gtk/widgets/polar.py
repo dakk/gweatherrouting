@@ -28,10 +28,11 @@ logger = logging.getLogger("gweatherrouting")
 
 
 class PolarWidget(Gtk.DrawingArea):
-    def __init__(self, parent):
+    def __init__(self, parent, core):
         self.par = parent
         super(PolarWidget, self).__init__()
 
+        self.polar_manager = core.polar_manager
         self.set_size_request(60, 180)
         self.connect("draw", self.draw)
         self.polar = None
@@ -49,12 +50,9 @@ class PolarWidget(Gtk.DrawingArea):
     def load_polar(self, polar_file):
         polar = None
         try:
-            polar = Polar(resource_path("gweatherrouting", f"data/polars/{polar_file}"))
+            polar = Polar(self.polar_manager.get_path(polar_file))
         except:
-            try:
-                polar = Polar(polar_file)
-            except:
-                logger.error("Error loading polar file %s", polar_file)
+            logger.error("Error loading polar file %s", polar_file)
 
         self.set_polar(polar)
 

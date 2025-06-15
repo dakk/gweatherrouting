@@ -20,7 +20,6 @@ PolFileFilter.add_pattern("*.pol")
 class PolarManagerWindow:
     def __init__(self,  polar_manager):
         self.polar_manager = polar_manager
-        print(self.polar_manager.polars)
         self.selected_polar = None
         self.selectedLocal_polar = None
 
@@ -35,6 +34,7 @@ class PolarManagerWindow:
 
         self.orc_ListStore = self.builder.get_object("orc-list-store")
         self.polar_managerStore = self.builder.get_object("polar-manager-store")
+        self.refresh_polars_tab()
         Thread(target=self.download_orc_list, args=()).start()
 
     def show(self):
@@ -61,7 +61,12 @@ class PolarManagerWindow:
         pass
 
     def on_polar_toggle(self, widget, i):
-        pass
+        n = self.polar_manager.polars_files[int(i)]
+        if self.polar_manager.is_enabled(n):
+            self.polar_manager.disable(n)
+        else:
+            self.polar_manager.enable(n)
+        self.refresh_polars_tab()
 
     def on_local_polar_click(self, widget, event):
         pass
@@ -125,4 +130,12 @@ class PolarManagerWindow:
             filepath = dialog.get_filename()
             self.polar_manager.add_polar_file(filepath)
             dialog.destroy()
-            
+
+        self.refresh_polars_tab()
+    
+    def refresh_polars_tab(self):
+        self.polar_managerStore.clear()
+        for polar in self.polar_manager.polars_files:
+            enabled = self.polar_manager.is_enabled(polar)
+            self.polar_managerStore.append([polar, '-', '-', enabled])
+        
