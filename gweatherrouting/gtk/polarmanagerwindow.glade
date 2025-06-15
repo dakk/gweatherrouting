@@ -2,7 +2,7 @@
 <!-- Generated with glade 3.40.0 -->
 <interface>
   <requires lib="gtk+" version="3.24"/>
-  <object class="GtkMenu" id="local-polar-menu">
+  <object class="GtkMenu" id="orc-list-menu">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <child>
@@ -24,7 +24,7 @@
       <column type="gchararray"/>
     </columns>
   </object>
-  <object class="GtkMenu" id="orc-polar-menu">
+  <object class="GtkMenu" id="polar-manager-menu">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <child>
@@ -38,12 +38,14 @@
   </object>
   <object class="GtkListStore" id="polar-manager-store">
     <columns>
-      <!-- column-name sail -->
+      <!-- column-name sail_data -->
       <column type="gchararray"/>
-      <!-- column-name name -->
+      <!-- column-name name_data -->
       <column type="gchararray"/>
-      <!-- column-name type -->
+      <!-- column-name type_data -->
       <column type="gchararray"/>
+      <!-- column-name active_data -->
+      <column type="gboolean"/>
     </columns>
   </object>
   <object class="GtkWindow" id="polar-manager-window">
@@ -132,60 +134,63 @@
           </packing>
         </child>
         <child>
-          <object class="GtkTreeView">
+          <object class="GtkScrolledWindow">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
-            <property name="model">polar-manager-store</property>
-            <signal name="button-press-event" handler="on_local_polar_click" swapped="no"/>
-            <child internal-child="selection">
-              <object class="GtkTreeSelection">
-                <signal name="changed" handler="on_local_polar_select" swapped="no"/>
-              </object>
-            </child>
+            <property name="shadow-type">in</property>
             <child>
-              <object class="GtkTreeViewColumn">
-                <property name="title" translatable="yes">Enabled</property>
-                <property name="clickable">True</property>
+              <object class="GtkTreeView">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="model">polar-manager-store</property>
+                <property name="search-column">0</property>
+                <signal name="button-press-event" handler="on_local_polar_click" swapped="no"/>
                 <child>
-                  <object class="GtkCellRendererToggle">
-                    <signal name="toggled" handler="on_polar_toggle" swapped="no"/>
+                  <object class="GtkTreeViewColumn">
+                    <property name="title" translatable="yes">Enabled</property>
+                    <property name="clickable">True</property>
+                    <child>
+                      <object class="GtkCellRendererToggle">
+                        <signal name="toggled" handler="on_polar_toggle" swapped="no"/>
+                      </object>
+                      <attributes>
+                        <attribute name="active">3</attribute>
+                      </attributes>
+                    </child>
                   </object>
-                  <attributes>
-                    <attribute name="active">4</attribute>
-                  </attributes>
                 </child>
-              </object>
-            </child>
-            <child>
-              <object class="GtkTreeViewColumn">
-                <property name="title" translatable="yes">Sail number</property>
                 <child>
-                  <object class="GtkCellRendererText"/>
-                  <attributes>
-                    <attribute name="text">0</attribute>
-                  </attributes>
+                  <object class="GtkTreeViewColumn">
+                    <property name="title" translatable="yes">Sail number</property>
+                    <child>
+                      <object class="GtkCellRendererText"/>
+                      <attributes>
+                        <attribute name="text">0</attribute>
+                      </attributes>
+                    </child>
+                  </object>
                 </child>
-              </object>
-            </child>
-            <child>
-              <object class="GtkTreeViewColumn">
-                <property name="title" translatable="yes">Name</property>
                 <child>
-                  <object class="GtkCellRendererText"/>
-                  <attributes>
-                    <attribute name="markup">1</attribute>
-                  </attributes>
+                  <object class="GtkTreeViewColumn">
+                    <property name="title" translatable="yes">Name</property>
+                    <child>
+                      <object class="GtkCellRendererText"/>
+                      <attributes>
+                        <attribute name="text">1</attribute>
+                      </attributes>
+                    </child>
+                  </object>
                 </child>
-              </object>
-            </child>
-            <child>
-              <object class="GtkTreeViewColumn">
-                <property name="title" translatable="yes">Type</property>
                 <child>
-                  <object class="GtkCellRendererText"/>
-                  <attributes>
-                    <attribute name="text">2</attribute>
-                  </attributes>
+                  <object class="GtkTreeViewColumn">
+                    <property name="title" translatable="yes">Type</property>
+                    <child>
+                      <object class="GtkCellRendererText"/>
+                      <attributes>
+                        <attribute name="text">2</attribute>
+                      </attributes>
+                    </child>
+                  </object>
                 </child>
               </object>
             </child>

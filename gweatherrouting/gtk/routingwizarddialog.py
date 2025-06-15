@@ -36,7 +36,8 @@ from .widgets.polar import PolarWidget
 class RoutingWizardDialog:
     def __init__(self, core, parent):
         self.core = core
-        self.polars = PolarManager().polars
+        self.polar_manager = core.polar_manager
+        self.polars = self.polar_manager.polars
         self.polar = None
 
         self.paramWidgets = {}
@@ -55,7 +56,7 @@ class RoutingWizardDialog:
         self.dialog.add_button("Cancel", Gtk.ResponseType.CANCEL)
         self.dialog.add_button("Run", Gtk.ResponseType.OK)
 
-        self.polarWidget = PolarWidget(self.dialog)
+        self.polarWidget = PolarWidget(self.dialog, self.core)
         self.builder.get_object("polar-container").add(self.polarWidget)
 
         start_store = self.builder.get_object("start-store")
