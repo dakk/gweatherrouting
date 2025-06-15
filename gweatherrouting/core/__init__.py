@@ -16,6 +16,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 # isort:skip_file
 from .grib import Grib  # noqa: F401
 from .gribmanager import GribManager  # noqa: F401
+from .polarmanager import PolarManager  # noqa: F401
 from .timecontrol import TimeControl  # noqa: F401
 from .datasource import DataSource, NMEADataPacket, DataPacket  # noqa: F401
 from .serialdatasource import SerialDataSource  # noqa: F401
