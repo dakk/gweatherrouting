@@ -21,10 +21,21 @@ class PolarManager(EventDispatcher):
         self.storage = PolarManagerStorage()
         self.polars_files = []
         self.polars = []
+        self.refresh_local_polars()
 
-        self.load_default_pol()
+        if self.storage.enabled:
+            logger.info("Loading enabled polars from storage: %s", self.storage.enabled)
+            for p in self.storage.enabled:
+                if p in self.polars_files:
+                    self.enable(p)
+        else:
+            self.storage.enabled = []
+            logger.info("No enabled polars found in storage, initializing with default polars.")
+            self.enable(self.polars_files[0]) if self.polars_files else None
 
-    def load_default_pol(self):
+
+
+    def refresh_local_polars(self):
         if not os.listdir(POLAR_DIR):
             default_polar = os.listdir(resource_path("gweatherrouting", "data/polars/"))
             for p in default_polar:
@@ -34,24 +45,15 @@ class PolarManager(EventDispatcher):
         
         for p in os.listdir(POLAR_DIR):
             self.polars_files.append(p)
-            self.enable(p)
         self.polars_files.sort()
 
-    '''
-    def refresh_polars(self):
-        self.polars = []
-        for x in self.polars_files:
-            if self.is_enabled(x):
-                self.polars.append(x)
-        self.polars.sort()
-    '''
     def store_enabled_polars(self):
         ss: List = []
         for x in self.polars:
             try:
-                ss.index(x.name)
+                ss.index(x)
             except:
-                ss.append(x.name)
+                ss.append(x)
         self.storage.enabled = ss
     
     def load(self, path):
@@ -66,6 +68,7 @@ class PolarManager(EventDispatcher):
             self.storage.enabled.append(name)
             self.storage.save()
         self.polars.sort()
+        self.store_enabled_polars()
         self.dispatch("polars-list-updated", self.polars)
 
     def disable(self, name):
@@ -76,6 +79,7 @@ class PolarManager(EventDispatcher):
             self.storage.save() 
 
         self.polars.sort()
+        self.store_enabled_polars()
         self.dispatch("polars-list-updated", self.polars)
     
     def is_enabled(self, name) -> bool:
@@ -90,13 +94,13 @@ class PolarManager(EventDispatcher):
             self.dispatch("polars-list-updated")
 
     def add_polar_file(self, polar_path):
-        polar_filename = os.path.basename(polar_path)
-        target_filepath = os.path.join(POLAR_DIR, polar_filename)
-        shutil.copyfile(polar_path, target_filepath)
-        logger.info(f"Copied {polar_path} to {target_filepath}")
-        self.polars_files.append(polar_filename)
+        file_name = os.path.basename(polar_path)
+        file_path = os.path.join(POLAR_DIR, file_name)
+        shutil.copyfile(polar_path, file_path)
+        logger.info(f"Copied {polar_path} to {file_path}")
+        self.polars_files.append(file_name)
         self.polars_files.sort()
-        self.enable(polar_filename)
+        self.enable(file_name)
         self.dispatch("polars-list-updated", self.polars)
     
     def get_path(self, name):
@@ -104,3 +108,19 @@ class PolarManager(EventDispatcher):
             logger.error(f"Polar {name} not found in the list of polars.")
             return None 
         return os.path.join(POLAR_DIR, name)
+
+    def download_orc_polar(self, orc_polar_name):
+        file_name = orc_polar_name.replace("/", "_")
+        file_name = f"{file_name}.pol"
+        source_path = os.path.join(POLAR_DIR, 'test.pol')
+        destination_path = os.path.join(POLAR_DIR, file_name)
+        try:
+            shutil.copy2(source_path, destination_path)
+            logger.info(f"Copied {source_path} to {destination_path}")
+            self.polars_files.append(file_name)
+            self.polars_files.sort()
+            self.enable(file_name)
+            self.dispatch("polars-list-updated", self.polars)
+        except Exception as e:
+            logger.error(f"Failed to download orc polar {orc_polar_name}: {str(e)}")
+            raise e
