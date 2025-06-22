@@ -9,8 +9,8 @@
       <object class="GtkMenuItem">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-        <property name="label" translatable="yes">Remove</property>
-        <signal name="activate" handler="on_remove_local_polar" swapped="no"/>
+        <property name="label" translatable="yes">Download</property>
+        <signal name="activate" handler="on_orc_download" swapped="no"/>
       </object>
     </child>
   </object>
@@ -73,7 +73,7 @@
                 <signal name="button-press-event" handler="on_polar_click" swapped="no"/>
                 <child internal-child="selection">
                   <object class="GtkTreeSelection">
-                    <signal name="changed" handler="on_polar_select" swapped="no"/>
+                    <signal name="changed" handler="on_orc_polar_select" swapped="no"/>
                   </object>
                 </child>
                 <child>
@@ -145,6 +145,9 @@
                 <property name="model">polar-manager-store</property>
                 <property name="search-column">0</property>
                 <signal name="button-press-event" handler="on_local_polar_click" swapped="no"/>
+                <child internal-child="selection">
+                  <object class="GtkTreeSelection"/>
+                </child>
                 <child>
                   <object class="GtkTreeViewColumn">
                     <property name="title" translatable="yes">Enabled</property>

@@ -20,7 +20,7 @@ PolFileFilter.add_pattern("*.pol")
 class PolarManagerWindow:
     def __init__(self,  polar_manager):
         self.polar_manager = polar_manager
-        self.selected_polar = None
+        self.selected_orc_polar = None
         self.selectedLocal_polar = None
 
         self.builder = Gtk.Builder()
@@ -35,6 +35,7 @@ class PolarManagerWindow:
         self.orc_ListStore = self.builder.get_object("orc-list-store")
         self.polar_managerStore = self.builder.get_object("polar-manager-store")
         self.refresh_polars_tab()
+        self.polar_manager.connect("polars-list-updated", self.refresh_polars_tab)
         Thread(target=self.download_orc_list, args=()).start()
 
     def show(self):
@@ -46,15 +47,14 @@ class PolarManagerWindow:
     def on_remove_local_polar(self, widget):
         pass
 
-    def on_polar_select(self, selection):
+    def on_orc_polar_select(self, selection):
         store, pathlist = selection.get_selected_rows()
         tree_iter = store.get_iter(pathlist[0])
-        self.selected_ORCboat = store.get_value(tree_iter, 0)
-
+        self.selected_orc_polar = store.get_value(tree_iter, 0)
 
     def on_polar_click(self, widget, event):
         if event.button == 3:
-            menu = self.builder.get_object("orc-polar-menu")
+            menu = self.builder.get_object("orc-list-menu")
             menu.popup(None, None, None, None, event.button, event.time)
 
     def on_local_polar_select(self, selection):
@@ -66,7 +66,6 @@ class PolarManagerWindow:
             self.polar_manager.disable(n)
         else:
             self.polar_manager.enable(n)
-        self.refresh_polars_tab()
 
     def on_local_polar_click(self, widget, event):
         pass
@@ -107,7 +106,22 @@ class PolarManagerWindow:
         Gdk.threads_leave()
 
     def download_orc(self):
-        print("Download orc")
+        Gdk.threads_enter()
+        try:
+            self.polar_manager.download_orc_polar(self.selected_orc_polar)
+        except:
+            logger.error(f"Failed to download orc data file {self.selected_orc_polar}")
+            dialog = Gtk.MessageDialog(
+                transient_for=self.window,
+                flags=0,
+                message_type=Gtk.MessageType.ERROR,
+                buttons=Gtk.ButtonsType.OK,
+                text="Download failed",
+           )
+            dialog.format_secondary_text(f"Failed to download {self.selected_orc_polar} polar file")
+            dialog.run()
+            dialog.destroy()  
+        Gdk.threads_leave()
     
     def on_open(self, widget):
         parent_window = self.window
@@ -130,10 +144,8 @@ class PolarManagerWindow:
             filepath = dialog.get_filename()
             self.polar_manager.add_polar_file(filepath)
             dialog.destroy()
-
-        self.refresh_polars_tab()
     
-    def refresh_polars_tab(self):
+    def refresh_polars_tab(self, widget=None):
         self.polar_managerStore.clear()
         for polar in self.polar_manager.polars_files:
             enabled = self.polar_manager.is_enabled(polar)
