@@ -44,21 +44,36 @@ class PolarManagerWindow:
     def close(self):
         self.window.hide()
 
-    def on_remove_local_polar(self, widget):
-        pass
+    # ORC data management
 
-    def on_orc_polar_select(self, selection):
+    def on_orc_select(self, selection):
         store, pathlist = selection.get_selected_rows()
         tree_iter = store.get_iter(pathlist[0])
         self.selected_orc_polar = store.get_value(tree_iter, 0)
 
-    def on_polar_click(self, widget, event):
+    def on_orc_click(self, widget, event):
         if event.button == 3:
             menu = self.builder.get_object("orc-list-menu")
             menu.popup(None, None, None, None, event.button, event.time)
+    
+    def on_orc_download(self, widget):
+        Thread(target=self.download_orc, args=()).start()
+
+    # Local polar management
+
+    def on_local_polar_click(self, widget, event):
+        if event.button == 3:
+            menu = self.builder.get_object("polar-manager-menu")
+            menu.popup(None, None, None, None, event.button, event.time)
 
     def on_local_polar_select(self, selection):
-        pass
+        store, pathlist = selection.get_selected_rows()
+        if not pathlist:
+            self.selected_local_polar = None
+            return
+        tree_iter = store.get_iter(pathlist[0])
+        self.selected_local_polar = store.get_value(tree_iter, 0)
+
 
     def on_polar_toggle(self, widget, i):
         n = self.polar_manager.polars_files[int(i)]
@@ -67,11 +82,8 @@ class PolarManagerWindow:
         else:
             self.polar_manager.enable(n)
 
-    def on_local_polar_click(self, widget, event):
-        pass
-
-    def on_orc_download(self, widget):
-        Thread(target=self.download_orc, args=()).start()
+    def on_local_polar_remove(self, widget):
+        self.polar_manager.delete_polar(self.selected_local_polar)
      
     def download_orc_list(self):
         Gdk.threads_enter()
