@@ -33,8 +33,6 @@ class PolarManager(EventDispatcher):
             logger.info("No enabled polars found in storage, initializing with default polars.")
             self.enable(self.polars_files[0]) if self.polars_files else None
 
-
-
     def refresh_local_polars(self):
         if not os.listdir(POLAR_DIR):
             default_polar = os.listdir(resource_path("gweatherrouting", "data/polars/"))
@@ -45,6 +43,7 @@ class PolarManager(EventDispatcher):
         
         for p in os.listdir(POLAR_DIR):
             self.polars_files.append(p)
+            self.polars.append(p)
         self.polars_files.sort()
 
     def store_enabled_polars(self):
@@ -90,8 +89,10 @@ class PolarManager(EventDispatcher):
         if os.path.exists(file_path):
             os.remove(file_path)
             logger.info(f"Removed polar file: {file_path}")
-            self.refresh_polars() 
-            self.dispatch("polars-list-updated")
+            self.polars_files.remove(name)
+            if name in self.polars:
+                self.polars.remove(name)
+            self.dispatch("polars-list-updated", self.polars)
 
     def add_polar_file(self, polar_path):
         file_name = os.path.basename(polar_path)

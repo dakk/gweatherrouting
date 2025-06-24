@@ -31,8 +31,8 @@
       <object class="GtkMenuItem">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-        <property name="label" translatable="yes">Download</property>
-        <signal name="activate" handler="on_orc_download" swapped="no"/>
+        <property name="label" translatable="yes">Remove</property>
+        <signal name="activate" handler="on_local_polar_remove" swapped="no"/>
       </object>
     </child>
   </object>
@@ -67,18 +67,20 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="model">orc-list-store</property>
-                <property name="search-column">1</property>
+                <property name="search-column">0</property>
                 <property name="show-expanders">False</property>
                 <property name="tooltip-column">0</property>
-                <signal name="button-press-event" handler="on_polar_click" swapped="no"/>
+                <signal name="button-press-event" handler="on_orc_click" swapped="no"/>
                 <child internal-child="selection">
                   <object class="GtkTreeSelection">
-                    <signal name="changed" handler="on_orc_polar_select" swapped="no"/>
+                    <signal name="changed" handler="on_orc_select" swapped="no"/>
                   </object>
                 </child>
                 <child>
                   <object class="GtkTreeViewColumn" id="Sail">
                     <property name="title" translatable="yes">Sail number</property>
+                    <property name="reorderable">True</property>
+                    <property name="sort-indicator">True</property>
                     <property name="sort-column-id">0</property>
                     <child>
                       <object class="GtkCellRendererText"/>
@@ -91,6 +93,8 @@
                 <child>
                   <object class="GtkTreeViewColumn" id="Name">
                     <property name="title" translatable="yes">Name</property>
+                    <property name="reorderable">True</property>
+                    <property name="sort-indicator">True</property>
                     <property name="sort-column-id">1</property>
                     <child>
                       <object class="GtkCellRendererText"/>
@@ -103,6 +107,8 @@
                 <child>
                   <object class="GtkTreeViewColumn" id="Type">
                     <property name="title" translatable="yes">Type</property>
+                    <property name="reorderable">True</property>
+                    <property name="sort-indicator">True</property>
                     <property name="sort-column-id">2</property>
                     <child>
                       <object class="GtkCellRendererText"/>
@@ -143,15 +149,19 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="model">polar-manager-store</property>
-                <property name="search-column">0</property>
+                <property name="search-column">1</property>
+                <property name="show-expanders">False</property>
                 <signal name="button-press-event" handler="on_local_polar_click" swapped="no"/>
                 <child internal-child="selection">
-                  <object class="GtkTreeSelection"/>
+                  <object class="GtkTreeSelection">
+                    <signal name="changed" handler="on_local_polar_select" swapped="no"/>
+                  </object>
                 </child>
                 <child>
                   <object class="GtkTreeViewColumn">
                     <property name="title" translatable="yes">Enabled</property>
-                    <property name="clickable">True</property>
+                    <property name="reorderable">True</property>
+                    <property name="sort-column-id">0</property>
                     <child>
                       <object class="GtkCellRendererToggle">
                         <signal name="toggled" handler="on_polar_toggle" swapped="no"/>
@@ -165,6 +175,8 @@
                 <child>
                   <object class="GtkTreeViewColumn">
                     <property name="title" translatable="yes">Sail number</property>
+                    <property name="reorderable">True</property>
+                    <property name="sort-column-id">1</property>
                     <child>
                       <object class="GtkCellRendererText"/>
                       <attributes>
