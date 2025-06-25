@@ -20,7 +20,7 @@ class PolarManager(EventDispatcher):
     def __init__(self):
         EventDispatcher.__init__(self)
         self.storage = PolarManagerStorage()
-        self.polars_files = []
+        self.polars_files: list[str] = []
         self.polars = []
         self.refresh_local_polars()
 
