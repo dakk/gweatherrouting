@@ -1,8 +1,7 @@
 import logging
 import os
 import shutil
-from shutil import copyfile
-from typing import Dict, List
+from typing import List
 
 from gweatherrouting.common import resource_path
 from gweatherrouting.core.storage import POLAR_DIR, Storage

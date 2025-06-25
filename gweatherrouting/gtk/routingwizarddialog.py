@@ -17,7 +17,6 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import datetime
 import itertools
 import os
-import shutil
 
 import gi
 import weatherrouting
@@ -27,7 +26,6 @@ from gi.repository import Gtk
 
 from gweatherrouting.common import resource_path
 from gweatherrouting.core import TimeControl
-from gweatherrouting.core.polarmanager import PolarManager
 from gweatherrouting.core.storage import POLAR_DIR
 
 from .timepickerdialog import TimePickerDialog
