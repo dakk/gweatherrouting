@@ -10,10 +10,12 @@ from gweatherrouting.core.utils import EventDispatcher
 
 logger = logging.getLogger("gweatherrouting")
 
+
 class PolarManagerStorage(Storage):
     def __init__(self):
         Storage.__init__(self, "polar-manager")
         self.load_or_save_default()
+
 
 class PolarManager(EventDispatcher):
     def __init__(self):
@@ -30,7 +32,9 @@ class PolarManager(EventDispatcher):
                     self.enable(p)
         else:
             self.storage.enabled = []
-            logger.info("No enabled polars found in storage, initializing with default polars.")
+            logger.info(
+                "No enabled polars found in storage, initializing with default polars."
+            )
             self.enable(self.polars_files[0]) if self.polars_files else None
 
     def refresh_local_polars(self):
@@ -40,7 +44,7 @@ class PolarManager(EventDispatcher):
                 target_filepath = os.path.join(POLAR_DIR, p)
                 polar_file_path = resource_path("gweatherrouting", f"data/polars/{p}")
                 shutil.copyfile(polar_file_path, target_filepath)
-        
+
         for p in os.listdir(POLAR_DIR):
             self.polars_files.append(p)
             self.polars.append(p)
@@ -54,12 +58,12 @@ class PolarManager(EventDispatcher):
             except:
                 ss.append(x)
         self.storage.enabled = ss
-    
+
     def load(self, path):
         logger.info("Loading polar %s", path)
         polar_name = path.split("/")[-1]
         self.polars.append(polar_name)
-    
+
     def enable(self, name):
         if name not in self.polars:
             self.polars.append(name)
@@ -75,15 +79,15 @@ class PolarManager(EventDispatcher):
             self.polars.remove(name)
             # TODO: Remove from storage
             self.polars.sort()
-            self.storage.save() 
+            self.storage.save()
 
         self.polars.sort()
         self.store_enabled_polars()
         self.dispatch("polars-list-updated", self.polars)
-    
+
     def is_enabled(self, name) -> bool:
         return name in self.polars
-    
+
     def delete_polar(self, name):
         file_path = os.path.join(POLAR_DIR, name)
         if os.path.exists(file_path):
@@ -103,17 +107,17 @@ class PolarManager(EventDispatcher):
         self.polars_files.sort()
         self.enable(file_name)
         self.dispatch("polars-list-updated", self.polars)
-    
+
     def get_path(self, name):
         if name not in self.polars:
             logger.error(f"Polar {name} not found in the list of polars.")
-            return None 
+            return None
         return os.path.join(POLAR_DIR, name)
 
     def download_orc_polar(self, orc_polar_name):
         file_name = orc_polar_name.replace("/", "_")
         file_name = f"{file_name}.pol"
-        source_path = os.path.join(POLAR_DIR, 'test.pol')
+        source_path = os.path.join(POLAR_DIR, "test.pol")
         destination_path = os.path.join(POLAR_DIR, file_name)
         try:
             shutil.copy2(source_path, destination_path)

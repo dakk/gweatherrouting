@@ -25,11 +25,12 @@ from gi.repository import Gtk
 
 from gweatherrouting.common import resource_path
 from gweatherrouting.core import TimeControl
-from gweatherrouting.core.storage import POLAR_DIR
 from gweatherrouting.core.polarmanager import PolarManager
+from gweatherrouting.core.storage import POLAR_DIR
 
 from .timepickerdialog import TimePickerDialog
 from .widgets.polar import PolarWidget
+
 
 class RoutingWizardDialog:
     def __init__(self, core, parent):
@@ -39,7 +40,6 @@ class RoutingWizardDialog:
         self.polar = None
 
         self.paramWidgets = {}
-
 
         self.builder = Gtk.Builder()
         self.builder.add_from_file(
@@ -202,5 +202,3 @@ class RoutingWizardDialog:
         else:
             s -= 2
             return self.core.poiManager[s].position
-
-    

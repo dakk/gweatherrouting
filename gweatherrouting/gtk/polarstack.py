@@ -21,6 +21,7 @@ import os
 import gi
 
 from gweatherrouting.core.polarmanager import PolarManager
+
 gi.require_version("Gtk", "3.0")
 try:
     gi.require_version("OsmGpsMap", "1.2")
@@ -54,7 +55,7 @@ class PolarStack(Gtk.Box):
         self.pack_start(self.builder.get_object("polarcontent"), True, True, 0)
 
         self.statusBar = self.builder.get_object("statusbar")
-        
+
         self.polars = self.polar_manager.polars
         self.polar_manager.connect("polars-list-updated", self.polars_list_updated)
 
@@ -65,7 +66,6 @@ class PolarStack(Gtk.Box):
         self.polarWidget = PolarWidget(self.parent, self.core)
         self.table = None
         self.boatselect.set_active(0)
-        
 
     def load_polar(self, polar_file):
         polarwidgetcontainer = self.builder.get_object("polarwidgetcontainer")
@@ -125,7 +125,7 @@ class PolarStack(Gtk.Box):
                 )
 
         self.show_all()
-    
+
     def on_boat_select(self, widget):
         polarwidgetcontainer = self.builder.get_object("polarwidgetcontainer")
         try:
@@ -133,7 +133,9 @@ class PolarStack(Gtk.Box):
             self.statusBar.push(0, "Polar loaded: " + widget.get_active_text())
         except:
             logger.error("Error loading polar: %s", widget.get_active_text())
-            self.statusBar.push(0, "Please select add/enable a polar file by using the Polar Manager")
+            self.statusBar.push(
+                0, "Please select add/enable a polar file by using the Polar Manager"
+            )
             return
 
     def on_polar_manager(self, event):
@@ -142,7 +144,7 @@ class PolarStack(Gtk.Box):
 
     def polars_list_updated(self, event):
         self.polars = self.polar_manager.polars
-        self.boatselect.get_model().clear()  
+        self.boatselect.get_model().clear()
         for polar in self.polars:
             self.boatselect.append_text(polar)
         self.boatselect.set_active(0)
