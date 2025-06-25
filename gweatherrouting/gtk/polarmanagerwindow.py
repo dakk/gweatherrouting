@@ -1,17 +1,12 @@
 import logging
 import os
-import shutil
 from threading import Thread
 
 import gi
 import requests
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gdk, GObject, Gtk
-
-from gweatherrouting.common import resource_path
-from gweatherrouting.core.polarmanager import PolarManager
-from gweatherrouting.core.storage import POLAR_DIR, Storage
+from gi.repository import Gdk, Gtk
 
 logger = logging.getLogger("gweatherrouting")
 
@@ -91,7 +86,7 @@ class PolarManagerWindow:
         Gdk.threads_enter()
         self.builder.get_object("download-progress").show()
         Gdk.threads_leave()
-        orc_url = "https://raw.githubusercontent.com/jieter/orc-data/refs/heads/master/site/index.json"
+        orc_url = "https://raw.githubusercontent.com/jieter/orc-data/refs/heads/master/site/index.json"  # noqa: E501
         Gdk.threads_enter()
         try:
             r = requests.get(orc_url)

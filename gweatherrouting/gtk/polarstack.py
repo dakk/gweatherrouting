@@ -20,8 +20,6 @@ import os
 
 import gi
 
-from gweatherrouting.core.polarmanager import PolarManager
-
 gi.require_version("Gtk", "3.0")
 try:
     gi.require_version("OsmGpsMap", "1.2")
@@ -29,8 +27,6 @@ except:
     gi.require_version("OsmGpsMap", "1.0")
 
 from gi.repository import Gtk
-
-from gweatherrouting.core.storage import POLAR_DIR
 
 from .polarmanagerwindow import PolarManagerWindow
 from .widgets.polar import PolarWidget
@@ -127,7 +123,6 @@ class PolarStack(Gtk.Box):
         self.show_all()
 
     def on_boat_select(self, widget):
-        polarwidgetcontainer = self.builder.get_object("polarwidgetcontainer")
         try:
             self.load_polar(self.polars[widget.get_active()])
             self.statusBar.push(0, "Polar loaded: " + widget.get_active_text())

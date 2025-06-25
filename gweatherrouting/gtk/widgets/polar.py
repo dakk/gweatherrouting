@@ -22,8 +22,6 @@ from weatherrouting import Polar
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gdk, Gtk
 
-from gweatherrouting.common import resource_path
-
 logger = logging.getLogger("gweatherrouting")
 
 
