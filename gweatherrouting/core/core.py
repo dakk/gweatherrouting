@@ -20,7 +20,7 @@ from typing import Callable, List, Optional
 import gpxpy
 import weatherrouting
 
-from gweatherrouting.core import GribManager, utils, PolarManager
+from gweatherrouting.core import GribManager, PolarManager, utils
 from gweatherrouting.core.aismanager import AISManager
 from gweatherrouting.core.connectionmanager import ConnectionManager
 from gweatherrouting.core.datasource import AISDataPacket, DataPacket

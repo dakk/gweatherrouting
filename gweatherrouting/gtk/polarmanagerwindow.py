@@ -1,24 +1,27 @@
 import logging
 import os
+import shutil
 from threading import Thread
 
 import gi
 import requests
-import shutil
+
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gdk, GObject, Gtk
-from gweatherrouting.core.storage import POLAR_DIR, Storage
+
 from gweatherrouting.common import resource_path
 from gweatherrouting.core.polarmanager import PolarManager
- 
+from gweatherrouting.core.storage import POLAR_DIR, Storage
+
 logger = logging.getLogger("gweatherrouting")
 
 PolFileFilter = Gtk.FileFilter()
 PolFileFilter.set_name("Polar file")
 PolFileFilter.add_pattern("*.pol")
 
+
 class PolarManagerWindow:
-    def __init__(self,  polar_manager):
+    def __init__(self, polar_manager):
         self.polar_manager = polar_manager
         self.selected_orc_polar = None
         self.selectedLocal_polar = None
@@ -55,7 +58,7 @@ class PolarManagerWindow:
         if event.button == 3:
             menu = self.builder.get_object("orc-list-menu")
             menu.popup(None, None, None, None, event.button, event.time)
-    
+
     def on_orc_download(self, widget):
         Thread(target=self.download_orc, args=()).start()
 
@@ -74,7 +77,6 @@ class PolarManagerWindow:
         tree_iter = store.get_iter(pathlist[0])
         self.selected_local_polar = store.get_value(tree_iter, 0)
 
-
     def on_polar_toggle(self, widget, i):
         n = self.polar_manager.polars_files[int(i)]
         if self.polar_manager.is_enabled(n):
@@ -84,14 +86,12 @@ class PolarManagerWindow:
 
     def on_local_polar_remove(self, widget):
         self.polar_manager.delete_polar(self.selected_local_polar)
-     
+
     def download_orc_list(self):
         Gdk.threads_enter()
         self.builder.get_object("download-progress").show()
         Gdk.threads_leave()
-        orc_url = (
-            "https://raw.githubusercontent.com/jieter/orc-data/refs/heads/master/site/index.json"
-        )
+        orc_url = "https://raw.githubusercontent.com/jieter/orc-data/refs/heads/master/site/index.json"
         Gdk.threads_enter()
         try:
             r = requests.get(orc_url)
@@ -129,12 +129,14 @@ class PolarManagerWindow:
                 message_type=Gtk.MessageType.ERROR,
                 buttons=Gtk.ButtonsType.OK,
                 text="Download failed",
-           )
-            dialog.format_secondary_text(f"Failed to download {self.selected_orc_polar} polar file")
+            )
+            dialog.format_secondary_text(
+                f"Failed to download {self.selected_orc_polar} polar file"
+            )
             dialog.run()
-            dialog.destroy()  
+            dialog.destroy()
         Gdk.threads_leave()
-    
+
     def on_open(self, widget):
         parent_window = self.window
         dialog = Gtk.FileChooserDialog(
@@ -156,10 +158,9 @@ class PolarManagerWindow:
             filepath = dialog.get_filename()
             self.polar_manager.add_polar_file(filepath)
             dialog.destroy()
-    
+
     def refresh_polars_tab(self, widget=None):
         self.polar_managerStore.clear()
         for polar in self.polar_manager.polars_files:
             enabled = self.polar_manager.is_enabled(polar)
-            self.polar_managerStore.append([polar, '-', '-', enabled])
-        
+            self.polar_managerStore.append([polar, "-", "-", enabled])
