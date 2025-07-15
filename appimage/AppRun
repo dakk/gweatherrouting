@@ -16,5 +16,8 @@ export LD_LIBRARY_PATH="$APPDIR/usr/lib:$LD_LIBRARY_PATH"
 # Set the path of GDAL data
 export GDAL_DATA="$APPDIR/usr/share/gdal"
 
+# Set the path for GI
+GI_TYPELIB_PATH="$APPDIR/usr/lib/girepository-1.0/"
+
 # Execute the wrapped binary with passed arguments
 exec "$this_dir/AppRun.wrapped" "$@"
