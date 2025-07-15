@@ -41,8 +41,10 @@ cd ..
 
 # 2. Create AppImage Directory Structure
 echo "Creating AppImage directory structure..."
-mkdir -p "$APP_DIR/usr/bin" "$APP_DIR/usr/share/applications" "$APP_DIR/usr/share/icons/hicolor/256x256/apps" 
-
+mkdir -p "$APP_DIR/usr/bin" "$APP_DIR/usr/share/applications" "$APP_DIR/usr/share/icons/hicolor/256x256/apps" \
+    "$APP_DIR/usr/lib/x86_64-linux-gnu/girepository-1.0"
+    
+cp /usr/lib/x86_64-linux-gnu/girepository-1.0/OsmGpsMap-1.0.typelib "$APP_DIR/usr/lib/x86_64-linux-gnu/girepository-1.0/"
 cp -r /usr/share/gdal "$APP_DIR/usr/share/"
 cp "gweatherrouting/dist/$APP_NAME" "$APP_DIR/usr/bin/"
 cp "appimage/icon.png" "$APP_DIR/usr/share/icons/hicolor/256x256/apps/"
