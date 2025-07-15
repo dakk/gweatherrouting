@@ -19,11 +19,6 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import logging
 import os
-
-typelib_path = "usr/lib/girepository-1.0"
-if os.path.isdir(typelib_path):
-    os.environ["GI_TYPELIB_PATH"] = typelib_path
-
 import gi
 
 gi.require_version("Gtk", "3.0")
