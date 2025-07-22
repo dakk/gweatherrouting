@@ -12,9 +12,15 @@ export APPDIR="${APPDIR:-$this_dir}"
 
 # Set library path to use bundled libraries first
 export LD_LIBRARY_PATH="$APPDIR/usr/lib:$LD_LIBRARY_PATH"
+echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH"
 
 # Set the path of GDAL data
 export GDAL_DATA="$APPDIR/usr/share/gdal"
+echo "GDAL_DATA=$GDAL_DATA"
+
+# Set the path for GI
+export GI_TYPELIB_PATH="$APPDIR/usr/lib/girepository-1.0"
+echo "GI_TYPELIB_PATH=$GI_TYPELIB_PATH"
 
 # Execute the wrapped binary with passed arguments
 exec "$this_dir/AppRun.wrapped" "$@"
