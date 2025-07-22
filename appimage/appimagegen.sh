@@ -72,7 +72,7 @@ chmod +x "$APP_DIR/AppRun"
 
 # 6. Create the AppImage
 echo "Creating the final AppImage..."
-wget https://github.com/AppImage/AppImageKit/releases/latest/download/appimagetool-x86_64.AppImage
+wget https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
 chmod +x appimagetool-x86_64.AppImage
 ./appimagetool-x86_64.AppImage --appimage-extract-and-run "$APP_DIR"
 
