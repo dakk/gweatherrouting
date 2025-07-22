@@ -136,10 +136,6 @@ def routage_point_distance(lat_a, lon_a, distanza, rotta, unit="nm"):
     return utils.routage_point_distance(lat_a, lon_a, distanza, rotta, unit)
 
 
-def reduce360(alfa):
-    return utils.reduce360(alfa)
-
-
 def ortodromic(lat_a, lon_a, lat_b, lon_b):
     return utils.ortodromic(lat_a, lon_a, lat_b, lon_b)
 

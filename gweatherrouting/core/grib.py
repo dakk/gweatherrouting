@@ -23,8 +23,6 @@ from typing import Optional, Tuple
 import weatherrouting
 from osgeo import gdal
 
-from gweatherrouting.core import utils
-
 logger = logging.getLogger("gweatherrouting")
 
 
@@ -124,8 +122,8 @@ class Grib(weatherrouting.Grib):
         if t is None:
             return
 
-        t1 = int(int(round(t)) / 3) * 3
-        t2 = int(int(round(t + 6)) / 3) * 3
+        t1 = int(round(t / 3.0)) * 3
+        t2 = t1 + 6
 
         if t2 == t1:
             t1 -= 3
@@ -144,13 +142,13 @@ class Grib(weatherrouting.Grib):
             _, _, uu2, vv2 = uuvv2[j]
 
             if lon > 180.0:
-                lon = -180.0 + (lon - 180.0)
+                lon -= 360.0
 
             uu = uu1 + (uu2 - uu1) * (t - t1) / (t2 - t1)
             vv = vv1 + (vv2 - vv1) * (t - t1) / (t2 - t1)
 
-            tws = (uu**2 + vv**2) / 2.0
-            twd = math.degrees(utils.reduce360(math.atan2(uu, vv) + math.pi))
+            tws = math.sqrt(uu**2 + vv**2)
+            twd = (math.degrees(math.atan2(-uu, -vv)) + 360) % 360
 
             data.append((twd, tws, (lat, lon)))
 
