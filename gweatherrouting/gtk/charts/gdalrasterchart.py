@@ -28,10 +28,10 @@ import numpy as np
 from osgeo import gdal, osr
 
 gi.require_version("Gtk", "3.0")
-# try:
-#     gi.require_version("OsmGpsMap", "1.2")
-# except:
-#     gi.require_version("OsmGpsMap", "1.0")
+try:
+    gi.require_version("OsmGpsMap", "1.2")
+except ValueError:
+    gi.require_version("OsmGpsMap", "1.0")
 
 from gi.repository import Gdk, OsmGpsMap
 
