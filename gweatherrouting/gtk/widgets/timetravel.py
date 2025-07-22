@@ -18,10 +18,10 @@ import os
 import gi
 
 gi.require_version("Gtk", "3.0")
-try:
-    gi.require_version("OsmGpsMap", "1.2")
-except:
-    gi.require_version("OsmGpsMap", "1.0")
+# try:
+#     gi.require_version("OsmGpsMap", "1.2")
+# except:
+#     gi.require_version("OsmGpsMap", "1.0")
 from gi.repository import GObject, Gtk, OsmGpsMap
 
 from gweatherrouting.core import TimeControl
