@@ -3,6 +3,8 @@ import os
 import shutil
 from typing import List
 
+import requests
+
 from gweatherrouting.common import resource_path
 from gweatherrouting.core.storage import POLAR_DIR, Storage
 from gweatherrouting.core.utils import EventDispatcher
@@ -22,6 +24,7 @@ class PolarManager(EventDispatcher):
         self.storage = PolarManagerStorage()
         self.polars_files: list[str] = []
         self.polars = []
+
         self.refresh_local_polars()
 
         if self.storage.enabled:
@@ -71,7 +74,7 @@ class PolarManager(EventDispatcher):
             self.storage.save()
         self.polars.sort()
         self.store_enabled_polars()
-        self.dispatch("polars-list-updated", self.polars)
+        # self.dispatch("polars-list-updated", self.polars)
 
     def disable(self, name):
         if name in self.storage.enabled:
@@ -114,17 +117,57 @@ class PolarManager(EventDispatcher):
         return os.path.join(POLAR_DIR, name)
 
     def download_orc_polar(self, orc_polar_name):
+        country_code = orc_polar_name.split("/")[0]
+        sailboat_name = orc_polar_name.split("/")[1]
+        polar_url = f"https://raw.githubusercontent.com/jieter/orc-data/refs/heads/master/site/data/{country_code}/{sailboat_name}.json"  # noqa: E501
+        try:
+            r = requests.get(polar_url)
+            polar_json = r.json()
+        except:
+            logger.error(f"Failed to download orc polar from {polar_url}")
+            return
+
         file_name = orc_polar_name.replace("/", "_")
         file_name = f"{file_name}.pol"
-        source_path = os.path.join(POLAR_DIR, "test.pol")
         destination_path = os.path.join(POLAR_DIR, file_name)
         try:
-            shutil.copy2(source_path, destination_path)
-            logger.info(f"Copied {source_path} to {destination_path}")
+            polar_json = polar_json["vpp"]
+            json_to_polars(polar_json, destination_path)
+
+            logger.info(
+                f"Downloaded and converted orc polar {orc_polar_name} to {destination_path}"
+            )
             self.polars_files.append(file_name)
+            self.polars.append(file_name)
             self.polars_files.sort()
             self.enable(file_name)
             self.dispatch("polars-list-updated", self.polars)
         except Exception as e:
-            logger.error(f"Failed to download orc polar {orc_polar_name}: {str(e)}")
+            logger.error(f"Failed to process orc polar data from {polar_url}: {e}")
             raise e
+
+
+def json_to_polars(json_data, destination_path):
+    angles = json_data["angles"]
+    speeds = json_data["speeds"]
+    polars = {}
+    for angle in angles:
+        if str(angle) in json_data:
+            polars[angle] = json_data[str(angle)]
+
+    with open(destination_path, "w") as f:
+        f.write(f"TWA\\TWS\t{'\t'.join(map(str, speeds))}\n")
+        for _ in range(len(speeds)):
+            f.write("0\t")
+        f.write("0\n")
+        for angle in sorted(polars.keys()):
+            line = (
+                f"{angle}\t"
+                + "\t".join(f"{speed:.2f}" for speed in polars[angle])
+                + "\n"
+            )
+            f.write(line)
+        f.write("180\t")
+        for _ in range(len(speeds) - 1):
+            f.write("0\t")
+        f.write("0\n")
