@@ -58,8 +58,8 @@ chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-gtk.sh
 echo "Adding required libraries to AppImage directory..."
 ./linuxdeploy-x86_64.AppImage --appimage-extract
 
-cp /usr/lib/libgirepository* ./squashfs-root/usr/lib/
-# cp /usr/lib/libglib* ./squashfs-root/usr/lib/
+cp /usr/lib64/libgirepository* ./squashfs-root/usr/lib/
+# cp /usr/lib64/libglib* ./squashfs-root/usr/lib/
 
 
 for LIBOSM_PATH in $LIBOSM_PATHS; do
