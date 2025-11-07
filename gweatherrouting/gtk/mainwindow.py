@@ -29,7 +29,7 @@ except ValueError:
 
 from gi.repository import Gdk, Gtk
 
-from gweatherrouting import log  # noqa: F401
+from gweatherrouting import log, __version__  # noqa: F401
 from gweatherrouting.common import resource_path
 
 from .charts import ChartManager
@@ -116,6 +116,7 @@ class MainWindow:
 
     def on_about(self, item):
         dialog = self.builder.get_object("about-dialog")
+        dialog.set_property("version", __version__)
         dialog.run()
         dialog.hide()
 

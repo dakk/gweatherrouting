@@ -29,7 +29,8 @@ jobs:
       - name: Install Python Dependencies
         run: |
             bash .github/workflows/script/python_dep.sh
-      - name: Instal gww
+
+      - name: Install gww
         run: pip install .
 
       - name: Generate AppImage

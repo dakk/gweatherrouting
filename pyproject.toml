@@ -61,6 +61,9 @@ packages = [
 ]
 zip-safe = false
 
+[tool.setuptools.dynamic]
+version = { attr = "gweatherrouting.__version__" }
+
 [tool.setuptools.package-data]
 gweatherrouting = [
     "data/*",
