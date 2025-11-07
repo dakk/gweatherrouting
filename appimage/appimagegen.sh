@@ -58,15 +58,29 @@ chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-gtk.sh
 echo "Adding required libraries to AppImage directory..."
 ./linuxdeploy-x86_64.AppImage --appimage-extract
 
-cp /usr/lib64/libgirepository* ./squashfs-root/usr/lib/
-# cp /usr/lib64/libglib* ./squashfs-root/usr/lib/
-
-
 for LIBOSM_PATH in $LIBOSM_PATHS; do
     #NO_STRIP=true DEPLOY_GTK_VERSION=3 ./linuxdeploy-x86_64.AppImage --appdir $APP_DIR --plugin gtk --library "$LIBOSM_PATH" 
     NO_STRIP=true DEPLOY_GTK_VERSION=3 ./squashfs-root/AppRun --appdir $APP_DIR --plugin gtk --library "$LIBOSM_PATH"
 done
 rm -rf squashfs-root
+
+
+# Ensure destination exists
+mkdir -p "$APP_DIR/usr/lib"
+
+# Find libgirepository libraries and copy them to your AppDir
+LIBGIREPO_PATHS=$(ldconfig -p | grep libgirepository | awk '{print $4}' | sort -u)
+
+if [[ -z "$LIBGIREPO_PATHS" ]]; then
+    echo "libgirepository libraries not found on the system, exiting."
+    exit 1
+fi
+
+for libpath in $LIBGIREPO_PATHS; do
+    echo "Copying $libpath to $APP_DIR/usr/lib/"
+    cp "$libpath" "$APP_DIR/usr/lib/"
+done
+
 
 # 5. Modify the AppRun file to add LD_LIBRARY_PATH after the gtk plugin line
 echo "Configuring AppRun file..."
