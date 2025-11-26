@@ -124,7 +124,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/nzjrs/osm-gps-map.git
-        branch: master
+        commit: 639ea5e02d2cb47cbc15554d61b1ba6b0ee073b6
 
   - name: python-deps
     buildsystem: simple
@@ -147,7 +147,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/dakk/gweatherrouting.git
-        branch: master
+        tag: v0.2.2
 
 cleanup:
   - /app/include
