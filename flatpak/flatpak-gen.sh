@@ -64,3 +64,9 @@ flatpak run \
     -c 'pip3 download -r requirements.txt -d wheels'
 
 flatpak-builder --user --install --force-clean build-dir org.gweatherrouting.app.yml
+
+
+# Run linters
+echo "Running linters..."
+flatpak install -y flathub org.flatpak.Builder
+flatpak run --command=flatpak-builder-lint org.flatpak.Builder manifest org.gweatherrouting.app.yml
