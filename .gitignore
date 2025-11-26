@@ -18,3 +18,5 @@ gweatherrouting/build
 gweatherrouting/dist
 gweatherrouting/*.spec
 docs/build
+flatpak/wheels
+.flatpak-builder
