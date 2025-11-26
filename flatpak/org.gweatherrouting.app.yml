@@ -8,7 +8,7 @@ finish-args:
   - --filesystem=xdg-documents
   - --filesystem=xdg-download
   - --socket=wayland
-  - --socket=x11
+  - --socket=fallback-x11
 
 modules:
 
@@ -147,6 +147,7 @@ modules:
       - type: git
         url: https://github.com/dakk/gweatherrouting.git
         branch: master
+        commit: d5c78265b983cf80a9ea935ec2f9504a5c6eb7c1
 
 cleanup:
   - /app/include
