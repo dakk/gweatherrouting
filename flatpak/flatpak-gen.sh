@@ -48,14 +48,15 @@ fi
 shopt -u nocasematch
 
 # Createh the build
-flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-flatpak install -y flathub org.gnome.Platform//46 flathub org.gnome.Sdk//46
+flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+flatpak install --user -y flathub org.gnome.Platform//46 flathub org.gnome.Sdk//46
 
 if [ ! -d "wheels" ]; then
     mkdir wheels
 fi
 
 flatpak run \
+    --user \
     --command=sh --devel \
     --filesystem="$DIR":rw \
     --share=network \
