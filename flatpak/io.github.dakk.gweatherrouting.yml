@@ -92,13 +92,9 @@ modules:
       - -DBUILD_TESTING=OFF
       - -DCMAKE_POLICY_VERSION_MINIMUM=3.5
     sources:
-      - type: git
-        url: https://github.com/json-c/json-c
-        tag: json-c-0.18-20240915
-        commit: 41a55cfcedb54d9c1874f2f0eb07b504091d7e37
-        x-checker-data:
-          type: git
-          tag-pattern: '^json-c-([\d.]+)-[\d]+$'          
+      - type: archive
+        url: https://github.com/json-c/json-c/archive/refs/tags/json-c-0.18-20240915.tar.gz
+        sha256: 3112c1f25d39eca661fe3fc663431e130cc6e2f900c081738317fba49d29e298         
 
   - name: libgeotiff
     buildsystem: autotools
@@ -144,8 +140,8 @@ modules:
     buildsystem: simple
     build-commands:
       - pip3 install --verbose --exists-action=i --no-index --no-deps --prefix=/app --no-build-isolation .
-      - install -Dm644 gweatherrouting/data/icon.png /app/share/icons/hicolor/256x256/apps/org.gweatherrouting.app.png
-      - install -Dm644 tools/org.gweatherrouting.app.desktop /app/share/applications/org.gweatherrouting.app.desktop  
+      - install -Dm644 gweatherrouting/data/icon.png /app/share/icons/hicolor/256x256/apps/io.github.dakk.gweatherrouting.png
+      - install -Dm644 tools/io.github.dakk.gweatherrouting.desktop /app/share/applications/io.github.dakk.gweatherrouting.desktop  
     cleanup:
       - /app/include
       - /app/lib/pkgconfig      
