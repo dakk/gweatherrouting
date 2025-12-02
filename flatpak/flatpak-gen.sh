@@ -24,6 +24,8 @@ case "$os" in
         ;;
 esac
 
+export XDG_DATA_DIRS="$XDG_DATA_DIRS:/var/lib/flatpak/exports/share:$HOME/.local/share/flatpak/exports/share"
+
 flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
 flatpak-builder --install-deps-from=flathub --force-clean build-dir io.github.dakk.gweatherrouting.yml
