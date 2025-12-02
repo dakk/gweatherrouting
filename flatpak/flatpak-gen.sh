@@ -15,7 +15,6 @@ case "$os" in
         sudo apt install -y flatpak flatpak-builder
         ;;
     [Ff][Ee][Dd][Oo][Rr][Aa]*|[Rr][Hh][Ee][Dd][Hh][Aa][Tt]*|[Cc][Ee][Nn][Tt][Oo][Ss]*|[Aa][Ll][Mm][Aa]*|[Rr][Oo][Cc][Kk][Yy]*)
-        sudo dnf check-update
         sudo dnf install -y flatpak flatpak-builder
         ;;
     *)
