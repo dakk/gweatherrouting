@@ -14,42 +14,6 @@ finish-args:
 
 modules:
 
-  - name: numpy
-    buildsystem: simple
-    build-commands:
-      - pip3 install --prefix=/app --no-deps numpy-2.3.5-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
-    sources:
-      - type: file
-        url: https://files.pythonhosted.org/packages/f5/10/ca162f45a102738958dcec8023062dad0cbc17d1ab99d68c4e4a6c45fb2b/numpy-2.3.5-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
-        sha256: 11e06aa0af8c0f05104d56450d6093ee639e15f24ecf62d417329d06e522e017
-
-  - name: matplotlib
-    buildsystem: simple
-    build-commands:
-      - pip3 install --prefix=/app --no-deps matplotlib-3.10.7-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
-    sources:
-    - type: file
-      url: https://files.pythonhosted.org/packages/22/ff/6425bf5c20d79aa5b959d1ce9e65f599632345391381c9a104133fe0b171/matplotlib-3.10.7-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
-      sha256: b3c4ea4948d93c9c29dc01c0c23eef66f2101bf75158c291b88de6525c55c3d1 
-      
-  - name: weatherrouting
-    buildsystem: simple
-    build-commands:
-      - pip3 install --prefix=/app --no-deps weatherrouting-0.2.3-py3-none-any.whl
-    sources:
-    - type: file
-      url: https://files.pythonhosted.org/packages/dc/52/ad7b1993dd3973a480c32f0eb75e1e6f37fdc1b1cf60b610bbeeb398fead/weatherrouting-0.2.3-py3-none-any.whl
-      sha256: e0fc6edef874380918714ca9231c7410d8b1d8fe9b5a2590a33f09d13988c1be
-
-  - name: kiwisolver
-    buildsystem: simple
-    build-commands:
-      - pip3 install --prefix=/app --no-deps kiwisolver-1.4.9-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
-    sources:
-      - type: file
-        url: https://files.pythonhosted.org/packages/e9/e9/f218a2cb3a9ffbe324ca29a9e399fa2d2866d7f348ec3a88df87fc248fc5/kiwisolver-1.4.9-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl
-        sha256: b67e6efbf68e077dd71d1a6b37e43e1a99d0bff1a3d51867d45ee8908b931098
-
   - name: proj
     buildsystem: cmake-ninja
     config-opts:
@@ -92,9 +56,13 @@ modules:
       - -DBUILD_TESTING=OFF
       - -DCMAKE_POLICY_VERSION_MINIMUM=3.5
     sources:
-      - type: archive
-        url: https://github.com/json-c/json-c/archive/refs/tags/json-c-0.18-20240915.tar.gz
-        sha256: 3112c1f25d39eca661fe3fc663431e130cc6e2f900c081738317fba49d29e298         
+      - type: git
+        url: https://github.com/json-c/json-c
+        tag: json-c-0.18-20240915
+        commit: 41a55cfcedb54d9c1874f2f0eb07b504091d7e37
+        x-checker-data:
+          type: git
+          tag-pattern: '^json-c-([\d.]+)-[\d]+$'          
 
   - name: libgeotiff
     buildsystem: autotools
@@ -102,6 +70,8 @@ modules:
     - type: archive
       url: https://github.com/OSGeo/libgeotiff/releases/download/1.7.4/libgeotiff-1.7.4.tar.gz
       sha256: c598d04fdf2ba25c4352844dafa81dde3f7fd968daa7ad131228cd91e9d3dc47
+
+  - bin-requirements.yaml 
 
   - name: gdal
     buildsystem: cmake-ninja
@@ -132,9 +102,7 @@ modules:
       - type: git
         url: https://github.com/nzjrs/osm-gps-map.git
         commit: 639ea5e02d2cb47cbc15554d61b1ba6b0ee073b6
-         
-  - python3-requirements.json        
-
+ 
   - name: gweatherrouting
     buildsystem: simple
     build-commands:
