@@ -1,10 +1,11 @@
 ### Build deps
 ## numpy:
 meson-python 
-## gweatherrouting:
-python-dateutil
+## matplotlib:
+setuptools_scm
 pybind11
-pillow
+cppy
+
 #### Requirements
 requests
 colorlog
@@ -15,12 +16,17 @@ pynmea2
 gpxpy
 numpy
 nmeatoolkit
+matplotlib
 weatherrouting
-PyGObject
 
-### Excluded
-## In the manifest
-# GDAL
-## Not needed
+## SDK
+# pygobject
+
+## MANIFEST
+# gdal
+
+# NOT NEEDED
 # "vext @ git+https://github.com/vext-python/vext@32ad4d1c5f45797e244df1d2816f76b60f28e20e",
 # "vext.gi",
+
+### add --config-settings=setup-args="-Dsystem-freetype=true" --config-settings=setup-args="-Dsystem-qhull=true" >> matploatlib
