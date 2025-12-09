@@ -2,7 +2,7 @@
 Version=1.0
 Name=GWeatherRouting
 Exec=gweatherrouting
-Icon=io.github.dakk.gweatherrouting
+Icon=org.gweatherrouting.app
 StartupNotify=true
 Terminal=false
 Type=Application
