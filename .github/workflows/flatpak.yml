@@ -24,5 +24,5 @@ jobs:
     - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
       with:
         bundle: GWeatherRouting.flatpak
-        manifest-path: flatpak/org.gweatherrouting.app.yml
+        manifest-path: flatpak/org.gweatherrouting.gweatherrouting.yml
         cache-key: flatpak-builder-${{ github.sha }}
