@@ -2,20 +2,25 @@
 
 set -e
 
-DIR="${PWD}"
+# Check for the presence of flatpak and flatpak-builder
+shopt -s nocasematch
 
+DIR="${PWD}"
 os=$(awk -F= '/^ID=/ { gsub(/"/, "", $2); print $2 }' /etc/os-release)
 
 case "$os" in
-    [Aa][Rr][Cc][Hh]*|[Mm][Aa][Nn][Jj][Aa][Rr][Oo]*)
+    arch*|manjaro*)
         sudo pacman -Syu --noconfirm --needed flatpak flatpak-builder
         ;;
-    [Dd][Ee][Bb][Ii][Aa][Nn]*|[Mm][Ii][Nn][Tt]*|[Uu][Bb][Uu][Nn][Tt][Uu]*)
+    debian*|mint*|ubuntu*)
         sudo apt update
         sudo apt install -y flatpak flatpak-builder
         ;;
-    [Ff][Ee][Dd][Oo][Rr][Aa]*|[Rr][Hh][Ee][Dd][Hh][Aa][Tt]*|[Cc][Ee][Nn][Tt][Oo][Ss]*|[Aa][Ll][Mm][Aa]*|[Rr][Oo][Cc][Kk][Yy]*)
+    fedora*|redhat*|centos*|alma*|rocky*)
         sudo dnf install -y flatpak flatpak-builder
+        ;;
+    gentoo*)
+        sudo emerge --ask --noreplace flatpak flatpak-builder
         ;;
     *)
         echo "Unsupported OS: $os"
@@ -23,8 +28,11 @@ case "$os" in
         ;;
 esac
 
+shopt -u nocasematch
+
 flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
 flatpak-builder --install-deps-from=flathub --force-clean org.gweatherrouting.app.yml
 
 flatpak-builder --user --install --force-clean org.gweatherrouting.app.yml
+

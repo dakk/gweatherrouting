@@ -142,7 +142,19 @@ modules:
       - type: git
         url: https://github.com/nzjrs/osm-gps-map.git
         commit: 639ea5e02d2cb47cbc15554d61b1ba6b0ee073b6
-               
+
+  - name: python-deps
+    buildsystem: simple
+    sources:
+      - type: dir
+        path: wheels
+        dest: wheels
+    build-commands:
+      - pip3 install --no-index --find-links=${PWD}/wheels --prefix=/app setuptools setuptools_scm[toml]
+      - pip3 install --no-index --find-links=${PWD}/wheels --prefix=/app requests colorlog geojson_utils beautifulsoup4
+      - pip3 install --no-index --find-links=${PWD}/wheels --prefix=/app pyserial pynmea2 gpxpy matplotlib
+      - pip3 install --no-index --find-links=${PWD}/wheels --prefix=/app nmeatoolkit weatherrouting
+
   - name: gweatherrouting
     buildsystem: simple
     build-commands:
@@ -157,7 +169,7 @@ modules:
 #        url: https://github.com/dakk/gweatherrouting/archive/refs/tags/v0.2.2.tar.gz <<<----<<SOME RELEASE>>
 #        sha256: 94d33d5890d2fe43ba70a878430bb3586472f794cdbd8f349db4c4655daeb38c
     sources:
-       - type: git
-         url: https://github.com/eresia999/gweatherrouting.git
-         branch: master     
+      - type: git
+        url: https://github.com/dakk/gweatherrouting.git
+        tag: v0.2.2
 
