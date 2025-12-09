@@ -25,6 +25,6 @@ esac
 
 flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
-flatpak-builder --install-deps-from=flathub --force-clean build-dir io.github.dakk.gweatherrouting.yml
+flatpak-builder --install-deps-from=flathub --force-clean org.gweatherrouting.app.yml
 
-flatpak-builder --user --install --force-clean build-dir io.github.dakk.gweatherrouting.yml
+flatpak-builder --user --install --force-clean org.gweatherrouting.app.yml
