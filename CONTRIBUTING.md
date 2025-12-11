@@ -75,3 +75,9 @@ make docs
 2. Wait for the CI to build the appimage file
 3. Upload the appimage in the new release
 4. Update website appimage link
+
+### Flatpak
+1. Pin the release tag in the flatpak manifest
+2. Build the release
+3. Update pypi-dependencies.json using https://github.com/flatpak/flatpak-builder-tools/tree/master/pip
+4. Upload the new release on flatpak
