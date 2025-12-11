@@ -34,7 +34,7 @@
     </ul>
   </description>
 
-  <launchable type="desktop-id">org.gweatherrouting.gweatherrouting</launchable>
+  <launchable type="desktop-id">org.gweatherrouting.gweatherrouting.desktop</launchable>
 
   <categories>
     <category>Utility</category>
