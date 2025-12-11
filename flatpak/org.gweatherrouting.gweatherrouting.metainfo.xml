@@ -9,9 +9,9 @@
   <name>GWeatherRouting</name>
   <summary>Open-source sailing routing and navigation software</summary>
   
-  <url type="homepage">https://github.com/dakk/gweatherrouting</url>
   <url type="bugtracker">https://github.com/dakk/gweatherrouting/issues</url>
-  <url type="documentation">https://gweatherrouting.org</url>
+  <url type="contribute">https://github.com/dakk/gweatherrouting</url>
+  <url type="homepage">https://gweatherrouting.org</url>
   <url type="donation">https://github.com/sponsors/dakk</url>
   
   <developer id="io.github.dakk">
@@ -31,7 +31,7 @@
       <li>Gtk4 interface</li>
       <li>NMEA instruments support</li>
       <li>NMEA / GPX log analysys</li>
-    <ul>
+    </ul>
   </description>
 
   <launchable type="desktop-id">org.gweatherrouting.gweatherrouting</launchable>
