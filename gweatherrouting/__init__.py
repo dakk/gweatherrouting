@@ -16,4 +16,4 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 # isort:skip_file
 from . import core  # noqa: F401
 
-__version__ = "0.2.2"
+__version__ = "0.2.3"

@@ -153,12 +153,11 @@ modules:
       - /app/lib/pkgconfig      
 #    sources:
 #      - type: archive
-#        url: https://github.com/dakk/gweatherrouting/archive/refs/tags/v0.2.2.tar.gz <<<----<<SOME RELEASE>>
+#        url: https://github.com/dakk/gweatherrouting/archive/refs/tags/v0.2.3.tar.gz <<<----<<SOME RELEASE>>
 #        sha256: 94d33d5890d2fe43ba70a878430bb3586472f794cdbd8f349db4c4655daeb38c
     sources:
        - type: git
          url: https://github.com/dakk/gweatherrouting.git
-         branch: flatpak-fixes
-         #tag: v0.2.2
+         tag: v0.2.3
 
 
