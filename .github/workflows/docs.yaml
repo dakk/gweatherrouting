@@ -24,7 +24,7 @@ jobs:
       - name: Sphinx build
         run: |
           sphinx-build docs/source _build
-          cp docs/CNAME _build
+          echo "gweatherrouting.org" > _build/CNAME
           mkdir _build/.well-known
           touch _build/.well-known/org.flathub.VerifiedApps.txt
       - name: Deploy to GitHub Pages
