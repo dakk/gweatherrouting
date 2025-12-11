@@ -1,14 +1,14 @@
 name: AppImage
-# on: [push]
 
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    types: [opened, synchronize, reopened]
+  # push:
+  #   branches:
+  #     - master
+  # pull_request:
+  #   types: [opened, synchronize, reopened]
   release:
     types: [created]
+  workflow_dispatch:
 
 jobs:
   build-appimage:
