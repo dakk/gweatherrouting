@@ -28,8 +28,7 @@ except ValueError:
 
 from gi.repository import Gtk
 
-from gweatherrouting.common import resource_path
-
+from .polarmanagerwindow import PolarManagerWindow
 from .widgets.polar import PolarWidget
 
 logger = logging.getLogger("gweatherrouting")
@@ -38,7 +37,7 @@ logger = logging.getLogger("gweatherrouting")
 class PolarStack(Gtk.Box):
     def __init__(self, parent, core, settings_manager):
         Gtk.Widget.__init__(self)
-
+        self.polar_manager = core.polar_manager
         self.parent = parent
         self.core = core
 
@@ -53,20 +52,23 @@ class PolarStack(Gtk.Box):
 
         self.statusBar = self.builder.get_object("statusbar")
 
-        self.polars = os.listdir(resource_path("gweatherrouting", "data/polars/"))
-        boatselect = self.builder.get_object("boat-select")
+        self.polars = self.polar_manager.polars
+        self.polar_manager.connect("polars-list-updated", self.polars_list_updated)
+
+        self.boatselect = self.builder.get_object("boat-select")
         for polar in self.polars:
-            boatselect.insert_text(0, polar)
+            self.boatselect.append_text(polar)
 
-        self.polarWidget = PolarWidget(self.parent)
+        self.polarWidget = PolarWidget(self.parent, self.core)
         self.table = None
-        boatselect.set_active(1)
+        self.boatselect.set_active(0)
 
-    def load_polar(self, pn):
-        self.polarWidget.load_polar(pn)
-        self.builder.get_object("polarwidgetcontainer").pack_start(
-            self.polarWidget, True, True, 0
-        )
+    def load_polar(self, polar_file):
+        polarwidgetcontainer = self.builder.get_object("polarwidgetcontainer")
+        for child in polarwidgetcontainer.get_children():
+            polarwidgetcontainer.remove(child)
+        self.polarWidget.load_polar(polar_file)
+        polarwidgetcontainer.pack_start(self.polarWidget, True, True, 0)
 
         cc = self.builder.get_object("polartablecontainer")
         if self.table:
@@ -121,4 +123,23 @@ class PolarStack(Gtk.Box):
         self.show_all()
 
     def on_boat_select(self, widget):
-        self.load_polar(self.polars[widget.get_active()])
+        try:
+            self.load_polar(self.polars[widget.get_active()])
+            self.statusBar.push(0, "Polar loaded: " + widget.get_active_text())
+        except:
+            logger.error("Error loading polar: %s", widget.get_active_text())
+            self.statusBar.push(
+                0, "Please select add/enable a polar file by using the Polar Manager"
+            )
+            return
+
+    def on_polar_manager(self, event):
+        w = PolarManagerWindow(self.core.polar_manager)
+        w.show()
+
+    def polars_list_updated(self, event):
+        self.polars = self.polar_manager.polars
+        self.boatselect.get_model().clear()
+        for polar in self.polars:
+            self.boatselect.append_text(polar)
+        self.boatselect.set_active(0)
