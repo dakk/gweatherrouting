@@ -25,7 +25,8 @@ jobs:
         run: |
           sphinx-build docs/source _build
           cp docs/CNAME _build
-          cp -r docs/.well-known _build
+          mkdir _build/.well-known
+          touch _build/.well-known/org.flathub.VerifiedApps.txt
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
