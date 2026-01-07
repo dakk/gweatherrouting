@@ -11,6 +11,14 @@ finish-args:
   - --socket=fallback-x11
   - --socket=wayland
 
+cleanup:
+  - /include
+  - /lib/cmake
+  - /lib/pkgconfig
+  - "*.a"
+  - "*.la"
+  - /share/aclocal
+
 
 modules:
 
@@ -30,6 +38,8 @@ modules:
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
       - -DBUILD_TESTING=OFF
+    cleanup:
+      - /share
     sources:
       - type: archive
         url: http://download.osgeo.org/geos/geos-3.13.1.tar.bz2
@@ -47,6 +57,8 @@ modules:
       - -DCMAKE_BUILD_TYPE=Release
       - -DBUILD_TESTING=OFF
       - -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+    cleanup:
+      - /share
     sources:
       - type: git
         url: https://github.com/json-c/json-c
@@ -104,12 +116,25 @@ modules:
       - --with-python3
       - --disable-debug
     cleanup:
-      - /bin
-      - /share/swig
+      - "*"
     sources:
       - type: archive
         url: https://github.com/swig/swig/archive/refs/tags/v4.4.0.tar.gz
         sha256: 00735db2dc5abfae43c702dd927fc81a439e32d875839200cc0b5681cc70f66e
+
+  - name: openblas
+    buildsystem: cmake-ninja
+    builddir: true
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DBUILD_TESTING=OFF
+      - -DUSE_OPENMP=ON
+    cleanup:
+      - /share
+    sources:
+      - type: archive
+        url: https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.30/OpenBLAS-0.3.30.tar.gz
+        sha256: 27342cff518646afb4c2b976d809102e368957974c250a25ccc965e53063c95d
 
   - python3-requirements.yaml 
 
@@ -142,6 +167,7 @@ modules:
       - type: git
         url: https://github.com/nzjrs/osm-gps-map.git
         commit: 639ea5e02d2cb47cbc15554d61b1ba6b0ee073b6           
+ 
   - name: gweatherrouting
     buildsystem: simple
     build-commands:
@@ -150,16 +176,7 @@ modules:
       - install -Dm644 tools/org.gweatherrouting.gweatherrouting.desktop /app/share/applications/org.gweatherrouting.gweatherrouting.desktop  
       - install -Dm644 flatpak/org.gweatherrouting.gweatherrouting.metainfo.xml /app/share/metainfo/org.gweatherrouting.gweatherrouting.metainfo.xml
 
-    cleanup:
-      - /app/include
-      - /app/lib/pkgconfig      
-#    sources:
-#      - type: archive
-#        url: https://github.com/dakk/gweatherrouting/archive/refs/tags/v0.2.3.tar.gz <<<----<<SOME RELEASE>>
-#        sha256: 94d33d5890d2fe43ba70a878430bb3586472f794cdbd8f349db4c4655daeb38c
     sources:
        - type: git
          url: https://github.com/dakk/gweatherrouting.git
          tag: v0.2.3
-
-
