@@ -14,17 +14,8 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 import cairo
-import gi
-
-gi.require_version("Gtk", "3.0")
-try:
-    gi.require_version("OsmGpsMap", "1.2")
-except ValueError:
-    gi.require_version("OsmGpsMap", "1.0")
-
-from gi.repository import OsmGpsMap
-
 from gweatherrouting.gtk.style import Style
+from gweatherrouting.gtk.widgets.mapwidget import MapPoint
 
 from .vectorchartdrawer import VectorChartDrawer
 
@@ -86,7 +77,7 @@ class SimpleChartDrawer(VectorChartDrawer):
             for ii in range(0, g.GetPointCount()):
                 pt = g.GetPoint(ii)
                 xx, yy = gpsmap.convert_geographic_to_screen(
-                    OsmGpsMap.MapPoint.new_degrees(pt[1], pt[0])
+                    MapPoint.new_degrees(pt[1], pt[0])
                 )
                 cr.line_to(xx, yy)
 

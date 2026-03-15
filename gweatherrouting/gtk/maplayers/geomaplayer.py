@@ -19,18 +19,15 @@ import dateutil.parser
 import gi
 
 gi.require_version("Gtk", "3.0")
-try:
-    gi.require_version("OsmGpsMap", "1.2")
-except ValueError:
-    gi.require_version("OsmGpsMap", "1.0")
 
-from gi.repository import GObject, OsmGpsMap
+from gi.repository import GObject
 
 from gweatherrouting.core import Core, TimeControl, utils
 from gweatherrouting.gtk.style import Style
+from gweatherrouting.gtk.widgets.mapwidget import MapPoint
 
 
-class GeoMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
+class GeoMapLayer(GObject.GObject):
     def __init__(self, core: Core, time_control: TimeControl):
         GObject.GObject.__init__(self)
 
@@ -48,7 +45,7 @@ class GeoMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 
         for p in self.core.logManager.log:
             x, y = gpsmap.convert_geographic_to_screen(
-                OsmGpsMap.MapPoint.new_degrees(p[0], p[1])
+                MapPoint.new_degrees(p[0], p[1])
             )
 
             if prevx is not None and prevy is not None:
@@ -78,7 +75,7 @@ class GeoMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
             for p in tr:
                 i += 1
                 x, y = gpsmap.convert_geographic_to_screen(
-                    OsmGpsMap.MapPoint.new_degrees(p[0], p[1])
+                    MapPoint.new_degrees(p[0], p[1])
                 )
 
                 if prevp is None:
@@ -112,7 +109,7 @@ class GeoMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 
                         Style.Track.RoutingBoat.apply(cr)
                         xx, yy = gpsmap.convert_geographic_to_screen(
-                            OsmGpsMap.MapPoint.new_degrees(rp[0], rp[1])
+                            MapPoint.new_degrees(rp[0], rp[1])
                         )
                         cr.arc(xx, yy, 7, 0, 2 * math.pi)
                         cr.fill()
@@ -152,7 +149,7 @@ class GeoMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
             for p in tr:
                 i += 1
                 x, y = gpsmap.convert_geographic_to_screen(
-                    OsmGpsMap.MapPoint.new_degrees(p[0], p[1])
+                    MapPoint.new_degrees(p[0], p[1])
                 )
 
                 if prevx is None:
@@ -202,7 +199,7 @@ class GeoMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
                 continue
 
             x, y = gpsmap.convert_geographic_to_screen(
-                OsmGpsMap.MapPoint.new_degrees(tr.position[0], tr.position[1])
+                MapPoint.new_degrees(tr.position[0], tr.position[1])
             )
 
             Style.Poi.Quad.apply(cr)
@@ -238,5 +235,3 @@ class GeoMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
     def do_button_press(self, gpsmap, gdkeventbutton):
         return False
 
-
-GObject.type_register(GeoMapLayer)

@@ -22,12 +22,10 @@ import requests
 from osgeo import ogr
 
 gi.require_version("Gtk", "3.0")
-try:
-    gi.require_version("OsmGpsMap", "1.2")
-except ValueError:
-    gi.require_version("OsmGpsMap", "1.0")
 
-from gi.repository import Gdk, Gtk, OsmGpsMap
+from gi.repository import Gdk, Gtk
+
+from gweatherrouting.gtk.widgets.mapwidget import MapPoint
 
 from gweatherrouting.common import resource_path
 from gweatherrouting.core.core import LinePointValidityProvider
@@ -424,7 +422,7 @@ class GSHHSVectorChart(ChartLayer, LinePointValidityProvider):
                 cr.set_source_rgba(0, 0, 0, 0.8)
                 cr.set_font_size(9)
                 x, y = gpsmap.convert_geographic_to_screen(
-                    OsmGpsMap.MapPoint.new_degrees(float(c[2]), float(c[3]))
+                    MapPoint.new_degrees(float(c[2]), float(c[3]))
                 )
                 cr.move_to(x, y)
                 cr.show_text(c[1])

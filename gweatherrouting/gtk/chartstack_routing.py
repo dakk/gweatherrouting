@@ -24,10 +24,6 @@ import gi
 from gweatherrouting.core.storage import POLAR_DIR
 
 gi.require_version("Gtk", "3.0")
-try:
-    gi.require_version("OsmGpsMap", "1.2")
-except ValueError:
-    gi.require_version("OsmGpsMap", "1.0")
 
 from gi.repository import Gdk, GObject, Gtk
 from weatherrouting import RoutingNoWindError

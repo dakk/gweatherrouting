@@ -28,12 +28,10 @@ import numpy as np
 from osgeo import gdal, osr
 
 gi.require_version("Gtk", "3.0")
-try:
-    gi.require_version("OsmGpsMap", "1.2")
-except ValueError:
-    gi.require_version("OsmGpsMap", "1.0")
 
-from gi.repository import Gdk, OsmGpsMap
+from gi.repository import Gdk
+
+from gweatherrouting.gtk.widgets.mapwidget import MapPoint
 
 from .chartlayer import ChartLayer
 
@@ -153,10 +151,10 @@ class GDALSingleRasterChart:
     def do_draw(self, gpsmap, cr):
         cr.save()
         xx, yy = gpsmap.convert_geographic_to_screen(
-            OsmGpsMap.MapPoint.new_degrees(self.bbox[0][0], self.bbox[0][1])
+            MapPoint.new_degrees(self.bbox[0][0], self.bbox[0][1])
         )
         xx2, yy2 = gpsmap.convert_geographic_to_screen(
-            OsmGpsMap.MapPoint.new_degrees(self.bbox[1][0], self.bbox[1][1])
+            MapPoint.new_degrees(self.bbox[1][0], self.bbox[1][1])
         )
         scalingy = (yy2 - yy) / self.dataset.RasterYSize
         scalingx = (xx2 - xx) / self.dataset.RasterXSize
@@ -331,10 +329,10 @@ class GDALRasterChart(ChartLayer):
             max_r_lon = max(bb[0][1], bb[1][1])
 
             xx, yy = gpsmap.convert_geographic_to_screen(
-                OsmGpsMap.MapPoint.new_degrees(min_r_lat, min_r_lon)
+                MapPoint.new_degrees(min_r_lat, min_r_lon)
             )
             xx2, yy2 = gpsmap.convert_geographic_to_screen(
-                OsmGpsMap.MapPoint.new_degrees(max_r_lat, max_r_lon)
+                MapPoint.new_degrees(max_r_lat, max_r_lon)
             )
 
             cr.set_source_rgba(1, 0, 0, 0.6)

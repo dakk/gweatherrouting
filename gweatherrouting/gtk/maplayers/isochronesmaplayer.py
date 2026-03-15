@@ -20,17 +20,14 @@ import gi
 from weatherrouting import utils
 
 gi.require_version("Gtk", "3.0")
-try:
-    gi.require_version("OsmGpsMap", "1.2")
-except ValueError:
-    gi.require_version("OsmGpsMap", "1.0")
 
-from gi.repository import GObject, OsmGpsMap
+from gi.repository import GObject
 
 from gweatherrouting.gtk.style import Style
+from gweatherrouting.gtk.widgets.mapwidget import MapPoint
 
 
-class IsochronesMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
+class IsochronesMapLayer(GObject.GObject):
     def __init__(self):
         GObject.GObject.__init__(self)
         self.isochrones = []
@@ -56,7 +53,7 @@ class IsochronesMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
                     p = p.to_list()
                 i += 1
                 x, y = gpsmap.convert_geographic_to_screen(
-                    OsmGpsMap.MapPoint.new_degrees(p[0], p[1])
+                    MapPoint.new_degrees(p[0], p[1])
                 )
 
                 if prevx is None:
@@ -93,7 +90,7 @@ class IsochronesMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
                 cr.set_line_width(1.5)
 
                 x, y = gpsmap.convert_geographic_to_screen(
-                    OsmGpsMap.MapPoint.new_degrees(icpoint.pos[0], icpoint.pos[1])
+                    MapPoint.new_degrees(icpoint.pos[0], icpoint.pos[1])
                 )
 
                 if prev is not None:
@@ -110,7 +107,7 @@ class IsochronesMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
                     #     cr.set_source_rgba(1, 0, 0, 0.8)
                     #     cr.set_line_width(0.6)
                     #     xa, ya = gpsmap.convert_geographic_to_screen(
-                    #         OsmGpsMap.MapPoint.new_degrees(
+                    #         MapPoint.new_degrees(
                     #             self.isochrones[i - 1][icpoint[2]][0],
                     #             self.isochrones[i - 1][icpoint[2]][1],
                     #         )
@@ -125,7 +122,7 @@ class IsochronesMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
             # cr.set_source_rgba (0,0,0,0.3)
             # cr.set_line_width (1)
             # cr.move_to (prev[0], prev[1])
-            # x, y = gpsmap.convert_geographic_to_screen (OsmGpsMap.MapPoint.new_degrees
+            # x, y = gpsmap.convert_geographic_to_screen (MapPoint.new_degrees
             #  (ic[0][0], ic[0][1]))
             # # cr.line_to (x, y)
             # cr.move_to (x, y)
@@ -142,5 +139,3 @@ class IsochronesMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
     def do_button_press(self, gpsmap, gdkeventbutton):
         return False
 
-
-GObject.type_register(IsochronesMapLayer)

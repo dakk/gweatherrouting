@@ -16,15 +16,11 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import gi
 
 gi.require_version("Gtk", "3.0")
-try:
-    gi.require_version("OsmGpsMap", "1.2")
-except ValueError:
-    gi.require_version("OsmGpsMap", "1.0")
 
-from gi.repository import GObject, OsmGpsMap
+from gi.repository import GObject
 
 
-class AISMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
+class AISMapLayer(GObject.GObject):
     def __init__(self, core):
         GObject.GObject.__init__(self)
         self.visible = True
@@ -45,5 +41,3 @@ class AISMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
     def do_button_press(self, gpsmap, gdkeventbutton):
         return False
 
-
-GObject.type_register(AISMapLayer)

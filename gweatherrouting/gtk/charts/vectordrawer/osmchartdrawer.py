@@ -15,15 +15,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 import logging
 
-import gi
-
-gi.require_version("Gtk", "3.0")
-try:
-    gi.require_version("OsmGpsMap", "1.2")
-except ValueError:
-    gi.require_version("OsmGpsMap", "1.0")
-
-from gi.repository import OsmGpsMap
+from gweatherrouting.gtk.widgets.mapwidget import MapPoint
 
 from .vectorchartdrawer import VectorChartDrawer
 
@@ -100,7 +92,7 @@ class OSMChartDrawer(VectorChartDrawer):
 
         pt = geom.GetPoint(0)
         xx, yy = gpsmap.convert_geographic_to_screen(
-            OsmGpsMap.MapPoint.new_degrees(pt[1], pt[0])
+            MapPoint.new_degrees(pt[1], pt[0])
         )
 
         scale = gpsmap.get_scale()

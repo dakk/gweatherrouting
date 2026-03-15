@@ -20,18 +20,15 @@ import cairo
 import gi
 
 gi.require_version("Gtk", "3.0")
-try:
-    gi.require_version("OsmGpsMap", "1.2")
-except ValueError:
-    gi.require_version("OsmGpsMap", "1.0")
 
-from gi.repository import GObject, OsmGpsMap
+from gi.repository import GObject
 
 from gweatherrouting.core import utils
 from gweatherrouting.gtk.style import Style
+from gweatherrouting.gtk.widgets.mapwidget import MapPoint
 
 
-class ToolsMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
+class ToolsMapLayer(GObject.GObject):
     def __init__(self, core):
         GObject.GObject.__init__(self)
 
@@ -106,7 +103,7 @@ class ToolsMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
         if self.mob and self.mobPosition:
             lat, lon = self.mobPosition
             x, y = gpsmap.convert_geographic_to_screen(
-                OsmGpsMap.MapPoint.new_degrees(lat, lon)
+                MapPoint.new_degrees(lat, lon)
             )
 
             Style.Track.Mob.apply(cr)
@@ -115,7 +112,7 @@ class ToolsMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 
         if self.compass and self.gps:
             x, y = gpsmap.convert_geographic_to_screen(
-                OsmGpsMap.MapPoint.new_degrees(self.gps[0], self.gps[1])
+                MapPoint.new_degrees(self.gps[0], self.gps[1])
             )
 
             Style.Compass.Font.apply(cr)
@@ -138,7 +135,7 @@ class ToolsMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 
         if self.gps:
             x, y = gpsmap.convert_geographic_to_screen(
-                OsmGpsMap.MapPoint.new_degrees(self.gps[0], self.gps[1])
+                MapPoint.new_degrees(self.gps[0], self.gps[1])
             )
             hdg = math.radians(self.gps[2])
             r = 6
@@ -183,12 +180,12 @@ class ToolsMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
                 return
 
             x, y = gpsmap.convert_geographic_to_screen(
-                OsmGpsMap.MapPoint.new_degrees(
+                MapPoint.new_degrees(
                     self.measureStart[0], self.measureStart[1]
                 )
             )
             x1, y1 = gpsmap.convert_geographic_to_screen(
-                OsmGpsMap.MapPoint.new_degrees(
+                MapPoint.new_degrees(
                     self.mousePosition[0], self.mousePosition[1]
                 )
             )
@@ -241,5 +238,3 @@ class ToolsMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
 
         return False
 
-
-GObject.type_register(ToolsMapLayer)

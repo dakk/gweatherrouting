@@ -18,18 +18,15 @@ import math
 import gi
 
 gi.require_version("Gtk", "3.0")
-try:
-    gi.require_version("OsmGpsMap", "1.2")
-except ValueError:
-    gi.require_version("OsmGpsMap", "1.0")
 
-from gi.repository import GObject, OsmGpsMap
+from gi.repository import GObject
 
 from gweatherrouting.common import wind_color
 from gweatherrouting.core.utils import point_in_country
+from gweatherrouting.gtk.widgets.mapwidget import MapPoint
 
 
-class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
+class GribMapLayer(GObject.GObject):
     def __init__(self, grib_manager, time_control, settings_manager):
         GObject.GObject.__init__(self)
         self.visible = True
@@ -109,7 +106,7 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
                         continue
 
                 xx, yy = gpsmap.convert_geographic_to_screen(
-                    OsmGpsMap.MapPoint.new_degrees(y[2][0], y[2][1])
+                    MapPoint.new_degrees(y[2][0], y[2][1])
                 )
                 self.draw_wind_arrow(cr, xx, yy, y[0], y[1])
 
@@ -117,12 +114,12 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
         # for i in range(0, len(data) - scale, scale):
         # 	for j in range(0, len(data[i]) - scale, scale):
         # 		xx, yy = gpsmap.convert_geographic_to_screen(
-        # 			OsmGpsMap.MapPoint.new_degrees(data[i][j][2][0], data[i][j][2][1])
+        # 			MapPoint.new_degrees(data[i][j][2][0], data[i][j][2][1])
         # 		)
 
         # 		try:
         # 			xx2, yy2 = gpsmap.convert_geographic_to_screen(
-        # 				OsmGpsMap.MapPoint.new_degrees(data[i+scale][j+scale][2][0],
+        # 				MapPoint.new_degrees(data[i+scale][j+scale][2][0],
         #  data[i+scale][j+scale][2][1])
         # 			)
         # 		except:
@@ -161,5 +158,3 @@ class GribMapLayer(GObject.GObject, OsmGpsMap.MapLayer):
     def do_button_press(self, gpsmap, gdkeventbutton):
         return False
 
-
-GObject.type_register(GribMapLayer)

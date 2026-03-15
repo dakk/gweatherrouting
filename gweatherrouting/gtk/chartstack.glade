@@ -2,7 +2,6 @@
 <!-- Generated with glade 3.40.0 -->
 <interface>
   <requires lib="gtk+" version="3.24"/>
-  <requires lib="osmgpsmap" version="1.0"/>
   <object class="GtkMenu" id="export-menu">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
@@ -985,13 +984,12 @@ loaded to created a routing</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="OsmGpsMap" id="map">
+                  <object class="GtkBox" id="map-container">
                     <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="repo-uri">none://</property>
-                    <property name="tile-cache">/home/dakk/.cache/osmgpsmap/b487b51738b9962abcc425a3dcb26b4d</property>
-                    <signal name="button-press-event" handler="on_map_click" swapped="no"/>
-                    <signal name="motion-notify-event" handler="on_map_mouse_move" swapped="no"/>
+                    <property name="can-focus">False</property>
+                    <child>
+                      <placeholder/>
+                    </child>
                   </object>
                   <packing>
                     <property name="expand">True</property>
