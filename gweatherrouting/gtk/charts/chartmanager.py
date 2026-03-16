@@ -33,11 +33,9 @@ from .chartlayer import ChartLayer
 from .gdalrasterchart import GDALRasterChart
 from .gdalvectorchart import GDALVectorChart
 from .gshhs import (
-    GSHHSAskDownloadDialog,
-    GSHHSDownloadDialog,
+    AskDownloadDialog,
+    CombinedDownloadDialog,
     GSHHSVectorChart,
-    OSMAskDownloadDialog,
-    OSMDownloadDialog,
 )
 
 logger = logging.getLogger("gweatherrouting")
@@ -86,53 +84,43 @@ class ChartManager(GObject.GObject):
 
     def load_base_chart(self, parent):
         self._load_base_gshhs()
-
-        if not self.gshhsLayer:
-            logger.info("GSHHS files not found, open a dialog asking for download")
-
-            def f():
-                Gdk.threads_enter()
-                ask_diag = GSHHSAskDownloadDialog(parent)
-                r = ask_diag.run()
-                ask_diag.destroy()
-                if r == Gtk.ResponseType.OK:
-                    down_diag = GSHHSDownloadDialog(parent)
-                    r = down_diag.run()
-                    down_diag.destroy()
-                    if r == Gtk.ResponseType.OK:
-                        self._load_base_gshhs()
-                else:
-                    self.charts = [
-                        GDALVectorChart(
-                            resource_path("gweatherrouting", "data/countries.geojson"),
-                            self.settings_manager,
-                        )
-                    ] + self.charts
-
-                Gdk.threads_leave()
-
-            GObject.timeout_add(10, f)
-
         self._load_base_osm()
 
-        if not self.osmLayer:
-            logger.info("OSM file not found, open a dialog asking for download")
+        gshhs_missing = self.gshhsLayer is None
+        osm_missing = self.osmLayer is None
 
-            def ff():
-                Gdk.threads_enter()
-                ask_diag = OSMAskDownloadDialog(parent)
-                r = ask_diag.run()
-                ask_diag.destroy()
+        if not gshhs_missing and not osm_missing:
+            return
+
+        def f():
+            Gdk.threads_enter()
+            ask_diag = AskDownloadDialog(parent, gshhs_missing, osm_missing)
+            r = ask_diag.run()
+            download_gshhs = ask_diag.download_gshhs
+            download_osm = ask_diag.download_osm
+            ask_diag.destroy()
+
+            if r == Gtk.ResponseType.OK and (download_gshhs or download_osm):
+                down_diag = CombinedDownloadDialog(parent, download_gshhs, download_osm)
+                r = down_diag.run()
+                down_diag.destroy()
                 if r == Gtk.ResponseType.OK:
-                    down_diag = OSMDownloadDialog(parent)
-                    r = down_diag.run()
-                    down_diag.destroy()
-                    if r == Gtk.ResponseType.OK:
+                    if download_gshhs:
+                        self._load_base_gshhs()
+                    if download_osm:
                         self._load_base_osm()
 
-                Gdk.threads_leave()
+            if not self.gshhsLayer:
+                self.charts = [
+                    GDALVectorChart(
+                        resource_path("gweatherrouting", "data/countries.geojson"),
+                        self.settings_manager,
+                    )
+                ] + self.charts
 
-            GObject.timeout_add(10, ff)
+            Gdk.threads_leave()
+
+        GObject.timeout_add(10, f)
 
     def load_vector_layer(self, path, metadata=None, enabled=True):
         logger.info("Loading vector chart %s", path)

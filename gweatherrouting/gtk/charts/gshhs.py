@@ -37,6 +37,51 @@ from .chartlayer import ChartLayer
 logger = logging.getLogger("gweatherrouting")
 
 
+class AskDownloadDialog(Gtk.Dialog):
+    def __init__(self, parent, gshhs_missing, osm_missing):
+        super().__init__(title="Map Data Setup", transient_for=parent, flags=0)
+        self.add_buttons(
+            Gtk.STOCK_CANCEL,
+            Gtk.ResponseType.CANCEL,
+            "Download",
+            Gtk.ResponseType.OK,
+        )
+        self.set_default_size(350, 180)
+        self.set_border_width(10)
+
+        box = self.get_content_area()
+        box.set_spacing(10)
+
+        label = Gtk.Label(label="Some map data is missing.\nSelect what to download:")
+        label.set_xalign(0)
+        box.add(label)
+
+        self.gshhs_check = None
+        self.osm_check = None
+
+        if gshhs_missing:
+            self.gshhs_check = Gtk.CheckButton(
+                label="Base world contour lines (~140 MB)"
+            )
+            self.gshhs_check.set_active(True)
+            box.add(self.gshhs_check)
+
+        if osm_missing:
+            self.osm_check = Gtk.CheckButton(label="OpenSeaMap sea marks (~2 MB)")
+            self.osm_check.set_active(True)
+            box.add(self.osm_check)
+
+        self.show_all()
+
+    @property
+    def download_gshhs(self):
+        return self.gshhs_check is not None and self.gshhs_check.get_active()
+
+    @property
+    def download_osm(self):
+        return self.osm_check is not None and self.osm_check.get_active()
+
+
 class OSMAskDownloadDialog(Gtk.Dialog):
     def __init__(self, parent):
         super().__init__(title="OpenSeaMap Download", transient_for=parent, flags=0)
@@ -225,6 +270,108 @@ class GSHHSDownloadDialog(Gtk.Dialog):
 
         zipfile.ZipFile(TEMP_DIR + "/gshhs2.3.6.zip").extractall(DATA_DIR)
         self.callback(True)
+
+
+class CombinedDownloadDialog(Gtk.Dialog):
+    def __init__(self, parent, download_gshhs, download_osm):
+        super().__init__(title="Downloading Map Data", transient_for=parent, flags=0)
+        self.parent = parent
+        self.download_gshhs = download_gshhs
+        self.download_osm = download_osm
+        self.success_gshhs = False
+        self.success_osm = False
+
+        self.set_default_size(350, 100)
+        self.set_border_width(10)
+
+        b = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.label = Gtk.Label(label="Preparing download...")
+        self.pb = Gtk.ProgressBar()
+        b.pack_start(self.label, True, True, 10)
+        b.pack_start(self.pb, True, True, 10)
+        box = self.get_content_area()
+        box.add(b)
+        self.show_all()
+
+        self.thread = Thread(target=self._run_downloads, args=())
+        self.thread.start()
+
+    def _update_progress(self, text, fraction):
+        Gdk.threads_enter()
+        self.label.set_text(text)
+        self.pb.set_fraction(fraction)
+        Gdk.threads_leave()
+
+    def _download_file(self, uri, dest, label_prefix):
+        response = requests.get(uri, stream=True)
+        total_length = response.headers.get("content-length")
+        last_signal_percent = -1
+
+        with open(dest, "wb") as f:
+            if total_length is None:
+                f.write(response.content)
+            else:
+                dl = 0
+                total_length_i = int(total_length)
+                for data in response.iter_content(chunk_size=4096):
+                    dl += len(data)
+                    f.write(data)
+                    done = int(100 * dl / total_length_i)
+                    if last_signal_percent != done:
+                        self._update_progress(f"{label_prefix}: {done}%", done / 100.0)
+                        last_signal_percent = done
+
+    def _run_downloads(self):
+        import zipfile
+
+        try:
+            if self.download_gshhs:
+                uri = (
+                    "https://github.com/dakk/gweatherrouting/releases/download/"
+                    + "gshhs2.3.6/gshhg-shp-2.3.6.zip"
+                )
+                self._update_progress("Downloading base map...", 0)
+                self._download_file(uri, TEMP_DIR + "/gshhs2.3.6.zip", "Base map")
+                self._update_progress("Extracting base map...", 1.0)
+                zipfile.ZipFile(TEMP_DIR + "/gshhs2.3.6.zip").extractall(DATA_DIR)
+                self.success_gshhs = True
+                logger.info("GSHHS base map download completed")
+
+            if self.download_osm:
+                uri = "https://github.com/dakk/osm-seamarks/raw/master/seamarks.pbf"
+                self._update_progress("Downloading OpenSeaMap...", 0)
+                self._download_file(uri, DATA_DIR + "/seamarks.pbf", "OpenSeaMap")
+                self.success_osm = True
+                logger.info("OpenSeaMap download completed")
+
+            self._finish(True)
+        except Exception:
+            logger.exception("Error during map data download")
+            self._finish(False)
+
+    def _finish(self, success):
+        Gdk.threads_enter()
+        if success:
+            edialog = Gtk.MessageDialog(
+                self.parent, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done"
+            )
+            edialog.format_secondary_text("Map data downloaded successfully")
+            edialog.run()
+            edialog.destroy()
+            self.response(Gtk.ResponseType.OK)
+        else:
+            edialog = Gtk.MessageDialog(
+                self.parent,
+                0,
+                Gtk.MessageType.ERROR,
+                Gtk.ButtonsType.OK,
+                "Error",
+            )
+            edialog.format_secondary_text("An error occurred during download")
+            edialog.run()
+            edialog.destroy()
+            self.response(Gtk.ResponseType.CANCEL)
+        Gdk.threads_leave()
 
 
 # 	GSHHS_shp: Shapefiles (polygons) derived from shorelines.
