@@ -50,13 +50,14 @@ jobs:
             --icon ../windows/icon.ico \
             --hidden-import=gi \
             --collect-submodules=gi \
-            --add-data "data:gweatherrouting/data" \
-            --add-data "gtk:gweatherrouting/gtk" \
+            --add-data "data;gweatherrouting/data" \
+            --add-data "gtk;gweatherrouting/gtk" \
             --runtime-hook ../windows/pyinstaller_gi_hook_win.py \
             $(for typelib in Gtk-3.0 Gdk-3.0 GdkPixbuf-2.0 Pango-1.0 PangoCairo-1.0 GObject-2.0 GLib-2.0 Gio-2.0 cairo-1.0 Atk-1.0 HarfBuzz-0.0 freetype2-2.0 GModule-2.0 GdkWin32-3.0; do
               typelibfile="/mingw64/lib/girepository-1.0/${typelib}.typelib"
               if [ -f "$typelibfile" ]; then
-                echo "--add-data ${typelibfile}:gi_typelibs"
+                winpath=$(cygpath -w "$typelibfile")
+                echo "--add-data ${winpath};gi_typelibs"
               fi
             done) \
             __main__.py
