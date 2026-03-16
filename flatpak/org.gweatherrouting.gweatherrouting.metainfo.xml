@@ -72,6 +72,12 @@
   </screenshots>
 
   <releases>
+    <release version="0.2.7" date="2026-03-16">
+      <url type="details">https://github.com/dakk/gweatherrouting/releases/tag/v0.2.7</url>
+      <description>
+          <p>Latest stable release with improved polar visualization and other minor improvements</p>
+      </description>
+    </release>
     <release version="0.2.3" date="2025-12-11">
       <url type="details">https://github.com/dakk/gweatherrouting/releases/tag/v0.2.3</url>
       <description>
