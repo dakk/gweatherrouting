@@ -50,25 +50,15 @@ class PolarWidget(Gtk.DrawingArea):
         super(PolarWidget, self).__init__()
 
         self.set_size_request(60, 180)
+        self.set_hexpand(True)
+        self.set_vexpand(True)
         self.connect("draw", self.draw)
-        self.connect("size-allocate", self._on_size_allocate)
         self.polar = None
 
         self.connect("motion-notify-event", self.on_mouse_move)
         self.add_events(Gdk.EventMask.POINTER_MOTION_MASK)
 
         self.mousePos = None
-
-    def _on_size_allocate(self, widget, allocation):
-        # Constrain width to maintain the logical aspect ratio based on height
-        max_r = 80.0
-        margin = 25.0
-        logical_w = max_r + 2 * margin
-        logical_h = 2 * max_r + 2 * margin
-        ideal_width = int(allocation.height * logical_w / logical_h)
-        if allocation.width > ideal_width:
-            allocation.width = ideal_width
-            self.set_allocation(allocation)
 
     def on_mouse_move(self, widget, event):
         p = self.get_pointer()
