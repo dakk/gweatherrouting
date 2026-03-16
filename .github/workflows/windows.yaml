@@ -24,6 +24,7 @@ jobs:
           msystem: MINGW64
           update: true
           install: >-
+            git
             mingw-w64-x86_64-gtk3
             mingw-w64-x86_64-python
             mingw-w64-x86_64-python-pip
@@ -37,8 +38,8 @@ jobs:
       - name: Install Python Dependencies
         shell: msys2 {0}
         run: |
-          pip install pyinstaller
-          pip install --no-deps .
+          pip install --break-system-packages pyinstaller
+          pip install --break-system-packages --no-build-isolation --no-deps .
 
       - name: Build Windows Executable
         shell: msys2 {0}
