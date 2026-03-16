@@ -13,17 +13,14 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+
 from typing import Callable
 
 import gi
 
 gi.require_version("Gtk", "3.0")
-try:
-    gi.require_version("OsmGpsMap", "1.2")
-except ValueError:
-    gi.require_version("OsmGpsMap", "1.0")
 
-from gi.repository import Gtk, OsmGpsMap
+from gi.repository import Gtk
 
 from gweatherrouting.core import Core, TimeControl
 
@@ -34,7 +31,7 @@ from .maplayers import GeoMapLayer, ToolsMapLayer
 class ChartStackBase:
     builder: Gtk.Builder
     core: Core
-    map: OsmGpsMap
+    map: Gtk.Widget
     parent: Gtk.Widget
     status_bar: Gtk.Statusbar
     progress_bar: Gtk.ProgressBar

@@ -13,6 +13,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+
 # isort:skip_file
 from .cm93chartdrawer import CM93ChartDrawer  # noqa: F401
 from .osmchartdrawer import OSMChartDrawer  # noqa: F401

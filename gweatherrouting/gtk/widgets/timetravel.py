@@ -13,16 +13,13 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+
 import os
 
 import gi
 
 gi.require_version("Gtk", "3.0")
-try:
-    gi.require_version("OsmGpsMap", "1.2")
-except ValueError:
-    gi.require_version("OsmGpsMap", "1.0")
-from gi.repository import GObject, Gtk, OsmGpsMap
+from gi.repository import GObject, Gtk
 
 from gweatherrouting.core import TimeControl
 from gweatherrouting.gtk.timepickerdialog import TimePickerDialog
@@ -47,7 +44,7 @@ class TimeTravelWidget(Gtk.Box):
         self,
         parent: Gtk.Window,
         time_control: TimeControl,
-        map: OsmGpsMap,
+        map,
         smaller_unit=False,
     ):
         super(TimeTravelWidget, self).__init__()

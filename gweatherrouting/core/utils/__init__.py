@@ -14,6 +14,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+
 # isort:skip_file
 import json
 from geojson_utils import point_in_polygon

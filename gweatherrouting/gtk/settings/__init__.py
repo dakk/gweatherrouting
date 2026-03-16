@@ -13,6 +13,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+
 # isort:skip_file
 from .settingswindow import SettingsWindow  # noqa: F401
 from .settingsmanager import SettingsManager  # noqa: F401

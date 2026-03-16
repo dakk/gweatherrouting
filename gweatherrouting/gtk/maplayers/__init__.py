@@ -13,6 +13,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+
 # isort:skip_file
 from .gribmaplayer import GribMapLayer  # noqa: F401
 from .isochronesmaplayer import IsochronesMapLayer  # noqa: F401

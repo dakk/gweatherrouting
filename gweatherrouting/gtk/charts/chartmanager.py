@@ -13,6 +13,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+
 import logging
 import os
 from typing import List, Optional
@@ -20,12 +21,8 @@ from typing import List, Optional
 import gi
 
 gi.require_version("Gtk", "3.0")
-try:
-    gi.require_version("OsmGpsMap", "1.2")
-except ValueError:
-    gi.require_version("OsmGpsMap", "1.0")
 
-from gi.repository import Gdk, GObject, Gtk, OsmGpsMap
+from gi.repository import Gdk, GObject, Gtk
 
 from gweatherrouting.common import resource_path
 from gweatherrouting.core.core import LinePointValidityProvider
@@ -46,20 +43,20 @@ from .gshhs import (
 logger = logging.getLogger("gweatherrouting")
 
 
-class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
+class ChartManager(GObject.GObject):
     def __init__(self, settings_manager):
         GObject.GObject.__init__(self)
         self.charts: List[ChartLayer] = []
         self.gshhsLayer: Optional[GSHHSVectorChart] = None
         self.osmLayer: Optional[GDALVectorChart] = None
         self.settings_manager: SettingsManager = settings_manager
-        self.maps: List[OsmGpsMap] = []
+        self.maps: List = []
 
         self.settings_manager.register_on_change(
             "chartPalette", self.on_chart_palette_changed
         )
 
-    def add_map(self, m: OsmGpsMap):
+    def add_map(self, m):
         self.maps.append(m)
 
     def get_line_point_validity_providers(self):
@@ -179,6 +176,3 @@ class ChartManager(GObject.GObject, OsmGpsMap.MapLayer):
     def do_button_press(self, gpsmap, gdkeventbutton):
         for x in filter(lambda x: x.enabled, self.charts):
             x.do_button_press(gpsmap, gdkeventbutton)
-
-
-GObject.type_register(ChartManager)

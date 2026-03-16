@@ -26,11 +26,6 @@ if [[ "$1" != "-y" ]]; then
     fi
 fi
 
-# 0. Detect libraries to manually inject
-LIBOSM_PATHS=$(ldconfig -p | grep "libosmgpsmap-1.0" | awk '{print $NF}' | tr '\n' ' ')
-echo "Using osmmap libraries at: $LIBOSM_PATHS"
-
-
 echo -e "\nStarting AppImage creation process..."
 
 # 1. Generate Binary from Python File
@@ -57,13 +52,8 @@ chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-gtk.sh
 # 4. Add Required Libraries to AppImage Directory
 echo "Adding required libraries to AppImage directory..."
 ./linuxdeploy-x86_64.AppImage --appimage-extract
-
-for LIBOSM_PATH in $LIBOSM_PATHS; do
-    #NO_STRIP=true DEPLOY_GTK_VERSION=3 ./linuxdeploy-x86_64.AppImage --appdir $APP_DIR --plugin gtk --library "$LIBOSM_PATH" 
-    NO_STRIP=true DEPLOY_GTK_VERSION=3 ./squashfs-root/AppRun --appdir $APP_DIR --plugin gtk --library "$LIBOSM_PATH"
-done
+NO_STRIP=true DEPLOY_GTK_VERSION=3 ./squashfs-root/AppRun --appdir $APP_DIR --plugin gtk
 rm -rf squashfs-root
-
 
 # Ensure destination exists
 mkdir -p "$APP_DIR/usr/lib"

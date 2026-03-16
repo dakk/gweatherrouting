@@ -13,6 +13,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+
 import io
 import logging
 import os
@@ -27,10 +28,6 @@ import numpy
 import PIL
 
 gi.require_version("Gtk", "3.0")
-try:
-    gi.require_version("OsmGpsMap", "1.2")
-except ValueError:
-    gi.require_version("OsmGpsMap", "1.0")
 
 from gi.repository import Gdk, Gtk
 
@@ -41,6 +38,7 @@ from gweatherrouting.gtk.settings import SettingsManager
 
 from .maplayers.geomaplayer import GeoMapLayer
 from .maplayers.toolsmaplayer import ToolsMapLayer
+from .widgets.mapwidget import MapWidget
 from .widgets.timetravel import TimeTravelWidget
 
 logger = logging.getLogger("gweatherrouting")
@@ -92,7 +90,9 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
 
         self.show_all()
 
-        self.map = self.builder.get_object("map")
+        self.map = MapWidget()
+        map_container = self.builder.get_object("map-container")
+        map_container.pack_start(self.map, True, True, 0)
         self.map.set_center_and_zoom(39.0, 9.0, 6)
         self.map.layer_add(chart_manager)
         chart_manager.add_map(self.map)

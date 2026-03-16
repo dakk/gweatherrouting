@@ -13,18 +13,15 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+
 import logging
 import os
 
 import gi
 
 gi.require_version("Gtk", "3.0")
-try:
-    gi.require_version("OsmGpsMap", "1.2")
-except ValueError:
-    gi.require_version("OsmGpsMap", "1.0")
 
-from gi.repository import Gdk, Gtk, OsmGpsMap  # Keybinder
+from gi.repository import Gdk, Gtk
 
 from gweatherrouting.core import Core, TimeControl
 
@@ -35,6 +32,7 @@ from .chartstack_track import ChartStackTrack
 from .gribmanagerwindow import GribFileFilter
 from .maplayers import AISMapLayer, GeoMapLayer, GribMapLayer, ToolsMapLayer
 from .settings import SettingsManager
+from .widgets.mapwidget import MapWidget
 from .widgets.timetravel import TimeTravelWidget
 
 logger = logging.getLogger("gweatherrouting")
@@ -68,25 +66,19 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
 
         self.pack_start(self.builder.get_object("chartcontent"), True, True, 0)
 
-        self.map = self.builder.get_object("map")
+        self.map = MapWidget()
+        map_container = self.builder.get_object("map-container")
+        map_container.pack_start(self.map, True, True, 0)
         self.map.set_center_and_zoom(39.0, 9.0, 6)
         self.map.connect("map", self.on_map_mapped)
         self.map.connect("button-press-event", self.on_map_clicked)
-        self.map.set_keyboard_shortcut(
-            OsmGpsMap.MapKey_t.FULLSCREEN, Gdk.keyval_from_name("F11")
-        )
-        self.map.set_keyboard_shortcut(
-            OsmGpsMap.MapKey_t.UP, Gdk.keyval_from_name("Up")
-        )
-        self.map.set_keyboard_shortcut(
-            OsmGpsMap.MapKey_t.DOWN, Gdk.keyval_from_name("Down")
-        )
-        self.map.set_keyboard_shortcut(
-            OsmGpsMap.MapKey_t.LEFT, Gdk.keyval_from_name("Left")
-        )
-        self.map.set_keyboard_shortcut(
-            OsmGpsMap.MapKey_t.RIGHT, Gdk.keyval_from_name("Right")
-        )
+        self.map.connect("button-press-event", self.on_map_click)
+        self.map.connect("motion-notify-event", self.on_map_mouse_move)
+        self.map.set_keyboard_shortcut("FULLSCREEN", Gdk.keyval_from_name("F11"))
+        self.map.set_keyboard_shortcut("UP", Gdk.keyval_from_name("Up"))
+        self.map.set_keyboard_shortcut("DOWN", Gdk.keyval_from_name("Down"))
+        self.map.set_keyboard_shortcut("LEFT", Gdk.keyval_from_name("Left"))
+        self.map.set_keyboard_shortcut("RIGHT", Gdk.keyval_from_name("Right"))
 
         self.map.layer_add(self.chart_manager)
         self.chart_manager.add_map(self.map)
