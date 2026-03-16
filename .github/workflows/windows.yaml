@@ -15,10 +15,6 @@ jobs:
     runs-on: windows-latest
     name: Windows Portable ZIP
 
-    defaults:
-      run:
-        shell: pwsh
-
     steps:
       - uses: actions/checkout@v4
 
@@ -29,34 +25,67 @@ jobs:
           update: true
           install: >-
             mingw-w64-x86_64-gtk3
+            mingw-w64-x86_64-python
+            mingw-w64-x86_64-python-pip
             mingw-w64-x86_64-python-gobject
             mingw-w64-x86_64-gobject-introspection
             mingw-w64-x86_64-gdal
+            mingw-w64-x86_64-python-numpy
             mingw-w64-x86_64-gdk-pixbuf2
             mingw-w64-x86_64-adwaita-icon-theme
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
       - name: Install Python Dependencies
-        env:
-          MSYS2_ROOT: D:\a\_temp\msys64
+        shell: msys2 {0}
         run: |
-          $env:PATH = "D:\a\_temp\msys64\mingw64\bin;$env:PATH"
-          pip install numpy wheel setuptools
-          pip install GDAL[numpy]==(& "D:\a\_temp\msys64\mingw64\bin\gdal-config" --version)
           pip install pyinstaller
-          pip install .
+          pip install --no-deps .
 
       - name: Build Windows Executable
-        env:
-          MSYS2_ROOT: D:\a\_temp\msys64
+        shell: msys2 {0}
         run: |
-          powershell -ExecutionPolicy Bypass -File windows/build.ps1 -SkipInstaller
+          cd gweatherrouting
+          pyinstaller --name GWeatherRouting \
+            --windowed \
+            --icon ../windows/icon.ico \
+            --hidden-import=gi \
+            --collect-submodules=gi \
+            --add-data "data:gweatherrouting/data" \
+            --add-data "gtk:gweatherrouting/gtk" \
+            --runtime-hook ../windows/pyinstaller_gi_hook_win.py \
+            $(for typelib in Gtk-3.0 Gdk-3.0 GdkPixbuf-2.0 Pango-1.0 PangoCairo-1.0 GObject-2.0 GLib-2.0 Gio-2.0 cairo-1.0 Atk-1.0 HarfBuzz-0.0 freetype2-2.0 GModule-2.0 GdkWin32-3.0; do
+              typelibfile="/mingw64/lib/girepository-1.0/${typelib}.typelib"
+              if [ -f "$typelibfile" ]; then
+                echo "--add-data ${typelibfile}:gi_typelibs"
+              fi
+            done) \
+            __main__.py
+
+      - name: Copy GTK runtime files
+        shell: msys2 {0}
+        run: |
+          DIST="gweatherrouting/dist/GWeatherRouting"
+
+          # GTK schemas
+          mkdir -p "$DIST/share/glib-2.0/schemas"
+          cp -r /mingw64/share/glib-2.0/schemas/* "$DIST/share/glib-2.0/schemas/"
+
+          # Icons
+          mkdir -p "$DIST/share/icons"
+          cp -r /mingw64/share/icons/Adwaita "$DIST/share/icons/"
+          cp -r /mingw64/share/icons/hicolor "$DIST/share/icons/"
+
+          # Pixbuf loaders
+          mkdir -p "$DIST/lib/gdk-pixbuf-2.0"
+          cp -r /mingw64/lib/gdk-pixbuf-2.0/* "$DIST/lib/gdk-pixbuf-2.0/"
+
+          # GDAL data
+          if [ -d /mingw64/share/gdal ]; then
+            mkdir -p "$DIST/share/gdal"
+            cp -r /mingw64/share/gdal/* "$DIST/share/gdal/"
+          fi
 
       - name: Create ZIP archive
+        shell: pwsh
         run: |
           Compress-Archive -Path "gweatherrouting\dist\GWeatherRouting\*" -DestinationPath "GWeatherRouting-win64.zip"
 
