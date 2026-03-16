@@ -170,4 +170,4 @@ modules:
     sources:
        - type: git
          url: https://github.com/dakk/gweatherrouting.git
-         tag: v0.2.3
+         tag: v0.2.7
