@@ -32,6 +32,7 @@ jobs:
             mingw-w64-x86_64-gobject-introspection
             mingw-w64-x86_64-gdal
             mingw-w64-x86_64-python-numpy
+            mingw-w64-x86_64-python-matplotlib
             mingw-w64-x86_64-gdk-pixbuf2
             mingw-w64-x86_64-adwaita-icon-theme
 
@@ -39,7 +40,7 @@ jobs:
         shell: msys2 {0}
         run: |
           pip install --break-system-packages pyinstaller
-          pip install --break-system-packages requests colorlog geojson_utils bs4 pyserial pynmea2 gpxpy nmeatoolkit matplotlib weatherrouting
+          pip install --break-system-packages requests colorlog geojson_utils bs4 pyserial pynmea2 gpxpy nmeatoolkit weatherrouting
           pip install --break-system-packages --no-build-isolation --no-deps .
 
       - name: Build Windows Executable
