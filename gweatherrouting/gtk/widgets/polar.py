@@ -28,6 +28,22 @@ from gweatherrouting.common import resource_path
 logger = logging.getLogger("gweatherrouting")
 
 
+POLAR_COLORS = [
+    (1.0, 0.2, 0.2),  # red
+    (0.2, 0.6, 1.0),  # blue
+    (0.2, 0.8, 0.2),  # green
+    (1.0, 0.6, 0.0),  # orange
+    (0.8, 0.2, 0.8),  # purple
+    (0.0, 0.8, 0.8),  # cyan
+    (1.0, 1.0, 0.2),  # yellow
+    (1.0, 0.4, 0.6),  # pink
+    (0.6, 0.4, 0.2),  # brown
+    (0.4, 1.0, 0.6),  # mint
+    (0.6, 0.6, 1.0),  # lavender
+    (1.0, 0.8, 0.4),  # gold
+]
+
+
 class PolarWidget(Gtk.DrawingArea):
     def __init__(self, parent):
         self.par = parent
@@ -68,96 +84,111 @@ class PolarWidget(Gtk.DrawingArea):
             return
 
         a = self.get_allocation()
-        # width = a.width
+        width = a.width
         height = a.height
 
-        s = height * 0.8 / 160
+        max_r = 80.0
+        margin = 25.0
+        # Scale to fit: width needs max_r + margin (half-polar), height needs 2*max_r + 2*margin
+        s = min(width / (max_r + 2 * margin), height / (2 * max_r + 2 * margin))
         cr.scale(s, s)
-        cr.translate(-80, 0)
 
-        cr.set_source_rgb(0.3, 0.3, 0.3)
+        cx = margin
+        cy = max_r + margin
+
+        # Dark background
+        cr.set_source_rgb(0.15, 0.17, 0.20)
         cr.paint()
 
-        cr.set_line_width(0.3)
-        cr.set_source_rgb(1, 1, 1)
+        # Compute max speed for scaling polar curves to fit max_r
+        max_speed = 0
+        for j in range(len(self.polar.twa)):
+            for i in range(len(self.polar.tws)):
+                if len(self.polar.speed_table[j]) > i:
+                    max_speed = max(max_speed, self.polar.speed_table[j][i])
+        if max_speed <= 0:
+            max_speed = 1
+        speed_scale = max_r / max_speed
 
-        for x in self.polar.tws:
-            cr.arc(100.0, 100.0, x * 3, math.radians(-90), math.radians(90.0))
-            cr.stroke()
-
+        # Speed rings (dashed, subtle)
         tws_step = 1
         if len(self.polar.tws) > 7:
             tws_step = 2
 
+        max_tws = max(self.polar.tws) if self.polar.tws else 1
+        for x in self.polar.tws:
+            r = (x / max_tws) * max_r
+            cr.set_line_width(0.2)
+            cr.set_source_rgba(1, 1, 1, 0.15)
+            cr.set_dash([2, 2])
+            cr.arc(cx, cy, r, math.radians(-90), math.radians(90.0))
+            cr.stroke()
+            cr.set_dash([])
+
+        # Speed ring labels
         for x in self.polar.tws[::tws_step]:
-            cr.set_source_rgb(1, 1, 1)
-            cr.set_font_size(7)
-            cr.move_to(80.0, 100.0 - x * 3)
-            cr.show_text(str(x))
+            r = (x / max_tws) * max_r
+            cr.set_source_rgba(1, 1, 1, 0.5)
+            cr.set_font_size(6)
+            cr.move_to(cx - 22, cy - r + 2)
+            cr.show_text(str(int(x)) + " kt")
 
-        cr.set_source_rgba(1, 1, 1, 0.6)
-
+        # TWA radial lines (subtle)
         twa_step = 1
         if len(self.polar.twa) > 20:
             twa_step = int(len(self.polar.twa) / 10)
 
         for x in self.polar.twa[::twa_step]:
-            cr.move_to(100.0, 100.0)
-            cr.line_to(100 + math.sin(x) * 100.0, 100 - math.cos(x) * 80.0)
+            cr.set_line_width(0.2)
+            cr.set_source_rgba(1, 1, 1, 0.12)
+            cr.move_to(cx, cy)
+            cr.line_to(cx + math.sin(x) * max_r, cy - math.cos(x) * max_r)
             cr.stroke()
 
+        # TWA angle labels
         for x in self.polar.twa[::twa_step]:
-            cr.set_source_rgb(1, 1, 1)
-            cr.set_font_size(7)
-            cr.move_to(100 + math.sin(x) * 100.0, 100 - math.cos(x) * 90.0)
+            cr.set_source_rgba(1, 1, 1, 0.5)
+            cr.set_font_size(6)
+            lx = cx + math.sin(x) * (max_r + 10)
+            ly = cy - math.cos(x) * (max_r + 10)
+            cr.move_to(lx, ly)
             cr.show_text(str(int(math.degrees(x))) + "°")
 
-        # for x in self.polar.twa:
-        # 	cr.move_to (100.0, 100.0)
-        # 	cr.line_to (100 - math.sin (x) * 100.0, 100 + math.cos (x) * 100.0)
-        # 	cr.stroke ()
+        # 0° axis line (slightly brighter)
+        cr.set_line_width(0.3)
+        cr.set_source_rgba(1, 1, 1, 0.25)
+        cr.move_to(cx, cy)
+        cr.line_to(cx, cy - max_r)
+        cr.stroke()
 
-        cr.set_line_width(0.5)
-        cr.set_source_rgb(1, 0, 0)
-
-        cr.move_to(100.0, 100.0)
+        # Polar curves
         for i in range(0, len(self.polar.tws), 1):
+            color = POLAR_COLORS[i % len(POLAR_COLORS)]
+            cr.set_source_rgba(color[0], color[1], color[2], 0.85)
+            cr.set_line_width(1.0)
+
+            first = True
             for j in range(0, len(self.polar.twa), 1):
                 if len(self.polar.speed_table[j]) <= i:
                     continue
 
-                cr.line_to(
-                    100
-                    + 5 * self.polar.speed_table[j][i] * math.sin(self.polar.twa[j]),
-                    100
-                    - 5 * self.polar.speed_table[j][i] * math.cos(self.polar.twa[j]),
-                )
-                cr.stroke()
-                cr.move_to(
-                    100
-                    + 5 * self.polar.speed_table[j][i] * math.sin(self.polar.twa[j]),
-                    100
-                    - 5 * self.polar.speed_table[j][i] * math.cos(self.polar.twa[j]),
-                )
+                speed = self.polar.speed_table[j][i]
+                if speed <= 0:
+                    first = True
+                    continue
 
-        # cr.move_to (100.0, 100.0)
-        # for i in range (0, len(self.polar.tws), 1):
-        # 	for j in range (0, len(self.polar.twa), 1):
-        # 		cr.line_to (100 - 5 * self.polar.speed_table [j][i]
-        # 			* math.sin (self.polar.twa[j]), 100 - 5 * self.polar.speed_table
-        #  [j][i] * math.cos (self.polar.twa[j]))
-        # 		cr.stroke ()
-        # 		cr.move_to (100 - 5 * self.polar.speed_table [j][i]
-        # 			* math.sin (self.polar.twa[j]), 100 - 5 * self.polar.speed_table
-        # [j][i] * math.cos (self.polar.twa[j]))
+                px = cx + speed_scale * speed * math.sin(self.polar.twa[j])
+                py = cy - speed_scale * speed * math.cos(self.polar.twa[j])
 
-        # 200 : 0.8 = height : x
-        # x = height * 0.8 / 200
+                if first:
+                    cr.move_to(px, py)
+                    first = False
+                else:
+                    cr.line_to(px, py)
 
-        # if self.mousePos:
-        # 	cr.scale(1,1)
-        # 	cr.translate(0, 0)
+            cr.stroke()
 
-        # 	cr.move_to(100.0, 100.0)
-        # 	cr.line_to(self.mousePos[0], self.mousePos[1])
-        # 	cr.stroke()
+        # Center dot
+        cr.set_source_rgba(1, 1, 1, 0.4)
+        cr.arc(cx, cy, 1.2, 0, 2 * math.pi)
+        cr.fill()

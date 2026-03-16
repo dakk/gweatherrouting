@@ -53,7 +53,7 @@ class RoutingWizardDialog:
 
         self.dialog = self.builder.get_object("routing-wizard-dialog")
         self.dialog.set_transient_for(parent)
-        self.dialog.set_default_size(550, 300)
+        self.dialog.set_default_size(800, 500)
 
         self.dialog.add_button("Cancel", Gtk.ResponseType.CANCEL)
         self.dialog.add_button("Run", Gtk.ResponseType.OK)
