@@ -33,6 +33,7 @@ jobs:
             mingw-w64-x86_64-gdal
             mingw-w64-x86_64-python-numpy
             mingw-w64-x86_64-python-matplotlib
+            mingw-w64-x86_64-python-pyproj
             mingw-w64-x86_64-gdk-pixbuf2
             mingw-w64-x86_64-adwaita-icon-theme
 
