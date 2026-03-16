@@ -115,8 +115,12 @@ class MapWidget(Gtk.DrawingArea):
 
     # --- Mercator projection helpers ---
 
+    # Maximum latitude for Mercator projection (avoids math domain errors at poles)
+    MAX_LAT = 85.051129
+
     def _lat_to_y(self, lat):
         """Convert latitude to Mercator world-pixel Y at current zoom."""
+        lat = max(-self.MAX_LAT, min(self.MAX_LAT, lat))
         n = 2.0**self._zoom
         lat_rad = math.radians(lat)
         return (

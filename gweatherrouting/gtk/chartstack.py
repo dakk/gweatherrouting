@@ -72,6 +72,8 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
         self.map.set_center_and_zoom(39.0, 9.0, 6)
         self.map.connect("map", self.on_map_mapped)
         self.map.connect("button-press-event", self.on_map_clicked)
+        self.map.connect("button-press-event", self.on_map_click)
+        self.map.connect("motion-notify-event", self.on_map_mouse_move)
         self.map.set_keyboard_shortcut("FULLSCREEN", Gdk.keyval_from_name("F11"))
         self.map.set_keyboard_shortcut("UP", Gdk.keyval_from_name("Up"))
         self.map.set_keyboard_shortcut("DOWN", Gdk.keyval_from_name("Down"))
