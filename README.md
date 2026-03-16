@@ -1,9 +1,9 @@
 # GWeatherRouting
 
 ![CI Status](https://github.com/dakk/gweatherrouting/actions/workflows/ci.yaml/badge.svg)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![GitHub Release](https://img.shields.io/github/v/release/dakk/gweatherrouting)](https://github.com/dakk/gweatherrouting/releases/latest)
-[![Flathub](https://img.shields.io/flathub/v/org.gweatherrouting.gweatherrouting)](https://flathub.org/apps/org.gweatherrouting.gweatherrouting)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg?logo=gnu&logoColor=white)](https://www.gnu.org/licenses/gpl-3.0)
+[![GitHub Release](https://img.shields.io/github/v/release/dakk/gweatherrouting?logo=github&color=orange)](https://github.com/dakk/gweatherrouting/releases/latest)
+[![Flathub](https://img.shields.io/flathub/v/org.gweatherrouting.gweatherrouting?logo=flathub&logoColor=white&color=royalblue)](https://flathub.org/apps/org.gweatherrouting.gweatherrouting)
 
 GWeatherRouting is an open-source sailing routing and navigation software written using Python and Gtk4.
 
