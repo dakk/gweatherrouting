@@ -10,6 +10,9 @@ GWeatherRouting  Documentation
 .. image:: https://img.shields.io/badge/License-GPLv3-blue.svg
    :alt: License: GPL v3
    :target: https://www.gnu.org/licenses/gpl-3.0
+.. image:: https://img.shields.io/flathub/v/org.gweatherrouting.gweatherrouting
+   :alt: Flathub
+   :target: https://flathub.org/apps/org.gweatherrouting.gweatherrouting
 
 
 Welcome to the GWeatherRouting documentation.

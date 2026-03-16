@@ -35,7 +35,10 @@ h3:not(#hero h3) {
     <p>GWeatherRouting is an open-source sailing routing and navigation software written using Python and Gtk4.</p>
     <div class="homepage-button-container">
       <div class="homepage-button-container-row">
-          <a href="https://github.com/dakk/gweatherrouting/releases/download/v0.2.7/GWeatherRouting-x86_64.AppImage" class="homepage-button primary-button"><i class="fa fa-download"></i> Download Appimage</a>
+          <a href="https://flathub.org/apps/org.gweatherrouting.gweatherrouting" class="homepage-button primary-button"><i class="fa fa-download"></i> Install from Flathub</a>
+      </div>
+      <div class="homepage-button-container-row">
+          <a href="https://github.com/dakk/gweatherrouting/releases/latest" class="homepage-button-link">Download AppImage →</a>
       </div>
       <div class="homepage-button-container-row">
           <a href="./docs/quickstart.html" class="homepage-button-link">Quickstart →</a>
