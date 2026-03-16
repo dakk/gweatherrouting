@@ -57,18 +57,18 @@ class PolarStack(Gtk.Box):
         for polar in self.polars:
             self.polarListStore.append([polar])
 
-        polarList = self.builder.get_object("polar-list")
-        polarList.set_model(self.polarListStore)
+        polar_list = self.builder.get_object("polar-list")
+        polar_list.set_model(self.polarListStore)
 
         renderer = Gtk.CellRendererText()
         column = Gtk.TreeViewColumn("Polars", renderer, text=0)
-        polarList.append_column(column)
+        polar_list.append_column(column)
 
         self.polarWidget = PolarWidget(self.parent)
         self.table = None
 
         if self.polars:
-            polarList.set_cursor(0)
+            polar_list.set_cursor(0)
 
     def load_polar(self, pn):
         self.polarWidget.load_polar(pn)
