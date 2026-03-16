@@ -1,0 +1,68 @@
+name: Windows Build
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    name: Windows Installer
+
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-gtk3
+            mingw-w64-x86_64-python-gobject
+            mingw-w64-x86_64-gobject-introspection
+            mingw-w64-x86_64-gdal
+            mingw-w64-x86_64-gdk-pixbuf2
+            mingw-w64-x86_64-adwaita-icon-theme
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python Dependencies
+        env:
+          MSYS2_ROOT: D:\a\_temp\msys64
+        run: |
+          $env:PATH = "D:\a\_temp\msys64\mingw64\bin;$env:PATH"
+          pip install numpy wheel setuptools
+          pip install GDAL[numpy]==(& "D:\a\_temp\msys64\mingw64\bin\gdal-config" --version)
+          pip install pyinstaller
+          pip install .
+
+      - name: Build Windows Executable
+        env:
+          MSYS2_ROOT: D:\a\_temp\msys64
+        run: |
+          powershell -ExecutionPolicy Bypass -File windows/build.ps1 -SkipInstaller
+
+      - name: Create Installer with Inno Setup
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" windows/installer.iss
+
+      - name: Upload Windows Installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: GWeatherRouting-win64-setup
+          path: dist/GWeatherRouting-setup-win64.exe
+
+      - name: Upload Windows Portable
+        uses: actions/upload-artifact@v4
+        with:
+          name: GWeatherRouting-win64-portable
+          path: gweatherrouting/dist/GWeatherRouting/
