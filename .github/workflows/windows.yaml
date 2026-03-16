@@ -52,7 +52,9 @@ jobs:
             --windowed \
             --icon ../windows/icon.ico \
             --hidden-import=gi \
+            --hidden-import=osgeo \
             --collect-submodules=gi \
+            --collect-submodules=osgeo \
             --add-data "data;gweatherrouting/data" \
             --add-data "gtk;gweatherrouting/gtk" \
             --runtime-hook ../windows/pyinstaller_gi_hook_win.py \
