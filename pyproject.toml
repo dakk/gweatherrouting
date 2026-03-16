@@ -34,6 +34,12 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
+[project.optional-dependencies]
+appimage = [
+    "vext @ git+https://github.com/vext-python/vext@32ad4d1c5f45797e244df1d2816f76b60f28e20e",
+    "vext.gi"
+]
+
 [project.urls]
 Homepage = "https://github.com/dakk/gweatherrouting"
 "Bug Tracker" = "https://github.com/dakk/gweatherrouting/issues/"
