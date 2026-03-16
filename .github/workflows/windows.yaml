@@ -13,7 +13,7 @@ on:
 jobs:
   build-windows:
     runs-on: windows-latest
-    name: Windows Installer
+    name: Windows Portable ZIP
 
     defaults:
       run:
@@ -56,18 +56,12 @@ jobs:
         run: |
           powershell -ExecutionPolicy Bypass -File windows/build.ps1 -SkipInstaller
 
-      - name: Create Installer with Inno Setup
+      - name: Create ZIP archive
         run: |
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" windows/installer.iss
+          Compress-Archive -Path "gweatherrouting\dist\GWeatherRouting\*" -DestinationPath "GWeatherRouting-win64.zip"
 
-      - name: Upload Windows Installer
+      - name: Upload Windows ZIP
         uses: actions/upload-artifact@v4
         with:
-          name: GWeatherRouting-win64-setup
-          path: dist/GWeatherRouting-setup-win64.exe
-
-      - name: Upload Windows Portable
-        uses: actions/upload-artifact@v4
-        with:
-          name: GWeatherRouting-win64-portable
-          path: gweatherrouting/dist/GWeatherRouting/
+          name: GWeatherRouting-win64
+          path: GWeatherRouting-win64.zip
