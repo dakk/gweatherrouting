@@ -60,18 +60,92 @@
           <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="orientation">vertical</property>
+            <property name="orientation">horizontal</property>
+            <property name="spacing">6</property>
+            <property name="margin-start">6</property>
+            <property name="margin-end">6</property>
+            <property name="margin-top">6</property>
+            <property name="margin-bottom">6</property>
+            <!-- Left side: settings -->
             <child>
-              <object class="GtkFrame">
+              <object class="GtkBox">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="label-xalign">0</property>
-                <property name="shadow-type">in</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">6</property>
                 <child>
-                  <!-- n-columns=3 n-rows=2 -->
-                  <object class="GtkGrid">
+                  <object class="GtkFrame">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
+                    <property name="label-xalign">0</property>
+                    <property name="shadow-type">in</property>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="margin-start">12</property>
+                        <property name="margin-end">6</property>
+                        <property name="margin-top">6</property>
+                        <property name="margin-bottom">6</property>
+                        <property name="spacing">6</property>
+                        <child>
+                          <object class="GtkComboBox" id="boat-select">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="hexpand">True</property>
+                            <property name="model">boat-store</property>
+                            <property name="active">0</property>
+                            <property name="id-column">0</property>
+                            <signal name="changed" handler="on_boat_select" swapped="no"/>
+                            <child>
+                              <object class="GtkCellRendererText" id="Name"/>
+                              <attributes>
+                                <attribute name="text">0</attribute>
+                              </attributes>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkButton">
+                            <property name="label" translatable="yes">Open</property>
+                            <property name="visible">True</property>
+                            <property name="can-focus">True</property>
+                            <property name="receives-default">True</property>
+                            <signal name="clicked" handler="on_open" swapped="no"/>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                    </child>
+                    <child type="label">
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">Boat</property>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkFrame">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label-xalign">0</property>
+                    <property name="shadow-type">in</property>
                     <child>
                       <object class="GtkAlignment">
                         <property name="visible">True</property>
@@ -83,31 +157,22 @@
                             <property name="can-focus">False</property>
                             <property name="orientation">vertical</property>
                             <child>
-                              <object class="GtkBox">
+                              <object class="GtkComboBox" id="routing-select">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="orientation">vertical</property>
+                                <property name="margin-start">2</property>
+                                <property name="margin-end">2</property>
+                                <property name="margin-top">2</property>
+                                <property name="margin-bottom">2</property>
+                                <property name="model">routing-store</property>
+                                <property name="active">0</property>
+                                <property name="id-column">0</property>
+                                <signal name="changed" handler="on_routing_algo_select" swapped="no"/>
                                 <child>
-                                  <object class="GtkComboBox" id="boat-select">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="hexpand">True</property>
-                                    <property name="model">boat-store</property>
-                                    <property name="active">0</property>
-                                    <property name="id-column">0</property>
-                                    <signal name="changed" handler="on_boat_select" swapped="no"/>
-                                    <child>
-                                      <object class="GtkCellRendererText" id="Name"/>
-                                      <attributes>
-                                        <attribute name="text">0</attribute>
-                                      </attributes>
-                                    </child>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">1</property>
-                                  </packing>
+                                  <object class="GtkCellRendererText" id="Name2"/>
+                                  <attributes>
+                                    <attribute name="text">0</attribute>
+                                  </attributes>
                                 </child>
                               </object>
                               <packing>
@@ -116,194 +181,80 @@
                                 <property name="position">0</property>
                               </packing>
                             </child>
-                          </object>
-                        </child>
-                      </object>
-                      <packing>
-                        <property name="left-attach">0</property>
-                        <property name="top-attach">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkButton">
-                        <property name="label" translatable="yes">Open</property>
-                        <property name="visible">True</property>
-                        <property name="can-focus">True</property>
-                        <property name="receives-default">True</property>
-                        <property name="halign">baseline</property>
-                        <signal name="clicked" handler="on_open" swapped="no"/>
-                      </object>
-                      <packing>
-                        <property name="left-attach">2</property>
-                        <property name="top-attach">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkSeparator">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                      </object>
-                      <packing>
-                        <property name="left-attach">1</property>
-                        <property name="top-attach">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkBox" id="polar-container">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="halign">baseline</property>
-                        <property name="hexpand">True</property>
-                        <property name="vexpand">False</property>
-                        <property name="orientation">vertical</property>
-                        <child>
-                          <placeholder/>
-                        </child>
-                      </object>
-                      <packing>
-                        <property name="left-attach">0</property>
-                        <property name="top-attach">1</property>
-                        <property name="width">3</property>
-                      </packing>
-                    </child>
-                  </object>
-                </child>
-                <child type="label">
-                  <object class="GtkLabel">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">Boat</property>
-                  </object>
-                </child>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="padding">3</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkFrame">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="label-xalign">0</property>
-                <property name="shadow-type">in</property>
-                <child>
-                  <object class="GtkAlignment">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="left-padding">12</property>
-                    <child>
-                      <object class="GtkBox">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="orientation">vertical</property>
-                        <child>
-                          <object class="GtkComboBox" id="routing-select">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="margin-start">2</property>
-                            <property name="margin-end">2</property>
-                            <property name="margin-top">2</property>
-                            <property name="margin-bottom">2</property>
-                            <property name="model">routing-store</property>
-                            <property name="active">0</property>
-                            <property name="id-column">0</property>
-                            <signal name="changed" handler="on_routing_algo_select" swapped="no"/>
                             <child>
-                              <object class="GtkCellRendererText" id="Name2"/>
-                              <attributes>
-                                <attribute name="text">0</attribute>
-                              </attributes>
-                            </child>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkFrame" id="router-params">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label-xalign">0</property>
-                            <property name="shadow-type">out</property>
-                            <child>
-                              <object class="GtkAlignment">
+                              <object class="GtkFrame" id="router-params">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="left-padding">12</property>
+                                <property name="label-xalign">0</property>
+                                <property name="shadow-type">out</property>
                                 <child>
-                                  <object class="GtkBox" id="router-params-container">
+                                  <object class="GtkAlignment">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
-                                    <property name="margin-start">3</property>
-                                    <property name="margin-end">3</property>
-                                    <property name="margin-top">3</property>
-                                    <property name="margin-bottom">3</property>
-                                    <property name="orientation">vertical</property>
+                                    <property name="left-padding">12</property>
                                     <child>
-                                      <placeholder/>
+                                      <object class="GtkBox" id="router-params-container">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="margin-start">3</property>
+                                        <property name="margin-end">3</property>
+                                        <property name="margin-top">3</property>
+                                        <property name="margin-bottom">3</property>
+                                        <property name="orientation">vertical</property>
+                                        <child>
+                                          <placeholder/>
+                                        </child>
+                                      </object>
                                     </child>
                                   </object>
                                 </child>
+                                <child type="label">
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">Router Parameters</property>
+                                  </object>
+                                </child>
                               </object>
-                            </child>
-                            <child type="label">
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="label" translatable="yes">Router Parameters</property>
-                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="padding">6</property>
+                                <property name="position">1</property>
+                              </packing>
                             </child>
                           </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="padding">6</property>
-                            <property name="position">1</property>
-                          </packing>
                         </child>
                       </object>
                     </child>
+                    <child type="label">
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">Routing Method</property>
+                      </object>
+                    </child>
                   </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
                 </child>
-                <child type="label">
-                  <object class="GtkLabel">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">Routing Method</property>
-                  </object>
-                </child>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="padding">3</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkFrame">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="label-xalign">0</property>
-                <property name="shadow-type">in</property>
                 <child>
-                  <object class="GtkAlignment">
+                  <object class="GtkFrame">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="left-padding">12</property>
+                    <property name="label-xalign">0</property>
+                    <property name="shadow-type">in</property>
                     <child>
                       <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="margin-start">2</property>
-                        <property name="margin-end">2</property>
-                        <property name="margin-top">2</property>
-                        <property name="margin-bottom">2</property>
+                        <property name="margin-start">12</property>
+                        <property name="margin-end">6</property>
+                        <property name="margin-top">6</property>
+                        <property name="margin-bottom">6</property>
                         <child>
                           <object class="GtkEntry" id="time-entry">
                             <property name="visible">True</property>
@@ -340,128 +291,165 @@
                         </child>
                       </object>
                     </child>
-                  </object>
-                </child>
-                <child type="label">
-                  <object class="GtkLabel">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">Start Time</property>
-                  </object>
-                </child>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="padding">3</property>
-                <property name="position">2</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkFrame">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="label-xalign">0</property>
-                <property name="shadow-type">in</property>
-                <child>
-                  <object class="GtkAlignment">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="left-padding">12</property>
-                    <child>
-                      <object class="GtkComboBox" id="start-select">
+                    <child type="label">
+                      <object class="GtkLabel">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="model">start-store</property>
+                        <property name="label" translatable="yes">Start Time</property>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkFrame">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label-xalign">0</property>
+                    <property name="shadow-type">in</property>
+                    <child>
+                      <object class="GtkAlignment">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="left-padding">12</property>
                         <child>
-                          <object class="GtkCellRendererText" id="Name3"/>
-                          <attributes>
-                            <attribute name="text">0</attribute>
-                          </attributes>
+                          <object class="GtkComboBox" id="start-select">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="model">start-store</property>
+                            <child>
+                              <object class="GtkCellRendererText" id="Name3"/>
+                              <attributes>
+                                <attribute name="text">0</attribute>
+                              </attributes>
+                            </child>
+                          </object>
                         </child>
                       </object>
                     </child>
-                  </object>
-                </child>
-                <child type="label">
-                  <object class="GtkLabel">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">Start Position</property>
-                  </object>
-                </child>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="padding">3</property>
-                <property name="position">3</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkFrame">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="label-xalign">0</property>
-                <property name="shadow-type">in</property>
-                <child>
-                  <object class="GtkAlignment">
-                    <property name="visible">True</property>
-                    <property name="can-focus">False</property>
-                    <property name="left-padding">12</property>
-                    <child>
-                      <object class="GtkComboBox" id="track-poi-select">
+                    <child type="label">
+                      <object class="GtkLabel">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="margin-start">2</property>
-                        <property name="margin-end">2</property>
-                        <property name="margin-top">2</property>
-                        <property name="margin-bottom">2</property>
-                        <property name="model">track-poi-store</property>
+                        <property name="label" translatable="yes">Start Position</property>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkFrame">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label-xalign">0</property>
+                    <property name="shadow-type">in</property>
+                    <child>
+                      <object class="GtkAlignment">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="left-padding">12</property>
                         <child>
-                          <object class="GtkCellRendererText"/>
-                          <attributes>
-                            <attribute name="text">0</attribute>
-                          </attributes>
+                          <object class="GtkComboBox" id="track-poi-select">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="margin-start">2</property>
+                            <property name="margin-end">2</property>
+                            <property name="margin-top">2</property>
+                            <property name="margin-bottom">2</property>
+                            <property name="model">track-poi-store</property>
+                            <child>
+                              <object class="GtkCellRendererText"/>
+                              <attributes>
+                                <attribute name="text">0</attribute>
+                              </attributes>
+                            </child>
+                          </object>
                         </child>
                       </object>
                     </child>
+                    <child type="label">
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">Route Track or POI</property>
+                      </object>
+                    </child>
                   </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">4</property>
+                  </packing>
                 </child>
-                <child type="label">
-                  <object class="GtkLabel">
+                <child>
+                  <object class="GtkFrame">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">Route Track or POI</property>
+                    <property name="label-xalign">0</property>
+                    <property name="shadow-type">in</property>
+                    <child>
+                      <object class="GtkAlignment">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="left-padding">12</property>
+                        <child>
+                          <object class="GtkCheckButton" id="coastline-check">
+                            <property name="label" translatable="yes">Enable coastline checks</property>
+                            <property name="visible">True</property>
+                            <property name="can-focus">True</property>
+                            <property name="receives-default">False</property>
+                            <property name="draw-indicator">True</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child type="label">
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="label" translatable="yes">Options</property>
+                      </object>
+                    </child>
                   </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">5</property>
+                  </packing>
                 </child>
               </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="padding">3</property>
-                <property name="position">4</property>
+                <property name="position">0</property>
               </packing>
             </child>
+            <!-- Right side: polar chart -->
             <child>
               <object class="GtkFrame">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="label-xalign">0</property>
                 <property name="shadow-type">in</property>
+                <property name="hexpand">True</property>
+                <property name="vexpand">True</property>
                 <child>
-                  <object class="GtkAlignment">
+                  <object class="GtkBox" id="polar-container">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="left-padding">12</property>
+                    <property name="hexpand">True</property>
+                    <property name="vexpand">True</property>
+                    <property name="orientation">vertical</property>
                     <child>
-                      <object class="GtkCheckButton" id="coastline-check">
-                        <property name="label" translatable="yes">Enable coastline checks</property>
-                        <property name="visible">True</property>
-                        <property name="can-focus">True</property>
-                        <property name="receives-default">False</property>
-                        <property name="draw-indicator">True</property>
-                      </object>
+                      <placeholder/>
                     </child>
                   </object>
                 </child>
@@ -469,15 +457,14 @@
                   <object class="GtkLabel">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">Options</property>
+                    <property name="label" translatable="yes">Polar</property>
                   </object>
                 </child>
               </object>
               <packing>
-                <property name="expand">False</property>
+                <property name="expand">True</property>
                 <property name="fill">True</property>
-                <property name="padding">3</property>
-                <property name="position">5</property>
+                <property name="position">1</property>
               </packing>
             </child>
           </object>

@@ -26,7 +26,7 @@ from gi.repository import Gtk
 
 from gweatherrouting.common import resource_path
 
-from .widgets.polar import PolarWidget
+from .widgets.polar import POLAR_COLORS, PolarWidget
 
 logger = logging.getLogger("gweatherrouting")
 
@@ -77,32 +77,37 @@ class PolarStack(Gtk.Box):
         if len(p.twa) > 20:
             twa_step = int(len(p.twa) / 10)
 
-        self.table = Gtk.Table(
-            n_rows=len(p.tws), n_columns=len(p.twa) / twa_step, homogeneous=False
-        )
+        self.table = Gtk.Grid()
+        self.table.set_column_spacing(10)
+        self.table.set_row_spacing(4)
+        self.table.set_margin_start(10)
+        self.table.set_margin_end(10)
+        self.table.set_margin_top(10)
+        self.table.set_margin_bottom(10)
         cc.pack_start(self.table, False, False, 0)
 
-        self.table.set_col_spacings(5)
-        self.table.set_row_spacings(5)
-
-        label = Gtk.Label(str("TWA/TWS"))
+        label = Gtk.Label()
         label.set_markup("<b>TWA/TWS</b>")
-        self.table.attach(label, 0, 1, 0, 1)
+        label.set_xalign(1.0)
+        self.table.attach(label, 0, 0, 1, 1)
 
-        i = 1
-        for x in p.tws:
+        for i, x in enumerate(p.tws):
+            color = POLAR_COLORS[i % len(POLAR_COLORS)]
+            hex_color = "#{:02x}{:02x}{:02x}".format(
+                int(color[0] * 255), int(color[1] * 255), int(color[2] * 255)
+            )
             label = Gtk.Label()
-            label.set_markup("<b>" + str(int(x)) + "</b>")
-            self.table.attach(label, i, i + 1, 0, 1)
-            i += 1
+            label.set_markup(
+                f'<b><span foreground="{hex_color}">{int(x)}</span></b>'
+            )
+            label.set_xalign(1.0)
+            self.table.attach(label, i + 1, 0, 1, 1)
 
-        i = 1
-
-        for x in p.twa[::twa_step]:
+        for row, x in enumerate(p.twa[::twa_step]):
             label = Gtk.Label()
             label.set_markup("<b>" + str(int(math.degrees(x))) + "°</b>")
-            self.table.attach(label, 0, 1, i, i + 1)
-            i += 1
+            label.set_xalign(1.0)
+            self.table.attach(label, 0, row + 1, 1, 1)
 
         for i in range(0, len(p.tws), 1):
             for j in range(0, len(p.twa), twa_step):
@@ -110,9 +115,8 @@ class PolarStack(Gtk.Box):
                     continue
 
                 label = Gtk.Label(str(p.speed_table[j][i]))
-                self.table.attach(
-                    label, i + 1, i + 2, (j / twa_step) + 1, (j / twa_step) + 2
-                )
+                label.set_xalign(1.0)
+                self.table.attach(label, i + 1, (j // twa_step) + 1, 1, 1)
 
         self.show_all()
 
