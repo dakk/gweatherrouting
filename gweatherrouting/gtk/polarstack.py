@@ -97,9 +97,7 @@ class PolarStack(Gtk.Box):
                 int(color[0] * 255), int(color[1] * 255), int(color[2] * 255)
             )
             label = Gtk.Label()
-            label.set_markup(
-                f'<b><span foreground="{hex_color}">{int(x)}</span></b>'
-            )
+            label.set_markup(f'<b><span foreground="{hex_color}">{int(x)}</span></b>')
             label.set_xalign(1.0)
             self.table.attach(label, i + 1, 0, 1, 1)
 

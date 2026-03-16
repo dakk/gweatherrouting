@@ -164,6 +164,9 @@ class ChartStackTrack(ChartStackBase):
             tree_iter = store.get_iter(path)
             value = store.get_value(tree_iter, 0)
             self.selected_track_item = int(value) - 1
+        self.geo_map_layer.highlight_track_item(self.selected_track_item)
+        self.geo_map_layer.highlight_poi(None)
+        self.map.queue_draw()
 
     def on_track_item_move(self, widget):
         if self.selected_track_item is not None:

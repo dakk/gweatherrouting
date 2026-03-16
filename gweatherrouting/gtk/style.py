@@ -106,6 +106,9 @@ class Style:
             color=(0x11 / 255, 0x11 / 255, 0x11 / 255, 0.7), font_size=10
         )
 
+        TrackItemHL = CairoStyle(color=(1, 0, 0, 1), line_width=2)
+        TrackItemHLFont = CairoStyle(color=(1, 0, 0, 0.9), font_size=10)
+
         TrackInactive = CairoStyle(
             color=(0x91 / 255.0, 0x4A / 255.0, 0x7C / 255.0, 0.6),
             line_width=0.8,
@@ -137,3 +140,8 @@ class Style:
         Quad = CairoStyle(color=(0x11 / 255, 0x11 / 255, 0x11 / 255, 1), line_width=0.3)
         QuadInt = CairoStyle(color=(0xFF / 255, 0xFF / 255, 0xFF / 255, 0.5))
         Font = CairoStyle(color=(0x11 / 255, 0x11 / 255, 0x11 / 255, 0.7), font_size=10)
+
+        DotHL = CairoStyle(color=(1, 0, 0, 1))
+        QuadHL = CairoStyle(color=(1, 0, 0, 1), line_width=1.5)
+        QuadIntHL = CairoStyle(color=(1, 0.9, 0.9, 0.7))
+        FontHL = CairoStyle(color=(1, 0, 0, 0.9), font_size=10)

@@ -35,9 +35,17 @@ class GeoMapLayer(GObject.GObject):
         self.core = core
         self.time_control = time_control
         self.hl_routing = None
+        self.hl_poi = None
+        self.hl_track_item = None
 
     def highlight_routing(self, name):
         self.hl_routing = name
+
+    def highlight_poi(self, name):
+        self.hl_poi = name
+
+    def highlight_track_item(self, index):
+        self.hl_track_item = index
 
     def do_draw(self, gpsmap, cr):  # noqa: C901
         prevx = None
@@ -151,6 +159,8 @@ class GeoMapLayer(GObject.GObject):
                     MapPoint.new_degrees(p[0], p[1])
                 )
 
+                item_hl = active and self.hl_track_item == (i - 1)
+
                 if prevx is None:
                     if active:
                         Style.Track.TrackActiveFont.apply(cr)
@@ -161,7 +171,9 @@ class GeoMapLayer(GObject.GObject):
                     cr.show_text(tr.name)
                     cr.stroke()
 
-                if active:
+                if item_hl:
+                    Style.Track.TrackItemHLFont.apply(cr)
+                elif active:
                     Style.Track.TrackActivePoiFont.apply(cr)
                 else:
                     Style.Track.TrackInactivePoiFont.apply(cr)
@@ -180,14 +192,16 @@ class GeoMapLayer(GObject.GObject):
                     cr.line_to(x, y)
                     cr.stroke()
 
-                if active:
+                if item_hl:
+                    Style.Track.TrackItemHL.apply(cr)
+                elif active:
                     Style.Track.TrackActive.apply(cr)
                 else:
                     Style.Track.TrackInactive.apply(cr)
 
                 Style.reset_dash(cr)
 
-                cr.arc(x, y, 5, 0, 2 * math.pi)
+                cr.arc(x, y, 7 if item_hl else 5, 0, 2 * math.pi)
                 cr.stroke()
 
                 prevx = x
@@ -197,23 +211,37 @@ class GeoMapLayer(GObject.GObject):
             if not tr.visible:
                 continue
 
+            poi_hl = tr.name == self.hl_poi
+
             x, y = gpsmap.convert_geographic_to_screen(
                 MapPoint.new_degrees(tr.position[0], tr.position[1])
             )
 
-            Style.Poi.Quad.apply(cr)
+            if poi_hl:
+                Style.Poi.QuadHL.apply(cr)
+            else:
+                Style.Poi.Quad.apply(cr)
             cr.rectangle(x + 3, y - 5, len(tr.name) * 6.7, 12)
             cr.stroke_preserve()
-            Style.Poi.QuadInt.apply(cr)
+            if poi_hl:
+                Style.Poi.QuadIntHL.apply(cr)
+            else:
+                Style.Poi.QuadInt.apply(cr)
             cr.fill()
 
-            Style.Poi.Font.apply(cr)
+            if poi_hl:
+                Style.Poi.FontHL.apply(cr)
+            else:
+                Style.Poi.Font.apply(cr)
             cr.move_to(x + 5, y + 5)
             cr.show_text(tr.name)
             cr.stroke()
 
-            Style.Poi.Dot.apply(cr)
-            cr.arc(x, y, 2, 0, 2 * math.pi)
+            if poi_hl:
+                Style.Poi.DotHL.apply(cr)
+            else:
+                Style.Poi.Dot.apply(cr)
+            cr.arc(x, y, 4 if poi_hl else 2, 0, 2 * math.pi)
             cr.fill()
 
             # Triangle

@@ -56,6 +56,9 @@ class ChartStackPOI(ChartStackBase):
         for path in pathlist:
             tree_iter = store.get_iter(path)
             self.selected_poi = store.get_value(tree_iter, 0)
+        self.geo_map_layer.highlight_poi(self.selected_poi)
+        self.geo_map_layer.highlight_track_item(None)
+        self.map.queue_draw()
 
     def on_poi_move(self, widget):
         if self.selected_poi is not None:
