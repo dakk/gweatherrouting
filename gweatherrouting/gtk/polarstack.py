@@ -49,14 +49,26 @@ class PolarStack(Gtk.Box):
 
         self.statusBar = self.builder.get_object("statusbar")
 
-        self.polars = os.listdir(resource_path("gweatherrouting", "data/polars/"))
-        boatselect = self.builder.get_object("boat-select")
+        self.polars = sorted(
+            os.listdir(resource_path("gweatherrouting", "data/polars/"))
+        )
+
+        self.polarListStore = Gtk.ListStore(str)
         for polar in self.polars:
-            boatselect.insert_text(0, polar)
+            self.polarListStore.append([polar])
+
+        polarList = self.builder.get_object("polar-list")
+        polarList.set_model(self.polarListStore)
+
+        renderer = Gtk.CellRendererText()
+        column = Gtk.TreeViewColumn("Polars", renderer, text=0)
+        polarList.append_column(column)
 
         self.polarWidget = PolarWidget(self.parent)
         self.table = None
-        boatselect.set_active(1)
+
+        if self.polars:
+            polarList.set_cursor(0)
 
     def load_polar(self, pn):
         self.polarWidget.load_polar(pn)
@@ -118,5 +130,9 @@ class PolarStack(Gtk.Box):
 
         self.show_all()
 
-    def on_boat_select(self, widget):
-        self.load_polar(self.polars[widget.get_active()])
+    def on_polar_list_cursor_changed(self, treeview):
+        selection = treeview.get_selection()
+        model, treeiter = selection.get_selected()
+        if treeiter is not None:
+            polar_name = model[treeiter][0]
+            self.load_polar(polar_name)
