@@ -71,6 +71,34 @@ for libpath in $LIBGIREPO_PATHS; do
     cp "$libpath" "$APP_DIR/usr/lib/"
 done
 
+# Copy GObject Introspection typelib files needed at runtime
+echo "Copying typelib files to AppDir..."
+mkdir -p "$APP_DIR/usr/lib/girepository-1.0"
+
+# Find system typelib directory
+TYPELIB_DIR=""
+for dir in /usr/lib/x86_64-linux-gnu/girepository-1.0 /usr/lib64/girepository-1.0 /usr/lib/girepository-1.0; do
+    if [[ -d "$dir" ]]; then
+        TYPELIB_DIR="$dir"
+        break
+    fi
+done
+
+if [[ -z "$TYPELIB_DIR" ]]; then
+    echo "ERROR: Could not find system typelib directory, exiting."
+    exit 1
+fi
+
+# Copy required typelibs for GTK3 and dependencies
+REQUIRED_TYPELIBS="Gtk-3.0 Gdk-3.0 GdkPixbuf-2.0 Pango-1.0 PangoCairo-1.0 GObject-2.0 GLib-2.0 Gio-2.0 cairo-1.0 Atk-1.0 GdkX11-3.0 xlib-2.0 HarfBuzz-0.0 freetype2-2.0 GModule-2.0"
+for typelib in $REQUIRED_TYPELIBS; do
+    if [[ -f "$TYPELIB_DIR/${typelib}.typelib" ]]; then
+        echo "Copying ${typelib}.typelib"
+        cp "$TYPELIB_DIR/${typelib}.typelib" "$APP_DIR/usr/lib/girepository-1.0/"
+    else
+        echo "WARNING: ${typelib}.typelib not found in $TYPELIB_DIR"
+    fi
+done
 
 # 5. Modify the AppRun file to add LD_LIBRARY_PATH after the gtk plugin line
 echo "Configuring AppRun file..."
