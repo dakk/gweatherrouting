@@ -42,8 +42,8 @@ modules:
       - /share
     sources:
       - type: archive
-        url: http://download.osgeo.org/geos/geos-3.13.1.tar.bz2
-        sha256: df2c50503295f325e7c8d7b783aca8ba4773919cde984193850cf9e361dfd28c
+        url: http://download.osgeo.org/geos/geos-3.14.1.tar.bz2
+        sha256: 3c20919cda9a505db07b5216baa980bacdaa0702da715b43f176fb07eff7e716
         x-checker-data:
           type: anitya
           project-id: 13493
