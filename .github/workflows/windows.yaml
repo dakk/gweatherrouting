@@ -31,6 +31,7 @@ jobs:
             mingw-w64-x86_64-python-gobject
             mingw-w64-x86_64-gobject-introspection
             mingw-w64-x86_64-gdal
+            mingw-w64-x86_64-python-gdal
             mingw-w64-x86_64-python-numpy
             mingw-w64-x86_64-python-matplotlib
             mingw-w64-x86_64-python-pyproj
@@ -52,9 +53,7 @@ jobs:
             --windowed \
             --icon ../windows/icon.ico \
             --hidden-import=gi \
-            --hidden-import=osgeo \
             --collect-submodules=gi \
-            --collect-submodules=osgeo \
             --add-data "data;gweatherrouting/data" \
             --add-data "gtk;gweatherrouting/gtk" \
             --runtime-hook ../windows/pyinstaller_gi_hook_win.py \
@@ -66,6 +65,14 @@ jobs:
               fi
             done) \
             __main__.py
+
+      - name: Copy osgeo (GDAL Python bindings)
+        shell: msys2 {0}
+        run: |
+          DIST="gweatherrouting/dist/GWeatherRouting"
+          OSGEO_DIR=$(python -c "import osgeo; import os; print(os.path.dirname(osgeo.__file__))")
+          echo "Copying osgeo from $OSGEO_DIR"
+          cp -r "$OSGEO_DIR" "$DIST/osgeo"
 
       - name: Copy GTK runtime files
         shell: msys2 {0}
