@@ -13,6 +13,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+
 from .s57symbolprovider import S57SymbolProvider
 
 

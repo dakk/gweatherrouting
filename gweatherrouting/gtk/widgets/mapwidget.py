@@ -13,6 +13,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+
 import math
 
 import gi
@@ -116,7 +117,7 @@ class MapWidget(Gtk.DrawingArea):
 
     def _lat_to_y(self, lat):
         """Convert latitude to Mercator world-pixel Y at current zoom."""
-        n = 2.0 ** self._zoom
+        n = 2.0**self._zoom
         lat_rad = math.radians(lat)
         return (
             (1.0 - math.log(math.tan(lat_rad) + 1.0 / math.cos(lat_rad)) / math.pi)
@@ -127,18 +128,18 @@ class MapWidget(Gtk.DrawingArea):
 
     def _lon_to_x(self, lon):
         """Convert longitude to Mercator world-pixel X at current zoom."""
-        n = 2.0 ** self._zoom
+        n = 2.0**self._zoom
         return (lon + 180.0) / 360.0 * n * self.TILE_SIZE
 
     def _y_to_lat(self, y):
         """Convert Mercator world-pixel Y to latitude at current zoom."""
-        n = 2.0 ** self._zoom
+        n = 2.0**self._zoom
         lat_rad = math.atan(math.sinh(math.pi * (1 - 2 * y / (n * self.TILE_SIZE))))
         return math.degrees(lat_rad)
 
     def _x_to_lon(self, x):
         """Convert Mercator world-pixel X to longitude at current zoom."""
-        n = 2.0 ** self._zoom
+        n = 2.0**self._zoom
         return x / (n * self.TILE_SIZE) * 360.0 - 180.0
 
     # --- Public API (OsmGpsMap compatible) ---
@@ -176,7 +177,7 @@ class MapWidget(Gtk.DrawingArea):
         lat_rad = math.radians(self._center_lat)
         # Circumference of Earth at this latitude / total pixels at zoom
         meters_per_pixel = (
-            math.cos(lat_rad) * 2 * math.pi * 6378137 / (2 ** self._zoom * self.TILE_SIZE)
+            math.cos(lat_rad) * 2 * math.pi * 6378137 / (2**self._zoom * self.TILE_SIZE)
         )
         return meters_per_pixel
 
@@ -298,14 +299,20 @@ class MapWidget(Gtk.DrawingArea):
             my = event.y - h / 2.0
 
             # Geographic point under cursor at old zoom
-            old_n = 2.0 ** old_zoom
+            old_n = 2.0**old_zoom
             old_cx = (self._center_lon + 180.0) / 360.0 * old_n * self.TILE_SIZE
             old_cy = (
-                (1.0 - math.log(
-                    math.tan(math.radians(self._center_lat))
-                    + 1.0 / math.cos(math.radians(self._center_lat))
-                ) / math.pi)
-                / 2.0 * old_n * self.TILE_SIZE
+                (
+                    1.0
+                    - math.log(
+                        math.tan(math.radians(self._center_lat))
+                        + 1.0 / math.cos(math.radians(self._center_lat))
+                    )
+                    / math.pi
+                )
+                / 2.0
+                * old_n
+                * self.TILE_SIZE
             )
             cursor_world_x = old_cx + mx
             cursor_world_y = old_cy + my
@@ -313,18 +320,28 @@ class MapWidget(Gtk.DrawingArea):
             # Convert cursor world coords to geographic
             cursor_lon = cursor_world_x / (old_n * self.TILE_SIZE) * 360.0 - 180.0
             cursor_lat = math.degrees(
-                math.atan(math.sinh(math.pi * (1 - 2 * cursor_world_y / (old_n * self.TILE_SIZE))))
+                math.atan(
+                    math.sinh(
+                        math.pi * (1 - 2 * cursor_world_y / (old_n * self.TILE_SIZE))
+                    )
+                )
             )
 
             # At new zoom, where is that geographic point in world coords?
-            new_n = 2.0 ** self._zoom
+            new_n = 2.0**self._zoom
             cursor_new_x = (cursor_lon + 180.0) / 360.0 * new_n * self.TILE_SIZE
             cursor_new_y = (
-                (1.0 - math.log(
-                    math.tan(math.radians(cursor_lat))
-                    + 1.0 / math.cos(math.radians(cursor_lat))
-                ) / math.pi)
-                / 2.0 * new_n * self.TILE_SIZE
+                (
+                    1.0
+                    - math.log(
+                        math.tan(math.radians(cursor_lat))
+                        + 1.0 / math.cos(math.radians(cursor_lat))
+                    )
+                    / math.pi
+                )
+                / 2.0
+                * new_n
+                * self.TILE_SIZE
             )
 
             # New center so that cursor point stays at same screen position
@@ -333,14 +350,16 @@ class MapWidget(Gtk.DrawingArea):
 
             self._center_lon = new_cx / (new_n * self.TILE_SIZE) * 360.0 - 180.0
             self._center_lat = math.degrees(
-                math.atan(math.sinh(math.pi * (1 - 2 * new_cy / (new_n * self.TILE_SIZE))))
+                math.atan(
+                    math.sinh(math.pi * (1 - 2 * new_cy / (new_n * self.TILE_SIZE)))
+                )
             )
             self._center_lat = max(-85.0, min(85.0, self._center_lat))
 
             self.queue_draw()
         return True
 
-    def _on_key_press(self, widget, event):
+    def _on_key_press(self, widget, event):  # noqa: C901
         pan_pixels = 50
         keyval = event.keyval
 

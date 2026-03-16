@@ -13,6 +13,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+
 import math
 
 import gi
@@ -157,4 +158,3 @@ class GribMapLayer(GObject.GObject):
 
     def do_button_press(self, gpsmap, gdkeventbutton):
         return False
-

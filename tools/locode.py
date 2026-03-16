@@ -182,7 +182,7 @@
 
 # 			if (port.position.coordinates.length == 0 && loc.longitude && loc.latitude) {
 # 				port.position = {
-# 					type: 'Point',
+# type: 'Point',
 # 					coordinates: [loc.longitude, loc.latitude]
 # 				};
 # 				mod = true;

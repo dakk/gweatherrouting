@@ -13,6 +13,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+
 import math
 
 import cairo
@@ -95,7 +96,7 @@ class IsochronesMapLayer(GObject.GObject):
 
                 if prev is not None:
                     cr.move_to(prev[0], prev[1])
-                    (d, r) = utils.ortodromic(
+                    d, r = utils.ortodromic(
                         prev[2].pos[0], prev[2].pos[1], icpoint.pos[0], icpoint.pos[1]
                     )
 
@@ -138,4 +139,3 @@ class IsochronesMapLayer(GObject.GObject):
 
     def do_button_press(self, gpsmap, gdkeventbutton):
         return False
-

@@ -13,6 +13,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+
 import logging
 
 from gweatherrouting.gtk.widgets.mapwidget import MapPoint
@@ -91,9 +92,7 @@ class OSMChartDrawer(VectorChartDrawer):
             self.featureCache[iid] = (name, tags)
 
         pt = geom.GetPoint(0)
-        xx, yy = gpsmap.convert_geographic_to_screen(
-            MapPoint.new_degrees(pt[1], pt[0])
-        )
+        xx, yy = gpsmap.convert_geographic_to_screen(MapPoint.new_degrees(pt[1], pt[0]))
 
         scale = gpsmap.get_scale()
         cr.set_source_rgba(0, 0, 0, 0.8)

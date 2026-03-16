@@ -13,6 +13,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+
 import math
 
 import dateutil.parser
@@ -44,9 +45,7 @@ class GeoMapLayer(GObject.GObject):
         prevp = None
 
         for p in self.core.logManager.log:
-            x, y = gpsmap.convert_geographic_to_screen(
-                MapPoint.new_degrees(p[0], p[1])
-            )
+            x, y = gpsmap.convert_geographic_to_screen(MapPoint.new_degrees(p[0], p[1]))
 
             if prevx is not None and prevy is not None:
                 Style.Track.LogTrack.apply(cr)
@@ -234,4 +233,3 @@ class GeoMapLayer(GObject.GObject):
 
     def do_button_press(self, gpsmap, gdkeventbutton):
         return False
-

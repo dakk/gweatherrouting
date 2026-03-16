@@ -13,6 +13,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+
 from gweatherrouting.core import utils
 from gweatherrouting.core.geo.element import Element
 

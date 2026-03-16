@@ -13,6 +13,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+
 import cairo
 from gweatherrouting.gtk.style import Style
 from gweatherrouting.gtk.widgets.mapwidget import MapPoint

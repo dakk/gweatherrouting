@@ -13,6 +13,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+
 import logging
 import os
 from typing import List, Optional
@@ -175,4 +176,3 @@ class ChartManager(GObject.GObject):
     def do_button_press(self, gpsmap, gdkeventbutton):
         for x in filter(lambda x: x.enabled, self.charts):
             x.do_button_press(gpsmap, gdkeventbutton)
-

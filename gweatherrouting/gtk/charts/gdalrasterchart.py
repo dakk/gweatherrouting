@@ -133,7 +133,7 @@ class GDALSingleRasterChart:
         mmin = band.GetMinimum()
         mmax = band.GetMaximum()
         if not mmin or not mmax:
-            (mmin, mmax) = band.ComputeRasterMinMax(True)
+            mmin, mmax = band.ComputeRasterMinMax(True)
 
         colors = {0: 0x00000000}
         ct = band.GetRasterColorTable()

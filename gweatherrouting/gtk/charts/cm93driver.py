@@ -13,6 +13,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+
 # https://github.com/OpenCPN/OpenCPN/blob/master/src/cm93.cpp
 
 

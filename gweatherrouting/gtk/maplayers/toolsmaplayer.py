@@ -13,6 +13,7 @@ GNU General Public License for more details.
 
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
+
 import math
 from typing import Tuple
 
@@ -102,9 +103,7 @@ class ToolsMapLayer(GObject.GObject):
 
         if self.mob and self.mobPosition:
             lat, lon = self.mobPosition
-            x, y = gpsmap.convert_geographic_to_screen(
-                MapPoint.new_degrees(lat, lon)
-            )
+            x, y = gpsmap.convert_geographic_to_screen(MapPoint.new_degrees(lat, lon))
 
             Style.Track.Mob.apply(cr)
             cr.arc(x, y, 5, 0, 2 * math.pi)
@@ -180,14 +179,10 @@ class ToolsMapLayer(GObject.GObject):
                 return
 
             x, y = gpsmap.convert_geographic_to_screen(
-                MapPoint.new_degrees(
-                    self.measureStart[0], self.measureStart[1]
-                )
+                MapPoint.new_degrees(self.measureStart[0], self.measureStart[1])
             )
             x1, y1 = gpsmap.convert_geographic_to_screen(
-                MapPoint.new_degrees(
-                    self.mousePosition[0], self.mousePosition[1]
-                )
+                MapPoint.new_degrees(self.mousePosition[0], self.mousePosition[1])
             )
             Style.Measure.Line.apply(cr)
             cr.move_to(x, y)
@@ -203,7 +198,7 @@ class ToolsMapLayer(GObject.GObject):
             )
 
             # Calculate bearing
-            (_, r) = utils.ortodromic(
+            _, r = utils.ortodromic(
                 self.measureStart[0],
                 self.measureStart[1],
                 self.mousePosition[0],
@@ -237,4 +232,3 @@ class ToolsMapLayer(GObject.GObject):
             return True
 
         return False
-
