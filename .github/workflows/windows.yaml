@@ -41,7 +41,7 @@ jobs:
       - name: Install Python Dependencies
         shell: msys2 {0}
         run: |
-          pip install --break-system-packages requests colorlog geojson_utils bs4 pyserial pynmea2 gpxpy nmeatoolkit weatherrouting
+          pip install --break-system-packages requests colorlog geojson_utils bs4 pyserial pynmea2 gpxpy nmeatoolkit weatherrouting appdirs
           pip install --break-system-packages --no-build-isolation --no-deps .
 
       - name: Create portable distribution
@@ -60,7 +60,7 @@ jobs:
           cp -r "$SITE_PACKAGES/gweatherrouting" "$DIST/lib/python3.14/site-packages/gweatherrouting" 2>/dev/null || true
 
           # Copy pip-installed pure-python packages
-          for pkg in requests colorlog geojson_utils bs4 beautifulsoup4 soupsieve pyserial pynmea2 gpxpy nmeatoolkit weatherrouting latlon3 geojson certifi charset_normalizer idna urllib3 colorama typing_extensions; do
+          for pkg in requests colorlog geojson_utils bs4 beautifulsoup4 soupsieve pyserial pynmea2 gpxpy nmeatoolkit weatherrouting latlon3 geojson certifi charset_normalizer idna urllib3 colorama typing_extensions appdirs; do
             for d in "$SITE_PACKAGES/$pkg" "$SITE_PACKAGES/${pkg}.py"; do
               [ -e "$d" ] && cp -r "$d" "$DIST/lib/python3.14/site-packages/" 2>/dev/null || true
             done
