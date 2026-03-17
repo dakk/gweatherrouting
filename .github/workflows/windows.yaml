@@ -66,13 +66,40 @@ jobs:
             done) \
             __main__.py
 
-      - name: Copy osgeo (GDAL Python bindings)
+      - name: Copy osgeo (GDAL Python bindings) and GDAL DLLs
         shell: msys2 {0}
         run: |
           DIST="gweatherrouting/dist/GWeatherRouting"
           OSGEO_DIR=$(python -c "import osgeo; import os; print(os.path.dirname(osgeo.__file__))")
           echo "Copying osgeo from $OSGEO_DIR"
           cp -r "$OSGEO_DIR" "$DIST/osgeo"
+
+          # Copy GDAL and PROJ DLLs needed by _gdal.pyd etc.
+          cp /mingw64/bin/libgdal-*.dll "$DIST/" 2>/dev/null || true
+          cp /mingw64/bin/libproj-*.dll "$DIST/" 2>/dev/null || true
+          cp /mingw64/bin/libgeos*.dll "$DIST/" 2>/dev/null || true
+          cp /mingw64/bin/libsqlite3-*.dll "$DIST/" 2>/dev/null || true
+          cp /mingw64/bin/libtiff-*.dll "$DIST/" 2>/dev/null || true
+          cp /mingw64/bin/libcurl-*.dll "$DIST/" 2>/dev/null || true
+          cp /mingw64/bin/libgeotiff-*.dll "$DIST/" 2>/dev/null || true
+          cp /mingw64/bin/libjpeg-*.dll "$DIST/" 2>/dev/null || true
+          cp /mingw64/bin/libpng*.dll "$DIST/" 2>/dev/null || true
+          cp /mingw64/bin/libopenjp2-*.dll "$DIST/" 2>/dev/null || true
+          cp /mingw64/bin/libwebp-*.dll "$DIST/" 2>/dev/null || true
+          cp /mingw64/bin/libxml2-*.dll "$DIST/" 2>/dev/null || true
+          cp /mingw64/bin/libexpat-*.dll "$DIST/" 2>/dev/null || true
+          cp /mingw64/bin/zlib*.dll "$DIST/" 2>/dev/null || true
+          cp /mingw64/bin/liblzma-*.dll "$DIST/" 2>/dev/null || true
+          cp /mingw64/bin/libzstd*.dll "$DIST/" 2>/dev/null || true
+          cp /mingw64/bin/libiconv-*.dll "$DIST/" 2>/dev/null || true
+          cp /mingw64/bin/libintl-*.dll "$DIST/" 2>/dev/null || true
+          cp /mingw64/bin/libssl-*.dll "$DIST/" 2>/dev/null || true
+          cp /mingw64/bin/libcrypto-*.dll "$DIST/" 2>/dev/null || true
+          cp /mingw64/bin/libbrotli*.dll "$DIST/" 2>/dev/null || true
+          cp /mingw64/bin/libnghttp2-*.dll "$DIST/" 2>/dev/null || true
+          cp /mingw64/bin/libidn2-*.dll "$DIST/" 2>/dev/null || true
+          cp /mingw64/bin/libpsl-*.dll "$DIST/" 2>/dev/null || true
+          cp /mingw64/bin/libssh2-*.dll "$DIST/" 2>/dev/null || true
 
       - name: Copy GTK runtime files
         shell: msys2 {0}
