@@ -49,9 +49,16 @@ jobs:
         shell: msys2 {0}
         run: |
           cd gweatherrouting
+
+          # Find MSYS2 Python site-packages path for PyInstaller
+          SITE_PACKAGES=$(python -c "import site; print(site.getsitepackages()[0])")
+          echo "Site-packages: $SITE_PACKAGES"
+          SITE_PACKAGES_WIN=$(cygpath -w "$SITE_PACKAGES")
+
           pyinstaller --name GWeatherRouting \
             --windowed \
             --icon ../windows/icon.ico \
+            --paths "$SITE_PACKAGES_WIN" \
             --hidden-import=gi \
             --collect-submodules=gi \
             --add-data "data;gweatherrouting/data" \
