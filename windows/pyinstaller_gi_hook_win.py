@@ -5,6 +5,13 @@ import sys
 if hasattr(sys, "_MEIPASS"):
     base = sys._MEIPASS
 
+    # Add DLL search path so native extensions (_gdal.pyd etc.) can find DLLs
+    if hasattr(os, "add_dll_directory"):
+        os.add_dll_directory(base)
+
+    # Also prepend to PATH as fallback
+    os.environ["PATH"] = base + ";" + os.environ.get("PATH", "")
+
     # GObject Introspection typelibs
     typelib_path = os.path.join(base, "gi_typelibs")
     existing = os.environ.get("GI_TYPELIB_PATH", "")
