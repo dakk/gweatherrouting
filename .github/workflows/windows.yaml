@@ -41,95 +41,80 @@ jobs:
       - name: Install Python Dependencies
         shell: msys2 {0}
         run: |
-          pip install --break-system-packages pyinstaller
           pip install --break-system-packages requests colorlog geojson_utils bs4 pyserial pynmea2 gpxpy nmeatoolkit weatherrouting
           pip install --break-system-packages --no-build-isolation --no-deps .
 
-      - name: Patch osgeo __init__.py for PyInstaller compatibility
+      - name: Create portable distribution
         shell: msys2 {0}
         run: |
-          OSGEO_DIR=$(python -c "import osgeo; import os; print(os.path.dirname(osgeo.__file__))")
-          GDAL_VERSION=$(python -c "from osgeo import gdal; print(gdal.VersionInfo('RELEASE_NAME'))")
-          echo "Patching $OSGEO_DIR/__init__.py with version $GDAL_VERSION"
-          echo "__version__ = '$GDAL_VERSION'" > "$OSGEO_DIR/__init__.py"
+          DIST="dist/GWeatherRouting"
+          mkdir -p "$DIST"
 
-      - name: Build Windows Executable
-        shell: msys2 {0}
-        run: |
-          cd gweatherrouting
+          # Copy the entire MSYS2 mingw64 runtime
+          cp -r /mingw64/bin "$DIST/bin"
+          cp -r /mingw64/lib "$DIST/lib"
+          cp -r /mingw64/share "$DIST/share"
 
-          # Find MSYS2 Python site-packages and osgeo paths
+          # Copy the app's package data
           SITE_PACKAGES=$(python -c "import site; print(site.getsitepackages()[0])")
-          OSGEO_DIR=$(python -c "import osgeo; import os; print(os.path.dirname(osgeo.__file__))")
-          echo "Site-packages: $SITE_PACKAGES"
-          echo "osgeo dir: $OSGEO_DIR"
-          SITE_PACKAGES_WIN=$(cygpath -w "$SITE_PACKAGES")
-          OSGEO_DIR_WIN=$(cygpath -w "$OSGEO_DIR")
+          cp -r "$SITE_PACKAGES/gweatherrouting" "$DIST/lib/python3.14/site-packages/gweatherrouting" 2>/dev/null || true
 
-          # Collect typelib flags
-          TYPELIB_FLAGS=""
-          for typelib in Gtk-3.0 Gdk-3.0 GdkPixbuf-2.0 Pango-1.0 PangoCairo-1.0 GObject-2.0 GLib-2.0 Gio-2.0 cairo-1.0 Atk-1.0 HarfBuzz-0.0 freetype2-2.0 GModule-2.0 GdkWin32-3.0; do
-            typelibfile="/mingw64/lib/girepository-1.0/${typelib}.typelib"
-            if [ -f "$typelibfile" ]; then
-              TYPELIB_FLAGS="$TYPELIB_FLAGS --add-data $(cygpath -w "$typelibfile");gi_typelibs"
-            fi
+          # Copy pip-installed pure-python packages
+          for pkg in requests colorlog geojson_utils bs4 beautifulsoup4 soupsieve pyserial pynmea2 gpxpy nmeatoolkit weatherrouting latlon3 geojson certifi charset_normalizer idna urllib3 colorama typing_extensions; do
+            for d in "$SITE_PACKAGES/$pkg" "$SITE_PACKAGES/${pkg}.py"; do
+              [ -e "$d" ] && cp -r "$d" "$DIST/lib/python3.14/site-packages/" 2>/dev/null || true
+            done
+            # Also copy .dist-info for packages that need it
+            for di in "$SITE_PACKAGES/${pkg}"*.dist-info; do
+              [ -d "$di" ] && cp -r "$di" "$DIST/lib/python3.14/site-packages/" 2>/dev/null || true
+            done
           done
 
-          pyinstaller --name GWeatherRouting \
-            --windowed \
-            --icon ../windows/icon.ico \
-            --paths "$SITE_PACKAGES_WIN" \
-            --paths "$OSGEO_DIR_WIN" \
-            --hidden-import=gi \
-            --hidden-import=osgeo \
-            --hidden-import=osgeo._gdal \
-            --hidden-import=osgeo._ogr \
-            --hidden-import=osgeo._osr \
-            --hidden-import=osgeo._gdalconst \
-            --collect-submodules=gi \
-            --collect-all=osgeo \
-            --add-data "data;gweatherrouting/data" \
-            --add-data "gtk;gweatherrouting/gtk" \
-            --runtime-hook ../windows/pyinstaller_gi_hook_win.py \
-            $TYPELIB_FLAGS \
-            __main__.py
+          # Create launcher script
+          cat > "$DIST/GWeatherRouting.bat" << 'LAUNCHER'
+          @echo off
+          set APPDIR=%~dp0
+          set PATH=%APPDIR%bin;%PATH%
+          set GI_TYPELIB_PATH=%APPDIR%lib\girepository-1.0
+          set GDAL_DATA=%APPDIR%share\gdal
+          set GTK_DATA_PREFIX=%APPDIR%
+          set XDG_DATA_DIRS=%APPDIR%share
+          set GDK_PIXBUF_MODULE_FILE=%APPDIR%lib\gdk-pixbuf-2.0\2.10.0\loaders.cache
+          "%APPDIR%bin\python.exe" -m gweatherrouting
+          LAUNCHER
 
-      - name: Copy runtime files
+          # Also create a pythonw launcher (no console window)
+          cat > "$DIST/GWeatherRouting-noconsole.vbs" << 'VBSLAUNCHER'
+          Set WshShell = CreateObject("WScript.Shell")
+          appDir = CreateObject("Scripting.FileSystemObject").GetParentFolderName(WScript.ScriptFullName)
+          WshShell.Environment("Process")("PATH") = appDir & "\bin;" & WshShell.Environment("Process")("PATH")
+          WshShell.Environment("Process")("GI_TYPELIB_PATH") = appDir & "\lib\girepository-1.0"
+          WshShell.Environment("Process")("GDAL_DATA") = appDir & "\share\gdal"
+          WshShell.Environment("Process")("GTK_DATA_PREFIX") = appDir
+          WshShell.Environment("Process")("XDG_DATA_DIRS") = appDir & "\share"
+          WshShell.Environment("Process")("GDK_PIXBUF_MODULE_FILE") = appDir & "\lib\gdk-pixbuf-2.0\2.10.0\loaders.cache"
+          WshShell.Run """" & appDir & "\bin\pythonw.exe"" -m gweatherrouting", 0, False
+          VBSLAUNCHER
+
+      - name: Trim distribution size
         shell: msys2 {0}
         run: |
-          DIST="gweatherrouting/dist/GWeatherRouting"
-
-          # Copy all MSYS2 mingw64 DLLs (GDAL, GTK, etc.)
-          for dll in /mingw64/bin/*.dll; do
-            cp "$dll" "$DIST/" 2>/dev/null || true
-          done
-
-      - name: Copy GTK runtime files
-        shell: msys2 {0}
-        run: |
-          DIST="gweatherrouting/dist/GWeatherRouting"
-
-          # GTK schemas
-          mkdir -p "$DIST/share/glib-2.0/schemas"
-          cp -r /mingw64/share/glib-2.0/schemas/* "$DIST/share/glib-2.0/schemas/"
-
-          # Icons
-          mkdir -p "$DIST/share/icons"
-          cp -r /mingw64/share/icons/Adwaita "$DIST/share/icons/"
-          cp -r /mingw64/share/icons/hicolor "$DIST/share/icons/"
-
-          # Pixbuf loaders
-          mkdir -p "$DIST/lib/gdk-pixbuf-2.0"
-          cp -r /mingw64/lib/gdk-pixbuf-2.0/* "$DIST/lib/gdk-pixbuf-2.0/"
-
-          # GDAL data
-          if [ -d /mingw64/share/gdal ]; then
-            mkdir -p "$DIST/share/gdal"
-            cp -r /mingw64/share/gdal/* "$DIST/share/gdal/"
-          fi
+          DIST="dist/GWeatherRouting"
+          # Remove unnecessary files to reduce size
+          rm -rf "$DIST/lib/python3.14/test" 2>/dev/null || true
+          rm -rf "$DIST/lib/python3.14/unittest" 2>/dev/null || true
+          rm -rf "$DIST/lib/python3.14/tkinter" 2>/dev/null || true
+          rm -rf "$DIST/lib/python3.14/idlelib" 2>/dev/null || true
+          rm -rf "$DIST/lib/python3.14/ensurepip" 2>/dev/null || true
+          rm -rf "$DIST/share/doc" 2>/dev/null || true
+          rm -rf "$DIST/share/man" 2>/dev/null || true
+          rm -rf "$DIST/share/info" 2>/dev/null || true
+          rm -rf "$DIST/share/gtk-doc" 2>/dev/null || true
+          find "$DIST" -name "*.a" -delete 2>/dev/null || true
+          find "$DIST" -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
 
       - name: Upload Windows ZIP
         uses: actions/upload-artifact@v4
         with:
           name: GWeatherRouting-win64
-          path: gweatherrouting/dist/GWeatherRouting/
+          path: dist/GWeatherRouting/
