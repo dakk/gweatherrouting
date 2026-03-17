@@ -1,0 +1,120 @@
+name: Windows Build
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
+  release:
+    types: [created]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    name: Windows Portable ZIP
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            git
+            mingw-w64-x86_64-gtk3
+            mingw-w64-x86_64-python
+            mingw-w64-x86_64-python-pip
+            mingw-w64-x86_64-python-gobject
+            mingw-w64-x86_64-gobject-introspection
+            mingw-w64-x86_64-gdal
+            mingw-w64-x86_64-python-gdal
+            mingw-w64-x86_64-python-numpy
+            mingw-w64-x86_64-python-matplotlib
+            mingw-w64-x86_64-python-pyproj
+            mingw-w64-x86_64-gdk-pixbuf2
+            mingw-w64-x86_64-adwaita-icon-theme
+
+      - name: Install Python Dependencies
+        shell: msys2 {0}
+        run: |
+          pip install --break-system-packages requests colorlog geojson_utils bs4 pyserial pynmea2 gpxpy nmeatoolkit weatherrouting appdirs
+          pip install --break-system-packages --no-build-isolation --no-deps .
+
+      - name: Create portable distribution
+        shell: msys2 {0}
+        run: |
+          DIST="dist/GWeatherRouting"
+          mkdir -p "$DIST"
+
+          # Copy the entire MSYS2 mingw64 runtime
+          cp -r /mingw64/bin "$DIST/bin"
+          cp -r /mingw64/lib "$DIST/lib"
+          cp -r /mingw64/share "$DIST/share"
+
+          # Copy the app's package data
+          SITE_PACKAGES=$(python -c "import site; print(site.getsitepackages()[0])")
+          cp -r "$SITE_PACKAGES/gweatherrouting" "$DIST/lib/python3.14/site-packages/gweatherrouting" 2>/dev/null || true
+
+          # Copy pip-installed pure-python packages
+          for pkg in requests colorlog geojson_utils bs4 beautifulsoup4 soupsieve pyserial pynmea2 gpxpy nmeatoolkit weatherrouting latlon3 geojson certifi charset_normalizer idna urllib3 colorama typing_extensions appdirs; do
+            for d in "$SITE_PACKAGES/$pkg" "$SITE_PACKAGES/${pkg}.py"; do
+              [ -e "$d" ] && cp -r "$d" "$DIST/lib/python3.14/site-packages/" 2>/dev/null || true
+            done
+            # Also copy .dist-info for packages that need it
+            for di in "$SITE_PACKAGES/${pkg}"*.dist-info; do
+              [ -d "$di" ] && cp -r "$di" "$DIST/lib/python3.14/site-packages/" 2>/dev/null || true
+            done
+          done
+
+          # Create launcher script
+          cat > "$DIST/GWeatherRouting.bat" << 'LAUNCHER'
+          @echo off
+          set APPDIR=%~dp0
+          set PATH=%APPDIR%bin;%PATH%
+          set GI_TYPELIB_PATH=%APPDIR%lib\girepository-1.0
+          set GDAL_DATA=%APPDIR%share\gdal
+          set GTK_DATA_PREFIX=%APPDIR%
+          set XDG_DATA_DIRS=%APPDIR%share
+          set GDK_PIXBUF_MODULE_FILE=%APPDIR%lib\gdk-pixbuf-2.0\2.10.0\loaders.cache
+          "%APPDIR%bin\python.exe" -m gweatherrouting
+          LAUNCHER
+
+          # Also create a pythonw launcher (no console window)
+          cat > "$DIST/GWeatherRouting-noconsole.vbs" << 'VBSLAUNCHER'
+          Set WshShell = CreateObject("WScript.Shell")
+          appDir = CreateObject("Scripting.FileSystemObject").GetParentFolderName(WScript.ScriptFullName)
+          WshShell.Environment("Process")("PATH") = appDir & "\bin;" & WshShell.Environment("Process")("PATH")
+          WshShell.Environment("Process")("GI_TYPELIB_PATH") = appDir & "\lib\girepository-1.0"
+          WshShell.Environment("Process")("GDAL_DATA") = appDir & "\share\gdal"
+          WshShell.Environment("Process")("GTK_DATA_PREFIX") = appDir
+          WshShell.Environment("Process")("XDG_DATA_DIRS") = appDir & "\share"
+          WshShell.Environment("Process")("GDK_PIXBUF_MODULE_FILE") = appDir & "\lib\gdk-pixbuf-2.0\2.10.0\loaders.cache"
+          WshShell.Run """" & appDir & "\bin\pythonw.exe"" -m gweatherrouting", 0, False
+          VBSLAUNCHER
+
+      - name: Trim distribution size
+        shell: msys2 {0}
+        run: |
+          DIST="dist/GWeatherRouting"
+          # Remove unnecessary files to reduce size
+          rm -rf "$DIST/lib/python3.14/test" 2>/dev/null || true
+          rm -rf "$DIST/lib/python3.14/unittest" 2>/dev/null || true
+          rm -rf "$DIST/lib/python3.14/tkinter" 2>/dev/null || true
+          rm -rf "$DIST/lib/python3.14/idlelib" 2>/dev/null || true
+          rm -rf "$DIST/lib/python3.14/ensurepip" 2>/dev/null || true
+          rm -rf "$DIST/share/doc" 2>/dev/null || true
+          rm -rf "$DIST/share/man" 2>/dev/null || true
+          rm -rf "$DIST/share/info" 2>/dev/null || true
+          rm -rf "$DIST/share/gtk-doc" 2>/dev/null || true
+          find "$DIST" -name "*.a" -delete 2>/dev/null || true
+          find "$DIST" -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+
+      - name: Upload Windows ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: GWeatherRouting-win64
+          path: dist/GWeatherRouting/

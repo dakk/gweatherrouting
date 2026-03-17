@@ -13,6 +13,9 @@ build-appimage:
 	pip install pyinstaller
 	cd appimage && bash appimagegen.sh -y
 
+build-windows:
+	powershell -ExecutionPolicy Bypass -File windows/build.ps1
+
 build-flatpak:
 	cd flatpak && bash flatpak-gen.sh -y
 
