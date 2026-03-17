@@ -45,44 +45,61 @@ jobs:
           pip install --break-system-packages requests colorlog geojson_utils bs4 pyserial pynmea2 gpxpy nmeatoolkit weatherrouting
           pip install --break-system-packages --no-build-isolation --no-deps .
 
+      - name: Patch osgeo __init__.py for PyInstaller compatibility
+        shell: msys2 {0}
+        run: |
+          OSGEO_DIR=$(python -c "import osgeo; import os; print(os.path.dirname(osgeo.__file__))")
+          GDAL_VERSION=$(python -c "from osgeo import gdal; print(gdal.VersionInfo('RELEASE_NAME'))")
+          echo "Patching $OSGEO_DIR/__init__.py with version $GDAL_VERSION"
+          echo "__version__ = '$GDAL_VERSION'" > "$OSGEO_DIR/__init__.py"
+
       - name: Build Windows Executable
         shell: msys2 {0}
         run: |
           cd gweatherrouting
 
-          # Find MSYS2 Python site-packages path for PyInstaller
+          # Find MSYS2 Python site-packages and osgeo paths
           SITE_PACKAGES=$(python -c "import site; print(site.getsitepackages()[0])")
+          OSGEO_DIR=$(python -c "import osgeo; import os; print(os.path.dirname(osgeo.__file__))")
           echo "Site-packages: $SITE_PACKAGES"
+          echo "osgeo dir: $OSGEO_DIR"
           SITE_PACKAGES_WIN=$(cygpath -w "$SITE_PACKAGES")
+          OSGEO_DIR_WIN=$(cygpath -w "$OSGEO_DIR")
+
+          # Collect typelib flags
+          TYPELIB_FLAGS=""
+          for typelib in Gtk-3.0 Gdk-3.0 GdkPixbuf-2.0 Pango-1.0 PangoCairo-1.0 GObject-2.0 GLib-2.0 Gio-2.0 cairo-1.0 Atk-1.0 HarfBuzz-0.0 freetype2-2.0 GModule-2.0 GdkWin32-3.0; do
+            typelibfile="/mingw64/lib/girepository-1.0/${typelib}.typelib"
+            if [ -f "$typelibfile" ]; then
+              TYPELIB_FLAGS="$TYPELIB_FLAGS --add-data $(cygpath -w "$typelibfile");gi_typelibs"
+            fi
+          done
 
           pyinstaller --name GWeatherRouting \
             --windowed \
             --icon ../windows/icon.ico \
             --paths "$SITE_PACKAGES_WIN" \
+            --paths "$OSGEO_DIR_WIN" \
             --hidden-import=gi \
+            --hidden-import=osgeo \
+            --hidden-import=osgeo._gdal \
+            --hidden-import=osgeo._ogr \
+            --hidden-import=osgeo._osr \
+            --hidden-import=osgeo._gdalconst \
             --collect-submodules=gi \
+            --collect-all=osgeo \
             --add-data "data;gweatherrouting/data" \
             --add-data "gtk;gweatherrouting/gtk" \
             --runtime-hook ../windows/pyinstaller_gi_hook_win.py \
-            $(for typelib in Gtk-3.0 Gdk-3.0 GdkPixbuf-2.0 Pango-1.0 PangoCairo-1.0 GObject-2.0 GLib-2.0 Gio-2.0 cairo-1.0 Atk-1.0 HarfBuzz-0.0 freetype2-2.0 GModule-2.0 GdkWin32-3.0; do
-              typelibfile="/mingw64/lib/girepository-1.0/${typelib}.typelib"
-              if [ -f "$typelibfile" ]; then
-                winpath=$(cygpath -w "$typelibfile")
-                echo "--add-data ${winpath};gi_typelibs"
-              fi
-            done) \
+            $TYPELIB_FLAGS \
             __main__.py
 
-      - name: Copy osgeo (GDAL Python bindings) and GDAL DLLs
+      - name: Copy runtime files
         shell: msys2 {0}
         run: |
           DIST="gweatherrouting/dist/GWeatherRouting"
-          OSGEO_DIR=$(python -c "import osgeo; import os; print(os.path.dirname(osgeo.__file__))")
-          echo "Copying osgeo from $OSGEO_DIR"
-          cp -r "$OSGEO_DIR" "$DIST/osgeo"
 
-          # Copy all MSYS2 mingw64 DLLs needed by osgeo's .pyd files
-          # Put them in the dist root where PyInstaller's exe lives
+          # Copy all MSYS2 mingw64 DLLs (GDAL, GTK, etc.)
           for dll in /mingw64/bin/*.dll; do
             cp "$dll" "$DIST/" 2>/dev/null || true
           done
