@@ -38,7 +38,10 @@ h3:not(#hero h3) {
           <a href="https://flathub.org/apps/org.gweatherrouting.gweatherrouting" class="homepage-button primary-button"><i class="fa fa-download"></i> Install from Flathub</a>
       </div>
       <div class="homepage-button-container-row">
-          <a href="https://github.com/dakk/gweatherrouting/releases/latest" class="homepage-button-link">Download AppImage →</a>
+          <a href="https://github.com/dakk/gweatherrouting/releases/latest" class="homepage-button-link"><i class="fa fa-linux"></i> Download AppImage →</a>
+      </div>
+      <div class="homepage-button-container-row">
+          <a href="https://github.com/dakk/gweatherrouting/releases/download/v0.2.7/GWeatherRouting-win64.zip" class="homepage-button-link"><i class="fa fa-windows"></i> Download for Windows →</a>
       </div>
       <div class="homepage-button-container-row">
           <a href="./docs/quickstart.html" class="homepage-button-link">Quickstart →</a>

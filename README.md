@@ -43,7 +43,15 @@ GWeatherRouting is an open-source sailing routing and navigation software writte
 
 ## Installation
 
-You can install gweatherrouting via flatpak, appimage or using the source code.
+You can install gweatherrouting via flatpak, appimage, windows portable zip, or from source.
+
+### Download
+
+[![Flathub](https://img.shields.io/badge/Flathub-blue?logo=flathub&logoColor=white)](https://flathub.org/apps/org.gweatherrouting.gweatherrouting)
+[![AppImage](https://img.shields.io/badge/AppImage-blue?logo=linux&logoColor=white)](https://github.com/dakk/gweatherrouting/releases/latest)
+[![Windows](https://img.shields.io/badge/Windows-blue?logo=windows&logoColor=white)](https://github.com/dakk/gweatherrouting/releases/download/v0.2.7/GWeatherRouting-win64.zip)
+
+### From source
 
 1. Make sure to have Python >= 3.9 installed and the `pip` package manager.
 2. Install the following dependencies using your OS package manager (e.g: archlinux=pacman, debian=apt, macos=homebrew). Be aware that some packages have different names with different package managers.
