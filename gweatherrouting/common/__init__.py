@@ -62,4 +62,4 @@ def wind_color(wspeed):  # noqa: C901
 def resource_path(package: str, relative_path: str):
     resource = files(package).joinpath(relative_path)
     with as_file(resource) as path:
-        return fspath(path) + (sep if relative_path[-1] == sep else "")
+        return fspath(path) + (sep if relative_path[-1] in ("/", sep) else "")
