@@ -19,15 +19,15 @@ import os
 from shutil import copyfile
 from typing import Dict, List
 
-import requests
 import weatherrouting
 
 from gweatherrouting.core.grib import Grib
-from gweatherrouting.core.storage import GRIB_DIR, TEMP_DIR, Storage
-
-# from bs4 import BeautifulSoup
+from gweatherrouting.core.gribsources import NOAAGFSSource, OpenSkironSource
+from gweatherrouting.core.storage import GRIB_DIR, Storage
 
 logger = logging.getLogger("gweatherrouting")
+
+GRIB_EXTENSIONS = (".grib", ".grb", ".grib2", ".grb2")
 
 
 class GribManagerStorage(Storage):
@@ -45,16 +45,24 @@ class GribManager(weatherrouting.Grib):
         self.gribs: List[Grib] = []
         self.timeframe = [0, 0]
 
+        self.sources = [OpenSkironSource(), NOAAGFSSource()]
+
         self.local_gribs = []
         self.refresh_local_gribs()
 
         for x in self.storage.opened:
             self.enable(x)
 
+    def get_source(self, source_name):
+        for s in self.sources:
+            if s.name == source_name:
+                return s
+        return None
+
     def refresh_local_gribs(self):
         self.local_gribs = []
         for x in os.listdir(GRIB_DIR):
-            if x[-5:] != ".grib" and x[-4:] != ".grb":
+            if not any(x.endswith(ext) for ext in GRIB_EXTENSIONS):
                 continue
 
             m = Grib.parse_metadata(GRIB_DIR + "/" + x)
@@ -65,7 +73,7 @@ class GribManager(weatherrouting.Grib):
         for x in self.gribs:
             try:
                 ss.index(x.name)
-            except:
+            except Exception:
                 ss.append(x.name)
         self.storage.opened = ss
 
@@ -102,7 +110,7 @@ class GribManager(weatherrouting.Grib):
         for x in self.gribs:
             try:
                 return x.get_wind_at(t, lat, lon)
-            except:
+            except Exception:
                 pass
 
     def get_wind(self, t, bounds) -> List:
@@ -112,7 +120,7 @@ class GribManager(weatherrouting.Grib):
         for x in self.gribs:
             try:
                 g = g + x.get_wind(t, bounds)
-            except:
+            except Exception:
                 pass
         return g
 
@@ -131,47 +139,26 @@ class GribManager(weatherrouting.Grib):
 
         return ddlist
 
-    def get_download_list(self, force=False):
-        from bs4 import BeautifulSoup
+    def get_download_list(self, source_name=None, force=False):
+        """Get available GRIB files from all sources or a specific source.
 
-        # https://openskiron.org/en/openskiron
-        # https://openskiron.org/en/openwrf
+        Args:
+            source_name: If provided, only query this source. Otherwise query all.
+            force: Force refresh of cached lists.
+
+        Returns:
+            List of [filename, source, size, date, identifier] entries.
+        """
         if not self.grib_files or force:
-            data = requests.get("https://openskiron.org/en/openskiron").text
-            soup = BeautifulSoup(data, "html.parser")
             self.grib_files = []
-
-            for row in soup.find("table").find_all("tr"):
-                r = row.find_all("td")
-
-                if len(r) >= 3:
-                    # Name, Source, Size, Time, Link
-                    self.grib_files.append(
-                        [
-                            r[0].text.strip(),
-                            "OpenSkiron",
-                            r[1].text,
-                            r[2].text,
-                            r[0].find("a", href=True)["href"],
-                        ]
-                    )
-
-            data = requests.get("https://openskiron.org/en/openwrf").text
-            soup = BeautifulSoup(data, "html.parser")
-
-            for row in soup.find("table").find_all("tr"):
-                r = row.find_all("td")
-
-                if len(r) >= 3:
-                    # Name, Source, Size, Time, Link
-                    self.grib_files.append(
-                        [
-                            r[0].text.strip(),
-                            "OpenWRF",
-                            r[1].text,
-                            r[2].text,
-                            r[0].find("a", href=True)["href"],
-                        ]
+            for source in self.sources:
+                if source_name and source.name != source_name:
+                    continue
+                try:
+                    self.grib_files.extend(source.get_download_list())
+                except Exception as e:
+                    logger.error(
+                        "Failed to get download list from %s: %s", source.name, str(e)
                     )
 
         return self.grib_files
@@ -191,39 +178,30 @@ class GribManager(weatherrouting.Grib):
         except Exception as e:
             logger.error(str(e))
 
-    def download(self, uri, percentage_callback, callback):
-        import bz2
+    def download(self, identifier, percentage_callback, callback):
+        """Download a GRIB file using the appropriate source.
 
-        name = uri.split("/")[-1]
-        logger.info("Downloading grib %s", uri)
+        The identifier determines which source handles the download.
+        JSON identifiers are handled by NOAA GFS, URLs by OpenSkiron.
+        """
+        try:
+            # Determine which source to use based on the identifier
+            source = None
+            if identifier.startswith("{"):
+                # JSON config = NOAA GFS
+                source = self.get_source("NOAA GFS")
+            else:
+                # URL = OpenSkiron
+                source = self.get_source("OpenSkiron")
 
-        response = requests.get(uri, stream=True)
-        total_length = response.headers.get("content-length")
-        last_signal_percent = -1
-        f = open(TEMP_DIR + "/" + name, "wb")
+            if source is None:
+                logger.error("No source found for identifier: %s", identifier)
+                callback(False)
+                return
 
-        if total_length is None:
-            pass
-        else:
-            dl = 0
-            total_length_i = int(total_length)
-            for data in response.iter_content(chunk_size=4096):
-                dl += len(data)
-                f.write(data)
-                done = int(100 * dl / total_length_i)
-
-                if last_signal_percent != done:
-                    percentage_callback(done)
-                    last_signal_percent = done
-
-        f.close()
-        logger.info("Grib download completed %s", uri)
-
-        bf = bz2.open(TEMP_DIR + "/" + name, "rb")
-        f = open(GRIB_DIR + "/" + name.replace(".bz2", ""), "wb")
-        f.write(bf.read())
-        f.close()
-        bf.close()
-
-        self.load(GRIB_DIR + "/" + name.replace(".bz2", ""))
-        callback(True)
+            final_path = source.download(identifier, GRIB_DIR, percentage_callback)
+            self.load(final_path)
+            callback(True)
+        except Exception as e:
+            logger.error("Download failed: %s", str(e))
+            callback(False)

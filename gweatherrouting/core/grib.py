@@ -123,11 +123,9 @@ class Grib(weatherrouting.Grib):
         if t is None:
             return
 
-        t1 = int(round(t / 3.0)) * 3
-        t2 = t1 + 6
-
-        if t2 == t1:
-            t1 -= 3
+        # Find the two surrounding forecast hours for interpolation
+        available_hours = self._get_available_forecast_hours()
+        t1, t2 = self._find_bracketing_hours(t, available_hours)
 
         lon1 = min(bounds[0][1], bounds[1][1])
         lon2 = max(bounds[0][1], bounds[1][1])
@@ -154,6 +152,41 @@ class Grib(weatherrouting.Grib):
             data.append((twd, tws, (lat, lon)))
 
         return data
+
+    @lru_cache(maxsize=1)
+    def _get_available_forecast_hours(self):
+        """Scan GRIB bands to find all available forecast hours."""
+        hours = set()
+        for bidx in range(1, self.dataset.RasterCount + 1):
+            band = self.dataset.GetRasterBand(bidx)
+            metadata = band.GetMetadata()
+            if "GRIB_FORECAST_SECONDS" in metadata and metadata.get("GRIB_ELEMENT") in (
+                "UGRD",
+                "VGRD",
+            ):
+                hours.add(int(metadata["GRIB_FORECAST_SECONDS"]) // 3600)
+        return sorted(hours)
+
+    def _find_bracketing_hours(self, t, available_hours):
+        """Find the two forecast hours that bracket time t for interpolation."""
+        if not available_hours:
+            # Fallback to old behavior
+            t1 = int(round(t / 3.0)) * 3
+            return t1, t1 + 3
+
+        t1 = available_hours[0]
+        t2 = available_hours[-1] if len(available_hours) > 1 else t1 + 3
+
+        for i in range(len(available_hours) - 1):
+            if available_hours[i] <= t <= available_hours[i + 1]:
+                t1 = available_hours[i]
+                t2 = available_hours[i + 1]
+                break
+
+        if t2 == t1:
+            t2 = t1 + 3
+
+        return t1, t2
 
     def _transform_time(self, t) -> Optional[float]:
         if self.end_time < t:
