@@ -64,7 +64,6 @@ class NumericGauge(Gauge):
             cr.set_source_rgba(0.7, 0.7, 0.7, 1.0)
             cr.set_font_size(10)
             # Position unit after the value text
-            text_extents = cr.text_extents(value_text)
             cr.set_font_size(18)
             val_width = cr.text_extents(value_text).width
             cr.set_font_size(10)

@@ -236,10 +236,15 @@ class ToolsMapLayer(GObject.GObject):
         twa = bi.twa
 
         # If no true wind data, calculate from apparent wind + SOG
-        if tws is None and bi.aws is not None and bi.awa is not None and bi.sog is not None:
+        if (
+            tws is None
+            and bi.aws is not None
+            and bi.awa is not None
+            and bi.sog is not None
+        ):
             awa_rad = math.radians(bi.awa)
             tws = math.sqrt(
-                bi.aws ** 2 + bi.sog ** 2 - 2 * bi.aws * bi.sog * math.cos(awa_rad)
+                bi.aws**2 + bi.sog**2 - 2 * bi.aws * bi.sog * math.cos(awa_rad)
             )
             # TWA from law of sines / atan2
             twa_y = bi.aws * math.sin(awa_rad)

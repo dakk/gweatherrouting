@@ -11,7 +11,7 @@ import sys
 
 port = 10110
 if len(sys.argv) > 1:
-	port = int(sys.argv[1])
+    port = int(sys.argv[1])
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind(("", port))
