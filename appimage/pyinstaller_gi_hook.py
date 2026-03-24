@@ -1,4 +1,5 @@
 """PyInstaller runtime hook to set GI_TYPELIB_PATH to the bundled typelibs."""
+
 import os
 import sys
 

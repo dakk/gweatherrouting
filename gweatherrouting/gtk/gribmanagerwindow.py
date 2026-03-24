@@ -23,8 +23,6 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gdk, GObject, Gtk
 
-from gweatherrouting.core.gribsources import NOAAGFSSource
-
 logger = logging.getLogger("gweatherrouting")
 
 GribFileFilter = Gtk.FileFilter()
@@ -47,8 +45,10 @@ class GFSBoundsDialog(Gtk.Dialog):
             flags=0,
         )
         self.add_buttons(
-            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-            Gtk.STOCK_OK, Gtk.ResponseType.OK,
+            Gtk.STOCK_CANCEL,
+            Gtk.ResponseType.CANCEL,
+            Gtk.STOCK_OK,
+            Gtk.ResponseType.OK,
         )
         self.set_default_size(350, 250)
         self.gfs_source = gfs_source
@@ -315,9 +315,7 @@ class GribManagerWindow:
 
     def on_grib_download_completed(self, status):
         if status:
-            self.builder.get_object("download-progress").set_text(
-                "Download completed!"
-            )
+            self.builder.get_object("download-progress").set_text("Download completed!")
         else:
             self.builder.get_object("download-progress").set_text("Download failed!")
         self.update_local_gribs()

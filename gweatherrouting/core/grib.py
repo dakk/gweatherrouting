@@ -160,9 +160,10 @@ class Grib(weatherrouting.Grib):
         for bidx in range(1, self.dataset.RasterCount + 1):
             band = self.dataset.GetRasterBand(bidx)
             metadata = band.GetMetadata()
-            if "GRIB_FORECAST_SECONDS" in metadata and metadata.get(
-                "GRIB_ELEMENT"
-            ) in ("UGRD", "VGRD"):
+            if "GRIB_FORECAST_SECONDS" in metadata and metadata.get("GRIB_ELEMENT") in (
+                "UGRD",
+                "VGRD",
+            ):
                 hours.add(int(metadata["GRIB_FORECAST_SECONDS"]) // 3600)
         return sorted(hours)
 
