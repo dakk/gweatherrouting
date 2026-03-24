@@ -48,6 +48,27 @@ class BoatInfo:
     speed = 0.0
     heading = 0.0
 
+    # Speed and course over ground (from GPS/RMC)
+    sog = None
+    cog = None
+
+    # Heading (true)
+    hdg = None
+
+    # Apparent wind
+    awa = None
+    aws = None
+
+    # True wind
+    twa = None
+    tws = None
+
+    # Depth below transducer (meters)
+    depth = None
+
+    # Water temperature (Celsius)
+    water_temp = None
+
     def is_valid(self):
         return self.latitude != 0.0 and self.longitude != 0.0
 
@@ -116,9 +137,113 @@ class Core(EventDispatcher):
             if x.is_position():
                 self.boat_info.latitude = x.data.latitude
                 self.boat_info.longitude = x.data.longitude
+
+                # RMC also provides SOG and COG
+                if hasattr(x.data, "spd_over_grnd") and x.data.spd_over_grnd:
+                    try:
+                        self.boat_info.sog = float(x.data.spd_over_grnd)
+                        self.boat_info.speed = self.boat_info.sog
+                    except (ValueError, TypeError):
+                        pass
+                if hasattr(x.data, "true_course") and x.data.true_course:
+                    try:
+                        self.boat_info.cog = float(x.data.true_course)
+                    except (ValueError, TypeError):
+                        pass
+
                 self.dispatch("boat_position", self.boat_info)
             elif x.is_heading():
                 self.boat_info.heading = x.data.heading
+
+            # Parse additional NMEA sentence types
+            self._parse_nmea_extra(x)
+
+        self.dispatch("boat_data", self.boat_info)
+
+    def _parse_nmea_extra(self, x: DataPacket):
+        """Parse additional NMEA sentences for instrument data."""
+        sentence = x.data
+        sentence_type = getattr(sentence, "sentence_type", None)
+        if sentence_type is None:
+            return
+
+        try:
+            if sentence_type == "MWV":
+                # Wind speed and angle
+                # Reference: R = relative, T = true
+                wind_angle = float(sentence.wind_angle) if sentence.wind_angle else None
+                wind_speed = float(sentence.wind_speed) if sentence.wind_speed else None
+
+                if wind_angle is not None and wind_speed is not None:
+                    # Convert wind speed to knots if needed
+                    units = getattr(sentence, "wind_speed_units", "N")
+                    if units == "M":  # meters/sec to knots
+                        wind_speed = wind_speed * 1.94384
+                    elif units == "K":  # km/h to knots
+                        wind_speed = wind_speed * 0.539957
+
+                    reference = getattr(sentence, "reference", "R")
+                    if reference == "R":
+                        self.boat_info.awa = wind_angle
+                        self.boat_info.aws = wind_speed
+                    elif reference == "T":
+                        self.boat_info.twa = wind_angle
+                        self.boat_info.tws = wind_speed
+
+            elif sentence_type == "DBT":
+                # Depth below transducer
+                depth_meters = getattr(sentence, "depth_meters", None)
+                if depth_meters:
+                    self.boat_info.depth = float(depth_meters)
+                elif getattr(sentence, "depth_feet", None):
+                    self.boat_info.depth = float(sentence.depth_feet) * 0.3048
+
+            elif sentence_type == "VHW":
+                # Speed through water and heading
+                water_speed = getattr(sentence, "water_speed_knots", None)
+                if water_speed:
+                    self.boat_info.speed = float(water_speed)
+                heading_true = getattr(sentence, "heading_true", None)
+                if heading_true:
+                    self.boat_info.hdg = float(heading_true)
+                    self.boat_info.heading = self.boat_info.hdg
+
+            elif sentence_type == "MTW":
+                # Water temperature
+                temperature = getattr(sentence, "temperature", None)
+                if temperature:
+                    temp = float(temperature)
+                    units = getattr(sentence, "units", "C")
+                    if units == "F":
+                        temp = (temp - 32) * 5.0 / 9.0
+                    self.boat_info.water_temp = temp
+
+            elif sentence_type == "HDT":
+                # True heading
+                heading = getattr(sentence, "heading", None)
+                if heading:
+                    self.boat_info.hdg = float(heading)
+                    self.boat_info.heading = self.boat_info.hdg
+
+            elif sentence_type == "HDG":
+                # Magnetic heading (use as heading if no true heading)
+                heading = getattr(sentence, "heading", None)
+                if heading:
+                    hdg = float(heading)
+                    # Apply variation if available
+                    variation = getattr(sentence, "variation", None)
+                    var_dir = getattr(sentence, "var_dir", None)
+                    if variation:
+                        var_val = float(variation)
+                        if var_dir == "W":
+                            var_val = -var_val
+                        hdg = (hdg + var_val) % 360
+                    if self.boat_info.hdg is None:
+                        self.boat_info.hdg = hdg
+                    self.boat_info.heading = hdg
+
+        except (ValueError, TypeError, AttributeError) as e:
+            logger.debug(f"Error parsing NMEA sentence {sentence_type}: {e}")
 
     # Simulation
     def create_routing(
