@@ -25,6 +25,7 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import GObject
 
 from gweatherrouting.core import utils
+from gweatherrouting.gtk.gauges import NumericGauge
 from gweatherrouting.gtk.style import Style
 from gweatherrouting.gtk.widgets.mapwidget import MapPoint
 
@@ -41,6 +42,19 @@ class ToolsMapLayer(GObject.GObject):
         self.compass = False
         self.boat_info = None
 
+        # Dashboard gauges
+        self._gauges = [
+            NumericGauge("SOG", "kts", "%.1f"),
+            NumericGauge("COG", "\u00b0", "%.0f"),
+            NumericGauge("AWS", "kts", "%.1f"),
+            NumericGauge("AWA", "\u00b0", "%.0f"),
+            # NumericGauge("AWD", "\u00b0", "%.0f"),
+            NumericGauge("TWS", "kts", "%.1f"),
+            # NumericGauge("TWD", "\u00b0", "%.0f"),
+            NumericGauge("TWA", "\u00b0", "%.0f"),
+            NumericGauge("Depth", "m", "%.1f"),
+        ]
+
         self.gps = None
 
         self.mob = False
@@ -49,8 +63,7 @@ class ToolsMapLayer(GObject.GObject):
         self.poiMoving = False
         self.poiMovingCallback = None
 
-        # TODO: need to create a new class for data
-        core.connect("data", self.data_handler)
+        core.connect("boat_data", self.data_handler)
 
     def toggle_mob(self, lat, lon):
         if self.mob:
@@ -98,8 +111,8 @@ class ToolsMapLayer(GObject.GObject):
             cr.arc(self.mousePosition[2], self.mousePosition[3], 16, 0, 2 * math.pi)
             cr.stroke()
 
-        if self.dashboard and self.boat_info:
-            pass
+        if self.dashboard:
+            self._draw_dashboard(gpsmap, cr)
 
         if self.mob and self.mobPosition:
             lat, lon = self.mobPosition
@@ -212,6 +225,81 @@ class ToolsMapLayer(GObject.GObject):
             cr.move_to(x1 + 15, y1 + 10)
             cr.show_text("HDG: %.2f°" % math.degrees(r))
             cr.stroke()
+
+    def _update_gauge_values(self):
+        """Update gauge values from boat_info."""
+        bi = self.boat_info
+        if bi is None:
+            return
+
+        tws = bi.tws
+        twa = bi.twa
+
+        # If no true wind data, calculate from apparent wind + SOG
+        if (
+            tws is None
+            and bi.aws is not None
+            and bi.awa is not None
+            and bi.sog is not None
+        ):
+            awa_rad = math.radians(bi.awa)
+            tws = math.sqrt(
+                bi.aws**2 + bi.sog**2 - 2 * bi.aws * bi.sog * math.cos(awa_rad)
+            )
+            # TWA from law of sines / atan2
+            twa_y = bi.aws * math.sin(awa_rad)
+            twa_x = bi.aws * math.cos(awa_rad) - bi.sog
+            twa = math.degrees(math.atan2(twa_y, twa_x))
+            if twa < 0:
+                twa += 360
+
+        gauge_map = {
+            "SOG": bi.sog,
+            "COG": bi.cog,
+            "AWS": bi.aws,
+            "AWA": bi.awa,
+            "TWS": tws,
+            "TWA": twa,
+            "Depth": bi.depth,
+        }
+
+        for gauge in self._gauges:
+            if gauge.label in gauge_map:
+                gauge.set_value(gauge_map[gauge.label])
+
+    def _draw_dashboard(self, gpsmap, cr):
+        """Draw the instrument dashboard panel on the map."""
+        self._update_gauge_values()
+
+        width = float(gpsmap.get_allocated_width())
+        height = float(gpsmap.get_allocated_height())
+
+        cols = len(self._gauges)
+        gauge_w = NumericGauge.WIDTH
+        gauge_h = NumericGauge.HEIGHT
+
+        total_w = cols * gauge_w
+        panel_padding = 4
+
+        # Center horizontally at the bottom of the map
+        panel_x = (width - total_w) / 2.0 - panel_padding
+        panel_y = height - gauge_h - panel_padding * 2 - 10
+
+        # Draw panel background
+        cr.set_source_rgba(0.05, 0.05, 0.05, 0.6)
+        cr.rectangle(
+            panel_x,
+            panel_y,
+            total_w + panel_padding * 2,
+            gauge_h + panel_padding * 2,
+        )
+        cr.fill()
+
+        # Draw each gauge
+        for i, gauge in enumerate(self._gauges):
+            gx = panel_x + panel_padding + i * gauge_w
+            gy = panel_y + panel_padding
+            gauge.draw(cr, gx, gy)
 
     def do_render(self, gpsmap):
         pass

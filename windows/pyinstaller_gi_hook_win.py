@@ -1,4 +1,5 @@
 """PyInstaller runtime hook to set GI_TYPELIB_PATH and GTK paths on Windows."""
+
 import os
 import sys
 
