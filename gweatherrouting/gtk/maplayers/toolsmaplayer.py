@@ -46,8 +46,11 @@ class ToolsMapLayer(GObject.GObject):
         self._gauges = [
             NumericGauge("SOG", "kts", "%.1f"),
             NumericGauge("COG", "\u00b0", "%.0f"),
+            NumericGauge("AWS", "kts", "%.1f"),
+            NumericGauge("AWA", "\u00b0", "%.0f"),
+            # NumericGauge("AWD", "\u00b0", "%.0f"),
             NumericGauge("TWS", "kts", "%.1f"),
-            NumericGauge("TWD", "\u00b0", "%.0f"),
+            # NumericGauge("TWD", "\u00b0", "%.0f"),
             NumericGauge("TWA", "\u00b0", "%.0f"),
             NumericGauge("Depth", "m", "%.1f"),
         ]
@@ -60,8 +63,7 @@ class ToolsMapLayer(GObject.GObject):
         self.poiMoving = False
         self.poiMovingCallback = None
 
-        # TODO: need to create a new class for data
-        core.connect("data", self.data_handler)
+        core.connect("boat_data", self.data_handler)
 
     def toggle_mob(self, lat, lon):
         if self.mob:
@@ -230,18 +232,31 @@ class ToolsMapLayer(GObject.GObject):
         if bi is None:
             return
 
+        tws = bi.tws
+        twa = bi.twa
+
+        # If no true wind data, calculate from apparent wind + SOG
+        if tws is None and bi.aws is not None and bi.awa is not None and bi.sog is not None:
+            awa_rad = math.radians(bi.awa)
+            tws = math.sqrt(
+                bi.aws ** 2 + bi.sog ** 2 - 2 * bi.aws * bi.sog * math.cos(awa_rad)
+            )
+            # TWA from law of sines / atan2
+            twa_y = bi.aws * math.sin(awa_rad)
+            twa_x = bi.aws * math.cos(awa_rad) - bi.sog
+            twa = math.degrees(math.atan2(twa_y, twa_x))
+            if twa < 0:
+                twa += 360
+
         gauge_map = {
             "SOG": bi.sog,
             "COG": bi.cog,
-            "TWS": bi.tws,
-            "TWD": None,  # Computed below
-            "TWA": bi.twa,
+            "AWS": bi.aws,
+            "AWA": bi.awa,
+            "TWS": tws,
+            "TWA": twa,
             "Depth": bi.depth,
         }
-
-        # Compute TWD from TWA + HDG if available
-        if bi.twa is not None and bi.hdg is not None:
-            gauge_map["TWD"] = (bi.hdg + bi.twa) % 360
 
         for gauge in self._gauges:
             if gauge.label in gauge_map:
