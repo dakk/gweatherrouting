@@ -18,7 +18,11 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 from .grib import Grib  # noqa: F401
 from .gribmanager import GribManager  # noqa: F401
 from .timecontrol import TimeControl  # noqa: F401
-from .datasource import DataSource, NMEADataPacket, DataPacket  # noqa: F401
+from .datasource import DataSource  # noqa: F401
+from .datasource import NMEADataPacket  # noqa: F401
+from .datasource import DataPacket  # noqa: F401
+from .datasource import AISDataPacket  # noqa: F401
+from .aismanager import AISManager, AISTarget  # noqa: F401
 from .serialdatasource import SerialDataSource  # noqa: F401
 from .networkdatasource import NetworkDataSource  # noqa: F401
 from .connectionmanager import ConnectionManager  # noqa: F401

@@ -66,6 +66,23 @@ class NMEADataPacket(DataPacket):
         return str(self.data)
 
 
+class AISDataPacket(DataPacket):
+    """Data packet for raw AIS sentences (!AIVDM/!AIVDO)."""
+
+    def __init__(self, raw_sentence: str):
+        DataPacket.__init__(self, "ais", None)
+        self.raw_sentence = raw_sentence
+
+    def is_position(self):
+        return False
+
+    def is_heading(self):
+        return False
+
+    def serialize(self):
+        return self.raw_sentence
+
+
 class DataSource:
     def __init__(self, protocol, direction):
         self.protocol = protocol
@@ -89,7 +106,7 @@ class DataSource:
 
         return self._write(packet.serialize())
 
-    def read(self) -> List[NMEADataPacket]:
+    def read(self) -> List[DataPacket]:
         if not self.connected:
             return []
 
@@ -101,9 +118,15 @@ class DataSource:
         if data is None:
             return []
 
-        msgs = []
+        msgs: List[DataPacket] = []
         for msg in data:
             if len(msg) == 0:
+                continue
+
+            # AIS sentences start with '!' and cannot be parsed by pynmea2
+            stripped = msg.strip()
+            if stripped.startswith("!"):
+                msgs.append(AISDataPacket(stripped))
                 continue
 
             try:
