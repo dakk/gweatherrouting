@@ -115,7 +115,10 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
-      run: pip install tox
+      run: |
+        bash .github/workflows/script/ubuntu_dep.sh
+        bash .github/workflows/script/python_dep.sh
+        pip install tox
 
     - name: Run tests
       run: tox -e unit-tests
