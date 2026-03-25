@@ -188,7 +188,7 @@ class AISManager:
         if shipname:
             target.name = shipname.strip().strip("@")
 
-        shiptype = data.get("shiptype")
+        shiptype = data.get("ship_type") or data.get("shiptype")
         if shiptype is not None:
             try:
                 target.ship_type = int(shiptype)

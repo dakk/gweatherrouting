@@ -26,6 +26,7 @@ from gi.repository import Gdk, Gtk
 from gweatherrouting.core import Core, TimeControl
 
 from .charts.chartmanager import ChartManager
+from .chartstack_ais import ChartStackAIS
 from .chartstack_poi import ChartStackPOI
 from .chartstack_routing import ChartStackRouting
 from .chartstack_track import ChartStackTrack
@@ -38,7 +39,7 @@ from .widgets.timetravel import TimeTravelWidget
 logger = logging.getLogger("gweatherrouting")
 
 
-class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
+class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting, ChartStackAIS):
     def __init__(
         self,
         parent,
@@ -106,6 +107,7 @@ class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting):
         ChartStackRouting.__init__(self)
         ChartStackTrack.__init__(self)
         ChartStackPOI.__init__(self)
+        ChartStackAIS.__init__(self)
 
         self.core.connect("boat_position", self.boat_info_handler)
 
