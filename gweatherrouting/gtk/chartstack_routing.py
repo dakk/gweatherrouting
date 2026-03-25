@@ -132,6 +132,93 @@ class ChartStackRouting(ChartStackBase):
             parts.append(f"eff{pe:.0f}%")
         return "_".join(parts)
 
+    def _show_routing_error(self, message):
+        """Show an error dialog from the routing thread."""
+        Gdk.threads_enter()
+        edialog = Gtk.MessageDialog(
+            self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error"
+        )
+        edialog.format_secondary_text(message)
+        edialog.run()
+        edialog.destroy()
+        Gdk.threads_leave()
+
+    def _run_single_scenario(self, scenario, params, idx, total):
+        """Run a single comparison scenario. Returns True on success."""
+        wind_speed_factor = 1.0 + scenario["wind_speed_pct"] / 100.0
+        wind_dir_offset = scenario["wind_dir_offset"]
+        polar_efficiency = scenario["polar_efficiency_pct"] / 100.0
+        time_offset = datetime.timedelta(hours=scenario["time_offset_hours"])
+
+        grib_override = None
+        if wind_speed_factor != 1.0 or wind_dir_offset != 0.0:
+            grib_override = ModifiedGribManager(
+                self.core.grib_manager,
+                wind_speed_factor=wind_speed_factor,
+                wind_dir_offset=wind_dir_offset,
+            )
+
+        self.currentRouting = self.core.create_routing(
+            params["algorithm"],
+            params["polar_file"],
+            params["track_or_poi"],
+            params["start_datetime"] + time_offset,
+            params["start_position"],
+            params["validity_providers"],
+            params["disable_coastline"],
+            grib_override=grib_override,
+            polar_efficiency=polar_efficiency if polar_efficiency != 1.0 else None,
+        )
+        self.currentRouting.name = self._build_scenario_name(
+            params["polar_name"], scenario
+        )
+
+        label = f"Scenario {idx + 1}/{total}"
+        Gdk.threads_enter()
+        self.progress_bar.set_fraction(0.0)
+        self.progress_bar.set_text(f"{label}: 0%")
+        self.progress_bar.show()
+        Gdk.threads_leave()
+
+        res = None
+        while (not self.currentRouting.end) and (not self.stop_routing):
+            try:
+                res = self.currentRouting.step()
+            except RoutingNoWindError:
+                self._show_routing_error(f"{label}: No wind information available")
+                return False
+            except Exception as e:
+                self._show_routing_error(f"{label}: {e}")
+                traceback.print_exc()
+                return False
+
+            Gdk.threads_enter()
+            self.progress_bar.set_fraction(res.progress / 100.0)
+            self.progress_bar.set_text(f"{label}: {res.progress}%")
+            self.isochronesMapLayer.set_isochrones(res.isochrones, res.path)
+            self.time_control.set_time(res.time)
+            Gdk.threads_leave()
+
+        if self.stop_routing or res is None:
+            return False
+
+        tr = [
+            (wp.pos[0], wp.pos[1], wp.time.strftime("%m/%d/%Y, %H:%M:%S"),
+             wp.twd, wp.tws, wp.speed, wp.brg)
+            for wp in res.path
+        ]
+        self.core.routingManager.append(
+            Routing(
+                name=self.core.routingManager.get_unique_name(
+                    self.currentRouting.name
+                ),
+                points=tr,
+                isochrones=res.isochrones,
+                collection=self.core.routingManager,
+            )
+        )
+        return True
+
     def on_comparison_routing_step(self):
         params = self._comparison_params
         scenarios = params["scenarios"]
@@ -140,129 +227,7 @@ class ChartStackRouting(ChartStackBase):
         for idx, scenario in enumerate(scenarios):
             if self.stop_routing:
                 break
-
-            # Build modified grib
-            wind_speed_factor = 1.0 + scenario["wind_speed_pct"] / 100.0
-            wind_dir_offset = scenario["wind_dir_offset"]
-            polar_efficiency = scenario["polar_efficiency_pct"] / 100.0
-            time_offset = datetime.timedelta(hours=scenario["time_offset_hours"])
-
-            grib_override = None
-            if wind_speed_factor != 1.0 or wind_dir_offset != 0.0:
-                grib_override = ModifiedGribManager(
-                    self.core.grib_manager,
-                    wind_speed_factor=wind_speed_factor,
-                    wind_dir_offset=wind_dir_offset,
-                )
-
-            start_dt = params["start_datetime"] + time_offset
-
-            self.currentRouting = self.core.create_routing(
-                params["algorithm"],
-                params["polar_file"],
-                params["track_or_poi"],
-                start_dt,
-                params["start_position"],
-                params["validity_providers"],
-                params["disable_coastline"],
-                grib_override=grib_override,
-                polar_efficiency=polar_efficiency if polar_efficiency != 1.0 else None,
-            )
-            self.currentRouting.name = self._build_scenario_name(
-                params["polar_name"], scenario
-            )
-
-            Gdk.threads_enter()
-            self.progress_bar.set_fraction(0.0)
-            self.progress_bar.set_text(f"Scenario {idx + 1}/{total}: 0%")
-            self.progress_bar.show()
-            Gdk.threads_leave()
-
-            res = None
-            error_occurred = False
-
-            while (not self.currentRouting.end) and (not self.stop_routing):
-                try:
-                    res = self.currentRouting.step()
-                except RoutingNoWindError:
-                    Gdk.threads_enter()
-                    edialog = Gtk.MessageDialog(
-                        self.parent,
-                        0,
-                        Gtk.MessageType.ERROR,
-                        Gtk.ButtonsType.OK,
-                        "Error",
-                    )
-                    edialog.format_secondary_text(
-                        f"Scenario {idx + 1}/{total}: "
-                        "Trying to create a route without wind information"
-                    )
-                    edialog.run()
-                    edialog.destroy()
-                    Gdk.threads_leave()
-                    error_occurred = True
-                    break
-                except Exception as e:
-                    Gdk.threads_enter()
-                    edialog = Gtk.MessageDialog(
-                        self.parent,
-                        0,
-                        Gtk.MessageType.ERROR,
-                        Gtk.ButtonsType.OK,
-                        "Error",
-                    )
-                    edialog.format_secondary_text(
-                        f"Scenario {idx + 1}/{total}: {str(e)}"
-                    )
-                    edialog.run()
-                    edialog.destroy()
-                    Gdk.threads_leave()
-                    traceback.print_exc()
-                    error_occurred = True
-                    break
-
-                Gdk.threads_enter()
-                self.progress_bar.set_fraction(res.progress / 100.0)
-                self.progress_bar.set_text(
-                    f"Scenario {idx + 1}/{total}: {res.progress}%"
-                )
-                self.isochronesMapLayer.set_isochrones(res.isochrones, res.path)
-                self.time_control.set_time(res.time)
-                Gdk.threads_leave()
-
-            if error_occurred:
-                continue
-
-            if self.stop_routing:
-                break
-
-            if res is None:
-                continue
-
-            tr = []
-            for wp in res.path:
-                tr.append(
-                    (
-                        wp.pos[0],
-                        wp.pos[1],
-                        wp.time.strftime("%m/%d/%Y, %H:%M:%S"),
-                        wp.twd,
-                        wp.tws,
-                        wp.speed,
-                        wp.brg,
-                    )
-                )
-
-            self.core.routingManager.append(
-                Routing(
-                    name=self.core.routingManager.get_unique_name(
-                        self.currentRouting.name
-                    ),
-                    points=tr,
-                    isochrones=res.isochrones,
-                    collection=self.core.routingManager,
-                )
-            )
+            self._run_single_scenario(scenario, params, idx, total)
 
         Gdk.threads_enter()
         self.progress_bar.set_fraction(1.0)

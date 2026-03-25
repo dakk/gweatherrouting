@@ -14,7 +14,7 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 import weatherrouting
 
@@ -31,7 +31,7 @@ class ModifiedGribManager(weatherrouting.Grib):
         self._speed_factor = wind_speed_factor
         self._dir_offset = wind_dir_offset
 
-    def get_wind_at(self, t, lat: float, lon: float) -> Tuple[float, float]:
+    def get_wind_at(self, t, lat: float, lon: float) -> Optional[Tuple[float, float]]:
         result = self._grib.get_wind_at(t, lat, lon)
         if result is None:
             return None
