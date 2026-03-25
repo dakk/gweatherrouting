@@ -138,6 +138,7 @@ class RoutingWizardDialog:
                     upper=p.upper,
                 )
                 e = Gtk.SpinButton(adjustment=adj, digits=p.digits)
+                e.connect("changed", self.on_param_change)
             elif p.ttype == "int":
                 adj = Gtk.Adjustment(
                     value=p.value,
@@ -147,9 +148,15 @@ class RoutingWizardDialog:
                     upper=p.upper,
                 )
                 e = Gtk.SpinButton(adjustment=adj, digits=0)
+                e.connect("changed", self.on_param_change)
+            elif p.ttype == "bool":
+                e = Gtk.CheckButton()
+                e.set_active(bool(p.value))
+                e.connect("toggled", self.on_bool_param_change)
+            else:
+                continue
 
             e.set_tooltip_text(p.tooltip)
-            e.connect("changed", self.on_param_change)
             self.paramWidgets[e] = p
             cb.add(e)
 
@@ -160,6 +167,10 @@ class RoutingWizardDialog:
     def on_param_change(self, widget):
         p = self.paramWidgets[widget]
         p.value = float(widget.get_text())
+
+    def on_bool_param_change(self, widget):
+        p = self.paramWidgets[widget]
+        p.value = widget.get_active()
 
     def on_boat_select(self, widget):
         pfile = self.polars[self.builder.get_object("boat-select").get_active()]
