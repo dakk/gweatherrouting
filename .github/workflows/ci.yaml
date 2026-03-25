@@ -69,10 +69,7 @@ jobs:
         python-version: '3.11'
 
     - name: Install dependencies
-      run: |
-        bash .github/workflows/script/ubuntu_dep.sh
-        bash .github/workflows/script/python_dep.sh
-        pip install tox
+      run: pip install tox
 
     - name: Run linters
       run: tox -e linters
@@ -118,4 +115,4 @@ jobs:
         pip install tox
 
     - name: Run tests
-      run: tox -e unit-tests -x testenv:unit-tests.sitepackages=True
+      run: tox -e unit-tests
