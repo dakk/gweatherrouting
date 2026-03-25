@@ -21,8 +21,9 @@ import gpxpy
 import weatherrouting
 
 from gweatherrouting.core import GribManager, utils
+from gweatherrouting.core.aismanager import AISManager
 from gweatherrouting.core.connectionmanager import ConnectionManager
-from gweatherrouting.core.datasource import DataPacket
+from gweatherrouting.core.datasource import AISDataPacket, DataPacket
 from gweatherrouting.core.geo import (
     POICollection,
     RoutingCollection,
@@ -109,6 +110,7 @@ class Core(EventDispatcher):
         self.grib_manager = GribManager()
         self.boat_info = BoatInfo()
         self.logManager = LogTrackCollection()
+        self.ais_manager = AISManager()
 
         self.connectionManager.connect("data", self.data_handler)
         logger.info("Initialized")
@@ -134,24 +136,13 @@ class Core(EventDispatcher):
 
     def data_handler(self, dps: List[DataPacket]):
         for x in dps:
+            # Route AIS sentences to the AIS manager
+            if isinstance(x, AISDataPacket):
+                self.ais_manager.process_sentence(x.raw_sentence)
+                continue
+
             if x.is_position():
-                self.boat_info.latitude = x.data.latitude
-                self.boat_info.longitude = x.data.longitude
-
-                # RMC also provides SOG and COG
-                if hasattr(x.data, "spd_over_grnd") and x.data.spd_over_grnd:
-                    try:
-                        self.boat_info.sog = float(x.data.spd_over_grnd)
-                        self.boat_info.speed = self.boat_info.sog
-                    except (ValueError, TypeError):
-                        pass
-                if hasattr(x.data, "true_course") and x.data.true_course:
-                    try:
-                        self.boat_info.cog = float(x.data.true_course)
-                    except (ValueError, TypeError):
-                        pass
-
-                self.dispatch("boat_position", self.boat_info)
+                self._parse_position(x)
             elif x.is_heading():
                 self.boat_info.heading = x.data.heading
 
@@ -159,6 +150,26 @@ class Core(EventDispatcher):
             self._parse_nmea_extra(x)
 
         self.dispatch("boat_data", self.boat_info)
+
+    def _parse_position(self, x: DataPacket):
+        """Parse position data from an NMEA sentence."""
+        self.boat_info.latitude = x.data.latitude
+        self.boat_info.longitude = x.data.longitude
+
+        # RMC also provides SOG and COG
+        if hasattr(x.data, "spd_over_grnd") and x.data.spd_over_grnd:
+            try:
+                self.boat_info.sog = float(x.data.spd_over_grnd)
+                self.boat_info.speed = self.boat_info.sog
+            except (ValueError, TypeError):
+                pass
+        if hasattr(x.data, "true_course") and x.data.true_course:
+            try:
+                self.boat_info.cog = float(x.data.true_course)
+            except (ValueError, TypeError):
+                pass
+
+        self.dispatch("boat_position", self.boat_info)
 
     def _parse_nmea_extra(self, x: DataPacket):
         """Parse additional NMEA sentences for instrument data."""

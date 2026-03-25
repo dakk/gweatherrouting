@@ -1,17 +1,20 @@
-f = (
-    open("/home/dakk/MEGA/GeoTracks/Boat/2021/MDC2021_2/data_12_12_2021.nmea", "r")
-    .read()
-    .split("\n")
-)
-
-# Create a tcp socket receiving connections
+import os
 import socket
-import time
 import sys
+import time
 
+nmea_file = "/home/dakk/MEGA/GeoTracks/Boat/2021/MDC2021_2/data_12_12_2021.nmea"
 port = 10110
-if len(sys.argv) > 1:
-    port = int(sys.argv[1])
+
+for arg in sys.argv[1:]:
+    if arg.isdigit():
+        port = int(arg)
+    else:
+        nmea_file = arg
+
+if not os.path.exists(nmea_file):
+    nmea_file = os.path.join(os.path.dirname(__file__), "sample_ais.nmea")
+f = open(nmea_file, "r").read().split("\n")
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind(("", port))
@@ -21,7 +24,7 @@ conn, addr = s.accept()
 with conn:
     print("Connected by", addr)
     while True:
-        for x in f[30000:]:
+        for x in f:
             try:
                 conn.send(x.encode("ascii") + "\n".encode("ascii"))
                 print(x)
