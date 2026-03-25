@@ -34,7 +34,7 @@ class NetworkDataSource(DataSource):
             self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         elif cnetwork == "udp":
             self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.s.settimeout(0.5)
+        self.s.settimeout(5)
 
     def connect(self):
         try:
@@ -51,10 +51,13 @@ class NetworkDataSource(DataSource):
         dd = self.cached
 
         while dd.find("\n") == -1 and dd.find("\r") == -1:
-            d = self.s.recv(128).decode("ascii")
+            try:
+                d = self.s.recv(1024).decode("ascii")
+            except socket.timeout:
+                return []
 
-            if len(dd) == 0:
-                time.sleep(0.5)
+            if len(d) == 0:
+                return []
 
             dd += d
 
