@@ -92,5 +92,9 @@ class SettingsWindowConnections(SettingsWindowBase):
 
     def on_connection_click(self, widget, event):
         if event.button == 3:
-            menu = self.builder.get_object("connection-menu")
-            menu.popup(None, None, None, None, event.button, event.time)
+            row = widget.get_row_at_y(int(event.y))
+            if row is not None:
+                widget.select_row(row)
+                self.selectedConnection = row
+                menu = self.builder.get_object("connection-menu")
+                menu.popup(None, None, None, None, event.button, event.time)
