@@ -170,11 +170,14 @@ class ChartStackTrack(ChartStackBase):
 
     def on_track_item_move(self, widget):
         if self.selected_track_item is not None:
-            self.tools_map_layer.enable_poi_moving(
-                lambda x, y: self.core.trackManager.get_active().move(
+
+            def _move_callback(x, y):
+                self.core.trackManager.get_active().move(
                     self.selected_track_item, x, y
                 )
-            )
+                self.update_track()
+
+            self.tools_map_layer.enable_poi_moving(_move_callback)
 
     def on_track_item_move_up(self, widget):
         if self.selected_track_item is not None:
