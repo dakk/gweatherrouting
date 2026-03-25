@@ -31,14 +31,14 @@ GWeatherRouting is an open-source sailing routing and navigation software writte
 - Gtk4 interface
 - NMEA instruments support
 - NMEA / GPX log analysys
+- AIS rendering
+- Boat dashboard and other realtime navigation support
 
 
 ## Planned features
 
 - Customizable routing calculator
 - Ortodromic track render
-- AIS rendering
-- Boat dashboard and other realtime navigation support
 
 
 ## Installation
