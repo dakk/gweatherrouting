@@ -161,6 +161,14 @@ class ChartManager(GObject.GObject):
         for x in filter(lambda x: x.enabled, self.charts):
             x.do_busy()
 
+    def query_point(self, lat, lon, tolerance=0.001):
+        """Query all vector chart layers for features near a given lat/lon."""
+        results = []
+        for chart in filter(lambda x: x.enabled, self.charts):
+            if isinstance(chart, GDALVectorChart):
+                results.extend(chart.query_point(lat, lon, tolerance))
+        return results
+
     def do_button_press(self, gpsmap, gdkeventbutton):
         for x in filter(lambda x: x.enabled, self.charts):
             x.do_button_press(gpsmap, gdkeventbutton)

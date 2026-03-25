@@ -74,5 +74,45 @@ class GDALVectorChart(ChartLayer):
     def do_busy(self):
         return False
 
+    def query_point(self, lat, lon, tolerance=0.001):
+        """Query vector chart features near a given lat/lon.
+
+        Returns a list of dicts with layer name, geometry type, and attributes.
+        """
+        results = []
+        bbox = ogr.CreateGeometryFromWkt(
+            self.get_bounding_wkt_of_coords(
+                lat - tolerance, lon - tolerance, lat + tolerance, lon + tolerance
+            )
+        )
+
+        for i in range(self.vector_file.GetLayerCount()):
+            layer = self.vector_file.GetLayerByIndex(i)
+            layer.SetSpatialFilter(bbox)
+            layer.ResetReading()
+
+            feat = layer.GetNextFeature()
+            while feat is not None:
+                attrs = {}
+                for j in range(feat.GetFieldCount()):
+                    fd = feat.GetFieldDefnRef(j)
+                    val = feat.GetFieldAsString(j)
+                    if val:
+                        attrs[fd.GetNameRef()] = val
+
+                geom = feat.GetGeometryRef()
+                geom_type = geom.GetGeometryName() if geom else "Unknown"
+
+                results.append(
+                    {
+                        "layer": layer.GetName(),
+                        "geometry": geom_type,
+                        "attributes": attrs,
+                    }
+                )
+                feat = layer.GetNextFeature()
+
+        return results
+
     def do_button_press(self, gpsmap, gdkeventbutton):
         return False

@@ -209,6 +209,8 @@ class ChartStack(
 
     def on_map_click(self, map, event):
         lat, lon = map.get_event_location(event).get_degrees()
+        self._last_click_lat = lat
+        self._last_click_lon = lon
         self.builder.get_object("track-add-point-lat").set_text(str(lat))
         self.builder.get_object("track-add-point-lon").set_text(str(lon))
         self.status_bar.push(
@@ -220,6 +222,72 @@ class ChartStack(
             menu = self.builder.get_object("map-context-menu")
             menu.popup(None, None, None, None, event.button, event.time)
         self.map.queue_draw()
+
+    def on_map_query(self, widget):
+        lat = self._last_click_lat
+        lon = self._last_click_lon
+        results = self.chart_manager.query_point(lat, lon)
+
+        dialog = Gtk.Dialog(
+            title="Map Query",
+            transient_for=self.parent,
+            flags=0,
+        )
+        dialog.add_button(Gtk.STOCK_CLOSE, Gtk.ResponseType.CLOSE)
+        dialog.set_default_size(500, 400)
+
+        content = dialog.get_content_area()
+
+        if not results:
+            label = Gtk.Label(label="No chart objects found at this location.")
+            label.set_margin_top(20)
+            content.add(label)
+        else:
+            scrolled = Gtk.ScrolledWindow()
+            scrolled.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+
+            box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+            box.set_margin_start(10)
+            box.set_margin_end(10)
+            box.set_margin_top(10)
+            box.set_margin_bottom(10)
+
+            for feat in results:
+                frame = Gtk.Frame()
+                frame_label = feat["layer"]
+                if feat["geometry"] != "Unknown":
+                    frame_label += f" ({feat['geometry']})"
+                frame.set_label(frame_label)
+
+                grid = Gtk.Grid()
+                grid.set_column_spacing(10)
+                grid.set_row_spacing(2)
+                grid.set_margin_start(6)
+                grid.set_margin_end(6)
+                grid.set_margin_top(4)
+                grid.set_margin_bottom(4)
+
+                for row, (key, val) in enumerate(feat["attributes"].items()):
+                    key_label = Gtk.Label()
+                    key_label.set_markup(f"<b>{key}</b>")
+                    key_label.set_xalign(0)
+                    grid.attach(key_label, 0, row, 1, 1)
+
+                    val_label = Gtk.Label(label=val)
+                    val_label.set_xalign(0)
+                    val_label.set_selectable(True)
+                    val_label.set_line_wrap(True)
+                    grid.attach(val_label, 1, row, 1, 1)
+
+                frame.add(grid)
+                box.add(frame)
+
+            scrolled.add(box)
+            content.pack_start(scrolled, True, True, 0)
+
+        dialog.show_all()
+        dialog.run()
+        dialog.destroy()
 
     def on_new(self, widget):
         e = self.core.trackManager.new_element(points=[])

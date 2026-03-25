@@ -26,10 +26,6 @@ class VectorChartDrawer:
 
         self.symbolProvider = S57SymbolProvider(settings_manager)
 
-    # TODO: this will handle object queries
-    def on_query_point(self, lat, lon):
-        raise Exception("Not implemented")
-
     def on_chart_palette_changed(self, v):
         self.palette = v
 

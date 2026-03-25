@@ -67,6 +67,7 @@
         <property name="can-focus">False</property>
         <property name="label" translatable="yes">Map query</property>
         <property name="use-underline">True</property>
+        <signal name="activate" handler="on_map_query" swapped="no"/>
       </object>
     </child>
     <child>
