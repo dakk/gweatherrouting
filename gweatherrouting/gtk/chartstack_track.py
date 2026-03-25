@@ -83,6 +83,10 @@ class ChartStackTrack(ChartStackBase):
             ),
         )
 
+        if self.core.trackManager.has_active():
+            track_name = self.core.trackManager.get_active().name
+            dialog.set_current_name(f"{track_name}.gpx")
+
         filter_gpx = Gtk.FileFilter()
         filter_gpx.set_name("GPX track")
         filter_gpx.add_mime_type("application/gpx+xml")
@@ -172,9 +176,7 @@ class ChartStackTrack(ChartStackBase):
         if self.selected_track_item is not None:
 
             def _move_callback(x, y):
-                self.core.trackManager.get_active().move(
-                    self.selected_track_item, x, y
-                )
+                self.core.trackManager.get_active().move(self.selected_track_item, x, y)
                 self.update_track()
 
             self.tools_map_layer.enable_poi_moving(_move_callback)
