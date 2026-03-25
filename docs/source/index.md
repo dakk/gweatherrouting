@@ -49,7 +49,7 @@ h3:not(#hero h3) {
     </div>
   </div>
   <div id="hero-right">
-    <img src="./_static/images/quickstart/10.gif">
+    <img src="./_static/images/gweatherrouting_levante.png">
   </div>
 </div>
 

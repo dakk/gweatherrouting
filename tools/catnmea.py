@@ -17,18 +17,20 @@ if not os.path.exists(nmea_file):
 f = open(nmea_file, "r").read().split("\n")
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 s.bind(("", port))
 s.listen(1)
 
-conn, addr = s.accept()
-with conn:
-    print("Connected by", addr)
-    while True:
-        for x in f:
-            try:
-                conn.send(x.encode("ascii") + "\n".encode("ascii"))
+try:
+    conn, addr = s.accept()
+    with conn:
+        print("Connected by", addr)
+        while True:
+            for x in f[30000:]:
+                conn.send(x.encode("ascii") + b"\n")
                 print(x)
-                time.sleep(0.1)
-            except:
-                conn.close()
-                s.close()
+                time.sleep(0.05)
+except (BrokenPipeError, ConnectionResetError, KeyboardInterrupt):
+    pass
+finally:
+    s.close()
