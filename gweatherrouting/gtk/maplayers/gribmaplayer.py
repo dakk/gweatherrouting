@@ -77,7 +77,7 @@ class GribMapLayer(GObject.GObject):
 
         # Build barbs from tip downward
         remaining = wspeed_kt
-        barb_y = -shaft_len
+        barb_y = float(-shaft_len)
         barb_spacing = 3.5
         barb_len = 8
 
@@ -155,7 +155,7 @@ class GribMapLayer(GObject.GObject):
         for i in range(0, len(data) - scale, scale):
             for j in range(0, len(data[i]) - scale, scale):
                 try:
-                    d_tl = data[i][j]          # top-left
+                    d_tl = data[i][j]  # top-left
                     d_tr = data[i][j + scale]  # top-right
                     d_bl = data[i + scale][j]  # bottom-left
                     d_br = data[i + scale][j + scale]  # bottom-right

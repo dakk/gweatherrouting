@@ -203,15 +203,20 @@ class ChartStackRouting(ChartStackBase):
             return False
 
         tr = [
-            (wp.pos[0], wp.pos[1], wp.time.strftime("%m/%d/%Y, %H:%M:%S"),
-             wp.twd, wp.tws, wp.speed, wp.brg)
+            (
+                wp.pos[0],
+                wp.pos[1],
+                wp.time.strftime("%m/%d/%Y, %H:%M:%S"),
+                wp.twd,
+                wp.tws,
+                wp.speed,
+                wp.brg,
+            )
             for wp in res.path
         ]
         self.core.routingManager.append(
             Routing(
-                name=self.core.routingManager.get_unique_name(
-                    self.currentRouting.name
-                ),
+                name=self.core.routingManager.get_unique_name(self.currentRouting.name),
                 points=tr,
                 isochrones=res.isochrones,
                 collection=self.core.routingManager,
