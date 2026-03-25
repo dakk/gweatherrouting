@@ -47,7 +47,7 @@ class ChartStackAIS(ChartStackBase):
     @staticmethod
     def _haversine_nm(lat1, lon1, lat2, lon2):
         """Calculate distance in nautical miles between two positions."""
-        R = 3440.065  # Earth radius in nautical miles
+        earth_radius = 3440.065  # Earth radius in nautical miles
         dlat = math.radians(lat2 - lat1)
         dlon = math.radians(lon2 - lon1)
         a = (
@@ -57,7 +57,7 @@ class ChartStackAIS(ChartStackBase):
             * math.sin(dlon / 2) ** 2
         )
         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-        return R * c
+        return earth_radius * c
 
     def _update_ais_targets(self):
         """Periodically update the AIS target list."""
@@ -91,8 +91,6 @@ class ChartStackAIS(ChartStackBase):
                 )
                 distance = "%.1f" % d
 
-            self.ais_store.append(
-                [str(t.mmsi), name, category, sog, cog, distance]
-            )
+            self.ais_store.append([str(t.mmsi), name, category, sog, cog, distance])
 
         return True  # Keep the timeout running

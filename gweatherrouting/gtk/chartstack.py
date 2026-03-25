@@ -39,7 +39,9 @@ from .widgets.timetravel import TimeTravelWidget
 logger = logging.getLogger("gweatherrouting")
 
 
-class ChartStack(Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting, ChartStackAIS):
+class ChartStack(
+    Gtk.Box, ChartStackPOI, ChartStackTrack, ChartStackRouting, ChartStackAIS
+):
     def __init__(
         self,
         parent,

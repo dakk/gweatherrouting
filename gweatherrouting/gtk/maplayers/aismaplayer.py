@@ -15,14 +15,14 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
 import math
-
+from typing import List
 import gi
 
 gi.require_version("Gtk", "3.0")
 
 from gi.repository import GLib, GObject
 
-from gweatherrouting.core.aismanager import SHIP_TYPE_COLORS, AISTarget
+from gweatherrouting.core.aismanager import SHIP_TYPE_COLORS
 from gweatherrouting.gtk.widgets.mapwidget import MapPoint
 
 # Ship marker half-size in pixels
@@ -104,8 +104,9 @@ class AISMapLayer(GObject.GObject):
         extents = cr.text_extents(label)
 
         cr.set_source_rgba(0.0, 0.0, 0.0, 0.5)
-        cr.rectangle(lx - 2, ly - extents.height - 2,
-                     extents.width + 4, extents.height + 4)
+        cr.rectangle(
+            lx - 2, ly - extents.height - 2, extents.width + 4, extents.height + 4
+        )
         cr.fill()
 
         cr.set_source_rgba(1.0, 1.0, 1.0, 0.95)
@@ -124,7 +125,7 @@ class AISMapLayer(GObject.GObject):
             return
 
         targets = self.ais_manager.get_active_targets()
-        label_positions = []
+        label_positions: List = []
         for target in targets:
             self._draw_target(gpsmap, cr, target, label_positions)
 

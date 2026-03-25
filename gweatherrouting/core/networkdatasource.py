@@ -16,7 +16,6 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import logging
 import socket
-import time
 
 from gweatherrouting.core import DataSource
 
