@@ -30,6 +30,7 @@ from gweatherrouting.core.geo import (
     Track,
     TrackCollection,
 )
+from gweatherrouting.core.polarwrapper import PolarWrapper
 from gweatherrouting.core.utils import EventDispatcher
 
 logger = logging.getLogger("gweatherrouting")
@@ -278,8 +279,13 @@ class Core(EventDispatcher):
         start_position,
         validity_providers,
         disable_coastline_checks=False,
+        grib_override=None,
+        polar_efficiency=None,
     ):
         polar = weatherrouting.Polar(polar_file)
+
+        if polar_efficiency is not None and polar_efficiency != 1.0:
+            polar = PolarWrapper(polar, polar_efficiency)
 
         pval: Optional[Callable] = utils.points_validity
         lval: Optional[Callable] = None
@@ -294,6 +300,8 @@ class Core(EventDispatcher):
             lval = None
             pval = None
 
+        grib = grib_override if grib_override is not None else self.grib_manager
+
         routing = weatherrouting.Routing(
             algorithm,
             polar,
@@ -302,7 +310,7 @@ class Core(EventDispatcher):
                 if isinstance(track_or_poi, Track)
                 else [track_or_poi.position]
             ),
-            self.grib_manager,
+            grib,
             start_datetime=start_datetime,
             start_position=start_position,
             points_validity=pval,
