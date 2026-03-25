@@ -15,6 +15,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
 import datetime
+import itertools
 import os
 import shutil
 
@@ -137,6 +138,7 @@ class RoutingWizardDialog:
                     upper=p.upper,
                 )
                 e = Gtk.SpinButton(adjustment=adj, digits=p.digits)
+                e.connect("changed", self.on_param_change)
             elif p.ttype == "int":
                 adj = Gtk.Adjustment(
                     value=p.value,
@@ -146,9 +148,15 @@ class RoutingWizardDialog:
                     upper=p.upper,
                 )
                 e = Gtk.SpinButton(adjustment=adj, digits=0)
+                e.connect("changed", self.on_param_change)
+            elif p.ttype == "bool":
+                e = Gtk.CheckButton()
+                e.set_active(bool(p.value))
+                e.connect("toggled", self.on_bool_param_change)
+            else:
+                continue
 
             e.set_tooltip_text(p.tooltip)
-            e.connect("changed", self.on_param_change)
             self.paramWidgets[e] = p
             cb.add(e)
 
@@ -159,6 +167,10 @@ class RoutingWizardDialog:
     def on_param_change(self, widget):
         p = self.paramWidgets[widget]
         p.value = float(widget.get_text())
+
+    def on_bool_param_change(self, widget):
+        p = self.paramWidgets[widget]
+        p.value = widget.get_active()
 
     def on_boat_select(self, widget):
         pfile = self.polars[self.builder.get_object("boat-select").get_active()]
@@ -248,6 +260,69 @@ class RoutingWizardDialog:
             self.polars.append(os.path.basename(filepath))
             self.boat_store.append([os.path.basename(filepath)])
             self.builder.get_object("boat-select").set_active(len(self.polars) - 1)
+
+    def _parse_csv_floats(self, widget_id):
+        """Parse a comma-separated string of floats from a GtkEntry."""
+        text = self.builder.get_object(widget_id).get_text().strip()
+        if not text:
+            return []
+        values = []
+        for part in text.split(","):
+            part = part.strip()
+            if part:
+                values.append(float(part))
+        return values
+
+    def get_comparison_scenarios(self):
+        """Return a list of scenario dicts (cartesian product of enabled axes).
+
+        Each dict has keys: time_offset_hours, wind_speed_pct,
+        wind_dir_offset, polar_efficiency_pct.
+        Returns an empty list if no comparison axis is enabled.
+        """
+        time_enabled = self.builder.get_object("compare-time-enable").get_active()
+        wind_speed_enabled = self.builder.get_object(
+            "compare-wind-speed-enable"
+        ).get_active()
+        wind_dir_enabled = self.builder.get_object(
+            "compare-wind-dir-enable"
+        ).get_active()
+        polar_enabled = self.builder.get_object("compare-polar-enable").get_active()
+
+        if not any([time_enabled, wind_speed_enabled, wind_dir_enabled, polar_enabled]):
+            return []
+
+        time_offsets = (
+            self._parse_csv_floats("compare-time-values") if time_enabled else [0]
+        )
+        wind_speed_pcts = (
+            self._parse_csv_floats("compare-wind-speed-values")
+            if wind_speed_enabled
+            else [0]
+        )
+        wind_dir_offsets = (
+            self._parse_csv_floats("compare-wind-dir-values")
+            if wind_dir_enabled
+            else [0]
+        )
+        polar_efficiencies = (
+            self._parse_csv_floats("compare-polar-values") if polar_enabled else [100]
+        )
+
+        scenarios = []
+        for t, ws, wd, pe in itertools.product(
+            time_offsets, wind_speed_pcts, wind_dir_offsets, polar_efficiencies
+        ):
+            scenarios.append(
+                {
+                    "time_offset_hours": t,
+                    "wind_speed_pct": ws,
+                    "wind_dir_offset": wd,
+                    "polar_efficiency_pct": pe,
+                }
+            )
+
+        return scenarios
 
     def load_default_pol(self):
         if not os.listdir(POLAR_DIR):

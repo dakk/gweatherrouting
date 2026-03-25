@@ -20,7 +20,7 @@ GWeatherRouting is an open-source sailing routing and navigation software writte
 
 - Multi-point sailing weather routing
 - Boat / polar integrated database
-- Grib1 and Grib2 support, with downloader for openskiron
+- Grib1 and Grib2 support, with downloader for OpenSkiron and NOAA
 - GPX support for importing and exporting POIs and tracks
 - Session manager for storing POIs, tracks and routings
 - Chart rendering: 
@@ -33,12 +33,8 @@ GWeatherRouting is an open-source sailing routing and navigation software writte
 - NMEA / GPX log analysys
 - AIS rendering
 - Boat dashboard and other realtime navigation support
-
-
-## Planned features
-
 - Customizable routing calculator
-- Ortodromic track render
+
 
 
 ## Installation
@@ -60,7 +56,6 @@ You can install gweatherrouting via flatpak, appimage, windows portable zip, or 
    - gtk+3
    - libffi
    - librsvg
-   - osm-gps-map
    - py3cairo
    - pygobject3
    - pkg-config

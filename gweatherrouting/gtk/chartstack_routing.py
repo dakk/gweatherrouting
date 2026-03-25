@@ -14,6 +14,7 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
+import datetime
 import logging
 import os
 import traceback
@@ -21,6 +22,7 @@ from threading import Thread
 
 import gi
 
+from gweatherrouting.core.modifiedgrib import ModifiedGribManager
 from gweatherrouting.core.storage import POLAR_DIR
 
 gi.require_version("Gtk", "3.0")
@@ -73,22 +75,170 @@ class ChartStackRouting(ChartStackBase):
 
         polar_file = dialog.get_selected_polar()
         if response == Gtk.ResponseType.OK:
-            self.stop_routing = False
-            self.currentRouting = self.core.create_routing(
-                dialog.get_selected_algorithm(),
-                os.path.join(POLAR_DIR, polar_file),
-                dialog.get_selected_track_or_poi(),
-                dialog.get_start_datetime(),
-                dialog.get_selected_start_point(),
-                self.chart_manager.get_line_point_validity_providers(),
-                not dialog.get_coastline_checks(),
-            )
-            self.currentRouting.name = "routing-" + polar_file.split(".")[0]
-            self.routing_thread = Thread(target=self.on_routing_step, args=())
-            self.routing_thread.start()
-            self.builder.get_object("stop-routing-button").show()
+            scenarios = dialog.get_comparison_scenarios()
+
+            if not scenarios:
+                # Single routing, same as before
+                self.stop_routing = False
+                self.currentRouting = self.core.create_routing(
+                    dialog.get_selected_algorithm(),
+                    os.path.join(POLAR_DIR, polar_file),
+                    dialog.get_selected_track_or_poi(),
+                    dialog.get_start_datetime(),
+                    dialog.get_selected_start_point(),
+                    self.chart_manager.get_line_point_validity_providers(),
+                    not dialog.get_coastline_checks(),
+                )
+                self.currentRouting.name = "routing-" + polar_file.split(".")[0]
+                self.routing_thread = Thread(target=self.on_routing_step, args=())
+                self.routing_thread.start()
+                self.builder.get_object("stop-routing-button").show()
+            else:
+                # Multiple scenario comparison
+                self._comparison_params = {
+                    "algorithm": dialog.get_selected_algorithm(),
+                    "polar_file": os.path.join(POLAR_DIR, polar_file),
+                    "polar_name": polar_file.split(".")[0],
+                    "track_or_poi": dialog.get_selected_track_or_poi(),
+                    "start_datetime": dialog.get_start_datetime(),
+                    "start_position": dialog.get_selected_start_point(),
+                    "validity_providers": self.chart_manager.get_line_point_validity_providers(),
+                    "disable_coastline": not dialog.get_coastline_checks(),
+                    "scenarios": scenarios,
+                }
+                self.stop_routing = False
+                self.routing_thread = Thread(
+                    target=self.on_comparison_routing_step, args=()
+                )
+                self.routing_thread.start()
+                self.builder.get_object("stop-routing-button").show()
 
         dialog.destroy()
+
+    def _build_scenario_name(self, polar_name, scenario):
+        """Build a descriptive name for a comparison scenario routing."""
+        parts = [f"routing-{polar_name}"]
+        t = scenario["time_offset_hours"]
+        if t != 0:
+            parts.append(f"t{t:+.0f}h")
+        ws = scenario["wind_speed_pct"]
+        if ws != 0:
+            parts.append(f"ws{ws:+.0f}%")
+        wd = scenario["wind_dir_offset"]
+        if wd != 0:
+            parts.append(f"wd{wd:+.0f}deg")
+        pe = scenario["polar_efficiency_pct"]
+        if pe != 100:
+            parts.append(f"eff{pe:.0f}%")
+        return "_".join(parts)
+
+    def _show_routing_error(self, message):
+        """Show an error dialog from the routing thread."""
+        Gdk.threads_enter()
+        edialog = Gtk.MessageDialog(
+            self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error"
+        )
+        edialog.format_secondary_text(message)
+        edialog.run()
+        edialog.destroy()
+        Gdk.threads_leave()
+
+    def _run_single_scenario(self, scenario, params, idx, total):
+        """Run a single comparison scenario. Returns True on success."""
+        wind_speed_factor = 1.0 + scenario["wind_speed_pct"] / 100.0
+        wind_dir_offset = scenario["wind_dir_offset"]
+        polar_efficiency = scenario["polar_efficiency_pct"] / 100.0
+        time_offset = datetime.timedelta(hours=scenario["time_offset_hours"])
+
+        grib_override = None
+        if wind_speed_factor != 1.0 or wind_dir_offset != 0.0:
+            grib_override = ModifiedGribManager(
+                self.core.grib_manager,
+                wind_speed_factor=wind_speed_factor,
+                wind_dir_offset=wind_dir_offset,
+            )
+
+        self.currentRouting = self.core.create_routing(
+            params["algorithm"],
+            params["polar_file"],
+            params["track_or_poi"],
+            params["start_datetime"] + time_offset,
+            params["start_position"],
+            params["validity_providers"],
+            params["disable_coastline"],
+            grib_override=grib_override,
+            polar_efficiency=polar_efficiency if polar_efficiency != 1.0 else None,
+        )
+        self.currentRouting.name = self._build_scenario_name(
+            params["polar_name"], scenario
+        )
+
+        label = f"Scenario {idx + 1}/{total}"
+        Gdk.threads_enter()
+        self.progress_bar.set_fraction(0.0)
+        self.progress_bar.set_text(f"{label}: 0%")
+        self.progress_bar.show()
+        Gdk.threads_leave()
+
+        res = None
+        while (not self.currentRouting.end) and (not self.stop_routing):
+            try:
+                res = self.currentRouting.step()
+            except RoutingNoWindError:
+                self._show_routing_error(f"{label}: No wind information available")
+                return False
+            except Exception as e:
+                self._show_routing_error(f"{label}: {e}")
+                traceback.print_exc()
+                return False
+
+            Gdk.threads_enter()
+            self.progress_bar.set_fraction(res.progress / 100.0)
+            self.progress_bar.set_text(f"{label}: {res.progress}%")
+            self.isochronesMapLayer.set_isochrones(res.isochrones, res.path)
+            self.time_control.set_time(res.time)
+            Gdk.threads_leave()
+
+        if self.stop_routing or res is None:
+            return False
+
+        tr = [
+            (wp.pos[0], wp.pos[1], wp.time.strftime("%m/%d/%Y, %H:%M:%S"),
+             wp.twd, wp.tws, wp.speed, wp.brg)
+            for wp in res.path
+        ]
+        self.core.routingManager.append(
+            Routing(
+                name=self.core.routingManager.get_unique_name(
+                    self.currentRouting.name
+                ),
+                points=tr,
+                isochrones=res.isochrones,
+                collection=self.core.routingManager,
+            )
+        )
+        return True
+
+    def on_comparison_routing_step(self):
+        params = self._comparison_params
+        scenarios = params["scenarios"]
+        total = len(scenarios)
+
+        for idx, scenario in enumerate(scenarios):
+            if self.stop_routing:
+                break
+            self._run_single_scenario(scenario, params, idx, total)
+
+        Gdk.threads_enter()
+        self.progress_bar.set_fraction(1.0)
+        self.progress_bar.set_text("100%")
+        GObject.timeout_add(3000, self.progress_bar.hide)
+        Gdk.threads_leave()
+
+        self.update_routings()
+        self.builder.get_object("stop-routing-button").hide()
+        self.isochronesMapLayer.set_isochrones([], [])
+        self.map.queue_draw()
 
     def on_routing_step(self):
         if self.currentRouting is None:
