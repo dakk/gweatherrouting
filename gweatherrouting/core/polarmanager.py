@@ -116,7 +116,7 @@ class PolarManager(EventDispatcher):
             return None
         return os.path.join(POLAR_DIR, name)
 
-    def download_orc_polar(self, orc_polar_name):
+    def download_orc_polar(self, orc_polar_name, dispatch=True):
         country_code = orc_polar_name.split("/")[0]
         sailboat_name = orc_polar_name.split("/")[1]
         polar_url = f"https://raw.githubusercontent.com/jieter/orc-data/refs/heads/master/site/data/{country_code}/{sailboat_name}.json"  # noqa: E501
@@ -141,7 +141,8 @@ class PolarManager(EventDispatcher):
             self.polars.append(file_name)
             self.polars_files.sort()
             self.enable(file_name)
-            self.dispatch("polars-list-updated", self.polars)
+            if dispatch:
+                self.dispatch("polars-list-updated", self.polars)
         except Exception as e:
             logger.error(f"Failed to process orc polar data from {polar_url}: {e}")
             raise e

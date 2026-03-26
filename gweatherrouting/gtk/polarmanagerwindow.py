@@ -6,7 +6,7 @@ import gi
 import requests
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gdk, Gtk
+from gi.repository import GLib, Gtk
 
 logger = logging.getLogger("gweatherrouting")
 
@@ -86,54 +86,49 @@ class PolarManagerWindow:
         self.polar_manager.delete_polar(self.selected_local_polar)
 
     def download_orc_list(self):
-        Gdk.threads_enter()
-        self.builder.get_object("download-progress").show()
-        Gdk.threads_leave()
+        GLib.idle_add(lambda: self.builder.get_object("download-progress").show())
         orc_url = "https://raw.githubusercontent.com/jieter/orc-data/refs/heads/master/site/index.json"  # noqa: E501
-        Gdk.threads_enter()
         try:
             r = requests.get(orc_url)
             orc_data = r.json()
-            for d in orc_data:
-                self.orc_ListStore.append(d)
-        except:
+            GLib.idle_add(self._populate_orc_list, orc_data)
+        except Exception:
             logger.error(f"Failed to download orc data file list from {orc_url}")
-            self.builder.get_object("download-progress").set_text(
-                "Failed to download orc data list"
+            GLib.idle_add(
+                lambda: self.builder.get_object("download-progress").set_text(
+                    "Failed to download orc data list"
+                )
             )
 
-            dialog = Gtk.MessageDialog(
-                transient_for=self.window,
-                flags=0,
-                message_type=Gtk.MessageType.ERROR,
-                buttons=Gtk.ButtonsType.OK,
-                text="Download failed",
-            )
-            dialog.format_secondary_text("Failed to download orc data list")
-            dialog.run()
-            dialog.destroy()
-
-        Gdk.threads_leave()
+    def _populate_orc_list(self, orc_data):
+        for d in orc_data:
+            self.orc_ListStore.append(d)
+        self.builder.get_object("download-progress").hide()
 
     def download_orc(self):
-        Gdk.threads_enter()
+        polar_name = self.selected_orc_polar
+        GLib.idle_add(
+            lambda: self.builder.get_object("download-progress").set_text(
+                f"Downloading {polar_name}..."
+            )
+        )
+        GLib.idle_add(lambda: self.builder.get_object("download-progress").show())
         try:
-            self.polar_manager.download_orc_polar(self.selected_orc_polar)
-        except:
-            logger.error(f"Failed to download orc data file {self.selected_orc_polar}")
-            dialog = Gtk.MessageDialog(
-                transient_for=self.window,
-                flags=0,
-                message_type=Gtk.MessageType.ERROR,
-                buttons=Gtk.ButtonsType.OK,
-                text="Download failed",
+            self.polar_manager.download_orc_polar(polar_name, dispatch=False)
+            GLib.idle_add(self._on_orc_download_done, polar_name)
+        except Exception:
+            logger.error(f"Failed to download orc data file {polar_name}")
+            GLib.idle_add(
+                lambda: self.builder.get_object("download-progress").set_text(
+                    f"Failed to download {polar_name}"
+                )
             )
-            dialog.format_secondary_text(
-                f"Failed to download {self.selected_orc_polar} polar file"
-            )
-            dialog.run()
-            dialog.destroy()
-        Gdk.threads_leave()
+
+    def _on_orc_download_done(self, polar_name):
+        self.builder.get_object("download-progress").set_text(
+            f"Downloaded {polar_name}"
+        )
+        self.polar_manager.dispatch("polars-list-updated", self.polar_manager.polars)
 
     def on_open(self, widget):
         parent_window = self.window
