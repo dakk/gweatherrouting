@@ -40,6 +40,8 @@
   </object>
   <object class="GtkListStore" id="polar-manager-store">
     <columns>
+      <!-- column-name filename -->
+      <column type="gchararray"/>
       <!-- column-name sail_data -->
       <column type="gchararray"/>
       <!-- column-name name_data -->
@@ -165,14 +167,25 @@
                 <child>
                   <object class="GtkTreeViewColumn">
                     <property name="title" translatable="yes">Enabled</property>
-                    <property name="reorderable">True</property>
-                    <property name="sort-column-id">0</property>
                     <child>
                       <object class="GtkCellRendererToggle">
                         <signal name="toggled" handler="on_polar_toggle" swapped="no"/>
                       </object>
                       <attributes>
-                        <attribute name="active">3</attribute>
+                        <attribute name="active">4</attribute>
+                      </attributes>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkTreeViewColumn">
+                    <property name="title" translatable="yes">Filename</property>
+                    <property name="reorderable">True</property>
+                    <property name="sort-column-id">0</property>
+                    <child>
+                      <object class="GtkCellRendererText"/>
+                      <attributes>
+                        <attribute name="text">0</attribute>
                       </attributes>
                     </child>
                   </object>
@@ -185,7 +198,7 @@
                     <child>
                       <object class="GtkCellRendererText"/>
                       <attributes>
-                        <attribute name="text">0</attribute>
+                        <attribute name="text">1</attribute>
                       </attributes>
                     </child>
                   </object>
@@ -196,7 +209,7 @@
                     <child>
                       <object class="GtkCellRendererText"/>
                       <attributes>
-                        <attribute name="text">1</attribute>
+                        <attribute name="text">2</attribute>
                       </attributes>
                     </child>
                   </object>
@@ -207,7 +220,7 @@
                     <child>
                       <object class="GtkCellRendererText"/>
                       <attributes>
-                        <attribute name="text">2</attribute>
+                        <attribute name="text">3</attribute>
                       </attributes>
                     </child>
                   </object>

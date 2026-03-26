@@ -25,6 +25,9 @@ class PolarManager(EventDispatcher):
         self.polars_files: list[str] = []
         self.polars = []
 
+        if not self.storage.metadata:
+            self.storage.metadata = {}
+
         self.refresh_local_polars()
 
         if self.storage.enabled:
@@ -110,6 +113,9 @@ class PolarManager(EventDispatcher):
         self.enable(file_name)
         self.dispatch("polars-list-updated", self.polars)
 
+    def get_metadata(self, name):
+        return self.storage.metadata.get(name, {})
+
     def get_path(self, name):
         if name not in self.polars:
             logger.error(f"Polar {name} not found in the list of polars.")
@@ -134,8 +140,15 @@ class PolarManager(EventDispatcher):
             return
         destination_path = os.path.join(POLAR_DIR, file_name)
         try:
-            polar_json = polar_json["vpp"]
-            json_to_polars(polar_json, destination_path)
+            vpp_data = polar_json["vpp"]
+            json_to_polars(vpp_data, destination_path)
+
+            self.storage.metadata[file_name] = {
+                "sail": polar_json.get("sailnumber", orc_polar_name),
+                "name": polar_json.get("name", sailboat_name),
+                "type": polar_json.get("boat", {}).get("type", ""),
+            }
+            self.storage.save()
 
             logger.info(
                 f"Downloaded and converted orc polar {orc_polar_name} to {destination_path}"
