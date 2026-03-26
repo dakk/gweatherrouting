@@ -171,7 +171,16 @@ class RoutingWizardDialog:
 
     def on_polar_manager(self, widget):
         w = PolarManagerWindow(self.polar_manager, parent=self.dialog)
+        w.window.connect("delete-event", lambda *_: self._refresh_boat_store())
         w.show()
+
+    def _refresh_boat_store(self):
+        self.polars = self.polar_manager.polars
+        self.boat_store.clear()
+        for polar in self.polars:
+            self.boat_store.append([polar])
+        if self.polars:
+            self.builder.get_object("boat-select").set_active(0)
 
     def on_boat_select(self, widget):
         pfile = self.polars[self.builder.get_object("boat-select").get_active()]
