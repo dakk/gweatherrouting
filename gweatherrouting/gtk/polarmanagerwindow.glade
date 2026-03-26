@@ -61,13 +61,26 @@
         <property name="orientation">vertical</property>
         <property name="spacing">2</property>
         <child>
+          <object class="GtkSearchEntry" id="orc-search">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="placeholder-text">Search polars...</property>
+            <signal name="search-changed" handler="on_orc_search_changed" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
           <object class="GtkScrolledWindow">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="hscrollbar-policy">never</property>
             <property name="shadow-type">in</property>
             <child>
-              <object class="GtkTreeView">
+              <object class="GtkTreeView" id="orc-treeview">
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="model">orc-list-store</property>
@@ -131,7 +144,7 @@
           <packing>
             <property name="expand">True</property>
             <property name="fill">True</property>
-            <property name="position">0</property>
+            <property name="position">1</property>
           </packing>
         </child>
         <child>
@@ -143,7 +156,7 @@
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">1</property>
+            <property name="position">2</property>
           </packing>
         </child>
         <child>

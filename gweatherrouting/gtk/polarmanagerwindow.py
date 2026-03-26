@@ -34,6 +34,11 @@ class PolarManagerWindow:
             self.window.set_modal(True)
 
         self.orc_ListStore = self.builder.get_object("orc-list-store")
+        self.orc_filter = Gtk.TreeModelFilter(child_model=self.orc_ListStore)
+        self.orc_filter.set_visible_func(self._orc_filter_func)
+        self.builder.get_object("orc-treeview").set_model(self.orc_filter)
+        self.orc_search_text = ""
+
         self.polar_managerStore = self.builder.get_object("polar-manager-store")
         self.refresh_polars_tab()
         self.polar_manager.connect("polars-list-updated", self.refresh_polars_tab)
@@ -46,6 +51,19 @@ class PolarManagerWindow:
         self.window.hide()
 
     # ORC data management
+
+    def on_orc_search_changed(self, widget):
+        self.orc_search_text = widget.get_text().lower()
+        self.orc_filter.refilter()
+
+    def _orc_filter_func(self, model, tree_iter, data=None):
+        if not self.orc_search_text:
+            return True
+        for col in range(3):
+            val = model.get_value(tree_iter, col)
+            if val and self.orc_search_text in val.lower():
+                return True
+        return False
 
     def on_orc_select(self, selection):
         store, pathlist = selection.get_selected_rows()
