@@ -121,10 +121,12 @@ class PolarStack(Gtk.Box):
         self.show_all()
 
     def on_boat_select(self, widget):
+        if widget.get_active() < 0:
+            return
         try:
             self.load_polar(self.polars[widget.get_active()])
             self.statusBar.push(0, "Polar loaded: " + widget.get_active_text())
-        except:
+        except Exception:
             logger.error("Error loading polar: %s", widget.get_active_text())
             self.statusBar.push(
                 0, "Please select add/enable a polar file by using the Polar Manager"
