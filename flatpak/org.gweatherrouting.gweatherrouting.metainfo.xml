@@ -57,6 +57,10 @@
   <content_rating type="oars-1.1" />
   
   <screenshots>
+    <screenshot>
+      <image>https://github.com/dakk/gweatherrouting/raw/master/docs/source/_static/images/gweatherrouting_levante.png</image>
+      <caption>Navigating with GWW</caption>
+    </screenshot>
     <screenshot type="default">
       <image>https://github.com/dakk/gweatherrouting/raw/master/docs/source/_static/images/quickstart/10.gif</image>
       <caption>Routing calculation process</caption>
