@@ -24,8 +24,7 @@ gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk
 
-from gweatherrouting.common import resource_path
-
+from .polarmanagerwindow import PolarManagerWindow
 from .widgets.polar import POLAR_COLORS, PolarWidget
 
 logger = logging.getLogger("gweatherrouting")
@@ -34,11 +33,9 @@ logger = logging.getLogger("gweatherrouting")
 class PolarStack(Gtk.Box):
     def __init__(self, parent, core, settings_manager):
         Gtk.Widget.__init__(self)
-
+        self.polar_manager = core.polar_manager
         self.parent = parent
         self.core = core
-
-        # self.core.connectionManager.connect("data", self.data_handler)
 
         self.builder = Gtk.Builder()
         self.builder.add_from_file(
@@ -48,33 +45,38 @@ class PolarStack(Gtk.Box):
         self.pack_start(self.builder.get_object("polarcontent"), True, True, 0)
 
         self.statusBar = self.builder.get_object("statusbar")
+        self.polar_list_store = self.builder.get_object("polar-list-store")
+        self.polar_list = self.builder.get_object("polar-list")
 
-        self.polars = sorted(
-            os.listdir(resource_path("gweatherrouting", "data/polars/"))
-        )
+        self.polars = self.polar_manager.polars
+        self.polar_manager.connect("polars-list-updated", self.polars_list_updated)
 
-        self.polarListStore = Gtk.ListStore(str)
-        for polar in self.polars:
-            self.polarListStore.append([polar])
-
-        polar_list = self.builder.get_object("polar-list")
-        polar_list.set_model(self.polarListStore)
-
-        renderer = Gtk.CellRendererText()
-        column = Gtk.TreeViewColumn("Polars", renderer, text=0)
-        polar_list.append_column(column)
-
-        self.polarWidget = PolarWidget(self.parent)
+        self.polarWidget = PolarWidget(self.parent, self.core)
         self.table = None
 
+        self._populate_polar_list()
         if self.polars:
-            polar_list.set_cursor(0)
+            self.polar_list.set_cursor(0)
 
-    def load_polar(self, pn):
-        self.polarWidget.load_polar(pn)
-        self.builder.get_object("polarwidgetcontainer").pack_start(
-            self.polarWidget, True, True, 0
-        )
+    def _populate_polar_list(self):
+        self.polar_list_store.clear()
+        for polar in self.polars:
+            meta = self.polar_manager.get_metadata(polar)
+            self.polar_list_store.append(
+                [
+                    polar,
+                    meta.get("sail", ""),
+                    meta.get("name", ""),
+                    meta.get("type", ""),
+                ]
+            )
+
+    def load_polar(self, polar_file):
+        polarwidgetcontainer = self.builder.get_object("polarwidgetcontainer")
+        for child in polarwidgetcontainer.get_children():
+            polarwidgetcontainer.remove(child)
+        self.polarWidget.load_polar(polar_file)
+        polarwidgetcontainer.pack_start(self.polarWidget, True, True, 0)
 
         cc = self.builder.get_object("polartablecontainer")
         if self.table:
@@ -130,9 +132,26 @@ class PolarStack(Gtk.Box):
 
         self.show_all()
 
-    def on_polar_list_cursor_changed(self, treeview):
-        selection = treeview.get_selection()
-        model, treeiter = selection.get_selected()
-        if treeiter is not None:
-            polar_name = model[treeiter][0]
+    def on_polar_list_select(self, selection):
+        store, tree_iter = selection.get_selected()
+        if tree_iter is None:
+            return
+        polar_name = store.get_value(tree_iter, 0)
+        try:
             self.load_polar(polar_name)
+            self.statusBar.push(0, "Polar loaded: " + polar_name)
+        except Exception:
+            logger.error("Error loading polar: %s", polar_name)
+            self.statusBar.push(
+                0, "Please select add/enable a polar file by using the Polar Manager"
+            )
+
+    def on_polar_manager(self, event):
+        w = PolarManagerWindow(self.core.polar_manager)
+        w.show()
+
+    def polars_list_updated(self, event):
+        self.polars = self.polar_manager.polars
+        self._populate_polar_list()
+        if self.polars:
+            self.polar_list.set_cursor(0)

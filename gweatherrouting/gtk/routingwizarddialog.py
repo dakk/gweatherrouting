@@ -29,22 +29,19 @@ from gweatherrouting.common import resource_path
 from gweatherrouting.core import TimeControl
 from gweatherrouting.core.storage import POLAR_DIR
 
+from .polarmanagerwindow import PolarManagerWindow
 from .timepickerdialog import TimePickerDialog
 from .widgets.polar import PolarWidget
-
-PolFileFilter = Gtk.FileFilter()
-PolFileFilter.set_name("Polar file")
-PolFileFilter.add_pattern("*.pol")
 
 
 class RoutingWizardDialog:
     def __init__(self, core, parent):
         self.core = core
+        self.polar_manager = core.polar_manager
+        self.polars = self.polar_manager.polars
         self.polar = None
 
         self.paramWidgets = {}
-        self.load_default_pol()
-        self.polars = os.listdir(POLAR_DIR)
 
         self.builder = Gtk.Builder()
         self.builder.add_from_file(
@@ -59,7 +56,7 @@ class RoutingWizardDialog:
         self.dialog.add_button("Cancel", Gtk.ResponseType.CANCEL)
         self.dialog.add_button("Run", Gtk.ResponseType.OK)
 
-        self.polarWidget = PolarWidget(self.dialog)
+        self.polarWidget = PolarWidget(self.dialog, self.core)
         self.builder.get_object("polar-container").add(self.polarWidget)
 
         start_store = self.builder.get_object("start-store")
@@ -69,8 +66,7 @@ class RoutingWizardDialog:
         for p in self.core.poiManager:
             start_store.append(["POI: " + p.name, "poi-" + p.name])
 
-        if len(self.core.trackManager) == 0:
-            self.builder.get_object("start-select").set_active(1)
+        self.builder.get_object("start-select").set_active(0)
 
         self.boat_store = self.builder.get_object("boat-store")
         for polar in self.polars:
@@ -172,6 +168,19 @@ class RoutingWizardDialog:
         p = self.paramWidgets[widget]
         p.value = widget.get_active()
 
+    def on_polar_manager(self, widget):
+        w = PolarManagerWindow(self.polar_manager, parent=self.dialog)
+        w.window.connect("delete-event", lambda *_: self._refresh_boat_store())
+        w.show()
+
+    def _refresh_boat_store(self):
+        self.polars = self.polar_manager.polars
+        self.boat_store.clear()
+        for polar in self.polars:
+            self.boat_store.append([polar])
+        if self.polars:
+            self.builder.get_object("boat-select").set_active(0)
+
     def on_boat_select(self, widget):
         pfile = self.polars[self.builder.get_object("boat-select").get_active()]
         self.polar = weatherrouting.Polar(os.path.join(POLAR_DIR, pfile))
@@ -225,41 +234,6 @@ class RoutingWizardDialog:
         else:
             s -= 2
             return self.core.poiManager[s].position
-
-    def add_custom_polar_file(self, polar_path):
-        polar_filename = os.path.basename(polar_path)
-        target_filepath = os.path.join(POLAR_DIR, polar_filename)
-        shutil.copyfile(polar_path, target_filepath)
-        self.polars.append(polar_filename)
-        self.builder.get_object("boat-select").set_active(len(self.polars) - 1)
-        self.polarWidget.set_polar(self.polar)
-
-    def on_open(self, widget):
-        parent_window = self.dialog
-        dialog = Gtk.FileChooserDialog(
-            "Please choose a file",
-            parent_window,
-            Gtk.FileChooserAction.OPEN,
-            (
-                Gtk.STOCK_CANCEL,
-                Gtk.ResponseType.CANCEL,
-                Gtk.STOCK_OPEN,
-                Gtk.ResponseType.OK,
-            ),
-        )
-
-        dialog.add_filter(PolFileFilter)
-
-        response = dialog.run()
-        if response == Gtk.ResponseType.OK:
-            filepath = dialog.get_filename()
-            dialog.destroy()
-            shutil.copyfile(
-                filepath, os.path.join(POLAR_DIR, os.path.basename(filepath))
-            )
-            self.polars.append(os.path.basename(filepath))
-            self.boat_store.append([os.path.basename(filepath)])
-            self.builder.get_object("boat-select").set_active(len(self.polars) - 1)
 
     def _parse_csv_floats(self, widget_id):
         """Parse a comma-separated string of floats from a GtkEntry."""

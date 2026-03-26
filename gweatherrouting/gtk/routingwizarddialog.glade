@@ -117,11 +117,11 @@
                         </child>
                         <child>
                           <object class="GtkButton">
-                            <property name="label" translatable="yes">Open</property>
+                            <property name="label" translatable="yes">Polar Manager</property>
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="receives-default">True</property>
-                            <signal name="clicked" handler="on_open" swapped="no"/>
+                            <signal name="clicked" handler="on_polar_manager" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
