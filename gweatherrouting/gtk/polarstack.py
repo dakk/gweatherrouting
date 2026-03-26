@@ -37,8 +37,6 @@ class PolarStack(Gtk.Box):
         self.parent = parent
         self.core = core
 
-        # self.core.connectionManager.connect("data", self.data_handler)
-
         self.builder = Gtk.Builder()
         self.builder.add_from_file(
             os.path.abspath(os.path.dirname(__file__)) + "/polarstack.glade"
@@ -47,17 +45,29 @@ class PolarStack(Gtk.Box):
         self.pack_start(self.builder.get_object("polarcontent"), True, True, 0)
 
         self.statusBar = self.builder.get_object("statusbar")
+        self.polar_list_store = self.builder.get_object("polar-list-store")
+        self.polar_list = self.builder.get_object("polar-list")
 
         self.polars = self.polar_manager.polars
         self.polar_manager.connect("polars-list-updated", self.polars_list_updated)
 
-        self.boatselect = self.builder.get_object("boat-select")
-        for polar in self.polars:
-            self.boatselect.append_text(polar)
-
         self.polarWidget = PolarWidget(self.parent, self.core)
         self.table = None
-        self.boatselect.set_active(0)
+
+        self._populate_polar_list()
+        if self.polars:
+            self.polar_list.set_cursor(0)
+
+    def _populate_polar_list(self):
+        self.polar_list_store.clear()
+        for polar in self.polars:
+            meta = self.polar_manager.get_metadata(polar)
+            self.polar_list_store.append([
+                polar,
+                meta.get("sail", ""),
+                meta.get("name", ""),
+                meta.get("type", ""),
+            ])
 
     def load_polar(self, polar_file):
         polarwidgetcontainer = self.builder.get_object("polarwidgetcontainer")
@@ -120,18 +130,19 @@ class PolarStack(Gtk.Box):
 
         self.show_all()
 
-    def on_boat_select(self, widget):
-        if widget.get_active() < 0:
+    def on_polar_list_select(self, selection):
+        store, tree_iter = selection.get_selected()
+        if tree_iter is None:
             return
+        polar_name = store.get_value(tree_iter, 0)
         try:
-            self.load_polar(self.polars[widget.get_active()])
-            self.statusBar.push(0, "Polar loaded: " + widget.get_active_text())
+            self.load_polar(polar_name)
+            self.statusBar.push(0, "Polar loaded: " + polar_name)
         except Exception:
-            logger.error("Error loading polar: %s", widget.get_active_text())
+            logger.error("Error loading polar: %s", polar_name)
             self.statusBar.push(
                 0, "Please select add/enable a polar file by using the Polar Manager"
             )
-            return
 
     def on_polar_manager(self, event):
         w = PolarManagerWindow(self.core.polar_manager)
@@ -139,7 +150,6 @@ class PolarStack(Gtk.Box):
 
     def polars_list_updated(self, event):
         self.polars = self.polar_manager.polars
-        self.boatselect.get_model().clear()
-        for polar in self.polars:
-            self.boatselect.append_text(polar)
-        self.boatselect.set_active(0)
+        self._populate_polar_list()
+        if self.polars:
+            self.polar_list.set_cursor(0)
