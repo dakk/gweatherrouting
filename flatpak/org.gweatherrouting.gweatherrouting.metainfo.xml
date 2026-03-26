@@ -24,7 +24,7 @@
     <ul>
       <li>Multi-point sailing weather routing</li>
       <li>Boat / polar integrated database</li>
-      <li>Grib1 and Grib2 support, with downloader for openskiron</li>
+      <li>Grib1 and Grib2 support, with downloader for OpenSkiron and NOAA GFS</li>
       <li>GPX support for importing and exporting POIs and tracks</li>
       <li>Session manager for storing POIs, tracks and routings</li>
       <li>Chart rendering for GeoJSON, GSHHS basemap, KAP, GeoTiff charts and other raster formats supported by GDAL, OpenSeaMap seamarks rendering</li>
