@@ -192,7 +192,12 @@ class PolarManagerWindow:
         for polar in self.polar_manager.polars_files:
             enabled = self.polar_manager.is_enabled(polar)
             meta = self.polar_manager.get_metadata(polar)
-            self.polar_managerStore.append([
-                polar, meta.get("sail", ""), meta.get("name", ""),
-                meta.get("type", ""), enabled,
-            ])
+            self.polar_managerStore.append(
+                [
+                    polar,
+                    meta.get("sail", ""),
+                    meta.get("name", ""),
+                    meta.get("type", ""),
+                    enabled,
+                ]
+            )

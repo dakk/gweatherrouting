@@ -62,12 +62,14 @@ class PolarStack(Gtk.Box):
         self.polar_list_store.clear()
         for polar in self.polars:
             meta = self.polar_manager.get_metadata(polar)
-            self.polar_list_store.append([
-                polar,
-                meta.get("sail", ""),
-                meta.get("name", ""),
-                meta.get("type", ""),
-            ])
+            self.polar_list_store.append(
+                [
+                    polar,
+                    meta.get("sail", ""),
+                    meta.get("name", ""),
+                    meta.get("type", ""),
+                ]
+            )
 
     def load_polar(self, polar_file):
         polarwidgetcontainer = self.builder.get_object("polarwidgetcontainer")

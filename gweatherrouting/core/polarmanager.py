@@ -173,8 +173,8 @@ def json_to_polars(json_data, destination_path):
             polars[angle] = json_data[str(angle)]
 
     with open(destination_path, "w") as f:
-        backslash_char = "\\"
-        f.write(f"TWA{backslash_char}TWS\t{'\t'.join(map(str, speeds))}\n")
+        speeds_str = "\t".join(map(str, speeds))
+        f.write(f"TWA\\TWS\t{speeds_str}\n")
         for _ in range(len(speeds)):
             f.write("0\t")
         f.write("0\n")
