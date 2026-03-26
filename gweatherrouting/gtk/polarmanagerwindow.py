@@ -49,7 +49,13 @@ class PolarManagerWindow:
 
     def on_orc_select(self, selection):
         store, pathlist = selection.get_selected_rows()
+        if not pathlist:
+            return
         tree_iter = store.get_iter(pathlist[0])
+        if not store.get_value(tree_iter, 3):
+            selection.unselect_iter(tree_iter)
+            self.selected_orc_polar = None
+            return
         self.selected_orc_polar = store.get_value(tree_iter, 0)
 
     def on_orc_click(self, widget, event):
@@ -100,9 +106,14 @@ class PolarManagerWindow:
                 )
             )
 
+    def _is_orc_downloaded(self, orc_entry):
+        file_name = orc_entry[0].replace("/", "_") + ".pol"
+        return file_name in self.polar_manager.polars_files
+
     def _populate_orc_list(self, orc_data):
         for d in orc_data:
-            self.orc_ListStore.append(d)
+            selectable = not self._is_orc_downloaded(d)
+            self.orc_ListStore.append([*d, selectable])
         self.builder.get_object("download-progress").hide()
 
     def download_orc(self):
@@ -128,6 +139,12 @@ class PolarManagerWindow:
         self.builder.get_object("download-progress").set_text(
             f"Downloaded {polar_name}"
         )
+        # Mark the row as no longer selectable
+        for row in self.orc_ListStore:
+            if row[0] == polar_name:
+                row[3] = False
+                break
+        self.selected_orc_polar = None
         self.polar_manager.dispatch("polars-list-updated", self.polar_manager.polars)
 
     def on_open(self, widget):

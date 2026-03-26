@@ -129,6 +129,9 @@ class PolarManager(EventDispatcher):
 
         file_name = orc_polar_name.replace("/", "_")
         file_name = f"{file_name}.pol"
+        if file_name in self.polars_files:
+            logger.info(f"Polar {file_name} already exists, skipping download")
+            return
         destination_path = os.path.join(POLAR_DIR, file_name)
         try:
             polar_json = polar_json["vpp"]
