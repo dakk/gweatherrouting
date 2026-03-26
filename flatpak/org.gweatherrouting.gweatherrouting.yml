@@ -129,6 +129,11 @@ modules:
       - -DCMAKE_BUILD_TYPE=Release
       - -DBUILD_TESTING=OFF
       - -DUSE_OPENMP=ON
+    build-options:
+      arch:
+        aarch64:
+          config-opts:
+            - -DTARGET=ARMV8
     cleanup:
       - /share
     sources:
