@@ -16,7 +16,7 @@ PolFileFilter.add_pattern("*.pol")
 
 
 class PolarManagerWindow:
-    def __init__(self, polar_manager):
+    def __init__(self, polar_manager, parent=None):
         self.polar_manager = polar_manager
         self.selected_orc_polar = None
         self.selectedLocal_polar = None
@@ -29,6 +29,9 @@ class PolarManagerWindow:
 
         self.window = self.builder.get_object("polar-manager-window")
         self.window.set_default_size(550, 300)
+        if parent:
+            self.window.set_transient_for(parent)
+            self.window.set_modal(True)
 
         self.orc_ListStore = self.builder.get_object("orc-list-store")
         self.polar_managerStore = self.builder.get_object("polar-manager-store")

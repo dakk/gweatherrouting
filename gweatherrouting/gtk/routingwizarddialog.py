@@ -29,6 +29,7 @@ from gweatherrouting.common import resource_path
 from gweatherrouting.core import TimeControl
 from gweatherrouting.core.storage import POLAR_DIR
 
+from .polarmanagerwindow import PolarManagerWindow
 from .timepickerdialog import TimePickerDialog
 from .widgets.polar import PolarWidget
 
@@ -167,6 +168,10 @@ class RoutingWizardDialog:
     def on_bool_param_change(self, widget):
         p = self.paramWidgets[widget]
         p.value = widget.get_active()
+
+    def on_polar_manager(self, widget):
+        w = PolarManagerWindow(self.polar_manager, parent=self.dialog)
+        w.show()
 
     def on_boat_select(self, widget):
         pfile = self.polars[self.builder.get_object("boat-select").get_active()]
