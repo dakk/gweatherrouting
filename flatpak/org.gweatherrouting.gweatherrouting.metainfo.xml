@@ -72,6 +72,12 @@
   </screenshots>
 
   <releases>
+    <release version="0.3.0" date="2026-03-26">
+      <url type="details">https://github.com/dakk/gweatherrouting/releases/tag/v0.3.0</url>
+      <description>
+          <p>Latest stable release with navigation instruments, AIS, multi routing and better GRIB manager</p>
+      </description>
+    </release>
     <release version="0.2.7" date="2026-03-16">
       <url type="details">https://github.com/dakk/gweatherrouting/releases/tag/v0.2.7</url>
       <description>

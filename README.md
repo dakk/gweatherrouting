@@ -40,7 +40,7 @@ You can install gweatherrouting via flatpak, appimage, windows portable zip, or 
 
 [![Flathub](https://img.shields.io/badge/Flathub-blue?logo=flathub&logoColor=white)](https://flathub.org/apps/org.gweatherrouting.gweatherrouting)
 [![AppImage](https://img.shields.io/badge/AppImage-blue?logo=linux&logoColor=white)](https://github.com/dakk/gweatherrouting/releases/latest)
-[![Windows](https://img.shields.io/badge/Windows-blue?logo=windows&logoColor=white)](https://github.com/dakk/gweatherrouting/releases/download/v0.2.7/GWeatherRouting-win64.zip)
+[![Windows](https://img.shields.io/badge/Windows-blue?logo=windows&logoColor=white)](https://github.com/dakk/gweatherrouting/releases/download/v0.3.0/GWeatherRouting-win64.zip)
 
 ### From source
 
