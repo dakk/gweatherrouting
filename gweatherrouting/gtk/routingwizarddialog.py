@@ -66,8 +66,7 @@ class RoutingWizardDialog:
         for p in self.core.poiManager:
             start_store.append(["POI: " + p.name, "poi-" + p.name])
 
-        if len(self.core.trackManager) == 0:
-            self.builder.get_object("start-select").set_active(1)
+        self.builder.get_object("start-select").set_active(0)
 
         self.boat_store = self.builder.get_object("boat-store")
         for polar in self.polars:
