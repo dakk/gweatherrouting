@@ -159,10 +159,10 @@ class CM93ChartDrawer(VectorChartDrawer):
                     cr.line_to(x, y)
 
             cr.close_path()
-            stroke.apply(cr)
-            cr.stroke_preserve()
             fill.apply(cr)
-            cr.fill()
+            cr.fill_preserve()
+            stroke.apply(cr)
+            cr.stroke()
 
     def _render_line(self, gpsmap, cr, feature, palette):
         name = feature.obj_name

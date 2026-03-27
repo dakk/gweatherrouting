@@ -438,20 +438,25 @@ def parse_cm93_cell(file_path, scale_level, obj_dict, attr_dict):
     off = header_len
 
     # Vector records (edges): each has ushort npoints, then npoints * (ushort x, ushort y)
-    edges = []
+    # Store both raw integer coords (for endpoint matching) and transformed coords
+    edges = []       # list of [(lat, lon), ...]
+    edges_raw = []   # list of [(px, py), ...] raw uint16 coords
     for _ in range(n_vector_records):
         if off + 2 > header_len + table1_len:
             break
         npts, off = _read_ushort(data, off)
         points = []
+        raw_points = []
         for _ in range(npts):
             if off + 4 > header_len + table1_len:
                 break
             px, off = _read_ushort(data, off)
             py, off = _read_ushort(data, off)
+            raw_points.append((px, py))
             lat, lon = _transform_point(px, py, tx_rate, ty_rate, tx_origin, ty_origin)
             points.append((lat, lon))
         edges.append(points)
+        edges_raw.append(raw_points)
 
     # 3D point records: each has ushort npoints, then npoints * (ushort x, ushort y, ushort z)
     point3d_records = []
@@ -531,29 +536,76 @@ def parse_cm93_cell(file_path, scale_level, obj_dict, attr_dict):
                 for _ in range(n_elems):
                     edge_ref, feat_off = _read_ushort(data, feat_off)
                     real_idx = edge_ref & 0x1FFF
-                    direction = edge_ref >> 13
+                    direction = (edge_ref >> 13) & 0x04
                     if real_idx < len(edges):
                         edge_pts = edges[real_idx]
                         if direction != 0:
                             edge_pts = list(reversed(edge_pts))
-                        line_points.extend(edge_pts)
+                        if line_points and edge_pts and line_points[-1] == edge_pts[0]:
+                            line_points.extend(edge_pts[1:])
+                        else:
+                            line_points.extend(edge_pts)
                 geometry = line_points
 
             elif geotype_flag == 4:
                 # Area: ushort n_elements, then n_elements * ushort edge_index
+                # Build rings by chaining edges via raw integer endpoints
+                # following OpenCPN's approach: direction bit is bit 2 of
+                # upper 3 bits, dedup junction points, detect closure on
+                # raw integer coords.
                 n_elems, feat_off = _read_ushort(data, feat_off)
-                ring = []
+
+                # Read all edge refs first
+                area_edge_refs = []
                 for _ in range(n_elems):
                     edge_ref, feat_off = _read_ushort(data, feat_off)
+                    area_edge_refs.append(edge_ref)
+
+                rings = []
+                ring = []        # transformed (lat, lon) points
+                ring_raw = []    # raw (px, py) integer points
+                start_raw = None # raw start point of current ring
+
+                for edge_ref in area_edge_refs:
                     real_idx = edge_ref & 0x1FFF
-                    direction = edge_ref >> 13
-                    if real_idx < len(edges):
-                        edge_pts = edges[real_idx]
-                        if direction != 0:
-                            edge_pts = list(reversed(edge_pts))
+                    direction = (edge_ref >> 13) & 0x04
+
+                    if real_idx >= len(edges) or not edges[real_idx]:
+                        continue
+
+                    edge_pts = edges[real_idx]
+                    edge_raw = edges_raw[real_idx]
+
+                    if direction != 0:
+                        edge_pts = list(reversed(edge_pts))
+                        edge_raw = list(reversed(edge_raw))
+
+                    # Record start of ring
+                    if start_raw is None and edge_raw:
+                        start_raw = edge_raw[0]
+
+                    # Get the end point of this edge (before dedup)
+                    cur_end_raw = edge_raw[-1] if edge_raw else None
+
+                    # Append points, deduplicating junction vertex
+                    if ring_raw and edge_raw and ring_raw[-1] == edge_raw[0]:
+                        ring.extend(edge_pts[1:])
+                        ring_raw.extend(edge_raw[1:])
+                    else:
                         ring.extend(edge_pts)
-                if ring:
-                    geometry = [ring]
+                        ring_raw.extend(edge_raw)
+
+                    # Check ring closure using raw integer coords
+                    if (start_raw is not None and cur_end_raw is not None
+                            and len(ring) >= 3 and cur_end_raw == start_raw):
+                        rings.append(ring)
+                        ring = []
+                        ring_raw = []
+                        start_raw = None
+
+                if ring and len(ring) >= 3:
+                    rings.append(ring)
+                geometry = rings
 
             elif geotype_flag == 8:
                 # 3D point descriptor
