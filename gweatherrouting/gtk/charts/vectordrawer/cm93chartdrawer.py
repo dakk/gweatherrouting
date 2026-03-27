@@ -18,6 +18,7 @@ import logging
 import math
 
 import cairo
+import numpy as np
 
 from gweatherrouting.gtk.style import CairoStyle, Style
 from gweatherrouting.gtk.widgets.mapwidget import MapPoint
@@ -48,7 +49,7 @@ DEFAULT_AREA_STROKE = CairoStyle(color=(0.6, 0.6, 0.6, 0.5), line_width=0.5)
 
 class CM93ChartDrawer(VectorChartDrawer):
     def _get_visible_cells(self, gpsmap, vector_file):
-        """Get visible cells for the current viewport."""
+        """Get visible cells and viewport bbox for the current viewport."""
         p1, p2 = gpsmap.get_bbox()
         lat1, lon1 = p1.get_degrees()
         lat2, lon2 = p2.get_degrees()
@@ -71,19 +72,42 @@ class CM93ChartDrawer(VectorChartDrawer):
             max_lon,
             len(cells),
         )
-        return cells, scale
+        viewport = (min_lat, min_lon, max_lat, max_lon)
+        return cells, scale, viewport
 
-    def _separate_features(self, cells):
-        """Separate cell features into areas and lines/points."""
+    @staticmethod
+    def _bbox_intersects(feat_bbox, vp):
+        """Check if a feature bbox intersects the viewport bbox."""
+        if not feat_bbox:
+            return True  # no bbox computed, render anyway
+        return not (
+            feat_bbox[2] < vp[0]
+            or feat_bbox[0] > vp[2]
+            or feat_bbox[3] < vp[1]
+            or feat_bbox[1] > vp[3]
+        )
+
+    def _separate_features(self, cells, viewport):
+        """Separate cell features into areas and lines/points, culling by viewport."""
         areas = []
         lines_points = []
         for cell in cells:
             for feat in cell.features:
+                if not self._bbox_intersects(feat.bbox, viewport):
+                    continue
                 if feat.geom_type == "A":
                     areas.append(feat)
                 else:
                     lines_points.append(feat)
         return areas, lines_points
+
+    @staticmethod
+    def _geo_to_screen_batch(gpsmap, points):
+        """Convert a list of (lat, lon, ...) points to screen coords via batch numpy."""
+        lats = np.array([p[0] for p in points], dtype=np.float64)
+        lons = np.array([p[1] for p in points], dtype=np.float64)
+        xs, ys = gpsmap.convert_geographic_to_screen_batch(lats, lons)
+        return xs.tolist(), ys.tolist()
 
     def draw(self, gpsmap, cr, vector_file, bounding):
         palette = Style.chart_palettes[self.palette]
@@ -94,11 +118,11 @@ class CM93ChartDrawer(VectorChartDrawer):
         cr.rectangle(0, 0, width, height)
         cr.fill()
 
-        cells, scale = self._get_visible_cells(gpsmap, vector_file)
+        cells, scale, viewport = self._get_visible_cells(gpsmap, vector_file)
         if not cells:
             return
 
-        areas, lines_points = self._separate_features(cells)
+        areas, lines_points = self._separate_features(cells, viewport)
         cr.set_line_join(cairo.LINE_JOIN_ROUND)
 
         areas.sort(key=lambda f: f.priority)
@@ -164,16 +188,10 @@ class CM93ChartDrawer(VectorChartDrawer):
             if not ring or len(ring) < 3:
                 continue
 
-            first = True
-            for lat, lon in ring:
-                x, y = gpsmap.convert_geographic_to_screen(
-                    MapPoint.new_degrees(lat, lon)
-                )
-                if first:
-                    cr.move_to(x, y)
-                    first = False
-                else:
-                    cr.line_to(x, y)
+            xs, ys = self._geo_to_screen_batch(gpsmap, ring)
+            cr.move_to(xs[0], ys[0])
+            for i in range(1, len(xs)):
+                cr.line_to(xs[i], ys[i])
 
             cr.close_path()
             fill.apply(cr)
@@ -200,29 +218,26 @@ class CM93ChartDrawer(VectorChartDrawer):
             return
 
         style.apply(cr)
-        first = True
-        for lat, lon in points:
-            x, y = gpsmap.convert_geographic_to_screen(MapPoint.new_degrees(lat, lon))
-            if first:
-                cr.move_to(x, y)
-                first = False
-            else:
-                cr.line_to(x, y)
+        xs, ys = self._geo_to_screen_batch(gpsmap, points)
+        cr.move_to(xs[0], ys[0])
+        for i in range(1, len(xs)):
+            cr.line_to(xs[i], ys[i])
 
         cr.stroke()
         Style.reset_dash(cr)
 
     def _render_soundings(self, gpsmap, cr, feature):
         """Render sounding (depth) labels for 3D point features."""
+        # Filter to renderable soundings first
+        valid = [p for p in feature.geometry if len(p) > 2 and p[2] <= 100]
+        if not valid:
+            return
+
         SOUNDING_STYLE.apply(cr)
-        for point in feature.geometry:
-            depth = point[2] if len(point) > 2 else None
-            if depth is not None and depth <= 100:
-                x, y = gpsmap.convert_geographic_to_screen(
-                    MapPoint.new_degrees(point[0], point[1])
-                )
-                cr.move_to(x + 2, y + 2)
-                cr.show_text(f"{depth:.1f}")
+        xs, ys = self._geo_to_screen_batch(gpsmap, valid)
+        for i, point in enumerate(valid):
+            cr.move_to(xs[i] + 2, ys[i] + 2)
+            cr.show_text(f"{point[2]:.1f}")
 
     @staticmethod
     def _draw_light(cr, x, y):

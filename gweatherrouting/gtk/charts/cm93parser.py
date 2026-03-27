@@ -339,6 +339,7 @@ class CM93Feature:
     priority: int
     geometry: list  # P: [(lat,lon)], L: [(lat,lon),...], A: [[(lat,lon),...], ...]
     attributes: dict = field(default_factory=dict)
+    bbox: tuple = ()  # (min_lat, min_lon, max_lat, max_lon) computed at parse time
 
 
 @dataclass
@@ -944,6 +945,32 @@ def _parse_feature_records(
     return features
 
 
+def _compute_feature_bbox(feat):
+    """Compute (min_lat, min_lon, max_lat, max_lon) from feature geometry."""
+    if feat.geom_type == "A":
+        pts = (pt for ring in feat.geometry for pt in ring)
+    else:
+        pts = iter(feat.geometry)
+
+    first = next(pts, None)
+    if first is None:
+        return ()
+
+    min_lat = max_lat = first[0]
+    min_lon = max_lon = first[1]
+    for p in pts:
+        lat, lon = p[0], p[1]
+        if lat < min_lat:
+            min_lat = lat
+        elif lat > max_lat:
+            max_lat = lat
+        if lon < min_lon:
+            min_lon = lon
+        elif lon > max_lon:
+            max_lon = lon
+    return (min_lat, min_lon, max_lat, max_lon)
+
+
 def parse_cm93_cell(file_path, scale_level, obj_dict, attr_dict):
     """Parse a single CM93 binary cell file.
 
@@ -999,11 +1026,12 @@ def parse_cm93_cell(file_path, scale_level, obj_dict, attr_dict):
         data, header_len, table1_len, table2_len, hdr, geom_tables, attr_dict
     )
 
-    # Resolve object names and priorities
+    # Resolve object names, priorities, and compute bounding boxes
     for feat in features:
         obj_info = obj_dict.get(feat.obj_code, {})
         feat.obj_name = obj_info.get("name", f"UNKNOWN_{feat.obj_code}")
         feat.priority = obj_info.get("priority", 6)
+        feat.bbox = _compute_feature_bbox(feat)
 
     cell_idx = cell_name_to_index(cell_name)
     if cell_idx is not None:
