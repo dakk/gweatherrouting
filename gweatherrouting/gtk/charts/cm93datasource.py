@@ -130,25 +130,44 @@ class CM93DataSource:
     def get_cells_for_bbox(self, min_lat, min_lon, max_lat, max_lon, scale_level):
         """Return parsed CM93Cells intersecting the bbox at the given scale.
 
-        Falls back to coarser scales if no cells found at the requested level.
+        Always includes a coarser "background" scale underneath the requested
+        scale so that areas not covered by fine cells still show land/sea from
+        coarser data (matching OpenCPN's multi-scale overlay approach).
         """
         scale_idx = SCALE_ORDER.index(scale_level)
 
-        # Try requested scale and fall back to coarser
-        for i in range(scale_idx, -1, -1):
-            scale = SCALE_ORDER[i]
-            cells = self._get_cells_at_scale(min_lat, min_lon, max_lat, max_lon, scale)
-            if cells:
-                return cells
+        # Get cells at the requested scale
+        cells = self._get_cells_at_scale(
+            min_lat, min_lon, max_lat, max_lon, scale_level
+        )
+
+        # Find a coarser background layer for gap-filling
+        bg_cells = []
+        for i in range(scale_idx - 1, -1, -1):
+            bg_scale = SCALE_ORDER[i]
+            bg_cells = self._get_cells_at_scale(
+                min_lat, min_lon, max_lat, max_lon, bg_scale
+            )
+            if bg_cells:
+                break
+
+        if cells or bg_cells:
+            # Background cells first (rendered underneath), then fine cells on top
+            return bg_cells + cells
 
         return []
 
     def _get_cells_at_scale(self, min_lat, min_lon, max_lat, max_lon, scale):
         """Get parsed cells intersecting bbox at a specific scale."""
         matching = []
-        for cell_name, file_path, clat_min, clon_min, clat_max, clon_max in (
-            self._cell_index.get(scale, [])
-        ):
+        for (
+            cell_name,
+            file_path,
+            clat_min,
+            clon_min,
+            clat_max,
+            clon_max,
+        ) in self._cell_index.get(scale, []):
             # Check bbox intersection
             if (
                 clat_max < min_lat
@@ -197,9 +216,7 @@ class CM93DataSource:
 
         # Use the finest available scale
         for scale in reversed(SCALE_ORDER):
-            cells = self._get_cells_at_scale(
-                min_lat, min_lon, max_lat, max_lon, scale
-            )
+            cells = self._get_cells_at_scale(min_lat, min_lon, max_lat, max_lon, scale)
             if cells:
                 for cell in cells:
                     for feat in cell.features:

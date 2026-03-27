@@ -28,8 +28,8 @@ logger = logging.getLogger("gweatherrouting")
 
 # Depth color styles
 DEPTH_SHALLOW = CairoStyle(color=(0.45, 0.71, 0.94, 1.0))  # Light blue
-DEPTH_MEDIUM = CairoStyle(color=(0.65, 0.85, 0.95, 1.0))   # Very light blue
-DEPTH_DEEP = CairoStyle(color=(0.83, 0.92, 0.93, 1.0))     # Near white-blue
+DEPTH_MEDIUM = CairoStyle(color=(0.65, 0.85, 0.95, 1.0))  # Very light blue
+DEPTH_DEEP = CairoStyle(color=(0.83, 0.92, 0.93, 1.0))  # Near white-blue
 
 CONTOUR_STYLE = CairoStyle(color=(0.5, 0.6, 0.7, 0.6), line_width=0.5)
 DASHED_STYLE = CairoStyle(color=(0.4, 0.4, 0.5, 0.6), line_width=0.8, dash=4.0)
@@ -47,51 +47,18 @@ DEFAULT_AREA_STROKE = CairoStyle(color=(0.6, 0.6, 0.6, 0.5), line_width=0.5)
 
 
 class CM93ChartDrawer(VectorChartDrawer):
-    def __init__(self, settings_manager):
-        super().__init__(settings_manager)
-        self._cached_surface = None
-        self._last_cache_key = None
-
-    def on_chart_palette_changed(self, v):
-        super().on_chart_palette_changed(v)
-        self._cached_surface = None
-        self._last_cache_key = None
-
     def draw(self, gpsmap, cr, vector_file, bounding):
-        width = int(gpsmap.get_allocated_width())
-        height = int(gpsmap.get_allocated_height())
-
-        # Build cache key from viewport state
-        p1, p2 = gpsmap.get_bbox()
-        scale = gpsmap.get_scale()
-        cache_key = (p1.get_degrees(), p2.get_degrees(), scale, width, height,
-                     self.palette)
-
-        if cache_key == self._last_cache_key and self._cached_surface:
-            cr.set_source_surface(self._cached_surface, 0, 0)
-            cr.paint()
-            return
-
-        # Render to offscreen surface
-        surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, width, height)
-        offscreen_cr = cairo.Context(surface)
-        self._do_render(gpsmap, offscreen_cr, vector_file, scale, p1, p2,
-                        width, height)
-
-        self._cached_surface = surface
-        self._last_cache_key = cache_key
-        cr.set_source_surface(surface, 0, 0)
-        cr.paint()
-
-    def _do_render(self, gpsmap, cr, vector_file, scale, p1, p2, width, height):
         palette = Style.chart_palettes[self.palette]
 
         # Fill background with sea color
+        width = float(gpsmap.get_allocated_width())
+        height = float(gpsmap.get_allocated_height())
         palette.sea.apply(cr)
         cr.rectangle(0, 0, width, height)
         cr.fill()
 
         # Get viewport bounds
+        p1, p2 = gpsmap.get_bbox()
         lat1, lon1 = p1.get_degrees()
         lat2, lon2 = p2.get_degrees()
         min_lat = min(lat1, lat2)
@@ -100,6 +67,7 @@ class CM93ChartDrawer(VectorChartDrawer):
         max_lon = max(lon1, lon2)
 
         # Determine scale level
+        scale = gpsmap.get_scale()
         scale_level = vector_file.get_scale_for_zoom(scale)
 
         # Get visible cells
@@ -109,7 +77,13 @@ class CM93ChartDrawer(VectorChartDrawer):
 
         logger.debug(
             "CM93 draw: scale=%.1f level=%s bbox=(%.2f,%.2f)-(%.2f,%.2f) cells=%d",
-            scale, scale_level, min_lat, min_lon, max_lat, max_lon, len(cells),
+            scale,
+            scale_level,
+            min_lat,
+            min_lon,
+            max_lat,
+            max_lon,
+            len(cells),
         )
 
         if not cells:
@@ -132,8 +106,8 @@ class CM93ChartDrawer(VectorChartDrawer):
         for feature in areas:
             try:
                 self._render_area(gpsmap, cr, feature, palette)
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug("Area render error %s: %s", feature.obj_name, e)
 
         # Then lines and points on top
         lines_points.sort(key=lambda f: f.priority)
@@ -143,8 +117,8 @@ class CM93ChartDrawer(VectorChartDrawer):
                     self._render_line(gpsmap, cr, feature, palette)
                 elif feature.geom_type == "P":
                     self._render_point(gpsmap, cr, feature, palette, scale)
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug("Feature render error %s: %s", feature.obj_name, e)
 
     def _render_area(self, gpsmap, cr, feature, palette):
         name = feature.obj_name
@@ -206,17 +180,13 @@ class CM93ChartDrawer(VectorChartDrawer):
         name = feature.obj_name
 
         if name == "COALNE":
-            style = CairoStyle(
-                color=palette.land_stroke.color, line_width=1.5
-            )
+            style = CairoStyle(color=palette.land_stroke.color, line_width=1.5)
         elif name == "DEPCNT":
             style = CONTOUR_STYLE
         elif name in ("NAVLNE", "FERYRT", "TSELNE"):
             style = DASHED_STYLE
         elif name == "SLCONS":
-            style = CairoStyle(
-                color=palette.land_stroke.color, line_width=1.0
-            )
+            style = CairoStyle(color=palette.land_stroke.color, line_width=1.0)
         else:
             style = DEFAULT_LINE
 
@@ -227,9 +197,7 @@ class CM93ChartDrawer(VectorChartDrawer):
         style.apply(cr)
         first = True
         for lat, lon in points:
-            x, y = gpsmap.convert_geographic_to_screen(
-                MapPoint.new_degrees(lat, lon)
-            )
+            x, y = gpsmap.convert_geographic_to_screen(MapPoint.new_degrees(lat, lon))
             if first:
                 cr.move_to(x, y)
                 first = False

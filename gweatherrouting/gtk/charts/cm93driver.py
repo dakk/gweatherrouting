@@ -48,7 +48,11 @@ class CM93Driver:
             logger.error("Failed to parse CM93OBJ.DIC")
             return None
 
-        logger.info("Opening CM93 chart at %s (%d objects, %d attributes)",
-                     path, len(obj_dict), len(attr_dict))
+        logger.info(
+            "Opening CM93 chart at %s (%d objects, %d attributes)",
+            path,
+            len(obj_dict),
+            len(attr_dict),
+        )
 
         return CM93DataSource(path, obj_dict, attr_dict)
