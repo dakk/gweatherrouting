@@ -849,11 +849,11 @@ def parse_cm93_cell(file_path, scale_level, obj_dict, attr_dict):
                 geometry = rings
 
             elif geotype_flag == 8:
-                # 3D point descriptor
+                # 3D point descriptor — preserve z (depth) coordinate
                 idx, feat_off = _read_ushort(data, feat_off)
                 if idx < len(point3d_records) and point3d_records[idx]:
                     for pt in point3d_records[idx]:
-                        geometry.append((pt[0], pt[1]))
+                        geometry.append((pt[0], pt[1], pt[2]))
 
         except Exception as e:
             logger.debug("Geometry parse error in %s: %s", file_path, e)

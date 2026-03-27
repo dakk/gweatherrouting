@@ -212,23 +212,23 @@ class CM93ChartDrawer(VectorChartDrawer):
         if not feature.geometry:
             return
 
-        lat, lon = feature.geometry[0]
+        if name == "SOUNDG":
+            # Soundings are multi-point 3D features: (lat, lon, depth)
+            SOUNDING_STYLE.apply(cr)
+            for point in feature.geometry:
+                depth = point[2] if len(point) > 2 else None
+                if depth is not None and depth <= 100:
+                    x, y = gpsmap.convert_geographic_to_screen(
+                        MapPoint.new_degrees(point[0], point[1])
+                    )
+                    cr.move_to(x + 2, y + 2)
+                    cr.show_text(f"{depth:.1f}")
+            return
+
+        lat, lon = feature.geometry[0][0], feature.geometry[0][1]
         x, y = gpsmap.convert_geographic_to_screen(MapPoint.new_degrees(lat, lon))
 
-        if name == "SOUNDG":
-            depth = feature.attributes.get("VALSOU")
-            if depth is None:
-                # Try to get depth from the z coordinate if stored
-                depth = feature.attributes.get("DRVAL1", "")
-            if depth is not None and depth != "":
-                SOUNDING_STYLE.apply(cr)
-                cr.move_to(x + 2, y + 2)
-                if isinstance(depth, float):
-                    cr.show_text(f"{depth:.1f}")
-                else:
-                    cr.show_text(str(depth))
-
-        elif name == "LIGHTS":
+        if name == "LIGHTS":
             # Draw a small yellow star/circle
             LIGHT_STYLE.apply(cr)
             cr.arc(x, y, 4, 0, 2 * math.pi)
