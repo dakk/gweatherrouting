@@ -130,32 +130,40 @@ class CM93DataSource:
     def get_cells_for_bbox(self, min_lat, min_lon, max_lat, max_lon, scale_level):
         """Return parsed CM93Cells intersecting the bbox at the given scale.
 
-        Always includes a coarser "background" scale underneath the requested
-        scale so that areas not covered by fine cells still show land/sea from
-        coarser data (matching OpenCPN's multi-scale overlay approach).
+        Always renders a coarse background (D or coarser) underneath the
+        requested fine scale, so areas without fine-scale coverage still
+        show land/sea from coarser data. Fine scales (E/F/G) have sparse
+        coverage and cannot serve as reliable backgrounds.
         """
         scale_idx = SCALE_ORDER.index(scale_level)
 
         # Get cells at the requested scale
-        cells = self._get_cells_at_scale(
+        fine_cells = self._get_cells_at_scale(
             min_lat, min_lon, max_lat, max_lon, scale_level
         )
 
-        # Find a coarser background layer for gap-filling
+        # If nothing at the requested scale, walk back to find best available
+        if not fine_cells:
+            for i in range(scale_idx - 1, -1, -1):
+                fine_cells = self._get_cells_at_scale(
+                    min_lat, min_lon, max_lat, max_lon, SCALE_ORDER[i]
+                )
+                if fine_cells:
+                    break
+
+        # Always include a background from D or coarser (index 0-4).
+        # Fine scales E/F/G have sparse cell coverage and can't fill gaps.
         bg_cells = []
-        for i in range(scale_idx - 1, -1, -1):
-            bg_scale = SCALE_ORDER[i]
+        max_bg_idx = min(scale_idx - 1, SCALE_ORDER.index("D"))
+        for i in range(max_bg_idx, -1, -1):
             bg_cells = self._get_cells_at_scale(
-                min_lat, min_lon, max_lat, max_lon, bg_scale
+                min_lat, min_lon, max_lat, max_lon, SCALE_ORDER[i]
             )
             if bg_cells:
                 break
 
-        if cells or bg_cells:
-            # Background cells first (rendered underneath), then fine cells on top
-            return bg_cells + cells
-
-        return []
+        # Background first (rendered underneath), then fine cells on top
+        return bg_cells + fine_cells
 
     def _get_cells_at_scale(self, min_lat, min_lon, max_lat, max_lon, scale):
         """Get parsed cells intersecting bbox at a specific scale."""
