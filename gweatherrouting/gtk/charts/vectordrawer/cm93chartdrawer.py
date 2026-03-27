@@ -47,30 +47,16 @@ DEFAULT_AREA_STROKE = CairoStyle(color=(0.6, 0.6, 0.6, 0.5), line_width=0.5)
 
 
 class CM93ChartDrawer(VectorChartDrawer):
-    def draw(self, gpsmap, cr, vector_file, bounding):
-        palette = Style.chart_palettes[self.palette]
-
-        # Fill background with sea color
-        width = float(gpsmap.get_allocated_width())
-        height = float(gpsmap.get_allocated_height())
-        palette.sea.apply(cr)
-        cr.rectangle(0, 0, width, height)
-        cr.fill()
-
-        # Get viewport bounds
+    def _get_visible_cells(self, gpsmap, vector_file):
+        """Get visible cells for the current viewport."""
         p1, p2 = gpsmap.get_bbox()
         lat1, lon1 = p1.get_degrees()
         lat2, lon2 = p2.get_degrees()
-        min_lat = min(lat1, lat2)
-        max_lat = max(lat1, lat2)
-        min_lon = min(lon1, lon2)
-        max_lon = max(lon1, lon2)
+        min_lat, max_lat = min(lat1, lat2), max(lat1, lat2)
+        min_lon, max_lon = min(lon1, lon2), max(lon1, lon2)
 
-        # Determine scale level
         scale = gpsmap.get_scale()
         scale_level = vector_file.get_scale_for_zoom(scale)
-
-        # Get visible cells
         cells = vector_file.get_cells_for_bbox(
             min_lat, min_lon, max_lat, max_lon, scale_level
         )
@@ -85,11 +71,10 @@ class CM93ChartDrawer(VectorChartDrawer):
             max_lon,
             len(cells),
         )
+        return cells, scale
 
-        if not cells:
-            return
-
-        # Single-pass: separate features by geometry type
+    def _separate_features(self, cells):
+        """Separate cell features into areas and lines/points."""
         areas = []
         lines_points = []
         for cell in cells:
@@ -98,10 +83,24 @@ class CM93ChartDrawer(VectorChartDrawer):
                     areas.append(feat)
                 else:
                     lines_points.append(feat)
+        return areas, lines_points
 
+    def draw(self, gpsmap, cr, vector_file, bounding):
+        palette = Style.chart_palettes[self.palette]
+
+        width = float(gpsmap.get_allocated_width())
+        height = float(gpsmap.get_allocated_height())
+        palette.sea.apply(cr)
+        cr.rectangle(0, 0, width, height)
+        cr.fill()
+
+        cells, scale = self._get_visible_cells(gpsmap, vector_file)
+        if not cells:
+            return
+
+        areas, lines_points = self._separate_features(cells)
         cr.set_line_join(cairo.LINE_JOIN_ROUND)
 
-        # Render areas first (sorted by priority)
         areas.sort(key=lambda f: f.priority)
         for feature in areas:
             try:
@@ -109,7 +108,6 @@ class CM93ChartDrawer(VectorChartDrawer):
             except Exception as e:
                 logger.debug("Area render error %s: %s", feature.obj_name, e)
 
-        # Then lines and points on top
         lines_points.sort(key=lambda f: f.priority)
         for feature in lines_points:
             try:
@@ -120,40 +118,47 @@ class CM93ChartDrawer(VectorChartDrawer):
             except Exception as e:
                 logger.debug("Feature render error %s: %s", feature.obj_name, e)
 
-    def _render_area(self, gpsmap, cr, feature, palette):
-        name = feature.obj_name
-
+    def _get_area_styles(self, name, attributes, palette):
+        """Return (fill, stroke) styles for an area feature."""
         if name == "LNDARE":
-            stroke = palette.land_stroke
-            fill = palette.land_fill
-        elif name == "DEPARE":
-            drval1 = feature.attributes.get("DRVAL1", 0)
-            drval2 = feature.attributes.get("DRVAL2", 100)
-            if isinstance(drval1, (int, float)) and drval1 < 5:
-                fill = palette.shallow_sea
-            elif isinstance(drval2, (int, float)) and drval2 < 20:
-                fill = DEPTH_MEDIUM
-            else:
-                fill = DEPTH_DEEP
-            stroke = CONTOUR_STYLE
-        elif name == "DRGARE":
+            return palette.land_fill, palette.land_stroke
+        if name == "DEPARE":
+            return self._get_depare_styles(attributes, palette)
+        if name == "DRGARE":
+            return DEPTH_MEDIUM, CONTOUR_STYLE
+        if name in ("BUAARE", "BUISGL"):
+            return BUILDUP_FILL, palette.land_stroke
+        if name in ("LAKARE", "RIVERS"):
+            return palette.sea, CONTOUR_STYLE
+        if name in ("ACHARE", "ANCBRT"):
+            return (
+                CairoStyle(color=(0.8, 0.8, 0.95, 0.3)),
+                CairoStyle(color=(0.5, 0.5, 0.7, 0.5), line_width=0.5),
+            )
+        if name in ("RESARE", "CTNARE"):
+            return (
+                CairoStyle(color=(0.95, 0.85, 0.85, 0.3)),
+                CairoStyle(color=(0.7, 0.4, 0.4, 0.5), line_width=0.5, dash=3.0),
+            )
+        return DEFAULT_AREA_FILL, DEFAULT_AREA_STROKE
+
+    @staticmethod
+    def _get_depare_styles(attributes, palette):
+        """Return (fill, stroke) for DEPARE features based on depth values."""
+        drval1 = attributes.get("DRVAL1", 0)
+        drval2 = attributes.get("DRVAL2", 100)
+        if isinstance(drval1, (int, float)) and drval1 < 5:
+            fill = palette.shallow_sea
+        elif isinstance(drval2, (int, float)) and drval2 < 20:
             fill = DEPTH_MEDIUM
-            stroke = CONTOUR_STYLE
-        elif name in ("BUAARE", "BUISGL"):
-            stroke = palette.land_stroke
-            fill = BUILDUP_FILL
-        elif name in ("LAKARE", "RIVERS"):
-            stroke = CONTOUR_STYLE
-            fill = palette.sea
-        elif name in ("ACHARE", "ANCBRT"):
-            fill = CairoStyle(color=(0.8, 0.8, 0.95, 0.3))
-            stroke = CairoStyle(color=(0.5, 0.5, 0.7, 0.5), line_width=0.5)
-        elif name in ("RESARE", "CTNARE"):
-            fill = CairoStyle(color=(0.95, 0.85, 0.85, 0.3))
-            stroke = CairoStyle(color=(0.7, 0.4, 0.4, 0.5), line_width=0.5, dash=3.0)
         else:
-            stroke = DEFAULT_AREA_STROKE
-            fill = DEFAULT_AREA_FILL
+            fill = DEPTH_DEEP
+        return fill, CONTOUR_STYLE
+
+    def _render_area(self, gpsmap, cr, feature, palette):
+        fill, stroke = self._get_area_styles(
+            feature.obj_name, feature.attributes, palette
+        )
 
         for ring in feature.geometry:
             if not ring or len(ring) < 3:
@@ -207,83 +212,99 @@ class CM93ChartDrawer(VectorChartDrawer):
         cr.stroke()
         Style.reset_dash(cr)
 
+    def _render_soundings(self, gpsmap, cr, feature):
+        """Render sounding (depth) labels for 3D point features."""
+        SOUNDING_STYLE.apply(cr)
+        for point in feature.geometry:
+            depth = point[2] if len(point) > 2 else None
+            if depth is not None and depth <= 100:
+                x, y = gpsmap.convert_geographic_to_screen(
+                    MapPoint.new_degrees(point[0], point[1])
+                )
+                cr.move_to(x + 2, y + 2)
+                cr.show_text(f"{depth:.1f}")
+
+    @staticmethod
+    def _draw_light(cr, x, y):
+        """Draw a light symbol (yellow circle with rays)."""
+        LIGHT_STYLE.apply(cr)
+        cr.arc(x, y, 4, 0, 2 * math.pi)
+        cr.fill()
+        cr.set_line_width(0.5)
+        for angle in range(0, 360, 45):
+            rad = math.radians(angle)
+            cr.move_to(x + 4 * math.cos(rad), y + 4 * math.sin(rad))
+            cr.line_to(x + 7 * math.cos(rad), y + 7 * math.sin(rad))
+        cr.stroke()
+
+    @staticmethod
+    def _draw_beacon(cr, x, y):
+        """Draw a beacon triangle symbol."""
+        BEACON_STYLE.apply(cr)
+        cr.set_line_width(1.5)
+        cr.move_to(x, y - 5)
+        cr.line_to(x - 4, y + 3)
+        cr.line_to(x + 4, y + 3)
+        cr.close_path()
+        cr.stroke()
+
+    @staticmethod
+    def _draw_buoy_lateral(cr, x, y, catlam):
+        """Draw a lateral buoy (red for port, green otherwise)."""
+        if catlam == 1:
+            BUOY_RED.apply(cr)
+        else:
+            BUOY_GREEN.apply(cr)
+        cr.arc(x, y, 3, 0, 2 * math.pi)
+        cr.fill()
+
+    @staticmethod
+    def _draw_wreck(cr, x, y):
+        """Draw an X mark for wrecks/obstructions."""
+        WRECK_STYLE.apply(cr)
+        cr.set_line_width(1.0)
+        cr.move_to(x - 3, y - 3)
+        cr.line_to(x + 3, y + 3)
+        cr.move_to(x + 3, y - 3)
+        cr.line_to(x - 3, y + 3)
+        cr.stroke()
+
+    _BEACON_NAMES = {"BCNCAR", "BCNLAT", "BCNISD", "BCNSAW", "BCNSPP"}
+    _BUOY_NAMES = {"BOYCAR", "BOYISD", "BOYSAW", "BOYSPP"}
+    _WRECK_NAMES = {"WRECKS", "UWTROC", "OBSTRN"}
+    _LANDMARK_NAMES = {"LNDMRK", "SILTNK", "CHIMNY", "TOWERS"}
+
     def _render_point(self, gpsmap, cr, feature, palette, scale):
         name = feature.obj_name
         if not feature.geometry:
             return
 
         if name == "SOUNDG":
-            # Soundings are multi-point 3D features: (lat, lon, depth)
-            SOUNDING_STYLE.apply(cr)
-            for point in feature.geometry:
-                depth = point[2] if len(point) > 2 else None
-                if depth is not None and depth <= 100:
-                    x, y = gpsmap.convert_geographic_to_screen(
-                        MapPoint.new_degrees(point[0], point[1])
-                    )
-                    cr.move_to(x + 2, y + 2)
-                    cr.show_text(f"{depth:.1f}")
+            self._render_soundings(gpsmap, cr, feature)
             return
 
         lat, lon = feature.geometry[0][0], feature.geometry[0][1]
         x, y = gpsmap.convert_geographic_to_screen(MapPoint.new_degrees(lat, lon))
 
         if name == "LIGHTS":
-            # Draw a small yellow star/circle
-            LIGHT_STYLE.apply(cr)
-            cr.arc(x, y, 4, 0, 2 * math.pi)
-            cr.fill()
-            # Draw rays
-            cr.set_line_width(0.5)
-            for angle in range(0, 360, 45):
-                rad = math.radians(angle)
-                cr.move_to(x + 4 * math.cos(rad), y + 4 * math.sin(rad))
-                cr.line_to(x + 7 * math.cos(rad), y + 7 * math.sin(rad))
-            cr.stroke()
-
-        elif name in ("BCNCAR", "BCNLAT", "BCNISD", "BCNSAW", "BCNSPP"):
-            BEACON_STYLE.apply(cr)
-            cr.set_line_width(1.5)
-            # Triangle symbol
-            cr.move_to(x, y - 5)
-            cr.line_to(x - 4, y + 3)
-            cr.line_to(x + 4, y + 3)
-            cr.close_path()
-            cr.stroke()
-
-        elif name in ("BOYCAR", "BOYISD", "BOYSAW", "BOYSPP"):
+            self._draw_light(cr, x, y)
+        elif name in self._BEACON_NAMES:
+            self._draw_beacon(cr, x, y)
+        elif name in self._BUOY_NAMES:
             DEFAULT_POINT.apply(cr)
             cr.arc(x, y, 3, 0, 2 * math.pi)
             cr.fill()
-
         elif name == "BOYLAT":
             catlam = feature.attributes.get("CATLAM", 0)
-            if catlam == 1:  # Port
-                BUOY_RED.apply(cr)
-            else:
-                BUOY_GREEN.apply(cr)
-            cr.arc(x, y, 3, 0, 2 * math.pi)
-            cr.fill()
-
-        elif name in ("WRECKS", "UWTROC", "OBSTRN"):
-            WRECK_STYLE.apply(cr)
-            cr.set_line_width(1.0)
-            # X mark
-            cr.move_to(x - 3, y - 3)
-            cr.line_to(x + 3, y + 3)
-            cr.move_to(x + 3, y - 3)
-            cr.line_to(x - 3, y + 3)
-            cr.stroke()
-
-        elif name in ("LNDMRK", "SILTNK", "CHIMNY", "TOWERS"):
+            self._draw_buoy_lateral(cr, x, y, catlam)
+        elif name in self._WRECK_NAMES:
+            self._draw_wreck(cr, x, y)
+        elif name in self._LANDMARK_NAMES:
             BEACON_STYLE.apply(cr)
             cr.set_line_width(1.0)
-            # Small square
             cr.rectangle(x - 2, y - 2, 4, 4)
             cr.stroke()
-
         else:
-            # Skip unknown points at high zoom to reduce clutter
             if scale > 100:
                 return
             DEFAULT_POINT.apply(cr)

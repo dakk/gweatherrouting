@@ -19,7 +19,6 @@ import os
 from collections import OrderedDict
 
 from .cm93parser import (
-    SCALE_LEVELS,
     cell_index_to_origin,
     cell_name_to_index,
     parse_cm93_cell,
@@ -73,45 +72,9 @@ class CM93DataSource:
             cell_dir = os.path.join(self.root_path, entry)
             if not os.path.isdir(cell_dir):
                 continue
-
-            cell_idx = cell_name_to_index(entry)
-            if cell_idx is None:
+            if cell_name_to_index(entry) is None:
                 continue
-
-            # Check which scale subdirectories exist
-            for scale in SCALE_ORDER:
-                scale_dir = os.path.join(cell_dir, scale)
-                if not os.path.isdir(scale_dir):
-                    continue
-
-                # Find binary files in the scale directory
-                try:
-                    files = os.listdir(scale_dir)
-                except OSError:
-                    continue
-
-                for fname in files:
-                    if not fname.upper().endswith("." + scale):
-                        continue
-
-                    file_path = os.path.join(scale_dir, fname)
-                    file_cell_name = os.path.splitext(fname)[0]
-                    file_cell_idx = cell_name_to_index(file_cell_name)
-
-                    if file_cell_idx is not None:
-                        lat, lon, elat, elon = cell_index_to_origin(
-                            file_cell_idx, scale
-                        )
-                        self._cell_index[scale].append(
-                            (
-                                file_cell_name,
-                                file_path,
-                                lat,
-                                lon,
-                                lat + elat,
-                                lon + elon,
-                            )
-                        )
+            self._index_cell_directory(cell_dir)
 
         total = sum(len(v) for v in self._cell_index.values())
         logger.info(
@@ -119,6 +82,42 @@ class CM93DataSource:
             total,
             sum(1 for v in self._cell_index.values() if v),
         )
+
+    def _index_cell_directory(self, cell_dir):
+        """Index all scale subdirectories within a single cell directory."""
+        for scale in SCALE_ORDER:
+            scale_dir = os.path.join(cell_dir, scale)
+            if not os.path.isdir(scale_dir):
+                continue
+            self._index_scale_directory(scale_dir, scale)
+
+    def _index_scale_directory(self, scale_dir, scale):
+        """Index all chart files within a single scale directory."""
+        try:
+            files = os.listdir(scale_dir)
+        except OSError:
+            return
+
+        for fname in files:
+            if not fname.upper().endswith("." + scale):
+                continue
+
+            file_cell_name = os.path.splitext(fname)[0]
+            file_cell_idx = cell_name_to_index(file_cell_name)
+            if file_cell_idx is None:
+                continue
+
+            lat, lon, elat, elon = cell_index_to_origin(file_cell_idx, scale)
+            self._cell_index[scale].append(
+                (
+                    file_cell_name,
+                    os.path.join(scale_dir, fname),
+                    lat,
+                    lon,
+                    lat + elat,
+                    lon + elon,
+                )
+            )
 
     def get_scale_for_zoom(self, meters_per_pixel):
         """Map meters_per_pixel to the appropriate CM93 scale level."""
@@ -241,19 +240,22 @@ class CM93DataSource:
 
         return results
 
+    @staticmethod
+    def _point_within_tolerance(pt, lat, lon, tolerance):
+        """Check if a single point is within tolerance of lat/lon."""
+        return abs(pt[0] - lat) <= tolerance and abs(pt[1] - lon) <= tolerance
+
     def _feature_near_point(self, feature, lat, lon, tolerance):
         """Check if a feature's geometry is within tolerance of a point."""
-        if feature.geom_type == "P":
-            for pt in feature.geometry:
-                if abs(pt[0] - lat) <= tolerance and abs(pt[1] - lon) <= tolerance:
-                    return True
-        elif feature.geom_type == "L":
-            for pt in feature.geometry:
-                if abs(pt[0] - lat) <= tolerance and abs(pt[1] - lon) <= tolerance:
-                    return True
-        elif feature.geom_type == "A":
-            for ring in feature.geometry:
-                for pt in ring:
-                    if abs(pt[0] - lat) <= tolerance and abs(pt[1] - lon) <= tolerance:
-                        return True
+        if feature.geom_type in ("P", "L"):
+            return any(
+                self._point_within_tolerance(pt, lat, lon, tolerance)
+                for pt in feature.geometry
+            )
+        if feature.geom_type == "A":
+            return any(
+                self._point_within_tolerance(pt, lat, lon, tolerance)
+                for ring in feature.geometry
+                for pt in ring
+            )
         return False
