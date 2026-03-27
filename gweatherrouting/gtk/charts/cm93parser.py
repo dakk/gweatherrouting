@@ -23,6 +23,8 @@ import os
 import struct
 from dataclasses import dataclass, field
 
+import numpy as np
+
 logger = logging.getLogger("gweatherrouting")
 
 # CM93 decryption table (from OpenCPN)
@@ -462,22 +464,23 @@ def cell_name_to_index(cell_name):
         return None
 
 
-def _transform_point(x, y, tx_rate, ty_rate, tx_origin, ty_origin):
-    """Transform CM93 uint16 coordinates to WGS84 lat/lon."""
-    valx = x * tx_rate + tx_origin
-    valy = y * ty_rate + ty_origin
+def _transform_points_batch(xs, ys, tx_rate, ty_rate, tx_origin, ty_origin):
+    """Batch-transform CM93 uint16 arrays to WGS84 lat/lon arrays using NumPy."""
+    valx = xs * tx_rate + tx_origin
+    valy = ys * ty_rate + ty_origin
+    lons = valx * _MERCATOR_SCALE
+    lats = (2.0 * np.arctan(np.exp(valy / CM93_SEMIMAJOR)) - _HALF_PI) * _RAD_TO_DEG
+    return lats, lons
 
-    # Inverse Mercator projection (using precomputed constants)
-    lon = valx * _MERCATOR_SCALE
-    lat = (2.0 * math.atan(math.exp(valy / CM93_SEMIMAJOR)) - _HALF_PI) * _RAD_TO_DEG
-    return lat, lon
+
+_ushort_st = struct.Struct("<H")
 
 
 def _read_ushort(data, offset):
     """Read a little-endian unsigned short from decrypted data."""
     if offset + 2 > len(data):
         return 0, offset + 2
-    val = struct.unpack_from("<H", data, offset)[0]
+    val = _ushort_st.unpack_from(data, offset)[0]
     return val, offset + 2
 
 
@@ -643,51 +646,110 @@ def _compute_transform(hdr):
 def _parse_edge_records(data, off, bound, n_records, transform):
     """Parse vector (edge) records from geometry table."""
     tx_rate, ty_rate, tx_origin, ty_origin = transform
-    edges = []
-    edges_raw = []
+
+    # First pass: read npts headers and bulk-read coordinate data via frombuffer
+    edge_sizes = []
+    all_raw_u16 = []  # list of numpy uint16 arrays, each (npts*2,)
+    total_pts = 0
     for _ in range(n_records):
         if off + 2 > bound:
-            break
-        npts, off = _read_ushort(data, off)
-        points = []
-        raw_points = []
-        for _ in range(npts):
-            if off + 4 > bound:
-                break
-            px, off = _read_ushort(data, off)
-            py, off = _read_ushort(data, off)
-            raw_points.append((px, py))
-            lat, lon = _transform_point(px, py, tx_rate, ty_rate, tx_origin, ty_origin)
-            points.append((lat, lon))
-        edges.append(points)
-        edges_raw.append(raw_points)
+            edge_sizes.append(0)
+            continue
+        (npts,) = _ushort_st.unpack_from(data, off)
+        off += 2
+        byte_len = npts * 4  # 2 uint16 per point
+        available = min(byte_len, bound - off)
+        actual_pts = available // 4
+        if actual_pts > 0:
+            raw = np.frombuffer(data, dtype="<u2", count=actual_pts * 2, offset=off)
+            all_raw_u16.append(raw)
+            off += actual_pts * 4
+        edge_sizes.append(actual_pts)
+        total_pts += actual_pts
+
+    # Batch transform all points at once with NumPy
+    if total_pts > 0:
+        flat = np.concatenate(all_raw_u16) if len(all_raw_u16) > 1 else all_raw_u16[0]
+        xs = flat[0::2].astype(np.float64)
+        ys = flat[1::2].astype(np.float64)
+        lats, lons = _transform_points_batch(
+            xs, ys, tx_rate, ty_rate, tx_origin, ty_origin
+        )
+        lat_list = lats.tolist()
+        lon_list = lons.tolist()
+        xs_raw = flat[0::2].tolist()
+        ys_raw = flat[1::2].tolist()
+
+        # Split back into per-edge lists
+        edges = []
+        edges_raw = []
+        idx = 0
+        for size in edge_sizes:
+            end = idx + size
+            edge_pts = list(zip(lat_list[idx:end], lon_list[idx:end]))
+            edge_raw = list(zip(xs_raw[idx:end], ys_raw[idx:end]))
+            edges.append(edge_pts)
+            edges_raw.append(edge_raw)
+            idx = end
+    else:
+        edges, edges_raw = [], []
+
     return edges, edges_raw, off
 
 
 def _parse_point3d_records(data, off, bound, n_records, transform):
     """Parse 3D point records from geometry table."""
     tx_rate, ty_rate, tx_origin, ty_origin = transform
-    point3d_records = []
+
+    # Read npts headers and bulk-read coordinate data via frombuffer
+    all_raw_u16 = []  # list of numpy uint16 arrays, each (npts*3,)
+    record_sizes = []
+    total_pts = 0
     for _ in range(n_records):
         if off + 2 > bound:
-            break
-        npts, off = _read_ushort(data, off)
-        pts3d: list[tuple[float, float, float]] = []
-        for _ in range(npts):
-            if off + 6 > bound:
-                break
-            px, off = _read_ushort(data, off)
-            py, off = _read_ushort(data, off)
-            pz, off = _read_ushort(data, off)
-            lat, lon = _transform_point(px, py, tx_rate, ty_rate, tx_origin, ty_origin)
-            pts3d.append((lat, lon, pz / 10.0))
-        point3d_records.append(pts3d)
+            record_sizes.append(0)
+            continue
+        (npts,) = _ushort_st.unpack_from(data, off)
+        off += 2
+        byte_len = npts * 6  # 3 uint16 per point (x, y, z)
+        available = min(byte_len, bound - off)
+        actual_pts = available // 6
+        if actual_pts > 0:
+            raw = np.frombuffer(data, dtype="<u2", count=actual_pts * 3, offset=off)
+            all_raw_u16.append(raw)
+            off += actual_pts * 6
+        record_sizes.append(actual_pts)
+        total_pts += actual_pts
+
+    # Batch transform all points at once with NumPy
+    if total_pts > 0:
+        flat = np.concatenate(all_raw_u16) if len(all_raw_u16) > 1 else all_raw_u16[0]
+        xs = flat[0::3].astype(np.float64)
+        ys = flat[1::3].astype(np.float64)
+        zs = flat[2::3].astype(np.float64) / 10.0
+        lats, lons = _transform_points_batch(
+            xs, ys, tx_rate, ty_rate, tx_origin, ty_origin
+        )
+        lat_list = lats.tolist()
+        lon_list = lons.tolist()
+        z_list = zs.tolist()
+
+        # Split back into per-record lists with z-coordinate
+        point3d_records = []
+        idx = 0
+        for size in record_sizes:
+            end = idx + size
+            pts3d = list(zip(lat_list[idx:end], lon_list[idx:end], z_list[idx:end]))
+            point3d_records.append(pts3d)
+            idx = end
+    else:
+        point3d_records = [[] for _ in range(n_records)]
+
     return point3d_records, off
 
 
 def _parse_geometry_tables(data, header_len, table1_len, hdr, transform):
     """Parse table1: edges, 3D points, and 2D points."""
-    tx_rate, ty_rate, tx_origin, ty_origin = transform
     bound = header_len + table1_len
     off = header_len
 
@@ -698,14 +760,20 @@ def _parse_geometry_tables(data, header_len, table1_len, hdr, transform):
         data, off, bound, hdr["n_point3d_records"], transform
     )
 
-    point2d_array = []
-    for _ in range(hdr["n_point2d_records"]):
-        if off + 4 > bound:
-            break
-        px, off = _read_ushort(data, off)
-        py, off = _read_ushort(data, off)
-        lat, lon = _transform_point(px, py, tx_rate, ty_rate, tx_origin, ty_origin)
-        point2d_array.append((lat, lon))
+    n_2d = hdr["n_point2d_records"]
+    byte_len_2d = n_2d * 4  # 2 uint16 per point
+    available_2d = min(byte_len_2d, bound - off)
+    actual_2d = available_2d // 4
+
+    if actual_2d > 0:
+        raw_2d = np.frombuffer(data, dtype="<u2", count=actual_2d * 2, offset=off)
+        off += actual_2d * 4
+        xs_2d = raw_2d[0::2].astype(np.float64)
+        ys_2d = raw_2d[1::2].astype(np.float64)
+        lats2d, lons2d = _transform_points_batch(xs_2d, ys_2d, *transform)
+        point2d_array = list(zip(lats2d.tolist(), lons2d.tolist()))
+    else:
+        point2d_array = []
 
     return edges, edges_raw, point3d_records, point2d_array
 
