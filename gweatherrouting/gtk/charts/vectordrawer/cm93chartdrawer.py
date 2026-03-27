@@ -75,6 +75,11 @@ class CM93ChartDrawer(VectorChartDrawer):
             min_lat, min_lon, max_lat, max_lon, scale_level
         )
 
+        logger.debug(
+            "CM93 draw: scale=%.1f level=%s bbox=(%.2f,%.2f)-(%.2f,%.2f) cells=%d",
+            scale, scale_level, min_lat, min_lon, max_lat, max_lon, len(cells),
+        )
+
         if not cells:
             return
 

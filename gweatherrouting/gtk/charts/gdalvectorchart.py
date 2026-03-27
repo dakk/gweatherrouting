@@ -63,7 +63,7 @@ class GDALVectorChart(ChartLayer):
             raise Exception("Unable to open vector map %s" % path)
 
     def on_register(self, on_tick_handler=None):
-        pass
+        return True
 
     def do_draw(self, gpsmap, cr):
         bounding_geometry = self.get_bounding_geometry(gpsmap)
