@@ -16,6 +16,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 from osgeo import ogr
 
+from gweatherrouting.gtk.charts.cm93datasource import CM93DataSource
 from gweatherrouting.gtk.charts.cm93driver import CM93Driver
 from gweatherrouting.gtk.charts.vectordrawer.osmchartdrawer import OSMChartDrawer
 
@@ -79,6 +80,9 @@ class GDALVectorChart(ChartLayer):
 
         Returns a list of dicts with layer name, geometry type, and attributes.
         """
+        if isinstance(self.vector_file, CM93DataSource):
+            return self.vector_file.query_point(lat, lon, tolerance)
+
         results = []
         bbox = ogr.CreateGeometryFromWkt(
             self.get_bounding_wkt_of_coords(
