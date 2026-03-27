@@ -74,7 +74,7 @@ def _build_decode_table():
 def decrypt_cm93(data):
     """Decrypt CM93 binary data using the substitution cipher."""
     _build_decode_table()
-    return bytes(_DECODE_TABLE[b] for b in data)
+    return data.translate(bytes(_DECODE_TABLE))
 
 
 # Scale level properties
@@ -91,6 +91,9 @@ SCALE_LEVELS = {
 }
 
 CM93_SEMIMAJOR = 6378137.0
+_RAD_TO_DEG = 180.0 / math.pi
+_MERCATOR_SCALE = _RAD_TO_DEG / CM93_SEMIMAJOR
+_HALF_PI = math.pi / 2.0
 
 
 @dataclass
@@ -230,11 +233,9 @@ def _transform_point(x, y, tx_rate, ty_rate, tx_origin, ty_origin):
     valx = x * tx_rate + tx_origin
     valy = y * ty_rate + ty_origin
 
-    # Inverse Mercator projection
-    lon = valx / (math.pi / 180.0 * CM93_SEMIMAJOR)
-    lat = (2.0 * math.atan(math.exp(valy / CM93_SEMIMAJOR)) - math.pi / 2.0) / (
-        math.pi / 180.0
-    )
+    # Inverse Mercator projection (using precomputed constants)
+    lon = valx * _MERCATOR_SCALE
+    lat = (2.0 * math.atan(math.exp(valy / CM93_SEMIMAJOR)) - _HALF_PI) * _RAD_TO_DEG
     return lat, lon
 
 
@@ -577,8 +578,8 @@ def parse_cm93_cell(file_path, scale_level, obj_dict, attr_dict):
                     edge_raw = edges_raw[real_idx]
 
                     if direction != 0:
-                        edge_pts = list(reversed(edge_pts))
-                        edge_raw = list(reversed(edge_raw))
+                        edge_pts = edge_pts[::-1]
+                        edge_raw = edge_raw[::-1]
 
                     # Record start of ring
                     if start_raw is None and edge_raw:

@@ -42,7 +42,7 @@ ZOOM_THRESHOLDS = [
     (0, "G"),
 ]
 
-MAX_CACHE_SIZE = 50
+MAX_CACHE_SIZE = 100
 
 
 class CM93DataSource:
