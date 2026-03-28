@@ -28,6 +28,24 @@ from gweatherrouting.gtk.style import Style
 from gweatherrouting.gtk.widgets.mapwidget import MapPoint
 
 
+def _speed_color(speed):
+    """Map boat speed (kts) to a color gradient: blue (slow) -> green -> yellow -> red (fast)."""
+    if speed < 2:
+        return (0.3, 0.5, 1.0, 0.9)
+    elif speed < 4:
+        return (0.2, 0.7, 0.9, 0.9)
+    elif speed < 6:
+        return (0.2, 0.85, 0.5, 0.9)
+    elif speed < 8:
+        return (0.5, 0.9, 0.2, 0.9)
+    elif speed < 10:
+        return (0.9, 0.85, 0.1, 0.9)
+    elif speed < 12:
+        return (1.0, 0.6, 0.1, 0.9)
+    else:
+        return (1.0, 0.3, 0.1, 0.9)
+
+
 class GeoMapLayer(GObject.GObject):
     def __init__(self, core: Core, time_control: TimeControl):
         GObject.GObject.__init__(self)
@@ -66,35 +84,39 @@ class GeoMapLayer(GObject.GObject):
             prevp = p
 
         for tr in self.core.routingManager:
-            highlight = False
-
             if not tr.visible:
                 continue
 
-            if tr.name == self.hl_routing:
-                highlight = True
+            highlight = tr.name == self.hl_routing
 
             prevx = None
             prevy = None
             prevp = None
-            i = 0
+            points_list = list(tr)
 
-            for p in tr:
-                i += 1
+            for i, p in enumerate(points_list):
                 x, y = gpsmap.convert_geographic_to_screen(
                     MapPoint.new_degrees(p[0], p[1])
                 )
 
-                if prevp is None:
-                    if highlight:
-                        Style.Track.RoutingTrackFontHL.apply(cr)
-                    else:
-                        Style.Track.RoutingTrackFont.apply(cr)
+                # Route name label at start with background
+                if prevp is None and highlight:
+                    cr.set_font_size(10)
+                    ext = cr.text_extents(tr.name)
+                    cr.set_source_rgba(0.0, 0.0, 0.0, 0.6)
+                    cr.rectangle(x + 8, y - 12, ext.width + 8, 16)
+                    cr.fill()
+                    cr.set_source_rgba(1.0, 1.0, 1.0, 0.9)
+                    cr.move_to(x + 12, y)
+                    cr.show_text(tr.name)
+                    cr.stroke()
+                elif prevp is None:
+                    Style.Track.RoutingTrackFont.apply(cr)
                     cr.move_to(x + 10, y)
                     cr.show_text(tr.name)
                     cr.stroke()
 
-                # Draw boat
+                # Interpolated boat position on route
                 if prevp is not None:
                     tprev = dateutil.parser.parse(prevp[2])
                     tcurr = dateutil.parser.parse(p[2])
@@ -114,30 +136,38 @@ class GeoMapLayer(GObject.GObject):
                             prevp[0], prevp[1], dl, math.radians(p[6])
                         )
 
-                        Style.Track.RoutingBoat.apply(cr)
                         xx, yy = gpsmap.convert_geographic_to_screen(
                             MapPoint.new_degrees(rp[0], rp[1])
                         )
-                        cr.arc(xx, yy, 7, 0, 2 * math.pi)
+                        # Boat marker: filled circle with border
+                        cr.set_source_rgba(0.1, 0.6, 0.1, 1.0)
+                        cr.arc(xx, yy, 8, 0, 2 * math.pi)
                         cr.fill()
+                        cr.set_source_rgba(1.0, 1.0, 1.0, 0.9)
+                        cr.set_line_width(1.5)
+                        cr.arc(xx, yy, 8, 0, 2 * math.pi)
+                        cr.stroke()
 
+                # Draw segment line colored by boat speed
                 if prevx is not None and prevy is not None:
-                    if highlight:
-                        Style.Track.RoutingTrackHL.apply(cr)
-                    else:
-                        Style.Track.RoutingTrack.apply(cr)
+                    speed = p[5] if p[5] is not None else 0
+                    lw = 3.0 if highlight else 2.0
 
+                    r, g, b, a = _speed_color(speed)
+                    cr.set_source_rgba(r, g, b, a if highlight else a * 0.7)
+                    cr.set_line_width(lw)
                     cr.move_to(prevx, prevy)
                     cr.line_to(x, y)
                     cr.stroke()
 
-                if highlight:
-                    Style.Track.RoutingTrackCircleHL.apply(cr)
-                else:
-                    Style.Track.RoutingTrackCircle.apply(cr)
+                # Waypoint markers
+                speed = p[5] if p[5] is not None else 0
+                r, g, b, a = _speed_color(speed)
+                radius = 3 if highlight else 2
 
-                cr.arc(x, y, 5, 0, 2 * math.pi)
-                cr.stroke()
+                cr.set_source_rgba(r, g, b, 1.0)
+                cr.arc(x, y, radius, 0, 2 * math.pi)
+                cr.fill()
 
                 prevx = x
                 prevy = y

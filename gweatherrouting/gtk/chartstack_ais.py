@@ -22,7 +22,14 @@ gi.require_version("Gtk", "3.0")
 
 from gi.repository import GLib
 
+from gweatherrouting.core.aismanager import SHIP_TYPE_COLORS
+
 from .chartstack_base import ChartStackBase
+
+
+def _color_to_hex(r, g, b):
+    """Convert float RGB (0-1) to hex color string."""
+    return "#%02x%02x%02x" % (int(r * 255), int(g * 255), int(b * 255))
 
 
 class ChartStackAIS(ChartStackBase):
@@ -74,7 +81,8 @@ class ChartStackAIS(ChartStackBase):
 
         boat_pos = self._get_boat_position()
 
-        self.ais_store.clear()
+        # Build rows with numeric distance for sorting
+        rows = []
         for t in targets:
             if not t.has_valid_position():
                 continue
@@ -84,13 +92,37 @@ class ChartStackAIS(ChartStackBase):
             sog = "%.1f" % t.sog if t.sog is not None else ""
             cog = "%.1f" % t.cog if t.cog is not None else ""
 
+            dist_num = float("inf")
             distance = ""
             if boat_pos is not None:
-                d = self._haversine_nm(
+                dist_num = self._haversine_nm(
                     boat_pos[0], boat_pos[1], t.latitude, t.longitude
                 )
-                distance = "%.1f" % d
+                distance = "%.1f" % dist_num
 
-            self.ais_store.append([str(t.mmsi), name, category, sog, cog, distance])
+            rgb = SHIP_TYPE_COLORS.get(category, (0.5, 0.5, 0.5))
+            color_hex = _color_to_hex(*rgb)
+
+            rows.append(
+                (
+                    dist_num,
+                    [
+                        str(t.mmsi),
+                        name,
+                        category,
+                        sog,
+                        cog,
+                        distance,
+                        "ais-ship-symbolic",
+                        color_hex,
+                    ],
+                )
+            )
+
+        rows.sort(key=lambda r: r[0])
+
+        self.ais_store.clear()
+        for _, row in rows:
+            self.ais_store.append(row)
 
         return True  # Keep the timeout running

@@ -9,7 +9,7 @@
       <object class="GtkBox">
         <property name="can-focus">False</property>
         <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
+        <property name="spacing">6</property>
         <child>
           <object class="GtkBox">
             <property name="visible">True</property>
@@ -21,8 +21,8 @@
                 <property name="can-focus">False</property>
                 <property name="halign">center</property>
                 <property name="valign">center</property>
-                <property name="margin-top">4</property>
-                <property name="margin-bottom">4</property>
+                <property name="margin-top">8</property>
+                <property name="margin-bottom">8</property>
                 <property name="stack">stack1</property>
               </object>
               <packing>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <path d="M2 14 Q4 8 8 8 Q12 8 14 2" fill="none" stroke="#bebebe" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="3,2"/>
+  <polygon points="14,2 11,4 12,1" fill="#bebebe"/>
+</svg>

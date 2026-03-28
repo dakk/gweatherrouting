@@ -1,0 +1,134 @@
+/* GWeatherRouting - GTK3 Custom Stylesheet */
+
+/* === General Window & Container Spacing === */
+window > box {
+    padding: 4px;
+}
+
+/* === Buttons === */
+button {
+    border-radius: 6px;
+    padding: 4px 12px;
+    min-height: 24px;
+}
+
+/* === HeaderBar === */
+headerbar {
+    padding: 4px 8px;
+}
+
+headerbar button {
+    margin: 2px 4px;
+}
+
+/* === Frames & Sections === */
+frame {
+    border-radius: 6px;
+    margin: 4px 2px;
+}
+
+frame > label {
+    font-weight: bold;
+    margin: 4px 8px;
+}
+
+/* === TreeView === */
+treeview {
+    padding: 2px;
+}
+
+treeview row {
+    padding: 4px 2px;
+}
+
+treeview header button {
+    padding: 4px 8px;
+    font-weight: 600;
+    border-radius: 0;
+}
+
+/* === Notebook Tabs === */
+notebook > header > tabs > tab {
+    padding: 6px 16px;
+}
+
+/* === StackSwitcher === */
+stackswitcher > button {
+    padding: 6px 16px;
+    min-width: 80px;
+}
+
+/* === Entry & ComboBox === */
+entry {
+    border-radius: 6px;
+    padding: 6px 8px;
+    min-height: 28px;
+}
+
+combobox button {
+    border-radius: 6px;
+    min-height: 28px;
+}
+
+combobox entry {
+    border-radius: 6px 0 0 6px;
+}
+
+/* === Progress Bar === */
+progressbar trough {
+    border-radius: 4px;
+    min-height: 8px;
+}
+
+progressbar progress {
+    border-radius: 4px;
+    min-height: 8px;
+}
+
+/* === Scale (Sliders) === */
+scale trough {
+    min-height: 6px;
+    border-radius: 3px;
+}
+
+scale slider {
+    min-width: 20px;
+    min-height: 20px;
+    border-radius: 10px;
+}
+
+/* === Scrolled Windows === */
+scrolledwindow {
+    border-radius: 6px;
+}
+
+/* === Switch === */
+switch {
+    border-radius: 12px;
+    min-width: 48px;
+    min-height: 24px;
+}
+
+/* === ListBox === */
+list row {
+    padding: 6px 8px;
+}
+
+/* === Dialogs === */
+dialog > box {
+    padding: 6px;
+}
+
+/* === CheckButton === */
+checkbutton {
+    padding: 4px 0;
+}
+
+/* === Toolbar === */
+toolbar button {
+    padding: 4px 8px;
+    min-height: 24px;
+}
+
+/* === Tooltip-style labels on the map should not be affected === */
+/* Cairo-rendered elements are not touched by CSS */
