@@ -162,27 +162,13 @@ class GeoMapLayer(GObject.GObject):
                     cr.stroke()
 
                 # Waypoint markers
-                is_endpoint = i == 0 or i == total_pts - 1
-                radius = 5 if is_endpoint else 3
-                if highlight:
-                    radius += 1
+                speed = p[5] if p[5] is not None else 0
+                r, g, b, a = _speed_color(speed)
+                radius = 3 if highlight else 2
 
-                if is_endpoint:
-                    # Start/end: filled circle
-                    cr.set_source_rgba(1.0, 1.0, 1.0, 1.0)
-                    cr.arc(x, y, radius, 0, 2 * math.pi)
-                    cr.fill()
-                    cr.set_source_rgba(0.2, 0.2, 0.2, 1.0)
-                    cr.set_line_width(1.5)
-                    cr.arc(x, y, radius, 0, 2 * math.pi)
-                    cr.stroke()
-                else:
-                    # Mid waypoints: small dots
-                    speed = p[5] if p[5] is not None else 0
-                    r, g, b, a = _speed_color(speed)
-                    cr.set_source_rgba(r, g, b, 1.0)
-                    cr.arc(x, y, radius, 0, 2 * math.pi)
-                    cr.fill()
+                cr.set_source_rgba(r, g, b, 1.0)
+                cr.arc(x, y, radius, 0, 2 * math.pi)
+                cr.fill()
 
                 prevx = x
                 prevy = y
