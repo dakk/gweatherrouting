@@ -87,6 +87,7 @@ class SettingsWindowCharts(SettingsWindowBase):
             if x["path"] == chart.path:
                 x["enabled"] = chart.enabled
 
+        self.settings_manager.save()
         self.reload_chart()
 
     def on_chart_select(self, selection):
