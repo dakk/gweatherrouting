@@ -38,7 +38,7 @@
       <object class="GtkBox">
         <property name="can-focus">False</property>
         <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
+        <property name="spacing">6</property>
         <child internal-child="action_area">
           <object class="GtkButtonBox">
             <property name="can-focus">False</property>
@@ -65,11 +65,11 @@
             <property name="visible">True</property>
             <property name="can-focus">False</property>
             <property name="orientation">horizontal</property>
-            <property name="spacing">6</property>
-            <property name="margin-start">6</property>
-            <property name="margin-end">6</property>
-            <property name="margin-top">6</property>
-            <property name="margin-bottom">6</property>
+            <property name="spacing">8</property>
+            <property name="margin-start">10</property>
+            <property name="margin-end">10</property>
+            <property name="margin-top">10</property>
+            <property name="margin-bottom">10</property>
             <!-- Left side: settings -->
             <child>
               <object class="GtkBox">
@@ -165,10 +165,10 @@
                               <object class="GtkComboBox" id="routing-select">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="margin-start">2</property>
-                                <property name="margin-end">2</property>
-                                <property name="margin-top">2</property>
-                                <property name="margin-bottom">2</property>
+                                <property name="margin-start">6</property>
+                                <property name="margin-end">6</property>
+                                <property name="margin-top">6</property>
+                                <property name="margin-bottom">6</property>
                                 <property name="model">routing-store</property>
                                 <property name="active">0</property>
                                 <property name="id-column">0</property>
@@ -201,10 +201,10 @@
                                       <object class="GtkBox" id="router-params-container">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
-                                        <property name="margin-start">3</property>
-                                        <property name="margin-end">3</property>
-                                        <property name="margin-top">3</property>
-                                        <property name="margin-bottom">3</property>
+                                        <property name="margin-start">8</property>
+                                        <property name="margin-end">8</property>
+                                        <property name="margin-top">8</property>
+                                        <property name="margin-bottom">8</property>
                                         <property name="orientation">vertical</property>
                                         <child>
                                           <placeholder/>
@@ -290,7 +290,7 @@
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
-                            <property name="padding">2</property>
+                            <property name="padding">6</property>
                             <property name="position">1</property>
                           </packing>
                         </child>
@@ -365,10 +365,10 @@
                           <object class="GtkComboBox" id="track-poi-select">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="margin-start">2</property>
-                            <property name="margin-end">2</property>
-                            <property name="margin-top">2</property>
-                            <property name="margin-bottom">2</property>
+                            <property name="margin-start">6</property>
+                            <property name="margin-end">6</property>
+                            <property name="margin-top">6</property>
+                            <property name="margin-bottom">6</property>
                             <property name="model">track-poi-store</property>
                             <child>
                               <object class="GtkCellRendererText"/>

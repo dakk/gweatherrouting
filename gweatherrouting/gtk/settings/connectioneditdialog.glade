@@ -12,7 +12,7 @@
       <object class="GtkBox">
         <property name="can-focus">False</property>
         <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
+        <property name="spacing">6</property>
         <child internal-child="action_area">
           <object class="GtkButtonBox">
             <property name="can-focus">False</property>
@@ -61,10 +61,10 @@
               <object class="GtkComboBoxText" id="type-combo">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="margin-start">5</property>
-                <property name="margin-end">5</property>
-                <property name="margin-top">5</property>
-                <property name="margin-bottom">5</property>
+                <property name="margin-start">8</property>
+                <property name="margin-end">8</property>
+                <property name="margin-top">8</property>
+                <property name="margin-bottom">8</property>
                 <property name="active">1</property>
                 <signal name="changed" handler="on_type_change" swapped="no"/>
               </object>
@@ -84,12 +84,12 @@
                   <object class="GtkGrid">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="margin-start">5</property>
-                    <property name="margin-end">5</property>
-                    <property name="margin-bottom">5</property>
+                    <property name="margin-start">8</property>
+                    <property name="margin-end">8</property>
+                    <property name="margin-bottom">8</property>
                     <property name="hexpand">True</property>
                     <property name="vexpand">True</property>
-                    <property name="row-spacing">5</property>
+                    <property name="row-spacing">8</property>
                     <child>
                       <object class="GtkLabel">
                         <property name="visible">True</property>
@@ -165,10 +165,10 @@
                   <object class="GtkGrid">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="margin-start">5</property>
-                    <property name="margin-end">5</property>
-                    <property name="margin-bottom">5</property>
-                    <property name="row-spacing">5</property>
+                    <property name="margin-start">8</property>
+                    <property name="margin-end">8</property>
+                    <property name="margin-bottom">8</property>
+                    <property name="row-spacing">8</property>
                     <child>
                       <object class="GtkLabel">
                         <property name="visible">True</property>
@@ -259,7 +259,7 @@
                 <property name="margin-end">5</property>
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
-                <property name="row-spacing">5</property>
+                <property name="row-spacing">8</property>
                 <child>
                   <object class="GtkLabel">
                     <property name="visible">True</property>

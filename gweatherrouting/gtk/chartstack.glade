@@ -418,7 +418,7 @@ loaded to created a routing</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="tooltip-text" translatable="yes">Show / Hide Track / POI tabs</property>
-                    <property name="margin-end">2</property>
+                    <property name="margin-end">4</property>
                     <property name="label" translatable="yes">Tabs</property>
                     <property name="use-underline">True</property>
                     <property name="icon-name">gtk-fullscreen</property>
@@ -436,7 +436,7 @@ loaded to created a routing</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="tooltip-text" translatable="yes">Enable / Disable connections</property>
-                    <property name="margin-end">2</property>
+                    <property name="margin-end">4</property>
                     <property name="label" translatable="yes">Data</property>
                     <property name="use-underline">True</property>
                     <property name="icon-name">gnome-dev-wavelan</property>
@@ -453,7 +453,7 @@ loaded to created a routing</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="tooltip-text" translatable="yes">Show / Hide gribs</property>
-                    <property name="margin-end">2</property>
+                    <property name="margin-end">4</property>
                     <property name="label" translatable="yes">Grib</property>
                     <property name="use-underline">True</property>
                     <property name="icon-name">weather-windy</property>
@@ -470,7 +470,7 @@ loaded to created a routing</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="tooltip-text" translatable="yes">Show / Hide instrument dashboard</property>
-                    <property name="margin-end">2</property>
+                    <property name="margin-end">4</property>
                     <property name="active">True</property>
                     <property name="label" translatable="yes">Dashboard</property>
                     <property name="use-underline">True</property>

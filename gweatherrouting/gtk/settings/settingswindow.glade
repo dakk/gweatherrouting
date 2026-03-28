@@ -53,7 +53,7 @@
       <object class="GtkBox">
         <property name="can-focus">False</property>
         <property name="orientation">vertical</property>
-        <property name="spacing">2</property>
+        <property name="spacing">6</property>
         <child>
           <object class="GtkBox">
             <property name="visible">True</property>
@@ -65,8 +65,8 @@
                 <property name="can-focus">False</property>
                 <property name="halign">center</property>
                 <property name="valign">center</property>
-                <property name="margin-top">4</property>
-                <property name="margin-bottom">4</property>
+                <property name="margin-top">8</property>
+                <property name="margin-bottom">8</property>
                 <property name="homogeneous">True</property>
                 <property name="icon-size">0</property>
                 <property name="stack">stack1</property>
@@ -126,10 +126,10 @@
                                   <object class="GtkBox">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
-                                    <property name="margin-start">4</property>
-                                    <property name="margin-end">4</property>
-                                    <property name="margin-top">4</property>
-                                    <property name="margin-bottom">4</property>
+                                    <property name="margin-start">8</property>
+                                    <property name="margin-end">8</property>
+                                    <property name="margin-top">8</property>
+                                    <property name="margin-bottom">8</property>
                                     <property name="orientation">vertical</property>
                                     <child>
                                       <object class="GtkBox">
@@ -183,6 +183,9 @@
                                 <property name="xpad">10</property>
                                 <property name="ypad">5</property>
                                 <property name="label" translatable="yes">Rendering</property>
+                                <attributes>
+                                  <attribute name="weight" value="bold"/>
+                                </attributes>
                               </object>
                             </child>
                           </object>
@@ -207,10 +210,10 @@
                                   <object class="GtkBox">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
-                                    <property name="margin-start">4</property>
-                                    <property name="margin-end">4</property>
-                                    <property name="margin-top">4</property>
-                                    <property name="margin-bottom">4</property>
+                                    <property name="margin-start">8</property>
+                                    <property name="margin-end">8</property>
+                                    <property name="margin-top">8</property>
+                                    <property name="margin-bottom">8</property>
                                     <property name="orientation">vertical</property>
                                     <child>
                                       <object class="GtkScrolledWindow">
@@ -297,9 +300,9 @@
                                             <property name="visible">True</property>
                                             <property name="can-focus">True</property>
                                             <property name="receives-default">True</property>
-                                            <property name="margin-end">4</property>
-                                            <property name="margin-top">4</property>
-                                            <property name="margin-bottom">4</property>
+                                            <property name="margin-end">6</property>
+                                            <property name="margin-top">6</property>
+                                            <property name="margin-bottom">6</property>
                                             <signal name="clicked" handler="on_add_vector_chart" swapped="no"/>
                                           </object>
                                           <packing>
@@ -314,9 +317,9 @@
                                             <property name="visible">True</property>
                                             <property name="can-focus">True</property>
                                             <property name="receives-default">True</property>
-                                            <property name="margin-start">4</property>
-                                            <property name="margin-top">4</property>
-                                            <property name="margin-bottom">4</property>
+                                            <property name="margin-start">6</property>
+                                            <property name="margin-top">6</property>
+                                            <property name="margin-bottom">6</property>
                                             <signal name="clicked" handler="on_add_raster_chart" swapped="no"/>
                                           </object>
                                           <packing>
@@ -343,6 +346,9 @@
                                 <property name="xpad">10</property>
                                 <property name="ypad">5</property>
                                 <property name="label" translatable="yes">Charts</property>
+                                <attributes>
+                                  <attribute name="weight" value="bold"/>
+                                </attributes>
                               </object>
                             </child>
                           </object>
@@ -447,7 +453,7 @@
                                       <object class="GtkScale" id="grib-arrow-opacity">
                                         <property name="visible">True</property>
                                         <property name="can-focus">True</property>
-                                        <property name="margin-end">4</property>
+                                        <property name="margin-end">8</property>
                                         <property name="adjustment">grib-arrow-opacity-adjustment</property>
                                         <property name="fill-level">100</property>
                                         <property name="round-digits">2</property>

@@ -54,6 +54,17 @@ class MainWindow:
         # settings.set_property("gtk-theme-name", "")
         settings.set_property("gtk-application-prefer-dark-theme", True)
 
+        # Load custom CSS
+        css_provider = Gtk.CssProvider()
+        css_provider.load_from_path(
+            resource_path("gweatherrouting", "data/style.css")
+        )
+        Gtk.StyleContext.add_provider_for_screen(
+            Gdk.Screen.get_default(),
+            css_provider,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
+        )
+
         self.builder = Gtk.Builder()
         self.builder.add_from_file(
             os.path.abspath(os.path.dirname(__file__)) + "/mainwindow.glade"
