@@ -93,7 +93,6 @@ class GeoMapLayer(GObject.GObject):
             prevy = None
             prevp = None
             points_list = list(tr)
-            total_pts = len(points_list)
 
             for i, p in enumerate(points_list):
                 x, y = gpsmap.convert_geographic_to_screen(
