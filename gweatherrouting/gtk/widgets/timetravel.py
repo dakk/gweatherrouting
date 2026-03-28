@@ -84,7 +84,12 @@ class TimeTravelWidget(Gtk.Box):
         self.seconds = TIME_UNITS[u]
 
     def on_time_change(self, t):
-        self.timeLabel.set_text("%s" % str(t))
+        date_str = t.strftime("%a %d %b")
+        time_str = t.strftime("%H:%M")
+        self.timeLabel.set_markup(
+            f'<span font_weight="bold" font_size="large">{time_str}</span>'
+            f'  <span alpha="60%">{date_str}</span>'
+        )
         self.map.queue_draw()
 
     def on_time_now(self, event):
