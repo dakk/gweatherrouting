@@ -14,6 +14,7 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
+import datetime
 import logging
 import os
 from threading import Thread
@@ -238,7 +239,12 @@ class GribManagerWindow:
         self.grib_manager.refresh_local_gribs()
         self.grib_managerStore.clear()
 
+        now = datetime.datetime.now()
         for x in self.grib_manager.local_gribs:
+            end_time = x.start_time + datetime.timedelta(hours=x.last_forecast)
+            expired = end_time < now
+            color = "#666666" if expired else ""
+
             self.grib_managerStore.append(
                 [
                     x.name,
@@ -246,6 +252,7 @@ class GribManagerWindow:
                     str(x.start_time),
                     x.last_forecast,
                     self.grib_manager.is_enabled(x.name),
+                    color,
                 ]
             )
         self.refresh_map_callback()

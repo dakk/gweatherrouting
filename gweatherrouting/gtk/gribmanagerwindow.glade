@@ -28,6 +28,8 @@
       <column type="gint"/>
       <!-- column-name active -->
       <column type="gboolean"/>
+      <!-- column-name color -->
+      <column type="gchararray"/>
     </columns>
   </object>
   <object class="GtkWindow" id="grib-manager-window">
@@ -159,6 +161,7 @@
                   <object class="GtkCellRendererText"/>
                   <attributes>
                     <attribute name="text">0</attribute>
+                    <attribute name="foreground">5</attribute>
                   </attributes>
                 </child>
               </object>
@@ -170,6 +173,7 @@
                   <object class="GtkCellRendererText"/>
                   <attributes>
                     <attribute name="markup">1</attribute>
+                    <attribute name="foreground">5</attribute>
                   </attributes>
                 </child>
               </object>
@@ -181,6 +185,7 @@
                   <object class="GtkCellRendererText"/>
                   <attributes>
                     <attribute name="text">2</attribute>
+                    <attribute name="foreground">5</attribute>
                   </attributes>
                 </child>
               </object>
@@ -192,6 +197,7 @@
                   <object class="GtkCellRendererText"/>
                   <attributes>
                     <attribute name="text">3</attribute>
+                    <attribute name="foreground">5</attribute>
                   </attributes>
                 </child>
               </object>
