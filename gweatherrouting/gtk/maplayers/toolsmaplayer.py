@@ -38,7 +38,7 @@ class ToolsMapLayer(GObject.GObject):
         self.measureStart = None
         self.mousePosition: Tuple[float, float, int, int] = (0.0, 0.0, 0, 0)
 
-        self.dashboard = False
+        self.dashboard = True
         self.compass = False
         self.boat_info = None
 
