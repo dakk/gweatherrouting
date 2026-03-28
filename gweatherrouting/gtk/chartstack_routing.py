@@ -20,6 +20,7 @@ import os
 import traceback
 from threading import Thread
 
+import dateutil.parser
 import gi
 
 from gweatherrouting.core.modifiedgrib import ModifiedGribManager
@@ -47,7 +48,8 @@ class ChartStackRouting(ChartStackBase):
 
     def __init__(self):
         self.currentRouting = None
-        self.routingStore = self.builder.get_object("routing-store")
+        self.routingListStore = self.builder.get_object("routing-list-store")
+        self.routingPointsStore = self.builder.get_object("routing-points-store")
 
         self.isochronesMapLayer = IsochronesMapLayer()
         self.map.layer_add(self.isochronesMapLayer)
@@ -348,22 +350,68 @@ class ChartStackRouting(ChartStackBase):
         self.isochronesMapLayer.set_isochrones([], res.path)
         self.map.queue_draw()
 
+    def _routing_summary(self, r):
+        """Build a short summary string for a routing."""
+        points = list(r)
+        if len(points) < 2:
+            return ""
+        total_dist = 0.0
+        total_speed = 0.0
+        for j in range(1, len(points)):
+            total_dist += utils.point_distance(
+                points[j - 1][0], points[j - 1][1], points[j][0], points[j][1]
+            )
+            total_speed += (points[j][5] if points[j][5] else 0)
+        avg_speed = total_speed / (len(points) - 1)
+        total_dist_nm = total_dist / 1852.0
+        try:
+            t_start = dateutil.parser.parse(points[0][2])
+            t_end = dateutil.parser.parse(points[-1][2])
+            hours = (t_end - t_start).total_seconds() / 3600.0
+            days = int(hours // 24)
+            rem_hours = hours % 24
+            dur_str = f"{days}d {rem_hours:.0f}h" if days > 0 else f"{rem_hours:.1f}h"
+            return "%.0f nm | %s | avg %.1f kts" % (total_dist_nm, dur_str, avg_speed)
+        except Exception:
+            return "%.0f nm | avg %.1f kts" % (total_dist_nm, avg_speed)
+
     def update_routings(self):
-        self.routingStore.clear()
+        self.routingListStore.clear()
+        self.routingPointsStore.clear()
 
         for r in self.core.routingManager:
-            riter = self.routingStore.append(
-                None, [r.name, "", 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, r.visible, False, True]
-            )
-
-            for x in r:
-                self.routingStore.append(
-                    riter,
-                    ["", x[2], x[0], x[1], x[3], x[4], x[5], x[6], False, True, False],
-                )
+            self.routingListStore.append([
+                r.name,
+                self._routing_summary(r),
+                r.visible,
+                "routing-symbolic",
+            ])
 
         self.map.queue_draw()
         self.core.trackManager.save()
+
+    def _update_routing_points(self, name):
+        """Populate the points store for the selected routing."""
+        self.routingPointsStore.clear()
+        routing = self.core.routingManager.get_by_name(name)
+        if routing is None:
+            return
+
+        for i, x in enumerate(routing):
+            try:
+                t = dateutil.parser.parse(x[2])
+                time_str = t.strftime("%d/%m %H:%M")
+            except Exception:
+                time_str = x[2]
+
+            self.routingPointsStore.append([
+                i + 1,
+                time_str,
+                "%.0f°" % x[3] if x[3] else "",
+                "%.1f" % x[4] if x[4] else "",
+                "%.1f" % x[5] if x[5] else "",
+                "%.0f°" % x[6] if x[6] else "",
+            ])
 
     def on_routing_toggle(self, widget, i):
         self.core.routingManager[int(i)].visible = not self.core.routingManager[
@@ -443,19 +491,11 @@ class ChartStackRouting(ChartStackBase):
         store, pathlist = selection.get_selected_rows()
         for path in pathlist:
             tree_iter = store.get_iter(path)
-            value = store.get_value(tree_iter, 0)
-            self.geo_map_layer.highlight_routing(value)
-
+            name = store.get_value(tree_iter, 0)
+            self.selected_routing = name
+            self.geo_map_layer.highlight_routing(name)
+            self._update_routing_points(name)
             self.map.queue_draw()
-
-            if path.get_depth() == 1:
-                self.selected_routing = value
-
-                # Show isochrones
-                # routing = self.core.routingManager.get_by_name(self.selected_routing)
-                # self.isochronesMapLayer.set_isochrones(routing.isochrones, None)
-            else:
-                self.selected_routing = None
 
     def on_routing_click(self, item, event):
         if (

@@ -151,6 +151,8 @@
       <column type="gboolean"/>
       <!-- column-name symbol -->
       <column type="gchararray"/>
+      <!-- column-name icon -->
+      <column type="gchararray"/>
     </columns>
   </object>
   <object class="GtkListStore" id="poi-symbols-store">
@@ -209,30 +211,32 @@ loaded to created a routing</property>
       </object>
     </child>
   </object>
-  <object class="GtkTreeStore" id="routing-store">
+  <object class="GtkListStore" id="routing-list-store">
     <columns>
       <!-- column-name name -->
       <column type="gchararray"/>
-      <!-- column-name time -->
+      <!-- column-name summary -->
       <column type="gchararray"/>
-      <!-- column-name latitude -->
-      <column type="gfloat"/>
-      <!-- column-name longitude -->
-      <column type="gfloat"/>
-      <!-- column-name twa -->
-      <column type="gfloat"/>
-      <!-- column-name tws -->
-      <column type="gfloat"/>
-      <!-- column-name speed -->
-      <column type="gfloat"/>
-      <!-- column-name bearing -->
-      <column type="gfloat"/>
       <!-- column-name visible -->
       <column type="gboolean"/>
-      <!-- column-name ischild -->
-      <column type="gboolean"/>
-      <!-- column-name isparent -->
-      <column type="gboolean"/>
+      <!-- column-name icon -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
+  <object class="GtkListStore" id="routing-points-store">
+    <columns>
+      <!-- column-name # -->
+      <column type="guint"/>
+      <!-- column-name time -->
+      <column type="gchararray"/>
+      <!-- column-name twa -->
+      <column type="gchararray"/>
+      <!-- column-name tws -->
+      <column type="gchararray"/>
+      <!-- column-name speed -->
+      <column type="gchararray"/>
+      <!-- column-name bearing -->
+      <column type="gchararray"/>
     </columns>
   </object>
   <object class="GtkMenu" id="track-item-menu">
@@ -322,6 +326,8 @@ loaded to created a routing</property>
       <column type="gfloat"/>
       <!-- column-name visible -->
       <column type="gboolean"/>
+      <!-- column-name icon -->
+      <column type="gchararray"/>
     </columns>
   </object>
   <object class="GtkListStore" id="track-store">
@@ -359,7 +365,7 @@ loaded to created a routing</property>
                     <property name="tooltip-text" translatable="yes">Import</property>
                     <property name="label" translatable="yes">Import</property>
                     <property name="use-underline">True</property>
-                    <property name="icon-name">gtk-add</property>
+                    <property name="icon-name">list-add-symbolic</property>
                     <signal name="clicked" handler="on_import" swapped="no"/>
                   </object>
                   <packing>
@@ -374,7 +380,7 @@ loaded to created a routing</property>
                     <property name="tooltip-text" translatable="yes">New Track</property>
                     <property name="label" translatable="yes">New</property>
                     <property name="use-underline">True</property>
-                    <property name="icon-name">gtk-file</property>
+                    <property name="icon-name">document-new-symbolic</property>
                     <signal name="clicked" handler="on_new" swapped="no"/>
                   </object>
                   <packing>
@@ -389,7 +395,7 @@ loaded to created a routing</property>
                     <property name="tooltip-text" translatable="yes">Routing...</property>
                     <property name="label" translatable="yes">Route...</property>
                     <property name="use-underline">True</property>
-                    <property name="icon-name">gtk-execute</property>
+                    <property name="icon-name">route-symbolic</property>
                     <signal name="clicked" handler="on_routing_create" swapped="no"/>
                   </object>
                   <packing>
@@ -404,7 +410,7 @@ loaded to created a routing</property>
                     <property name="tooltip-text" translatable="yes">Export</property>
                     <property name="label" translatable="yes">Export</property>
                     <property name="use-underline">True</property>
-                    <property name="icon-name">gtk-save</property>
+                    <property name="icon-name">document-save-symbolic</property>
                     <signal name="clicked" handler="on_export" swapped="no"/>
                   </object>
                   <packing>
@@ -421,7 +427,7 @@ loaded to created a routing</property>
                     <property name="margin-end">4</property>
                     <property name="label" translatable="yes">Tabs</property>
                     <property name="use-underline">True</property>
-                    <property name="icon-name">gtk-fullscreen</property>
+                    <property name="icon-name">view-fullscreen-symbolic</property>
                     <property name="active">True</property>
                     <signal name="toggled" handler="on_toggle_notebook" swapped="no"/>
                   </object>
@@ -498,7 +504,7 @@ loaded to created a routing</property>
                     <property name="tooltip-text" translatable="yes">Stop routing calculation</property>
                     <property name="label" translatable="yes">Stop Routing</property>
                     <property name="use-underline">True</property>
-                    <property name="icon-name">gtk-stop</property>
+                    <property name="icon-name">media-playback-stop-symbolic</property>
                     <signal name="clicked" handler="on_routing_stop" swapped="no"/>
                   </object>
                   <packing>
@@ -602,6 +608,19 @@ loaded to created a routing</property>
                               <object class="GtkTreeSelection" id="track-list-selection">
                                 <property name="mode">browse</property>
                                 <signal name="changed" handler="on_select_track" swapped="no"/>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkTreeViewColumn">
+                                <property name="title" translatable="yes"> </property>
+                                <property name="fixed-width">24</property>
+                                <property name="sizing">fixed</property>
+                                <child>
+                                  <object class="GtkCellRendererPixbuf"/>
+                                  <attributes>
+                                    <attribute name="icon-name">4</attribute>
+                                  </attributes>
+                                </child>
                               </object>
                             </child>
                             <child>
@@ -769,26 +788,45 @@ loaded to created a routing</property>
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="orientation">vertical</property>
+                    <!-- Top: routing list -->
                     <child>
                       <object class="GtkScrolledWindow">
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
+                        <property name="vscrollbar-policy">always</property>
                         <property name="shadow-type">in</property>
                         <child>
-                          <object class="GtkTreeView">
+                          <object class="GtkTreeView" id="routing-list-view">
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
-                            <property name="model">routing-store</property>
-                            <property name="level-indentation">1</property>
+                            <property name="model">routing-list-store</property>
+                            <property name="headers-clickable">False</property>
+                            <property name="enable-search">False</property>
+                            <property name="show-expanders">False</property>
+                            <property name="enable-grid-lines">horizontal</property>
                             <signal name="button-press-event" handler="on_routing_click" swapped="no"/>
                             <child internal-child="selection">
                               <object class="GtkTreeSelection">
+                                <property name="mode">browse</property>
                                 <signal name="changed" handler="on_select_routing" swapped="no"/>
                               </object>
                             </child>
                             <child>
                               <object class="GtkTreeViewColumn">
-                                <property name="title" translatable="yes">Routing</property>
+                                <property name="title" translatable="yes"> </property>
+                                <property name="fixed-width">24</property>
+                                <property name="sizing">fixed</property>
+                                <child>
+                                  <object class="GtkCellRendererPixbuf"/>
+                                  <attributes>
+                                    <attribute name="icon-name">3</attribute>
+                                  </attributes>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkTreeViewColumn">
+                                <property name="title" translatable="yes">Name</property>
                                 <child>
                                   <object class="GtkCellRendererText">
                                     <property name="editable">True</property>
@@ -802,11 +840,10 @@ loaded to created a routing</property>
                             </child>
                             <child>
                               <object class="GtkTreeViewColumn">
-                                <property name="title" translatable="yes">Time</property>
+                                <property name="title" translatable="yes">Summary</property>
                                 <child>
                                   <object class="GtkCellRendererText"/>
                                   <attributes>
-                                    <attribute name="visible">9</attribute>
                                     <attribute name="text">1</attribute>
                                   </attributes>
                                 </child>
@@ -814,61 +851,13 @@ loaded to created a routing</property>
                             </child>
                             <child>
                               <object class="GtkTreeViewColumn">
-                                <property name="title" translatable="yes">TWA</property>
-                                <child>
-                                  <object class="GtkCellRendererText"/>
-                                  <attributes>
-                                    <attribute name="visible">9</attribute>
-                                    <attribute name="text">4</attribute>
-                                  </attributes>
-                                </child>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkTreeViewColumn">
-                                <property name="title" translatable="yes">TWS</property>
-                                <child>
-                                  <object class="GtkCellRendererText"/>
-                                  <attributes>
-                                    <attribute name="visible">9</attribute>
-                                    <attribute name="text">5</attribute>
-                                  </attributes>
-                                </child>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkTreeViewColumn">
-                                <property name="title" translatable="yes">Speed</property>
-                                <child>
-                                  <object class="GtkCellRendererText"/>
-                                  <attributes>
-                                    <attribute name="visible">9</attribute>
-                                    <attribute name="text">6</attribute>
-                                  </attributes>
-                                </child>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkTreeViewColumn">
-                                <property name="title" translatable="yes">Bearing</property>
-                                <child>
-                                  <object class="GtkCellRendererText"/>
-                                  <attributes>
-                                    <attribute name="visible">9</attribute>
-                                    <attribute name="text">7</attribute>
-                                  </attributes>
-                                </child>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkTreeViewColumn">
+                                <property name="title" translatable="yes">Visible</property>
                                 <child>
                                   <object class="GtkCellRendererToggle">
                                     <signal name="toggled" handler="on_routing_toggle" swapped="no"/>
                                   </object>
                                   <attributes>
-                                    <attribute name="visible">10</attribute>
-                                    <attribute name="active">8</attribute>
+                                    <attribute name="active">2</attribute>
                                   </attributes>
                                 </child>
                               </object>
@@ -880,6 +869,97 @@ loaded to created a routing</property>
                         <property name="expand">True</property>
                         <property name="fill">True</property>
                         <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <!-- Bottom: waypoints of selected routing -->
+                    <child>
+                      <object class="GtkScrolledWindow">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="vscrollbar-policy">always</property>
+                        <property name="shadow-type">in</property>
+                        <child>
+                          <object class="GtkTreeView" id="routing-points-view">
+                            <property name="visible">True</property>
+                            <property name="can-focus">True</property>
+                            <property name="model">routing-points-store</property>
+                            <property name="headers-clickable">False</property>
+                            <property name="enable-search">False</property>
+                            <property name="show-expanders">False</property>
+                            <property name="enable-grid-lines">horizontal</property>
+                            <child>
+                              <object class="GtkTreeViewColumn">
+                                <property name="title" translatable="yes">#</property>
+                                <child>
+                                  <object class="GtkCellRendererText"/>
+                                  <attributes>
+                                    <attribute name="text">0</attribute>
+                                  </attributes>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkTreeViewColumn">
+                                <property name="title" translatable="yes">Time</property>
+                                <child>
+                                  <object class="GtkCellRendererText"/>
+                                  <attributes>
+                                    <attribute name="text">1</attribute>
+                                  </attributes>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkTreeViewColumn">
+                                <property name="title" translatable="yes">TWA</property>
+                                <child>
+                                  <object class="GtkCellRendererText"/>
+                                  <attributes>
+                                    <attribute name="text">2</attribute>
+                                  </attributes>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkTreeViewColumn">
+                                <property name="title" translatable="yes">TWS</property>
+                                <child>
+                                  <object class="GtkCellRendererText"/>
+                                  <attributes>
+                                    <attribute name="text">3</attribute>
+                                  </attributes>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkTreeViewColumn">
+                                <property name="title" translatable="yes">Speed</property>
+                                <child>
+                                  <object class="GtkCellRendererText"/>
+                                  <attributes>
+                                    <attribute name="text">4</attribute>
+                                  </attributes>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkTreeViewColumn">
+                                <property name="title" translatable="yes">Brg</property>
+                                <child>
+                                  <object class="GtkCellRendererText"/>
+                                  <attributes>
+                                    <attribute name="text">5</attribute>
+                                  </attributes>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
                       </packing>
                     </child>
                   </object>
@@ -912,6 +992,19 @@ loaded to created a routing</property>
                         <child internal-child="selection">
                           <object class="GtkTreeSelection">
                             <signal name="changed" handler="on_select_poi" swapped="no"/>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkTreeViewColumn">
+                            <property name="title" translatable="yes"> </property>
+                            <property name="fixed-width">24</property>
+                            <property name="sizing">fixed</property>
+                            <child>
+                              <object class="GtkCellRendererPixbuf"/>
+                              <attributes>
+                                <attribute name="icon-name">5</attribute>
+                              </attributes>
+                            </child>
                           </object>
                         </child>
                         <child>
