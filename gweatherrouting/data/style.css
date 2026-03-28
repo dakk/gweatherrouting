@@ -124,5 +124,11 @@ checkbutton {
     padding: 4px 0;
 }
 
+/* === Toolbar === */
+toolbar button {
+    padding: 4px 8px;
+    min-height: 24px;
+}
+
 /* === Tooltip-style labels on the map should not be affected === */
 /* Cairo-rendered elements are not touched by CSS */

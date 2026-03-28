@@ -363,7 +363,7 @@ class ChartStackRouting(ChartStackBase):
             )
             total_speed += points[j][5] if points[j][5] else 0
         avg_speed = total_speed / (len(points) - 1)
-        total_dist_nm = total_dist / 1852.0
+        total_dist_nm = total_dist
         try:
             t_start = dateutil.parser.parse(points[0][2])
             t_end = dateutil.parser.parse(points[-1][2])

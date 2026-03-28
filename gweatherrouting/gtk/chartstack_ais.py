@@ -103,7 +103,21 @@ class ChartStackAIS(ChartStackBase):
             rgb = SHIP_TYPE_COLORS.get(category, (0.5, 0.5, 0.5))
             color_hex = _color_to_hex(*rgb)
 
-            rows.append((dist_num, [str(t.mmsi), name, category, sog, cog, distance, "ais-ship-symbolic", color_hex]))
+            rows.append(
+                (
+                    dist_num,
+                    [
+                        str(t.mmsi),
+                        name,
+                        category,
+                        sog,
+                        cog,
+                        distance,
+                        "ais-ship-symbolic",
+                        color_hex,
+                    ],
+                )
+            )
 
         rows.sort(key=lambda r: r[0])
 
