@@ -351,6 +351,7 @@ class CM93Cell:
     extent_lat: float
     extent_lon: float
     features: list = field(default_factory=list)
+    is_background: bool = False
 
 
 def load_cm93_obj_dictionary(path):

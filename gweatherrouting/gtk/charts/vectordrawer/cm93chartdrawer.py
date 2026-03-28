@@ -88,18 +88,26 @@ class CM93ChartDrawer(VectorChartDrawer):
         )
 
     def _separate_features(self, cells, viewport):
-        """Separate cell features into areas and lines/points, culling by viewport."""
-        areas = []
+        """Separate cell features into bg areas, fine areas, and fine lines/points.
+
+        Background cells only contribute area fills to avoid duplicate
+        coastlines. Fine-scale areas render on top of background areas.
+        """
+        bg_areas = []
+        fine_areas = []
         lines_points = []
         for cell in cells:
             for feat in cell.features:
                 if not self._bbox_intersects(feat.bbox, viewport):
                     continue
                 if feat.geom_type == "A":
-                    areas.append(feat)
-                else:
+                    if cell.is_background:
+                        bg_areas.append(feat)
+                    else:
+                        fine_areas.append(feat)
+                elif not cell.is_background:
                     lines_points.append(feat)
-        return areas, lines_points
+        return bg_areas, fine_areas, lines_points
 
     @staticmethod
     def _geo_to_screen_batch(gpsmap, points):
@@ -122,9 +130,18 @@ class CM93ChartDrawer(VectorChartDrawer):
         if not cells:
             return
 
-        areas, lines_points = self._separate_features(cells, viewport)
+        bg_areas, fine_areas, lines_points = self._separate_features(cells, viewport)
         cr.set_line_join(cairo.LINE_JOIN_ROUND)
 
+        # Pass 1: bg areas (coarse gap-filler, rendered first)
+        self._render_areas(gpsmap, cr, bg_areas, palette)
+        # Pass 2: fine areas (paint over bg)
+        self._render_areas(gpsmap, cr, fine_areas, palette)
+        # Pass 3: fine lines and points
+        self._render_lines_points(gpsmap, cr, lines_points, palette, scale)
+
+    def _render_areas(self, gpsmap, cr, areas, palette):
+        """Render area features sorted by priority."""
         areas.sort(key=lambda f: f.priority)
         for feature in areas:
             try:
@@ -132,8 +149,10 @@ class CM93ChartDrawer(VectorChartDrawer):
             except Exception as e:
                 logger.debug("Area render error %s: %s", feature.obj_name, e)
 
-        lines_points.sort(key=lambda f: f.priority)
-        for feature in lines_points:
+    def _render_lines_points(self, gpsmap, cr, features, palette, scale):
+        """Render line and point features sorted by priority."""
+        features.sort(key=lambda f: f.priority)
+        for feature in features:
             try:
                 if feature.geom_type == "L":
                     self._render_line(gpsmap, cr, feature, palette)

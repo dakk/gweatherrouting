@@ -161,6 +161,12 @@ class CM93DataSource:
             if bg_cells:
                 break
 
+        # Tag cells so the drawer knows which are background
+        for cell in bg_cells:
+            cell.is_background = True
+        for cell in fine_cells:
+            cell.is_background = False
+
         # Background first (rendered underneath), then fine cells on top
         return bg_cells + fine_cells
 
