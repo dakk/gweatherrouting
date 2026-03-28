@@ -14,23 +14,45 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
-# https://github.com/OpenCPN/OpenCPN/blob/master/src/cm93.cpp
+# https://github.com/OpenCPN/OpenCPN/blob/master/gui/src/cm93.cpp
 
+import logging
+import os
 
-def load_cm93_dictionary(path):
-    with open(path, "r") as f:
-        d = f.read().split("\n")
-        dd = list(map(lambda x: x.split("|"), d))
-        return dict(dd)
+from .cm93datasource import CM93DataSource
+from .cm93parser import load_cm93_attr_dictionary, load_cm93_obj_dictionary
+
+logger = logging.getLogger("gweatherrouting")
 
 
 class CM93Driver:
     def __init__(self):
-        return
+        pass
 
     def Open(self, path):  # noqa: N802
-        attr_dict = load_cm93_dictionary(path + "CM93ATTR.DIC")  # noqa: F841
-        obj_dict = load_cm93_dictionary(path + "CM93OBJ.DIC")  # noqa: F841
-        limits_dict = load_cm93_dictionary(path + "LIMITS.DIC")  # noqa: F841
+        """Open a CM93 chart directory and return a CM93DataSource."""
+        if not path.endswith(os.sep):
+            path = path + os.sep
 
-        return None
+        obj_path = os.path.join(path, "CM93OBJ.DIC")
+        attr_path = os.path.join(path, "CM93ATTR.DIC")
+
+        if not os.path.exists(obj_path) or not os.path.exists(attr_path):
+            logger.error("CM93 dictionary files not found in %s", path)
+            return None
+
+        obj_dict, _ = load_cm93_obj_dictionary(obj_path)
+        attr_dict, _ = load_cm93_attr_dictionary(attr_path)
+
+        if not obj_dict:
+            logger.error("Failed to parse CM93OBJ.DIC")
+            return None
+
+        logger.info(
+            "Opening CM93 chart at %s (%d objects, %d attributes)",
+            path,
+            len(obj_dict),
+            len(attr_dict),
+        )
+
+        return CM93DataSource(path, obj_dict, attr_dict)

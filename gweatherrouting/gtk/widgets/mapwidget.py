@@ -16,6 +16,8 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 import math
 
+import numpy as np
+
 import gi
 
 gi.require_version("Gtk", "3.0")
@@ -202,6 +204,51 @@ class MapWidget(Gtk.DrawingArea):
         sy = py - cy + h / 2.0
 
         return (sx, sy)
+
+    def convert_geographic_to_screen_batch(self, lats, lons):
+        """Batch-convert numpy arrays of lat/lon to screen (x, y) arrays.
+
+        Args:
+            lats: numpy float64 array of latitudes
+            lons: numpy float64 array of longitudes
+
+        Returns:
+            (xs, ys): tuple of numpy float64 arrays of screen coordinates
+        """
+        w = self.get_allocated_width()
+        h = self.get_allocated_height()
+
+        n = 2.0**self._zoom
+        tile_n = n * self.TILE_SIZE
+
+        # Center offsets (scalar)
+        cx = (self._center_lon + 180.0) / 360.0 * tile_n
+        clat_rad = math.radians(max(-self.MAX_LAT, min(self.MAX_LAT, self._center_lat)))
+        cy = (
+            (1.0 - math.log(math.tan(clat_rad) + 1.0 / math.cos(clat_rad)) / math.pi)
+            / 2.0
+            * tile_n
+        )
+
+        half_w = w / 2.0
+        half_h = h / 2.0
+
+        # Batch lon -> x
+        px = (lons + 180.0) / 360.0 * tile_n
+
+        # Batch lat -> y (Mercator)
+        lat_clamped = np.clip(lats, -self.MAX_LAT, self.MAX_LAT)
+        lat_rad = np.radians(lat_clamped)
+        py = (
+            (1.0 - np.log(np.tan(lat_rad) + 1.0 / np.cos(lat_rad)) / math.pi)
+            / 2.0
+            * tile_n
+        )
+
+        xs = px - cx + half_w
+        ys = py - cy + half_h
+
+        return xs, ys
 
     def convert_screen_to_geographic(self, sx, sy):
         """Convert screen (x, y) to MapPoint."""

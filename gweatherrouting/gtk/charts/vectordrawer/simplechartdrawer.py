@@ -15,8 +15,9 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
 import cairo
+import numpy as np
+
 from gweatherrouting.gtk.style import Style
-from gweatherrouting.gtk.widgets.mapwidget import MapPoint
 
 from .vectorchartdrawer import VectorChartDrawer
 
@@ -63,6 +64,21 @@ class SimpleChartDrawer(VectorChartDrawer):
         cr.stroke_preserve()
         cr.fill()
 
+    @staticmethod
+    def _geom_to_screen_batch(gpsmap, g):
+        """Extract OGR geometry points and batch-convert to screen coords."""
+        npts = g.GetPointCount()
+        if npts == 0:
+            return None, None
+        lats = np.empty(npts, dtype=np.float64)
+        lons = np.empty(npts, dtype=np.float64)
+        for ii in range(npts):
+            pt = g.GetPoint(ii)
+            lats[ii] = pt[1]
+            lons[ii] = pt[0]
+        xs, ys = gpsmap.convert_geographic_to_screen_batch(lats, lons)
+        return xs.tolist(), ys.tolist()
+
     def feature_render(
         self, gpsmap, cr, geom, feat, layer, stroke_style, fill_style, contourn_style
     ):
@@ -75,12 +91,11 @@ class SimpleChartDrawer(VectorChartDrawer):
                     gpsmap, cr, g, feat, layer, stroke_style, fill_style, contourn_style
                 )
 
-            for ii in range(0, g.GetPointCount()):
-                pt = g.GetPoint(ii)
-                xx, yy = gpsmap.convert_geographic_to_screen(
-                    MapPoint.new_degrees(pt[1], pt[0])
-                )
-                cr.line_to(xx, yy)
+            xs, ys = self._geom_to_screen_batch(gpsmap, g)
+            if xs is not None:
+                cr.move_to(xs[0], ys[0])
+                for ii in range(1, len(xs)):
+                    cr.line_to(xs[ii], ys[ii])
 
             cr.close_path()
             cr.stroke_preserve()

@@ -87,6 +87,7 @@ class SettingsWindowCharts(SettingsWindowBase):
             if x["path"] == chart.path:
                 x["enabled"] = chart.enabled
 
+        self.settings_manager.save()
         self.reload_chart()
 
     def on_chart_select(self, selection):
@@ -147,15 +148,43 @@ class SettingsWindowCharts(SettingsWindowBase):
             dialog.destroy()
 
     def on_add_vector_chart(self, widget):
-        edialog = Gtk.MessageDialog(
-            self.parent.window,
-            0,
-            Gtk.MessageType.WARNING,
-            Gtk.ButtonsType.OK,
-            "Warning",
+        dialog = Gtk.FileChooserDialog(
+            "Please select a vector chart directory",
+            self.window,
+            Gtk.FileChooserAction.SELECT_FOLDER,
+            (
+                Gtk.STOCK_CANCEL,
+                Gtk.ResponseType.CANCEL,
+                Gtk.STOCK_OPEN,
+                Gtk.ResponseType.OK,
+            ),
         )
-        edialog.format_secondary_text(
-            "Only the already shown OSM vector data is currently supported."
-        )
-        edialog.run()
-        edialog.destroy()
+
+        response = dialog.run()
+
+        if response == Gtk.ResponseType.OK:
+            path = dialog.get_filename() + "/"
+            dialog.destroy()
+
+            try:
+                vec_l = self.parent.chart_manager.load_vector_layer(path)
+                Thread(
+                    target=self.registering_chart,
+                    args=(
+                        vec_l,
+                        "vector",
+                    ),
+                ).start()
+            except Exception as e:
+                edialog = Gtk.MessageDialog(
+                    self.parent.window,
+                    0,
+                    Gtk.MessageType.ERROR,
+                    Gtk.ButtonsType.OK,
+                    "Error loading vector chart",
+                )
+                edialog.format_secondary_text(str(e))
+                edialog.run()
+                edialog.destroy()
+        else:
+            dialog.destroy()
