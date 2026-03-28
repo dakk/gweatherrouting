@@ -14,15 +14,11 @@ GNU General Public License for more details.
 For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
-import os
-
 import gi
 
 gi.require_version("Gtk", "3.0")
 
-from gi.repository import GdkPixbuf, Gtk
-
-from gweatherrouting.common import resource_path
+from gi.repository import Gtk
 
 from .chartstack_base import ChartStackBase
 
@@ -33,17 +29,6 @@ class ChartStackPOI(ChartStackBase):
     def __init__(self):
         self.poiStore = self.builder.get_object("poi-store")
         self.update_poi()
-
-        poi_symbol_store = self.builder.get_object("poi-symbols-store")
-        base_path = resource_path("gweatherrouting", "data/symbols/")
-
-        for x in os.listdir(base_path):
-            poi_symbol_store.append(
-                [
-                    x.split(".svg")[0],
-                    GdkPixbuf.Pixbuf.new_from_file_at_size(base_path + x, 32, 32),
-                ]
-            )
 
     def on_poi_name_edit(self, widget, i, name):
         self.core.poiManager.elements[int(i)].name = (
