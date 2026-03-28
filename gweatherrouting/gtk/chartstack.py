@@ -91,14 +91,14 @@ class ChartStack(
         )
         self.map.layer_add(self.gribMapLayer)
 
-        self.tools_map_layer = ToolsMapLayer(core)
-        self.map.layer_add(self.tools_map_layer)
+        self.geo_map_layer = GeoMapLayer(self.core, self.time_control)
+        self.map.layer_add(self.geo_map_layer)
 
         self.ais_map_layer = AISMapLayer(core)
         self.map.layer_add(self.ais_map_layer)
 
-        self.geo_map_layer = GeoMapLayer(self.core, self.time_control)
-        self.map.layer_add(self.geo_map_layer)
+        self.tools_map_layer = ToolsMapLayer(core)
+        self.map.layer_add(self.tools_map_layer)
 
         # This causes rendering problem
         # self.map.layer_add (OsmGpsMap.MapOsd (show_scale=True, show_dpad=False,
