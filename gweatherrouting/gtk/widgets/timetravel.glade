@@ -11,139 +11,94 @@
   <object class="GtkBox" id="timetravel">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
-    <property name="margin-top">3</property>
-    <property name="margin-bottom">3</property>
     <child>
-      <object class="GtkButton">
+      <object class="GtkToolbar">
         <property name="visible">True</property>
-        <property name="can-focus">True</property>
-        <property name="receives-default">True</property>
-        <property name="margin-start">3</property>
-        <property name="always-show-image">True</property>
-        <signal name="clicked" handler="on_backward_click" swapped="no"/>
+        <property name="can-focus">False</property>
+        <property name="toolbar-style">icons</property>
         <child>
-          <object class="GtkImage">
+          <object class="GtkToolButton">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
+            <property name="tooltip-text" translatable="yes">Step backward</property>
             <property name="icon-name">media-seek-backward-symbolic</property>
+            <signal name="clicked" handler="on_backward_click" swapped="no"/>
           </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="homogeneous">True</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkToolButton">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="tooltip-text" translatable="yes">Stop</property>
+            <property name="icon-name">media-playback-pause-symbolic</property>
+            <signal name="clicked" handler="on_stop_click" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="homogeneous">True</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkToolButton">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="tooltip-text" translatable="yes">Play</property>
+            <property name="icon-name">media-playback-start-symbolic</property>
+            <signal name="clicked" handler="on_play_click" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="homogeneous">True</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkToolButton">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="tooltip-text" translatable="yes">Step forward</property>
+            <property name="icon-name">media-seek-forward-symbolic</property>
+            <signal name="clicked" handler="on_foward_click" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="homogeneous">True</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkToolButton">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="tooltip-text" translatable="yes">Select now</property>
+            <property name="icon-name">go-bottom-symbolic</property>
+            <signal name="clicked" handler="on_time_now" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="homogeneous">True</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkToolButton">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="tooltip-text" translatable="yes">Manual set date and time</property>
+            <property name="icon-name">preferences-system-time-symbolic</property>
+            <signal name="clicked" handler="on_time_select" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="homogeneous">True</property>
+          </packing>
         </child>
       </object>
       <packing>
         <property name="expand">False</property>
         <property name="fill">True</property>
         <property name="position">0</property>
-      </packing>
-    </child>
-    <child>
-      <object class="GtkButton">
-        <property name="visible">True</property>
-        <property name="can-focus">True</property>
-        <property name="receives-default">True</property>
-        <property name="margin-start">3</property>
-        <property name="always-show-image">True</property>
-        <signal name="clicked" handler="on_stop_click" swapped="no"/>
-        <child>
-          <object class="GtkImage">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="icon-name">media-playback-pause-symbolic</property>
-          </object>
-        </child>
-      </object>
-      <packing>
-        <property name="expand">False</property>
-        <property name="fill">True</property>
-        <property name="position">1</property>
-      </packing>
-    </child>
-    <child>
-      <object class="GtkButton">
-        <property name="visible">True</property>
-        <property name="can-focus">True</property>
-        <property name="receives-default">True</property>
-        <property name="margin-start">3</property>
-        <property name="always-show-image">True</property>
-        <signal name="clicked" handler="on_play_click" swapped="no"/>
-        <child>
-          <object class="GtkImage">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="icon-name">media-playback-start-symbolic</property>
-          </object>
-        </child>
-      </object>
-      <packing>
-        <property name="expand">False</property>
-        <property name="fill">True</property>
-        <property name="position">2</property>
-      </packing>
-    </child>
-    <child>
-      <object class="GtkButton">
-        <property name="visible">True</property>
-        <property name="can-focus">True</property>
-        <property name="receives-default">True</property>
-        <property name="margin-start">3</property>
-        <property name="always-show-image">True</property>
-        <signal name="clicked" handler="on_foward_click" swapped="no"/>
-        <child>
-          <object class="GtkImage">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="icon-name">media-seek-forward-symbolic</property>
-          </object>
-        </child>
-      </object>
-      <packing>
-        <property name="expand">False</property>
-        <property name="fill">True</property>
-        <property name="position">3</property>
-      </packing>
-    </child>
-    <child>
-      <object class="GtkButton">
-        <property name="visible">True</property>
-        <property name="can-focus">True</property>
-        <property name="receives-default">True</property>
-        <property name="tooltip-text" translatable="yes">Select now</property>
-        <property name="margin-start">3</property>
-        <signal name="clicked" handler="on_time_now" swapped="no"/>
-        <child>
-          <object class="GtkImage">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="icon-name">go-bottom-symbolic</property>
-          </object>
-        </child>
-      </object>
-      <packing>
-        <property name="expand">False</property>
-        <property name="fill">True</property>
-        <property name="position">4</property>
-      </packing>
-    </child>
-    <child>
-      <object class="GtkButton">
-        <property name="visible">True</property>
-        <property name="can-focus">True</property>
-        <property name="receives-default">True</property>
-        <property name="tooltip-text" translatable="yes">Manual set date and time</property>
-        <property name="margin-start">3</property>
-        <property name="margin-end">3</property>
-        <signal name="clicked" handler="on_time_select" swapped="no"/>
-        <child>
-          <object class="GtkImage">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="icon-name">preferences-system-time-symbolic</property>
-          </object>
-        </child>
-      </object>
-      <packing>
-        <property name="expand">False</property>
-        <property name="fill">True</property>
-        <property name="position">5</property>
       </packing>
     </child>
     <child>
@@ -159,7 +114,7 @@
         <property name="expand">True</property>
         <property name="fill">True</property>
         <property name="pack-type">end</property>
-        <property name="position">6</property>
+        <property name="position">1</property>
       </packing>
     </child>
     <child>
@@ -181,9 +136,9 @@
         <signal name="changed" handler="on_time_unit_combo_change" swapped="no"/>
       </object>
       <packing>
-        <property name="expand">True</property>
+        <property name="expand">False</property>
         <property name="fill">True</property>
-        <property name="position">7</property>
+        <property name="position">2</property>
       </packing>
     </child>
   </object>
