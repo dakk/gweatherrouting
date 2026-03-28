@@ -277,27 +277,32 @@ class ToolsMapLayer(GObject.GObject):
         cols = len(self._gauges)
         gauge_w = NumericGauge.WIDTH
         gauge_h = NumericGauge.HEIGHT
+        gauge_gap = 4
 
-        total_w = cols * gauge_w
-        panel_padding = 4
+        total_w = cols * gauge_w + (cols - 1) * gauge_gap
+        panel_padding = 6
 
         # Center horizontally at the bottom of the map
         panel_x = (width - total_w) / 2.0 - panel_padding
-        panel_y = height - gauge_h - panel_padding * 2 - 10
+        panel_y = height - gauge_h - panel_padding * 2 - 12
 
-        # Draw panel background
-        cr.set_source_rgba(0.05, 0.05, 0.05, 0.6)
-        cr.rectangle(
+        # Draw panel background with rounded corners
+        from gweatherrouting.gtk.gauges.numericgauge import _rounded_rect
+
+        cr.set_source_rgba(0.03, 0.03, 0.03, 0.55)
+        _rounded_rect(
+            cr,
             panel_x,
             panel_y,
             total_w + panel_padding * 2,
             gauge_h + panel_padding * 2,
+            8,
         )
         cr.fill()
 
         # Draw each gauge
         for i, gauge in enumerate(self._gauges):
-            gx = panel_x + panel_padding + i * gauge_w
+            gx = panel_x + panel_padding + i * (gauge_w + gauge_gap)
             gy = panel_y + panel_padding
             gauge.draw(cr, gx, gy)
 
