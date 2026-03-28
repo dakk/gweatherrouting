@@ -36,7 +36,9 @@ class ChartStackTrack(ChartStackBase):
         if not only_active:
             self.track_list_store.clear()
             for x in self.core.trackManager:
-                self.track_list_store.append([x.name, len(x), x.length(), x.visible, "track-symbolic"])
+                self.track_list_store.append(
+                    [x.name, len(x), x.length(), x.visible, "track-symbolic"]
+                )
 
         self.track_store.clear()
 

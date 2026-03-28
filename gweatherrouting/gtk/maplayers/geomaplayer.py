@@ -162,7 +162,7 @@ class GeoMapLayer(GObject.GObject):
                     cr.stroke()
 
                 # Waypoint markers
-                is_endpoint = (i == 0 or i == total_pts - 1)
+                is_endpoint = i == 0 or i == total_pts - 1
                 radius = 5 if is_endpoint else 3
                 if highlight:
                     radius += 1

@@ -56,9 +56,7 @@ class MainWindow:
 
         # Load custom CSS
         css_provider = Gtk.CssProvider()
-        css_provider.load_from_path(
-            resource_path("gweatherrouting", "data/style.css")
-        )
+        css_provider.load_from_path(resource_path("gweatherrouting", "data/style.css"))
         Gtk.StyleContext.add_provider_for_screen(
             Gdk.Screen.get_default(),
             css_provider,

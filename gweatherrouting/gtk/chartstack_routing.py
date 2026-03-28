@@ -361,7 +361,7 @@ class ChartStackRouting(ChartStackBase):
             total_dist += utils.point_distance(
                 points[j - 1][0], points[j - 1][1], points[j][0], points[j][1]
             )
-            total_speed += (points[j][5] if points[j][5] else 0)
+            total_speed += points[j][5] if points[j][5] else 0
         avg_speed = total_speed / (len(points) - 1)
         total_dist_nm = total_dist / 1852.0
         try:
@@ -380,12 +380,14 @@ class ChartStackRouting(ChartStackBase):
         self.routingPointsStore.clear()
 
         for r in self.core.routingManager:
-            self.routingListStore.append([
-                r.name,
-                self._routing_summary(r),
-                r.visible,
-                "routing-symbolic",
-            ])
+            self.routingListStore.append(
+                [
+                    r.name,
+                    self._routing_summary(r),
+                    r.visible,
+                    "routing-symbolic",
+                ]
+            )
 
         self.map.queue_draw()
         self.core.trackManager.save()
@@ -404,14 +406,16 @@ class ChartStackRouting(ChartStackBase):
             except Exception:
                 time_str = x[2]
 
-            self.routingPointsStore.append([
-                i + 1,
-                time_str,
-                "%.0f°" % x[3] if x[3] else "",
-                "%.1f" % x[4] if x[4] else "",
-                "%.1f" % x[5] if x[5] else "",
-                "%.0f°" % x[6] if x[6] else "",
-            ])
+            self.routingPointsStore.append(
+                [
+                    i + 1,
+                    time_str,
+                    "%.0f°" % x[3] if x[3] else "",
+                    "%.1f" % x[4] if x[4] else "",
+                    "%.1f" % x[5] if x[5] else "",
+                    "%.0f°" % x[6] if x[6] else "",
+                ]
+            )
 
     def on_routing_toggle(self, widget, i):
         self.core.routingManager[int(i)].visible = not self.core.routingManager[
