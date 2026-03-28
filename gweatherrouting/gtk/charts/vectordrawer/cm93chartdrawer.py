@@ -88,10 +88,10 @@ class CM93ChartDrawer(VectorChartDrawer):
         )
 
     def _separate_features(self, cells, viewport):
-        """Separate cell features into bg areas, fine areas, and fine lines/points.
+        """Separate cell features into bg areas, fine areas, and lines/points.
 
-        Background cells only contribute area fills to avoid duplicate
-        coastlines. Fine-scale areas render on top of background areas.
+        Background areas render first so fine-scale areas paint over them.
+        All lines/points render regardless of cell type.
         """
         bg_areas = []
         fine_areas = []
@@ -105,7 +105,7 @@ class CM93ChartDrawer(VectorChartDrawer):
                         bg_areas.append(feat)
                     else:
                         fine_areas.append(feat)
-                elif not cell.is_background:
+                else:
                     lines_points.append(feat)
         return bg_areas, fine_areas, lines_points
 
