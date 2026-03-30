@@ -32,6 +32,7 @@ from gi.repository import Gdk, GObject, Gtk
 from weatherrouting import RoutingNoWindError
 
 from gweatherrouting.core import utils
+from gweatherrouting.core.geo.poi import POI
 from gweatherrouting.core.geo.routing import Routing
 
 from .chartstack_base import ChartStackBase
@@ -73,10 +74,32 @@ class ChartStackRouting(ChartStackBase):
 
     def on_routing_create(self, event):
         dialog = RoutingWizardDialog(self.core, self.parent)
-        response = dialog.run()
 
-        polar_file = dialog.get_selected_polar()
-        if response == Gtk.ResponseType.OK:
+        while True:
+            response = dialog.run()
+
+            if response != Gtk.ResponseType.OK:
+                break
+
+            if dialog.get_selected_start_point() is None and isinstance(
+                dialog.get_selected_track_or_poi(), POI
+            ):
+                edialog = Gtk.MessageDialog(
+                    self.parent,
+                    0,
+                    Gtk.MessageType.ERROR,
+                    Gtk.ButtonsType.OK,
+                    "Invalid start position",
+                )
+                edialog.format_secondary_text(
+                    "\"First track point\" cannot be used when the destination is a POI. "
+                    "Please select a track as destination or choose a different start position."
+                )
+                edialog.run()
+                edialog.destroy()
+                continue
+
+            polar_file = dialog.get_selected_polar()
             scenarios = dialog.get_comparison_scenarios()
 
             if not scenarios:
@@ -114,6 +137,7 @@ class ChartStackRouting(ChartStackBase):
                 )
                 self.routing_thread.start()
                 self.builder.get_object("stop-routing-button").show()
+            break
 
         dialog.destroy()
 
