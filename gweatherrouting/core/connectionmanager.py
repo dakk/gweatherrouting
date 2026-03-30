@@ -125,9 +125,7 @@ class ConnectionManager(EventDispatcher):
                         x["network"],
                     )
                     if self.sources[x["host"] + ":" + str(x["port"])].connect():
-                        logger.info(
-                            "Data source %s:%d connected", x["host"], x["port"]
-                        )
+                        logger.info("Data source %s:%d connected", x["host"], x["port"])
 
     def add_connection(self, d):
         if d["type"] == "serial":

@@ -22,6 +22,9 @@ from gweatherrouting.core import DataSource
 logger = logging.getLogger("gweatherrouting")
 
 
+MAX_LINE_LENGTH = 4096
+
+
 class NetworkDataSource(DataSource):
     def __init__(self, protocol, direction, host, port, cnetwork):
         DataSource.__init__(self, protocol, direction)
@@ -73,6 +76,13 @@ class NetworkDataSource(DataSource):
                 return []
 
             dd += d
+
+            if len(dd) > MAX_LINE_LENGTH:
+                logger.warning(
+                    "Discarded oversized line from %s:%d", self.host, self.port
+                )
+                self.cached = ""
+                return []
 
         cc = dd.split("\n")
         self.cached = cc[-1]

@@ -92,7 +92,7 @@ class ChartStackRouting(ChartStackBase):
                     "Invalid start position",
                 )
                 edialog.format_secondary_text(
-                    "\"First track point\" cannot be used when the destination is a POI. "
+                    '"First track point" cannot be used when the destination is a POI. '
                     "Please select a track as destination or choose a different start position."
                 )
                 edialog.run()
