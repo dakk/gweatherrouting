@@ -20,3 +20,5 @@ gweatherrouting/*.spec
 docs/build
 flatpak/wheels
 .flatpak-builder
+.coverage
+coverage.xml
