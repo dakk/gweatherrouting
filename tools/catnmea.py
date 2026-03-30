@@ -30,16 +30,25 @@ s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 s.bind(("", port))
 s.listen(1)
 
+print(f"NMEA server listening on port {port} ({len(f)} sentences loaded)")
+print("Waiting for connection...")
+
+line_index = 0
+
 try:
-    conn, addr = s.accept()
-    with conn:
-        print("Connected by", addr)
-        while True:
-            for x in f:
-                conn.send(x.encode("ascii") + b"\n")
-                print(x)
-                time.sleep(0.05)
-except (BrokenPipeError, ConnectionResetError, KeyboardInterrupt):
+    while True:
+        conn, addr = s.accept()
+        print(f"Connected by {addr}, resuming from sentence {line_index}")
+        try:
+            with conn:
+                while True:
+                    conn.send(f[line_index].encode("ascii") + b"\n")
+                    print(f[line_index])
+                    line_index = (line_index + 1) % len(f)
+                    time.sleep(0.05)
+        except (BrokenPipeError, ConnectionResetError):
+            print(f"Client disconnected at sentence {line_index}. Waiting for reconnection...")
+except KeyboardInterrupt:
     pass
 finally:
     s.close()
