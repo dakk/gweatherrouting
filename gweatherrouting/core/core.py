@@ -17,6 +17,13 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 import logging
 from typing import Callable, List, Optional
 
+try:
+    from gi.repository import GLib
+
+    _has_glib = True
+except ImportError:
+    _has_glib = False
+
 import gpxpy
 import weatherrouting
 
@@ -104,6 +111,7 @@ class LogTrackCollection(TrackCollection):
 
 class Core(EventDispatcher):
     def __init__(self):
+        EventDispatcher.__init__(self)
         self.connectionManager = ConnectionManager()
         self.trackManager = TrackCollection()
         self.routingManager = RoutingCollection()
@@ -151,7 +159,10 @@ class Core(EventDispatcher):
             # Parse additional NMEA sentence types
             self._parse_nmea_extra(x)
 
-        self.dispatch("boat_data", self.boat_info)
+        if _has_glib:
+            GLib.idle_add(self.dispatch, "boat_data", self.boat_info)
+        else:
+            self.dispatch("boat_data", self.boat_info)
 
     def _parse_position(self, x: DataPacket):
         """Parse position data from an NMEA sentence."""
@@ -171,7 +182,10 @@ class Core(EventDispatcher):
             except (ValueError, TypeError):
                 pass
 
-        self.dispatch("boat_position", self.boat_info)
+        if _has_glib:
+            GLib.idle_add(self.dispatch, "boat_position", self.boat_info)
+        else:
+            self.dispatch("boat_position", self.boat_info)
 
     def _parse_nmea_extra(self, x: DataPacket):
         """Parse additional NMEA sentences for instrument data."""

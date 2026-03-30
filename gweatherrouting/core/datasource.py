@@ -97,6 +97,9 @@ class DataSource:
     def connect(self):
         return False
 
+    def close(self):
+        self.connected = False
+
     def write(self, packet):
         if not self.connected:
             return False

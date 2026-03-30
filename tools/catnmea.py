@@ -47,7 +47,9 @@ try:
                     line_index = (line_index + 1) % len(f)
                     time.sleep(0.05)
         except (BrokenPipeError, ConnectionResetError):
-            print(f"Client disconnected at sentence {line_index}. Waiting for reconnection...")
+            print(
+                f"Client disconnected at sentence {line_index}. Waiting for reconnection..."
+            )
 except KeyboardInterrupt:
     pass
 finally:

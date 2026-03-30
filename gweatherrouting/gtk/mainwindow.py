@@ -116,8 +116,8 @@ class MainWindow:
 
     def quit(self, a, b):
         logger.info("Quitting...")
-        Gtk.main_quit()
         self.core.connectionManager.stop_polling()
+        Gtk.main_quit()
 
     def on_about(self, item):
         dialog = self.builder.get_object("about-dialog")

@@ -72,23 +72,26 @@ class OpenSkironSource(GribSource):
         logger.info("Downloading grib from OpenSkiron: %s", identifier)
 
         response = requests.get(identifier, stream=True)
-        total_length = response.headers.get("content-length")
-        last_signal_percent = -1
+        try:
+            total_length = response.headers.get("content-length")
+            last_signal_percent = -1
 
-        tmp_path = tempfile.mktemp(dir=dest_dir, suffix=".bz2")
-        with open(tmp_path, "wb") as f:
-            if total_length is None:
-                f.write(response.content)
-            else:
-                dl = 0
-                total_length_i = int(total_length)
-                for data in response.iter_content(chunk_size=4096):
-                    dl += len(data)
-                    f.write(data)
-                    done = int(100 * dl / total_length_i)
-                    if last_signal_percent != done:
-                        percentage_callback(done)
-                        last_signal_percent = done
+            tmp_path = tempfile.mktemp(dir=dest_dir, suffix=".bz2")
+            with open(tmp_path, "wb") as f:
+                if total_length is None:
+                    f.write(response.content)
+                else:
+                    dl = 0
+                    total_length_i = int(total_length)
+                    for data in response.iter_content(chunk_size=4096):
+                        dl += len(data)
+                        f.write(data)
+                        done = int(100 * dl / total_length_i)
+                        if last_signal_percent != done:
+                            percentage_callback(done)
+                            last_signal_percent = done
+        finally:
+            response.close()
 
         logger.info("Download completed, decompressing: %s", name)
         final_name = name.replace(".bz2", "")

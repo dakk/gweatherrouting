@@ -205,11 +205,14 @@ class NOAAGFSSource(GribSource):
                 logger.debug("Downloading forecast hour %d", fhour)
 
                 response = requests.get(GFS_FILTER_URL, params=params, stream=True)
-                response.raise_for_status()
+                try:
+                    response.raise_for_status()
 
-                for chunk in response.iter_content(chunk_size=8192):
-                    outfile.write(chunk)
-                    bytes_written += len(chunk)
+                    for chunk in response.iter_content(chunk_size=8192):
+                        outfile.write(chunk)
+                        bytes_written += len(chunk)
+                finally:
+                    response.close()
 
                 percentage = int(100 * (i + 1) / total_steps)
                 percentage_callback(percentage)

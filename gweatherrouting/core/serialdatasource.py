@@ -36,9 +36,18 @@ class SerialDataSource(DataSource):
             self.serial_conn = serial.Serial(self.port, baudrate=self.baudrate)
             self.connected = True
             return True
-        except:
+        except Exception:
             logger.error("Error connecting to serial port %s", self.port)
             return False
+
+    def close(self):
+        if self.serial_conn:
+            try:
+                self.serial_conn.close()
+            except Exception:
+                pass
+            self.serial_conn = None
+        self.connected = False
 
     @staticmethod
     def detect():
@@ -49,18 +58,22 @@ class SerialDataSource(DataSource):
                 logger.info(
                     "Detected new data source: %s [%s]", x.device, x.description
                 )
-            except:
+            except Exception:
                 pass
 
         return devices
 
     def _read(self):
-        if self.serial_conn and self.serial_conn.inWaiting() > 0:
-            return (
-                self.serial_conn.read(self.serial_conn.inWaiting())
-                .decode("ascii")
-                .split("\n")
-            )
+        try:
+            if self.serial_conn and self.serial_conn.inWaiting() > 0:
+                return (
+                    self.serial_conn.read(self.serial_conn.inWaiting())
+                    .decode("ascii")
+                    .split("\n")
+                )
+        except (OSError, serial.SerialException) as e:
+            logger.warning("Serial connection lost on %s: %s", self.port, e)
+            self.connected = False
 
         return []
 

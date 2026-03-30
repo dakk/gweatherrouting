@@ -146,7 +146,6 @@ class Storage(dict):
                 )
             )
             # logger.debug ('Configuration saved to %s/%s.json' % (DATA_DIR, self.__filename))
-            f.close()
 
     def load(self):
         if self.__parent:

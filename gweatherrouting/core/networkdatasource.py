@@ -22,11 +22,15 @@ from gweatherrouting.core import DataSource
 logger = logging.getLogger("gweatherrouting")
 
 
+MAX_LINE_LENGTH = 4096
+
+
 class NetworkDataSource(DataSource):
     def __init__(self, protocol, direction, host, port, cnetwork):
         DataSource.__init__(self, protocol, direction)
         self.host = host
         self.port = port
+        self.cached = ""
 
         # Create socket
         if cnetwork == "tcp":
@@ -44,7 +48,12 @@ class NetworkDataSource(DataSource):
             logger.error("Error while connecting to the network: %s", e)
             return False
 
-    cached = ""
+    def close(self):
+        try:
+            self.s.close()
+        except Exception:
+            pass
+        self.connected = False
 
     def _read(self):
         dd = self.cached
@@ -53,12 +62,27 @@ class NetworkDataSource(DataSource):
             try:
                 d = self.s.recv(1024).decode("ascii")
             except socket.timeout:
+                logger.debug("Socket timeout on %s:%d", self.host, self.port)
+                return []
+            except OSError as e:
+                logger.warning("Connection lost on %s:%d: %s", self.host, self.port, e)
+                self.connected = False
                 return []
 
             if len(d) == 0:
+                # Peer closed the connection
+                logger.info("Connection closed by peer on %s:%d", self.host, self.port)
+                self.connected = False
                 return []
 
             dd += d
+
+            if len(dd) > MAX_LINE_LENGTH:
+                logger.warning(
+                    "Discarded oversized line from %s:%d", self.host, self.port
+                )
+                self.cached = ""
+                return []
 
         cc = dd.split("\n")
         self.cached = cc[-1]
