@@ -27,7 +27,9 @@
       <li>Grib1 and Grib2 support, with downloader for OpenSkiron and NOAA GFS</li>
       <li>GPX support for importing and exporting POIs and tracks</li>
       <li>Session manager for storing POIs, tracks and routings</li>
-      <li>Chart rendering for GeoJSON, GSHHS basemap, KAP, GeoTiff charts and other raster formats supported by GDAL, OpenSeaMap seamarks rendering</li>
+      <li>Chart rendering for GeoJSON, GSHHS basemap, KAP, 
+        GeoTiff charts and other raster formats supported by GDAL, 
+        OpenSeaMap seamarks rendering and CM93 binary format</li>
       <li>Gtk4 interface</li>
       <li>NMEA instruments support</li>
       <li>NMEA / GPX log analysys</li>
@@ -57,11 +59,15 @@
   <content_rating type="oars-1.1" />
   
   <screenshots>
-    <screenshot>
+    <screenshot type="default">
       <image>https://github.com/dakk/gweatherrouting/raw/master/docs/source/_static/images/gweatherrouting_levante.png</image>
       <caption>Navigating with GWW</caption>
     </screenshot>
-    <screenshot type="default">
+    <screenshot>
+      <image>https://github.com/dakk/gweatherrouting/raw/master/docs/source/_static/images/gww_polars.png</image>
+      <caption>Polar analysys</caption>
+    </screenshot>
+    <screenshot>
       <image>https://github.com/dakk/gweatherrouting/raw/master/docs/source/_static/images/quickstart/10.gif</image>
       <caption>Routing calculation process</caption>
     </screenshot>
@@ -76,6 +82,12 @@
   </screenshots>
 
   <releases>
+    <release version="0.3.5" date="2026-03-30">
+      <url type="details">https://github.com/dakk/gweatherrouting/releases/tag/v0.3.5</url>
+      <description>
+          <p>UI improvements, connection handling fixes and minor bugfixing</p>
+      </description>
+    </release>
     <release version="0.3.0" date="2026-03-26">
       <url type="details">https://github.com/dakk/gweatherrouting/releases/tag/v0.3.0</url>
       <description>
