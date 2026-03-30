@@ -82,8 +82,8 @@
   </screenshots>
 
   <releases>
-    <release version="0.3.5" date="2026-03-30">
-      <url type="details">https://github.com/dakk/gweatherrouting/releases/tag/v0.3.5</url>
+    <release version="0.3.6" date="2026-03-30">
+      <url type="details">https://github.com/dakk/gweatherrouting/releases/tag/v0.3.6</url>
       <description>
           <p>UI improvements, connection handling fixes and minor bugfixing</p>
       </description>

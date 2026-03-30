@@ -30,7 +30,7 @@ chmod +x GWeatherRouting-linux-x86_64.AppImage
 
 ### Alternative: Windows
 
-Download the latest [Windows portable ZIP](https://github.com/dakk/gweatherrouting/releases/download/v0.3.0/GWeatherRouting-win64.zip), extract it, and run `GWeatherRouting.bat` (or `GWeatherRouting-noconsole.vbs` to hide the console window).
+Download the latest [Windows portable ZIP](https://github.com/dakk/gweatherrouting/releases/download/v0.3.6/GWeatherRouting-win64.zip), extract it, and run `GWeatherRouting.bat` (or `GWeatherRouting-noconsole.vbs` to hide the console window).
 
 ### Alternative: From source
 
