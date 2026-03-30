@@ -15,6 +15,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
 import logging
+import signal
 
 from gweatherrouting import log  # noqa: F401
 from gweatherrouting.core import Core
@@ -26,11 +27,19 @@ def start_ui_gtk():
     import gi
 
     gi.require_version("Gtk", "3.0")
-    from gi.repository import Gtk
+    from gi.repository import GLib, Gtk
 
     from gweatherrouting.gtk.mainwindow import MainWindow
 
-    MainWindow(Core())
+    main_window = MainWindow(Core())
+
+    # Let GLib handle SIGINT so Ctrl+C triggers a clean shutdown
+    def on_sigint():
+        main_window.quit(None, None)
+        return GLib.SOURCE_REMOVE
+
+    GLib.unix_signal_add(GLib.PRIORITY_DEFAULT, signal.SIGINT, on_sigint)
+
     Gtk.main()
 
 
