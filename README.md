@@ -9,6 +9,8 @@ GWeatherRouting is an open-source sailing routing and navigation software writte
 
 ![GWeatherRouting](https://github.com/dakk/gweatherrouting/raw/master/docs/source/_static/images/gweatherrouting_levante.png)
 
+![Polars](https://github.com/dakk/gweatherrouting/raw/master/docs/source/_static/images/gww_polars.png)
+
 ![Log analysis](https://github.com/dakk/gweatherrouting/raw/master/docs/source/_static/images/loganalysis.png)
 
 ## Features

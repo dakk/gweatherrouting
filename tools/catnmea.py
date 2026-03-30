@@ -45,7 +45,7 @@ try:
                     conn.send(f[line_index].encode("ascii") + b"\n")
                     print(f[line_index])
                     line_index = (line_index + 1) % len(f)
-                    time.sleep(0.05)
+                    time.sleep(0.01)
         except (BrokenPipeError, ConnectionResetError):
             print(
                 f"Client disconnected at sentence {line_index}. Waiting for reconnection..."
