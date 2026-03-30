@@ -15,6 +15,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
 import logging
+import threading
 import time
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
@@ -91,6 +92,7 @@ class AISManager:
     def __init__(self):
         self._targets: Dict[int, AISTarget] = {}
         self._fragment_buffer: Dict[Tuple[int, int], List[bytes]] = {}
+        self._lock = threading.Lock()
 
     def process_sentence(self, raw_sentence: str) -> None:
         """Process a raw AIS NMEA sentence (!AIVDM/!AIVDO)."""
@@ -110,23 +112,24 @@ class AISManager:
         frag_num = nmea_msg.frag_num
         seq_id = nmea_msg.seq_id or 0
 
-        if frag_cnt == 1:
-            # Single-fragment message
-            self._decode_and_update(raw_sentence.encode("ascii"))
-        else:
-            # Multi-fragment message: buffer fragments
-            key = (seq_id, frag_cnt)
-            if frag_num == 1:
-                self._fragment_buffer[key] = [raw_sentence.encode("ascii")]
-            elif key in self._fragment_buffer:
-                self._fragment_buffer[key].append(raw_sentence.encode("ascii"))
-                if len(self._fragment_buffer[key]) == frag_cnt:
-                    # All fragments received
-                    fragments = self._fragment_buffer.pop(key)
-                    self._decode_and_update(*fragments)
+        with self._lock:
+            if frag_cnt == 1:
+                # Single-fragment message
+                self._decode_and_update(raw_sentence.encode("ascii"))
             else:
-                # Got a non-first fragment without the first; discard
-                logger.debug("Orphaned AIS fragment %d/%d", frag_num, frag_cnt)
+                # Multi-fragment message: buffer fragments
+                key = (seq_id, frag_cnt)
+                if frag_num == 1:
+                    self._fragment_buffer[key] = [raw_sentence.encode("ascii")]
+                elif key in self._fragment_buffer:
+                    self._fragment_buffer[key].append(raw_sentence.encode("ascii"))
+                    if len(self._fragment_buffer[key]) == frag_cnt:
+                        # All fragments received
+                        fragments = self._fragment_buffer.pop(key)
+                        self._decode_and_update(*fragments)
+                else:
+                    # Got a non-first fragment without the first; discard
+                    logger.debug("Orphaned AIS fragment %d/%d", frag_num, frag_cnt)
 
     def _decode_and_update(self, *fragments: bytes) -> None:
         """Decode AIS message fragments and update the target."""
@@ -198,12 +201,13 @@ class AISManager:
     def get_active_targets(self) -> List[AISTarget]:
         """Return active targets, removing stale ones (>10 min old)."""
         now = time.time()
-        stale_mmsis = [
-            mmsi
-            for mmsi, t in self._targets.items()
-            if now - t.last_update > STALE_TIMEOUT
-        ]
-        for mmsi in stale_mmsis:
-            del self._targets[mmsi]
+        with self._lock:
+            stale_mmsis = [
+                mmsi
+                for mmsi, t in self._targets.items()
+                if now - t.last_update > STALE_TIMEOUT
+            ]
+            for mmsi in stale_mmsis:
+                del self._targets[mmsi]
 
-        return list(self._targets.values())
+            return list(self._targets.values())

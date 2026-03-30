@@ -142,7 +142,8 @@ def ortodromic(lat_a, lon_a, lat_b, lon_b):
 
 
 class EventDispatcher:
-    handlers: Dict[str, List[Callable]] = {}
+    def __init__(self):
+        self.handlers: Dict[str, List[Callable]] = {}
 
     def connect(self, evt, f):
         if evt not in self.handlers:

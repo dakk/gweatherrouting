@@ -23,6 +23,7 @@ class TimeControl(EventDispatcher):
     DFORMAT = "%Y/%m/%d, %H:%M"
 
     def __init__(self):
+        EventDispatcher.__init__(self)
         self._time: datetime.datetime
         self.now()
 
