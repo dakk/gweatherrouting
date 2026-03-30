@@ -199,6 +199,19 @@ class ChartStackRouting(ChartStackBase):
             params["polar_name"], scenario
         )
 
+        # Check if GRIB data covers the routing start area and time
+        pos = self.currentRouting.position
+        wind = self.currentRouting.grib.get_wind_at(
+            self.currentRouting.time, pos[0], pos[1]
+        )
+        if wind is None:
+            self._show_routing_error(
+                "No GRIB data available for the routing area and time. "
+                "Please load a GRIB file that covers the routing region "
+                "and time period."
+            )
+            return False
+
         label = f"Scenario {idx + 1}/{total}"
         Gdk.threads_enter()
         self.progress_bar.set_fraction(0.0)
@@ -274,6 +287,27 @@ class ChartStackRouting(ChartStackBase):
     def on_routing_step(self):
         if self.currentRouting is None:
             return
+
+        # Check if GRIB data covers the routing start area and time
+        pos = self.currentRouting.position
+        wind = self.currentRouting.grib.get_wind_at(
+            self.currentRouting.time, pos[0], pos[1]
+        )
+        if wind is None:
+            Gdk.threads_enter()
+            edialog = Gtk.MessageDialog(
+                self.parent, 0, Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, "Error"
+            )
+            edialog.format_secondary_text(
+                "No GRIB data available for the routing area and time. "
+                "Please load a GRIB file that covers the routing region "
+                "and time period."
+            )
+            edialog.run()
+            edialog.destroy()
+            Gdk.threads_leave()
+            self.builder.get_object("stop-routing-button").hide()
+            return None
 
         Gdk.threads_enter()
         self.progress_bar.set_fraction(1.0)
