@@ -41,6 +41,7 @@ class ToolsMapLayer(GObject.GObject):
         self.dashboard = True
         self.compass = False
         self.boat_info = None
+        self._connection_manager = core.connectionManager
 
         # Dashboard gauges
         self._gauges = [
@@ -267,6 +268,97 @@ class ToolsMapLayer(GObject.GObject):
             if gauge.label in gauge_map:
                 gauge.set_value(gauge_map[gauge.label])
 
+    def _draw_connection_status(self, cr, panel_x, panel_y, panel_w):
+        """Draw a compact connection status line above the gauge panel.
+
+        Shows a single summary row normally, expanding only when a
+        connection is down to show which one has the problem.
+        """
+        from gweatherrouting.gtk.gauges.numericgauge import _rounded_rect
+
+        cm = self._connection_manager
+        statuses = cm.get_status()
+        polling = cm.polling_active
+
+        row_h = 18
+        pad = 6
+
+        # Collect disconnected sources for the detail rows
+        disconnected = [s for s in statuses if not s["connected"]] if statuses else []
+
+        # How many rows: 1 summary + 1 per disconnected source
+        n_rows = 1 + len(disconnected)
+        conn_panel_h = n_rows * row_h + pad * 2
+        cy = panel_y - conn_panel_h - 4
+
+        # Background
+        cr.set_source_rgba(0.03, 0.03, 0.03, 0.55)
+        _rounded_rect(cr, panel_x, cy, panel_w, conn_panel_h, 6)
+        cr.fill()
+
+        # --- Summary row ---
+        ry = cy + pad
+
+        if not polling and not statuses:
+            # Data disabled
+            cr.set_source_rgba(0.5, 0.5, 0.5, 0.8)
+            cr.arc(panel_x + pad + 5, ry + 8, 3.5, 0, 2 * math.pi)
+            cr.fill()
+            cr.set_font_size(10)
+            cr.move_to(panel_x + pad + 14, ry + 12)
+            cr.show_text("Data off")
+            return
+
+        if not statuses:
+            # Polling active but no connections configured
+            cr.set_source_rgba(0.5, 0.5, 0.5, 0.8)
+            cr.arc(panel_x + pad + 5, ry + 8, 3.5, 0, 2 * math.pi)
+            cr.fill()
+            cr.set_font_size(10)
+            cr.move_to(panel_x + pad + 14, ry + 12)
+            cr.show_text("No connections")
+            return
+
+        total = len(statuses)
+        connected = sum(1 for s in statuses if s["connected"])
+        total_pkts = sum(s["packets"] for s in statuses)
+
+        # Dot: green if all connected, red if any down
+        if connected == total:
+            cr.set_source_rgba(0.2, 0.9, 0.4, 0.9)
+        else:
+            cr.set_source_rgba(1.0, 0.3, 0.2, 0.9)
+        cr.arc(panel_x + pad + 5, ry + 8, 3.5, 0, 2 * math.pi)
+        cr.fill()
+
+        # Summary text
+        cr.set_source_rgba(0.85, 0.85, 0.85, 1.0)
+        cr.set_font_size(10)
+        summary = "%d/%d connected" % (connected, total)
+        cr.move_to(panel_x + pad + 14, ry + 12)
+        cr.show_text(summary)
+
+        # Packet count (right-aligned)
+        pkt_text = "%d pkt" % total_pkts
+        cr.set_font_size(9)
+        pkt_ext = cr.text_extents(pkt_text)
+        cr.set_source_rgba(0.4, 0.7, 0.9, 1.0)
+        cr.move_to(panel_x + panel_w - pad - pkt_ext.width, ry + 12)
+        cr.show_text(pkt_text)
+
+        # --- Detail rows for disconnected sources only ---
+        for i, s in enumerate(disconnected):
+            ry = cy + pad + (i + 1) * row_h
+
+            cr.set_source_rgba(1.0, 0.3, 0.2, 0.7)
+            cr.arc(panel_x + pad + 15, ry + 8, 2.5, 0, 2 * math.pi)
+            cr.fill()
+
+            cr.set_source_rgba(0.7, 0.7, 0.7, 0.9)
+            cr.set_font_size(9)
+            cr.move_to(panel_x + pad + 22, ry + 11)
+            cr.show_text(s["name"])
+
     def _draw_dashboard(self, gpsmap, cr):
         """Draw the instrument dashboard panel on the map."""
         self._update_gauge_values()
@@ -285,19 +377,13 @@ class ToolsMapLayer(GObject.GObject):
         # Center horizontally at the bottom of the map
         panel_x = (width - total_w) / 2.0 - panel_padding
         panel_y = height - gauge_h - panel_padding * 2 - 12
+        panel_w = total_w + panel_padding * 2
 
         # Draw panel background with rounded corners
         from gweatherrouting.gtk.gauges.numericgauge import _rounded_rect
 
         cr.set_source_rgba(0.03, 0.03, 0.03, 0.55)
-        _rounded_rect(
-            cr,
-            panel_x,
-            panel_y,
-            total_w + panel_padding * 2,
-            gauge_h + panel_padding * 2,
-            8,
-        )
+        _rounded_rect(cr, panel_x, panel_y, panel_w, gauge_h + panel_padding * 2, 8)
         cr.fill()
 
         # Draw each gauge
@@ -305,6 +391,9 @@ class ToolsMapLayer(GObject.GObject):
             gx = panel_x + panel_padding + i * (gauge_w + gauge_gap)
             gy = panel_y + panel_padding
             gauge.draw(cr, gx, gy)
+
+        # Draw connection status above the gauge panel
+        self._draw_connection_status(cr, panel_x, panel_y, panel_w)
 
     def do_render(self, gpsmap):
         pass
