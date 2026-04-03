@@ -17,13 +17,14 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 from threading import Thread
 
 import gi
-
+import logging
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gdk, Gtk
 
 from gweatherrouting.gtk.charts.chartlayer import ChartLayer
 
 from .settingswindow_base import SettingsWindowBase
+logger = logging.getLogger("gweatherrouting")
 
 PALETTES = {"cm93": 0, "navionics": 1, "dark": 2}
 
@@ -149,9 +150,9 @@ class SettingsWindowCharts(SettingsWindowBase):
 
     def on_add_vector_chart(self, widget):
         dialog = Gtk.FileChooserDialog(
-            "Please select a vector chart directory",
+            "Please select a vector chart file",
             self.window,
-            Gtk.FileChooserAction.SELECT_FOLDER,
+            Gtk.FileChooserAction.OPEN,
             (
                 Gtk.STOCK_CANCEL,
                 Gtk.ResponseType.CANCEL,
@@ -160,10 +161,16 @@ class SettingsWindowCharts(SettingsWindowBase):
             ),
         )
 
+        s57_filter = Gtk.FileFilter()
+        s57_filter.set_name("S57 ENC (*.000)")
+        s57_filter.add_pattern("*.000")
+        s57_filter.add_pattern("*.000".upper())
+        dialog.add_filter(s57_filter)
         response = dialog.run()
 
         if response == Gtk.ResponseType.OK:
-            path = dialog.get_filename() + "/"
+            path = dialog.get_filename()
+            logger.info("Selected vector file: %s", path)
             dialog.destroy()
 
             try:

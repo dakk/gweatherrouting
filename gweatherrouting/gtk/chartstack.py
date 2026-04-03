@@ -72,7 +72,8 @@ class ChartStack(
         self.map = MapWidget()
         map_container = self.builder.get_object("map-container")
         map_container.pack_start(self.map, True, True, 0)
-        self.map.set_center_and_zoom(39.0, 9.0, 6)
+        self.map.set_center_and_zoom(41.3, -71.6, 9) # for debug purpose
+        # self.map.set_center_and_zoom(39.0, 9.0, 6)
         self.map.connect("map", self.on_map_mapped)
         self.map.connect("button-press-event", self.on_map_clicked)
         self.map.connect("button-press-event", self.on_map_click)

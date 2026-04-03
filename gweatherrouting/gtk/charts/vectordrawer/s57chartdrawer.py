@@ -15,48 +15,76 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
 from .vectorchartdrawer import VectorChartDrawer
-
+from gweatherrouting.gtk.widgets.mapwidget import MapPoint
 
 class S57ChartDrawer(VectorChartDrawer):
     def draw(self, gpsmap, cr, vector_file, bounding):
+        width = float(gpsmap.get_allocated_width())
+        height = float(gpsmap.get_allocated_height())
+
+        cr.rectangle(0, 0, width, height)
+        cr.fill()
+
+        # Loop over each layer of the map
         for i in range(vector_file.GetLayerCount()):
             layer = vector_file.GetLayerByIndex(i)
+            layer_name = layer.GetName()
+            layer_defn = layer.GetLayerDefn()
+            geom_field_count = layer_defn.GetGeomFieldCount()
+
+            # Skip non geometry layers
+            if geom_field_count == 0:
+                print(f"Skip non geometry layer {layer_name}")
+                continue
+
+            if layer_name not in ("LNDARE", "DEPARE"):
+                continue
+
             layer.SetSpatialFilter(bounding)
+            layer.ResetReading()
 
-            print(i, layer.GetName())
+            feature = layer.GetNextFeature()
+            while feature is not None:
+                l_geom = feature.GetGeometryRef()
+                if l_geom is not None:
+                    self._render_polygon_geometry(gpsmap, cr, l_geom, layer_name, feature)
+                feature = layer.GetNextFeature()
 
-            # Iterate over features
-            feat = layer.GetNextFeature()
-            while feat is not None:
-                feat = layer.GetNextFeature()
+    def _render_polygon_geometry(self, gpsmap, cr, l_geom, layer_name, feature):
+        l_geom_name = l_geom.GetGeometryName()
 
-                if not feat:
-                    continue
+        # Define layer color
+        if layer_name == "LNDARE":
+            cr.set_source_rgba(1.0, 0.0, 0.0, 1.0)
+        elif layer_name == "DEPARE":
+            cr.set_source_rgba(0.0, 1.0, 0.0, 1.0)
+        else:
+            print("ERROR: layer not handled")
+            return
 
-                # print (feat.GetFieldCount())
-                for x in range(feat.GetFieldCount()):
-                    fd = feat.GetFieldDefnRef(x)  # noqa: F841
+        if l_geom_name == "POLYGON":
+            self._draw_polygon(gpsmap, cr, l_geom)
+        elif l_geom_name == "MULTYPOLYGON":
+            for i in range(l_geom.GetGeometryCount()):
+                poly = l_geom.GetGeometryRef(i)
+                self._draw_polygon(gpsmap, cr, poly)
 
-                    # print (fd.GetNameRef())
 
-                geom = feat.GetGeometryRef()  # noqa: F841
-                # print (geom)
+    def _draw_polygon(self, gpsmap, cr, polygon):
+        ring = polygon.GetGeometryRef(0)
+        if ring is None or ring.GetPointCount == 0:
+            return
 
-                # gj = json.loads(geom.ExportToJson())
+        for idx in range(ring.GetPointCount()):
+            pt = ring.GetPoint(idx)
+            lon = pt[0]
+            lat = pt[1]
+            x,y = gpsmap.convert_geographic_to_screen(MapPoint.new_degrees(lat,lon))
 
-                # cr.set_line_width(1)
+            if idx==0:
+                cr.move_to(x,y)
+            else:
+                cr.line_to(x,y)
 
-                # if gj["type"] == "Polygon":
-                # 	for l in gj["coordinates"]:
-                # 		cr.set_source_rgba(245 / 255.0, 203 / 255.0, 66 / 255.0, 1.0)
-                # 		for x in l:
-                # 			xx, yy = gpsmap.convert_geographic_to_screen(
-                # 				OsmGpsMap.MapPoint.new_degrees(x[1], x[0])
-                # 			)
-                # 			cr.line_to(xx, yy)
-
-                # 		cr.close_path()
-                # 		cr.stroke_preserve()
-                # 		cr.set_source_rgba(245 / 255.0, 203 / 255.0, 66 / 255.0, 0.6)
-                # 		cr.fill()
-                # return
+        cr.close_path()
+        cr.fill()
