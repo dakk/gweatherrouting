@@ -22,8 +22,8 @@ class S57ChartDrawer(VectorChartDrawer):
         width = float(gpsmap.get_allocated_width())
         height = float(gpsmap.get_allocated_height())
 
-        cr.rectangle(0, 0, width, height)
-        cr.fill()
+        #cr.rectangle(0, 0, width, height)
+        #cr.fill()
 
         # Loop over each layer of the map
         for i in range(vector_file.GetLayerCount()):
