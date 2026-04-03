@@ -64,7 +64,7 @@ class S57ChartDrawer(VectorChartDrawer):
 
         if l_geom_name == "POLYGON":
             self._draw_polygon(gpsmap, cr, l_geom)
-        elif l_geom_name == "MULTYPOLYGON":
+        elif l_geom_name == "MULTIPOLYGON":
             for i in range(l_geom.GetGeometryCount()):
                 poly = l_geom.GetGeometryRef(i)
                 self._draw_polygon(gpsmap, cr, poly)
@@ -72,7 +72,7 @@ class S57ChartDrawer(VectorChartDrawer):
 
     def _draw_polygon(self, gpsmap, cr, polygon):
         ring = polygon.GetGeometryRef(0)
-        if ring is None or ring.GetPointCount == 0:
+        if ring is None or ring.GetPointCount() == 0:
             return
 
         for idx in range(ring.GetPointCount()):
