@@ -160,6 +160,7 @@ class SettingsWindowCharts(SettingsWindowBase):
                 Gtk.ResponseType.OK,
             ),
         )
+        dialog.set_select_multiple(True)
 
         s57_filter = Gtk.FileFilter()
         s57_filter.set_name("S57 ENC (*.000)")
@@ -169,29 +170,29 @@ class SettingsWindowCharts(SettingsWindowBase):
         response = dialog.run()
 
         if response == Gtk.ResponseType.OK:
-            path = dialog.get_filename()
-            logger.info("Selected vector file: %s", path)
+            paths = dialog.get_filenames()
             dialog.destroy()
 
-            try:
-                vec_l = self.parent.chart_manager.load_vector_layer(path)
-                Thread(
-                    target=self.registering_chart,
-                    args=(
-                        vec_l,
-                        "vector",
-                    ),
-                ).start()
-            except Exception as e:
-                edialog = Gtk.MessageDialog(
-                    self.parent.window,
-                    0,
-                    Gtk.MessageType.ERROR,
-                    Gtk.ButtonsType.OK,
-                    "Error loading vector chart",
-                )
-                edialog.format_secondary_text(str(e))
-                edialog.run()
-                edialog.destroy()
+            for path in paths:
+                try:
+                    vec_l = self.parent.chart_manager.load_vector_layer(path)
+                    Thread(
+                        target=self.registering_chart,
+                        args=(
+                            vec_l,
+                            "vector",
+                        ),
+                    ).start()
+                except Exception as e:
+                    edialog = Gtk.MessageDialog(
+                        self.parent.window,
+                        0,
+                        Gtk.MessageType.ERROR,
+                        Gtk.ButtonsType.OK,
+                        "Error loading vector chart",
+                    )
+                    edialog.format_secondary_text(str(e))
+                    edialog.run()
+                    edialog.destroy()
         else:
             dialog.destroy()
