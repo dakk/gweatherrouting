@@ -16,6 +16,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 from .vectorchartdrawer import VectorChartDrawer
 from gweatherrouting.gtk.widgets.mapwidget import MapPoint
+
 import cairo
 
 SUPPORTED_LAYERS = {
@@ -80,7 +81,7 @@ class S57ChartDrawer(VectorChartDrawer):
             elif layer_name in SUPPORTED_LAYERS["line"]:
                 self._render_line_geometry(gpsmap, cr, l_geom, layer_name)
             elif layer_name in SUPPORTED_LAYERS["point"]:
-                self._render_point_geometry(gpsmap, cr, l_geom, layer_name)
+                self._render_point_geometry(gpsmap, cr, l_geom, layer_name, feature)
             else:
                 print(f"ERROR: layer {layer_name} not supported")
 
@@ -148,7 +149,7 @@ class S57ChartDrawer(VectorChartDrawer):
                 line = l_geom.GetGeometryRef(i)
                 self._draw_line(gpsmap, cr, line)
 
-    def _render_point_geometry(self, gpsmap, cr, l_geom, layer_name):
+    def _render_point_geometry(self, gpsmap, cr, l_geom, layer_name, feature):
         l_geom_name = l_geom.GetGeometryName()
         pt_radius = 1.5
         if layer_name == "SOUNDG":
@@ -167,11 +168,19 @@ class S57ChartDrawer(VectorChartDrawer):
             return
 
         if l_geom_name == "POINT":
-            self._draw_point(gpsmap, cr, l_geom, pt_radius)
+            if layer_name == "LIGHTS":
+                symbol_name = self._select_light_symbol(feature)
+                self._draw_light_symbol(gpsmap, cr, l_geom, symbol_name)
+            else:
+                self._draw_point(gpsmap, cr, l_geom, pt_radius)
         elif l_geom_name == "MULTIPOINT":
             for i in range(l_geom.GetGeometryCount()):
                 point = l_geom.GetGeometryRef(i)
-                self._draw_point(gpsmap, cr, point, pt_radius)
+                if layer_name == "LIGHTS":
+                    symbol_name = self._select_light_symbol(feature)
+                    self._draw_light_symbol(gpsmap, cr, point, symbol_name)
+                else:
+                    self._draw_point(gpsmap, cr, point, pt_radius)
 
     def _draw_polygon(self, gpsmap, cr, polygon):
         ring_count = polygon.GetGeometryCount()
@@ -186,7 +195,7 @@ class S57ChartDrawer(VectorChartDrawer):
             self._draw_ring(gpsmap, cr, ring)
 
         cr.fill()
-        cr.restore()
+        cr.set_fill_rule(cairo.FillRule.WINDING)
 
     def _draw_line(self, gpsmap, cr, line):
         if line is None or line.GetPointCount() == 0:
@@ -235,4 +244,75 @@ class S57ChartDrawer(VectorChartDrawer):
             else:
                 cr.line_to(x,y)
         cr.close_path()
+
+    def _draw_light_symbol(self, gpsmap, cr, point_geom, symbol_name):
+        pt = point_geom.GetPoint(0)
+        lon = pt[0]
+        lat = pt[1]
+
+        x,y = gpsmap.convert_geographic_to_screen(MapPoint.new_degrees(lat,lon))
+
+        try:
+            self.symbolProvider.draw(cr, symbol_name, x, y)
+        except Exception:
+            cr.set_source_rgba(0.9, 0.9, 0.1, 0.7)
+            self._draw_point(gpsmap, cr, point_geom, 9)
+
+    def _build_light_label(self, feature):
+        # TODO: implement it :)
+        litchr = self._get_string_field(feature, "LITCHR")
+        colour = self._get_string_field(feature, "COLOUR")
+        sigper = self._get_string_field(feature, "SIGPER")
+
+        parts = []
+        if litchr:
+            parts.append(litchr)
+        if colour:
+            parts.append(colour)
+        if sigper:
+            parts.append(sigper + "s")
+        return ".".join(parts) if parts else None
+
+    def _select_light_symbol(self, feature):
+        self._build_light_label(feature)
+        raw_colour = self._get_string_field(feature, "COLOUR")
+        colours = self._parse_s57_int_list(raw_colour)
+
+        if 12 in colours:
+            return "LIGHTS14"
+        elif 3 in colours:
+            return "LIGHTS11"
+        elif 4 in colours:
+            return "LIGHTS12"
+        elif 1 in colours or 6 in colours:
+            return "LIGHTS13"
+        return "LIGHTS13"
+
+    def _get_string_field(self, feature, name):
+        idx = feature.GetFieldIndex(name)
+        if idx != -1 and feature.IsFieldSet(idx):
+            return feature.GetFieldAsString(idx)
+        return None
+
+    def _parse_s57_int_list(self, raw_value):
+        if not raw_value:
+            return []
+
+        cleaned = raw_value.strip().strip("()")
+        if not cleaned:
+            return []
+
+        values = []
+        for chunk in cleaned.split(","):
+            chunk = chunk.strip()
+            if ":" in chunk:
+                parts = chunk.split(":")
+                for part in parts:
+                    part = part.strip()
+                    if part.isdigit():
+                        values.append(int(part))
+            elif chunk.isdigit():
+                values.append(int(chunk))
+
+        return values
 
