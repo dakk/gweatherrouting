@@ -16,12 +16,15 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 from .vectorchartdrawer import VectorChartDrawer
 from gweatherrouting.gtk.widgets.mapwidget import MapPoint
+import cairo
 
 SUPPORTED_LAYERS = {
-                    "polygon" : ("LNDARE", "DEPARE"),
+                    "polygon" : ("LNDARE", "DEPARE","OBSTRN", "UWTROC"),
                     "line": ("COALNE", "DEPCNT"), 
-                    "point": ("SOUNDG", "LIGHTS", "BOYLAT")
+                    "point": ("SOUNDG", "LIGHTS", "BOYLAT", "WRECKS")
                    }
+SAFE_DEPTH = 5
+
 class S57ChartDrawer(VectorChartDrawer):
     def draw(self, gpsmap, cr, vector_file, bounding):
         # NOTE: Actually to ensure proper visualization the file is read three
@@ -48,7 +51,7 @@ class S57ChartDrawer(VectorChartDrawer):
                 continue
             if layer_name in SUPPORTED_LAYERS["line"]:
                 self._render_layer(layer, gpsmap, cr, layer_name, bounding)
-        
+
         # Draw point layers
         for i in range(vector_file.GetLayerCount()):
             layer = vector_file.GetLayerByIndex(i)
@@ -72,7 +75,8 @@ class S57ChartDrawer(VectorChartDrawer):
                 continue
 
             if layer_name in SUPPORTED_LAYERS["polygon"]:
-                self._render_polygon_geometry(gpsmap, cr, l_geom, layer_name)
+                self._render_polygon_geometry(gpsmap, cr, l_geom,
+                                              layer_name, feature)
             elif layer_name in SUPPORTED_LAYERS["line"]:
                 self._render_line_geometry(gpsmap, cr, l_geom, layer_name)
             elif layer_name in SUPPORTED_LAYERS["point"]:
@@ -83,14 +87,36 @@ class S57ChartDrawer(VectorChartDrawer):
             feature = layer.GetNextFeature()
 
 
-    def _render_polygon_geometry(self, gpsmap, cr, l_geom, layer_name):
+    def _render_polygon_geometry(self, gpsmap, cr, l_geom, layer_name, feature):
         l_geom_name = l_geom.GetGeometryName()
 
         # Define layer color
-        if layer_name == "LNDARE":      # soil
+        if layer_name == "LNDARE":      # land
             cr.set_source_rgba(0.4, 0.2, 0, 1.0)
-        elif layer_name == "DEPARE":    # water
-            cr.set_source_rgba(0.54, 0.61, 0.85, 1.0)
+        elif layer_name == "DEPARE":    # depth area
+
+            # Access the minimum depth
+            field_index = feature.GetFieldIndex("DRVAL1")
+            if field_index != -1 and feature.IsFieldSet(field_index):
+                drval1 = feature.GetFieldAsDouble(field_index)
+            else:
+                drval1 = None
+
+            if drval1 is None:
+                cr.set_source_rgba(0, 0, 0, 1.0)
+            elif drval1<0:
+                cr.set_source_rgba(0, 0.28, 0.63, 1.0)
+            elif drval1>=0 and drval1<SAFE_DEPTH:
+                cr.set_source_rgba(0, 0.45, 1, 1.0)
+            elif drval1>=SAFE_DEPTH:
+                cr.set_source_rgba(0.5, 0.72, 1, 1.0)
+            else:
+                cr.set_source_rgba(0, 0, 0, 1.0)
+
+        elif layer_name == "OBSTRN":
+            cr.set_source_rgba(0, 1, 0, 0.4)
+        elif layer_name == "UWTROC":
+            cr.set_source_rgba(0, 0, 1, 0.4)
         else:
             print("ERROR: layer not handled")
             return
@@ -106,11 +132,11 @@ class S57ChartDrawer(VectorChartDrawer):
         l_geom_name = l_geom.GetGeometryName()
 
         if layer_name == "COALNE":
-            cr.set_source_rgba(1, 1, 1, 1.0)
+            cr.set_source_rgba(0.6, 0.6, 0.6, 0.8)
             cr.set_line_width(1.2)
         elif layer_name == "DEPCNT":
             cr.set_source_rgba(0, 0, 0, 0.8)
-            cr.set_line_width(0.6)
+            cr.set_line_width(0.8)
         else:
             print("ERROR: layer not handled")
             return
@@ -130,6 +156,12 @@ class S57ChartDrawer(VectorChartDrawer):
         elif layer_name == "LIGHTS":
             cr.set_source_rgba(0.9, 0.9, 0.1, 0.7)
             pt_radius = 9
+        elif layer_name == "BOYLAT":
+            cr.set_source_rgba(1, 0, 0, 0.7)
+            pt_radius = 5
+        elif layer_name == "WRECKS":
+            pt_radius = 5
+            cr.set_source_rgba(1, 0.6, 0.1, 0.7)
         else:
             print("ERROR: layer not handled")
             return
@@ -142,23 +174,19 @@ class S57ChartDrawer(VectorChartDrawer):
                 self._draw_point(gpsmap, cr, point, pt_radius)
 
     def _draw_polygon(self, gpsmap, cr, polygon):
-        ring = polygon.GetGeometryRef(0)
-        if ring is None or ring.GetPointCount() == 0:
+        ring_count = polygon.GetGeometryCount()
+        if ring_count == 0:
             return
 
-        for idx in range(ring.GetPointCount()):
-            pt = ring.GetPoint(idx)
-            lon = pt[0]
-            lat = pt[1]
-            x,y = gpsmap.convert_geographic_to_screen(MapPoint.new_degrees(lat,lon))
+        cr.new_path()
+        cr.set_fill_rule(cairo.FillRule.EVEN_ODD)
 
-            if idx==0:
-                cr.move_to(x,y)
-            else:
-                cr.line_to(x,y)
+        for ring_idx in range(ring_count):
+            ring = polygon.GetGeometryRef(ring_idx)
+            self._draw_ring(gpsmap, cr, ring)
 
-        cr.close_path()
         cr.fill()
+        cr.restore()
 
     def _draw_line(self, gpsmap, cr, line):
         if line is None or line.GetPointCount() == 0:
@@ -192,4 +220,19 @@ class S57ChartDrawer(VectorChartDrawer):
             cr.set_font_size(8)
             cr.move_to(x+3, y-3)
             cr.show_text(f"{depth:.1f}")
+
+    def _draw_ring(self, gpsmap, cr, ring):
+        if ring is None or ring.GetPointCount()==0:
+            return
+        for idx in range(ring.GetPointCount()):
+            pt = ring.GetPoint(idx)
+            lon = pt[0]
+            lat = pt[1]
+            x,y = gpsmap.convert_geographic_to_screen(MapPoint.new_degrees(lat,lon))
+
+            if idx==0:
+                cr.move_to(x,y)
+            else:
+                cr.line_to(x,y)
+        cr.close_path()
 
