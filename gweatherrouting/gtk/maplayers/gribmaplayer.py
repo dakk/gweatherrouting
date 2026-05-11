@@ -18,6 +18,7 @@ import math
 
 import cairo
 import gi
+import numpy as np
 
 gi.require_version("Gtk", "3.0")
 
@@ -25,7 +26,6 @@ from gi.repository import GObject
 
 from gweatherrouting.common import wind_color
 from gweatherrouting.core.utils import point_in_country
-from gweatherrouting.gtk.widgets.mapwidget import MapPoint
 
 
 class GribMapLayer(GObject.GObject):
@@ -136,37 +136,65 @@ class GribMapLayer(GObject.GObject):
 
         # Draw wind barbs
         cr.set_line_width(1)
+        points = []
         for x in data[::scale]:
             for y in x[::scale]:
                 if not self.settings_manager.gribArrowOnGround:
                     if point_in_country(y[2][0], y[2][1]):
                         continue
+                points.append(y)
 
-                xx, yy = gpsmap.convert_geographic_to_screen(
-                    MapPoint.new_degrees(y[2][0], y[2][1])
-                )
-                self.draw_wind_barb(cr, xx, yy, y[0], y[1])
+        if points:
+            lats = np.array([p[2][0] for p in points], dtype=np.float64)
+            lons = np.array([p[2][1] for p in points], dtype=np.float64)
+            xxs, yys = gpsmap.convert_geographic_to_screen_batch(lats, lons)
+            for xx, yy, p in zip(xxs, yys, points):
+                self.draw_wind_barb(cr, xx, yy, p[0], p[1])
 
     def _draw_color_fill(self, gpsmap, cr, data, scale):
         """Draw interpolated color fill between grid points."""
         opacity = self.settings_manager.gribArrowOpacity * 0.3
-        convert = gpsmap.convert_geographic_to_screen
+
+        # Batch-convert all grid points used as quad corners
+        point_map = {}
+        all_lats = []
+        all_lons = []
+        for i in range(0, len(data), scale):
+            row = data[i]
+            for j in range(0, len(row), scale):
+                point_map[(i, j)] = len(all_lats)
+                d = row[j]
+                all_lats.append(d[2][0])
+                all_lons.append(d[2][1])
+
+        if not all_lats:
+            return
+
+        lats = np.array(all_lats, dtype=np.float64)
+        lons = np.array(all_lons, dtype=np.float64)
+        screen_xs, screen_ys = gpsmap.convert_geographic_to_screen_batch(lats, lons)
 
         for i in range(0, len(data) - scale, scale):
             for j in range(0, len(data[i]) - scale, scale):
                 try:
-                    d_tl = data[i][j]  # top-left
-                    d_tr = data[i][j + scale]  # top-right
-                    d_bl = data[i + scale][j]  # bottom-left
-                    d_br = data[i + scale][j + scale]  # bottom-right
+                    d_tl = data[i][j]
+                    d_tr = data[i][j + scale]
+                    d_bl = data[i + scale][j]
+                    d_br = data[i + scale][j + scale]
                 except IndexError:
                     continue
 
-                # Use actual screen coordinates for each corner
-                x_tl, y_tl = convert(MapPoint.new_degrees(d_tl[2][0], d_tl[2][1]))
-                x_tr, y_tr = convert(MapPoint.new_degrees(d_tr[2][0], d_tr[2][1]))
-                x_bl, y_bl = convert(MapPoint.new_degrees(d_bl[2][0], d_bl[2][1]))
-                x_br, y_br = convert(MapPoint.new_degrees(d_br[2][0], d_br[2][1]))
+                try:
+                    x_tl = screen_xs[point_map[(i, j)]]
+                    y_tl = screen_ys[point_map[(i, j)]]
+                    x_tr = screen_xs[point_map[(i, j + scale)]]
+                    y_tr = screen_ys[point_map[(i, j + scale)]]
+                    x_bl = screen_xs[point_map[(i + scale, j)]]
+                    y_bl = screen_ys[point_map[(i + scale, j)]]
+                    x_br = screen_xs[point_map[(i + scale, j + scale)]]
+                    y_br = screen_ys[point_map[(i + scale, j + scale)]]
+                except KeyError:
+                    continue
 
                 pat = cairo.MeshPattern()
                 pat.begin_patch()
