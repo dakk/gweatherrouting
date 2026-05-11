@@ -15,6 +15,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
 import math
+from typing import List
 
 import cairo
 import gi
@@ -157,8 +158,8 @@ class GribMapLayer(GObject.GObject):
 
         # Batch-convert all grid points used as quad corners
         point_map = {}
-        all_lats = []
-        all_lons = []
+        all_lats: List = []
+        all_lons: List = []
         for i in range(0, len(data), scale):
             row = data[i]
             for j in range(0, len(row), scale):
