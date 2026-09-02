@@ -15,8 +15,8 @@ cleanup:
   - /include
   - /lib/cmake
   - /lib/pkgconfig
-  - "*.a"
-  - "*.la"
+  - '*.a'
+  - '*.la'
   - /share/aclocal
 
 
@@ -42,8 +42,8 @@ modules:
       - /share
     sources:
       - type: archive
-        url: http://download.osgeo.org/geos/geos-3.14.1.tar.bz2
-        sha256: 3c20919cda9a505db07b5216baa980bacdaa0702da715b43f176fb07eff7e716
+        url: http://download.osgeo.org/geos/geos-3.15.0.tar.bz2
+        sha256: d5e5192a686d065eaed082de14dd26244c5c8e02bff16b2c6cce3265f648e00e
         x-checker-data:
           type: anitya
           project-id: 13493
@@ -62,19 +62,19 @@ modules:
     sources:
       - type: git
         url: https://github.com/json-c/json-c
-        tag: json-c-0.18-20240915
-        commit: 41a55cfcedb54d9c1874f2f0eb07b504091d7e37
+        tag: json-c-0.19-20260627
+        commit: aa716cd8d663c976b99b0f30f102ee1d8ef63146
         x-checker-data:
           type: git
-          tag-pattern: '^json-c-([\d.]+)-[\d]+$'          
+          tag-pattern: ^json-c-([\d.]+)-[\d]+$
 
   - name: libgeotiff
     buildsystem: autotools
     sources:
-    - type: archive
-      url: https://github.com/OSGeo/libgeotiff/releases/download/1.7.4/libgeotiff-1.7.4.tar.gz
-      sha256: c598d04fdf2ba25c4352844dafa81dde3f7fd968daa7ad131228cd91e9d3dc47
-      
+      - type: archive
+        url: https://github.com/OSGeo/libgeotiff/releases/download/1.7.4/libgeotiff-1.7.4.tar.gz
+        sha256: c598d04fdf2ba25c4352844dafa81dde3f7fd968daa7ad131228cd91e9d3dc47
+
   - name: qhull
     buildsystem: cmake-ninja
     config-opts:
@@ -96,7 +96,7 @@ modules:
       - type: archive
         url: https://github.com/Esri/lerc/archive/refs/tags/v4.0.0.tar.gz
         sha256: 91431c2b16d0e3de6cbaea188603359f87caed08259a645fd5a3805784ee30a0
-        
+
   - name: muparser
     buildsystem: cmake-ninja
     config-opts:
@@ -116,7 +116,7 @@ modules:
       - --with-python3
       - --disable-debug
     cleanup:
-      - "*"
+      - '*'
     sources:
       - type: archive
         url: https://github.com/swig/swig/archive/refs/tags/v4.4.0.tar.gz
@@ -141,7 +141,7 @@ modules:
         url: https://github.com/OpenMathLib/OpenBLAS/releases/download/v0.3.30/OpenBLAS-0.3.30.tar.gz
         sha256: 27342cff518646afb4c2b976d809102e368957974c250a25ccc965e53063c95d
 
-  - python3-requirements.yaml 
+  - python3-requirements.yaml
 
   - name: gdal
     buildsystem: cmake-ninja
@@ -163,16 +163,17 @@ modules:
       - type: archive
         url: https://github.com/OSGeo/gdal/releases/download/v3.12.0/gdal-3.12.0.tar.gz
         sha256: 44c95baabe6c1a047c1ebe5043e38dd73e4936bc4c481db14efbfd03342eab73
- 
+
   - name: gweatherrouting
     buildsystem: simple
     build-commands:
-      - pip3 install --verbose --exists-action=i --no-index --no-deps --prefix=/app --no-build-isolation .
+      - pip3 install --verbose --exists-action=i --no-index --no-deps --prefix=/app
+        --no-build-isolation .
       - install -Dm644 gweatherrouting/data/icon.png /app/share/icons/hicolor/256x256/apps/org.gweatherrouting.gweatherrouting.png
-      - install -Dm644 tools/org.gweatherrouting.gweatherrouting.desktop /app/share/applications/org.gweatherrouting.gweatherrouting.desktop  
+      - install -Dm644 tools/org.gweatherrouting.gweatherrouting.desktop /app/share/applications/org.gweatherrouting.gweatherrouting.desktop
       - install -Dm644 flatpak/org.gweatherrouting.gweatherrouting.metainfo.xml /app/share/metainfo/org.gweatherrouting.gweatherrouting.metainfo.xml
 
     sources:
-       - type: git
-         url: https://github.com/dakk/gweatherrouting.git
-         tag: v0.3.6
+      - type: git
+        url: https://github.com/dakk/gweatherrouting.git
+        tag: v0.3.6
