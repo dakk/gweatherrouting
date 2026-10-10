@@ -120,13 +120,11 @@ class LogsStack(Gtk.Box, nt.Output, nt.Input):
         self.recording_thread: Optional[Thread] = None
         self.loading_thread: Optional[Thread] = None
 
-        try:
+        if os.path.isfile(LOG_TEMP_FILE):
             self.loading_thread = Thread(
                 target=self.load_from_file, args=(LOG_TEMP_FILE,)
             )
             self.loading_thread.start()
-        except:
-            pass
 
     def on_time_change(self, time):
         self.selected_time = time

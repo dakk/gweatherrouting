@@ -1,0 +1,4 @@
+brew "gdal"
+brew "gobject-introspection"
+brew "gtk+3"
+brew "python@3.11"

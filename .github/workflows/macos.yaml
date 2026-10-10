@@ -1,0 +1,23 @@
+name: macOS
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up macOS development environment
+        run: make setup-macos
+
+      - name: Check native dependencies and application imports
+        run: |
+          source .venv/bin/activate
+          mkdir -p "$RUNNER_TEMP/gww-home"
+          HOME="$RUNNER_TEMP/gww-home" python -c 'import gi; gi.require_version("Gtk", "3.0"); gi.require_version("GIRepository", "2.0"); from gi.repository import GIRepository; GIRepository.Repository.get_default().require("Gtk", "3.0", 0); import osgeo.gdal_array; import gweatherrouting.__main__; print("GTK typelib, GDAL bindings, and app imports loaded")'

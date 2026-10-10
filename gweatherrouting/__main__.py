@@ -27,6 +27,7 @@ def start_ui_gtk():
     import gi
 
     gi.require_version("Gtk", "3.0")
+    gi.require_version("GLibUnix", "2.0")
     from gi.repository import GLib, Gtk, GLibUnix
 
     from gweatherrouting.gtk.mainwindow import MainWindow

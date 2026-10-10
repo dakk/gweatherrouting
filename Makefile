@@ -19,5 +19,8 @@ build-windows:
 build-flatpak:
 	cd flatpak && bash flatpak-gen.sh -y
 
+setup-macos:
+	bash tools/macos/setup.sh
+
 docs:
 	make -C docs html
