@@ -26,9 +26,12 @@ from gweatherrouting.core import Core
 from .settingsmanager import SettingsManager
 from .settingswindow_charts import SettingsWindowCharts
 from .settingswindow_connections import SettingsWindowConnections
+from .settingswindow_display import SettingsWindowDisplay
 
 
-class SettingsWindow(SettingsWindowConnections, SettingsWindowCharts):
+class SettingsWindow(
+    SettingsWindowConnections, SettingsWindowCharts, SettingsWindowDisplay
+):
     def __init__(
         self, parent: Gtk.Window, settings_manager: SettingsManager, core: Core
     ):
@@ -59,6 +62,7 @@ class SettingsWindow(SettingsWindowConnections, SettingsWindowCharts):
 
         SettingsWindowConnections.__init__(self)
         SettingsWindowCharts.__init__(self)
+        SettingsWindowDisplay.__init__(self)
 
     def show(self):
         self.window.show_all()

@@ -26,5 +26,7 @@ class SettingsManager(Storage):
         self.vectorCharts = []
         self.rasterCharts = []
         self.chartPalette = "cm93"
+        self.smoothZoom = True
+        self.panInertia = True
 
         self.load_or_save_default()
