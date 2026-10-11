@@ -115,4 +115,6 @@ jobs:
         pip install tox
 
     - name: Run tests
-      run: tox -e unit-tests
+      run: |
+        sudo apt-get install -y xvfb xauth
+        xvfb-run -a tox -e unit-tests
