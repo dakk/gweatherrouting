@@ -26,5 +26,6 @@ class SettingsManager(Storage):
         self.vectorCharts = []
         self.rasterCharts = []
         self.chartPalette = "cm93"
+        self.canadianCharts = True
 
         self.load_or_save_default()

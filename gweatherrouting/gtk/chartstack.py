@@ -26,6 +26,7 @@ from gi.repository import Gdk, Gtk
 from gweatherrouting.core import Core, TimeControl
 
 from .charts.chartmanager import ChartManager
+from .charts.chartdownload import ChartDownloadHover
 from .chartstack_ais import ChartStackAIS
 from .chartstack_poi import ChartStackPOI
 from .chartstack_routing import ChartStackRouting
@@ -85,6 +86,7 @@ class ChartStack(
 
         self.map.layer_add(self.chart_manager)
         self.chart_manager.add_map(self.map)
+        self.chart_download_hover = ChartDownloadHover(self.map, self.chart_manager)
 
         self.gribMapLayer = GribMapLayer(
             self.core.grib_manager, self.time_control, self.settings_manager

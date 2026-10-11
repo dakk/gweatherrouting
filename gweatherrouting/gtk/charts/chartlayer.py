@@ -29,7 +29,8 @@ class ChartLayer:
         """Called when the dataset is registered on the software"""
         return
 
-    def get_bounding_wkt_of_coords(self, p1lat, p1lon, p2lat, p2lon):
+    @staticmethod
+    def get_bounding_wkt_of_coords(p1lat, p1lon, p2lat, p2lon):
         return "POLYGON((%f %f,%f %f,%f %f,%f %f,%f %f))" % (
             p1lon,
             p1lat,
