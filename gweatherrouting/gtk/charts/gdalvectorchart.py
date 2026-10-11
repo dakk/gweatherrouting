@@ -16,6 +16,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 
 from osgeo import ogr
 
+from gweatherrouting.core.enccharts import chart_scale_visible
 from gweatherrouting.gtk.charts.cm93datasource import CM93DataSource
 from gweatherrouting.gtk.charts.cm93driver import CM93Driver
 from gweatherrouting.gtk.charts.vectordrawer.osmchartdrawer import OSMChartDrawer
@@ -62,11 +63,67 @@ class GDALVectorChart(ChartLayer):
         if self.vector_file is None:
             raise Exception("Unable to open vector map %s" % path)
 
+        self._coverage: list[ogr.Geometry] = []
+        self._native_scale = 0
+        if drv_name == "S57":
+            self._load_enc_metadata()
+        self._coverage_envelopes = tuple(g.GetEnvelope() for g in self._coverage)
+
+    def _load_enc_metadata(self):
+        identification = self.vector_file.GetLayerByName("DSID")
+        if identification:
+            identification.ResetReading()
+            feature = identification.GetNextFeature()
+            if feature and feature.GetFieldIndex("DSPM_CSCL") >= 0:
+                self._native_scale = feature.GetField("DSPM_CSCL") or 0
+        self._coverage = self.read_coverage(self.vector_file)
+
+    @staticmethod
+    def read_coverage(vector_file):
+        """Read actual ENC coverage, preserving holes and no-coverage panels."""
+        coverage: list[ogr.Geometry] = []
+        exclusions: list[ogr.Geometry] = []
+        layer = vector_file.GetLayerByName("M_COVR")
+        if layer is None:
+            return coverage
+        layer.ResetReading()
+        for feature in layer:
+            geometry = feature.GetGeometryRef()
+            if geometry is not None:
+                geometry = geometry.Clone()
+                if not geometry.IsValid():
+                    geometry = geometry.MakeValid()
+                if feature.GetField("CATCOV") == 1:
+                    coverage.append(geometry)
+                elif feature.GetField("CATCOV") == 2:
+                    exclusions.append(geometry)
+        for exclusion in exclusions:
+            coverage = [g.Difference(exclusion) for g in coverage]
+        return [g for g in coverage if g is not None and not g.IsEmpty()]
+
+    def covers_point(self, lat, lon, scale):
+        if not chart_scale_visible(self._native_scale, scale):
+            return False
+        if isinstance(self.vector_file, CM93DataSource):
+            level = self.vector_file.get_scale_for_zoom(scale)
+            return bool(self.vector_file.get_cells_for_bbox(lat, lon, lat, lon, level))
+        point = ogr.Geometry(ogr.wkbPoint)
+        point.AddPoint_2D(lon, lat)
+        return any(geometry.Intersects(point) for geometry in self._coverage)
+
     def on_register(self, on_tick_handler=None):
         return True
 
     def do_draw(self, gpsmap, cr):
         bounding_geometry = self.get_bounding_geometry(gpsmap)
+        if isinstance(self.drawer, S57ChartDrawer):
+            if not chart_scale_visible(self._native_scale, gpsmap.get_scale()):
+                return
+            # Avoid scanning offscreen charts, including their attribute layers.
+            if self._coverage and not any(
+                g.Intersects(bounding_geometry) for g in self._coverage
+            ):
+                return
         self.drawer.draw(gpsmap, cr, self.vector_file, bounding_geometry)
 
     def do_render(self, gpsmap):

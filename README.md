@@ -25,6 +25,23 @@ GWeatherRouting is an open-source sailing routing and navigation software writte
     - GSHHS basemap (download helper included)
     - KAP, GeoTiff charts and other raster formats supported by GDAL
     - OpenSeaMap seamarks rendering
+    - Canadian CHS chart imagery loads automatically as you browse Canadian waters.
+      Background PNG tile loading, Retina resolution, zoom previews, short
+      crossfades between detail levels, and a local
+      offline cache keep map interaction responsive. Toggle it under Settings →
+      Charts → Canadian charts (CHS). Cached tiles refresh after 14 days when online;
+      previously cached imagery stays available offline. This CHS viewing service
+      is not for navigation and does not supply depths to the routing engine.
+    - Zoom-aware ENC selection: overlapping charts use the compilation scale closest
+      to the current zoom, with other downloaded charts filling coverage gaps.
+    - On-demand NOAA ENC downloads: pause the pointer to check for a chart better
+      suited to the current zoom, even where another chart is already displayed.
+      The hover card offers to download it or use an existing disabled/cached copy.
+      Charts load immediately and remain available offline. Basic ENC rendering
+      includes depth soundings in meters, depth contours, and shallow-water shading.
+      Download discovery currently covers NOAA's U.S. chart catalog. Downloaded
+      charts are snapshots; automatic chart updates and depth-aware routing are
+      not yet implemented.
 - Gtk4 interface
 - NMEA instruments support
 - NMEA / GPX log analysys
