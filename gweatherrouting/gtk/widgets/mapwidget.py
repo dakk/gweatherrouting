@@ -15,6 +15,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
 import math
+from typing import Callable, Protocol
 
 import numpy as np
 
@@ -63,6 +64,14 @@ class MapLayer:
         return False
 
 
+class Projection(Protocol):
+    """Projection state shared by the GTK canvas and frozen render viewports."""
+
+    _zoom: float
+    TILE_SIZE: int
+    MAX_LAT: float
+
+
 class MapWidget(Gtk.DrawingArea):
     """Pure Python/GTK replacement for OsmGpsMap widget.
 
@@ -83,7 +92,7 @@ class MapWidget(Gtk.DrawingArea):
         # Map state
         self._center_lat = 0.0
         self._center_lon = 0.0
-        self._zoom = 3
+        self._zoom = 3.0
 
         # Layers
         self._layers = []
@@ -120,7 +129,7 @@ class MapWidget(Gtk.DrawingArea):
     # Maximum latitude for Mercator projection (avoids math domain errors at poles)
     MAX_LAT = 85.051129
 
-    def _lat_to_y(self, lat):
+    def _lat_to_y(self: Projection, lat):
         """Convert latitude to Mercator world-pixel Y at current zoom."""
         lat = max(-self.MAX_LAT, min(self.MAX_LAT, lat))
         n = 2.0**self._zoom
@@ -132,18 +141,18 @@ class MapWidget(Gtk.DrawingArea):
             * self.TILE_SIZE
         )
 
-    def _lon_to_x(self, lon):
+    def _lon_to_x(self: Projection, lon):
         """Convert longitude to Mercator world-pixel X at current zoom."""
         n = 2.0**self._zoom
         return (lon + 180.0) / 360.0 * n * self.TILE_SIZE
 
-    def _y_to_lat(self, y):
+    def _y_to_lat(self: Projection, y):
         """Convert Mercator world-pixel Y to latitude at current zoom."""
         n = 2.0**self._zoom
         lat_rad = math.atan(math.sinh(math.pi * (1 - 2 * y / (n * self.TILE_SIZE))))
         return math.degrees(lat_rad)
 
-    def _x_to_lon(self, x):
+    def _x_to_lon(self: Projection, x):
         """Convert Mercator world-pixel X to longitude at current zoom."""
         n = 2.0**self._zoom
         return x / (n * self.TILE_SIZE) * 360.0 - 180.0
@@ -473,3 +482,34 @@ class MapWidget(Gtk.DrawingArea):
         self._center_lat = max(-85.0, min(85.0, self._center_lat))
 
         self.queue_draw()
+
+
+class MapViewport:
+    """Frozen map projection for rendering a reusable chart image with a margin."""
+
+    TILE_SIZE = MapWidget.TILE_SIZE
+    MAX_LAT = MapWidget.MAX_LAT
+    _lat_to_y = MapWidget._lat_to_y
+    _lon_to_x = MapWidget._lon_to_x
+    _y_to_lat = MapWidget._y_to_lat
+    _x_to_lon = MapWidget._x_to_lon
+    get_bbox = MapWidget.get_bbox
+    get_scale = MapWidget.get_scale
+    convert_screen_to_geographic = MapWidget.convert_screen_to_geographic
+    convert_geographic_to_screen = MapWidget.convert_geographic_to_screen
+    convert_geographic_to_screen_batch = MapWidget.convert_geographic_to_screen_batch
+
+    def __init__(self, source, margin=0, on_redraw=None):
+        self._center_lat = source._center_lat
+        self._center_lon = source._center_lon
+        self._zoom = source._zoom
+        self.width = source.get_allocated_width() + 2 * margin
+        self.height = source.get_allocated_height() + 2 * margin
+        self.queue_draw = on_redraw or source.queue_draw
+        self.render_cancelled: Callable[[], bool] = lambda: False
+
+    def get_allocated_width(self):
+        return self.width
+
+    def get_allocated_height(self):
+        return self.height
