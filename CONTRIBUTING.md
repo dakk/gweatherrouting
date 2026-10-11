@@ -5,10 +5,14 @@
 If you have found an issue with gweatherrouting, first do a search in the [gweatherrouting issue tracker](https://github.com/dakk/gweatherrouting/issues) to ensure that there are no existing issues with
 similar content. If you can't find another related issue, open a new one: please try to be as detailed as possible.
 
+## AI assisted Contributions
+
+AI assisted contributions are allowed but we only accept humans as authors of contributions, so you are responsible for the code you submit; the use of AI tools should be disclosed in PR description and you must fully understand the code you submit.
 
 ## Submit a pull request
 
-If you want to contribute to gweatherrouting, you have to follow this flow:
+If you want to contribute to gweatherrouting, please first open an issue and discuss with the maintainer the proposed feature / fix before writing code.
+Then you have to follow this flow:
 
 1. First fork the [gweatherrouting repository](https://github.com/dakk/gweatherrouting) so you can work on your copy of the code
 2. Clone it locally by running ```git clone https://github.com/YOUR_USERNAME/gweatherrouting.git```
@@ -80,3 +84,5 @@ make docs
 1. Pin the release tag in the flatpak manifest
 2. Build the release
 3. flatpak-pip-generator --runtime=org.gnome.Sdk//49 -r requirements.txt --yaml
+
+
