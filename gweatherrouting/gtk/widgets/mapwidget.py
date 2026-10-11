@@ -15,13 +15,16 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
 import math
+from typing import Callable, Protocol
 
 import numpy as np
 
 import gi
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gdk, GObject, Gtk
+from gi.repository import Gdk, GLib, GObject, Gtk
+
+from .mapmotion import DragVelocity, PanInertia, ZoomAnimation
 
 
 class MapPoint:
@@ -63,6 +66,14 @@ class MapLayer:
         return False
 
 
+class Projection(Protocol):
+    """Projection state shared by the GTK canvas and frozen render viewports."""
+
+    _zoom: float
+    TILE_SIZE: int
+    MAX_LAT: float
+
+
 class MapWidget(Gtk.DrawingArea):
     """Pure Python/GTK replacement for OsmGpsMap widget.
 
@@ -83,7 +94,17 @@ class MapWidget(Gtk.DrawingArea):
         # Map state
         self._center_lat = 0.0
         self._center_lon = 0.0
-        self._zoom = 3
+        self._zoom = 3.0
+        self._smooth_zoom = True
+        self._pan_inertia_enabled = True
+        self._zoom_animation = None
+        self._zoom_animating = False
+        self._inertia = None
+        self._motion_tick = 0
+        self._last_frame_time = None
+        self._motion_destroyed = False
+        self._display_bound = False
+        self._drag_velocity = DragVelocity()
 
         # Layers
         self._layers = []
@@ -105,6 +126,7 @@ class MapWidget(Gtk.DrawingArea):
             | Gdk.EventMask.BUTTON_RELEASE_MASK
             | Gdk.EventMask.POINTER_MOTION_MASK
             | Gdk.EventMask.SCROLL_MASK
+            | Gdk.EventMask.SMOOTH_SCROLL_MASK
             | Gdk.EventMask.KEY_PRESS_MASK
         )
 
@@ -114,13 +136,15 @@ class MapWidget(Gtk.DrawingArea):
         self.connect("motion-notify-event", self._on_motion)
         self.connect("scroll-event", self._on_scroll)
         self.connect("key-press-event", self._on_key_press)
+        self.connect("unmap", self._cancel_motion)
+        self.connect("destroy", self._destroy_motion)
 
     # --- Mercator projection helpers ---
 
     # Maximum latitude for Mercator projection (avoids math domain errors at poles)
     MAX_LAT = 85.051129
 
-    def _lat_to_y(self, lat):
+    def _lat_to_y(self: Projection, lat):
         """Convert latitude to Mercator world-pixel Y at current zoom."""
         lat = max(-self.MAX_LAT, min(self.MAX_LAT, lat))
         n = 2.0**self._zoom
@@ -132,18 +156,18 @@ class MapWidget(Gtk.DrawingArea):
             * self.TILE_SIZE
         )
 
-    def _lon_to_x(self, lon):
+    def _lon_to_x(self: Projection, lon):
         """Convert longitude to Mercator world-pixel X at current zoom."""
         n = 2.0**self._zoom
         return (lon + 180.0) / 360.0 * n * self.TILE_SIZE
 
-    def _y_to_lat(self, y):
+    def _y_to_lat(self: Projection, y):
         """Convert Mercator world-pixel Y to latitude at current zoom."""
         n = 2.0**self._zoom
         lat_rad = math.atan(math.sinh(math.pi * (1 - 2 * y / (n * self.TILE_SIZE))))
         return math.degrees(lat_rad)
 
-    def _x_to_lon(self, x):
+    def _x_to_lon(self: Projection, x):
         """Convert Mercator world-pixel X to longitude at current zoom."""
         n = 2.0**self._zoom
         return x / (n * self.TILE_SIZE) * 360.0 - 180.0
@@ -151,9 +175,10 @@ class MapWidget(Gtk.DrawingArea):
     # --- Public API (OsmGpsMap compatible) ---
 
     def set_center_and_zoom(self, lat, lon, zoom):
+        self._cancel_motion()
         self._center_lat = float(lat)
         self._center_lon = float(lon)
-        self._zoom = max(self.MIN_ZOOM, min(self.MAX_ZOOM, int(zoom)))
+        self._zoom = max(self.MIN_ZOOM, min(self.MAX_ZOOM, float(zoom)))
         self.queue_draw()
 
     def layer_add(self, layer):
@@ -280,6 +305,101 @@ class MapWidget(Gtk.DrawingArea):
 
     # --- Internal event handlers ---
 
+    def bind_display_settings(self, settings):
+        if not self._display_bound:
+            self._display_bound = True
+            settings.register_on_change("smoothZoom", self._set_smooth_zoom)
+            settings.register_on_change("panInertia", self._set_pan_inertia)
+
+    def _set_smooth_zoom(self, enabled):
+        if self._motion_destroyed:
+            return
+        self._smooth_zoom = bool(enabled)
+        if not enabled and self._zoom_animation:
+            motion = self._zoom_animation
+            self._apply_zoom(motion.target, motion.anchor, motion.pointer)
+            self._cancel_motion()
+            self.queue_draw()
+
+    def _set_pan_inertia(self, enabled):
+        if self._motion_destroyed:
+            return
+        self._pan_inertia_enabled = bool(enabled)
+        if not enabled and self._inertia:
+            self._cancel_motion()
+
+    def _cancel_motion(self, *args):
+        if self._motion_tick:
+            self.remove_tick_callback(self._motion_tick)
+            self._motion_tick = 0
+        self._zoom_animation = None
+        self._zoom_animating = False
+        self._inertia = None
+        self._last_frame_time = None
+
+    def _destroy_motion(self, *args):
+        self._cancel_motion()
+        self._motion_destroyed = True
+
+    def _ensure_motion_tick(self):
+        if not self._motion_tick:
+            self._last_frame_time = None
+            self._motion_tick = self.add_tick_callback(self._animate_motion)
+
+    def _animate_motion(self, widget, frame_clock):
+        now = frame_clock.get_frame_time() / 1000000
+        elapsed = (
+            min(0.05, max(0, now - self._last_frame_time))
+            if self._last_frame_time
+            else 1 / 60
+        )
+        self._last_frame_time = now
+        if self._zoom_animation:
+            motion = self._zoom_animation
+            zoom, finished = motion.value_at(now)
+            self._apply_zoom(zoom, motion.anchor, motion.pointer)
+            if finished:
+                self._zoom_animation = None
+                self._zoom_animating = False
+        if self._inertia:
+            dx, dy = self._inertia.step(elapsed)
+            self._move_pixels(-dx, -dy)
+            if not self._inertia.active:
+                self._inertia = None
+        self.queue_draw()
+        if not self._zoom_animation and not self._inertia:
+            self._motion_tick = 0
+            self._last_frame_time = None
+            return False
+        return True
+
+    def _apply_zoom(self, zoom, anchor, pointer):
+        self._zoom = zoom
+        lat, lon = anchor
+        x = self._lon_to_x(lon) - (pointer[0] - self.get_allocated_width() / 2)
+        y = self._lat_to_y(lat) - (pointer[1] - self.get_allocated_height() / 2)
+        self._center_lon = self._x_to_lon(x)
+        self._center_lat = max(-85, min(85, self._y_to_lat(y)))
+
+    def _request_zoom(self, amount, x, y):
+        target = self._zoom_animation.target if self._zoom_animation else self._zoom
+        target = max(self.MIN_ZOOM, min(self.MAX_ZOOM, target + amount))
+        anchor = self.convert_screen_to_geographic(x, y).get_degrees()
+        self._cancel_motion()
+        self._dragging = False
+        if abs(target - self._zoom) < 0.000001:
+            return
+        if self._smooth_zoom:
+            now = GLib.get_monotonic_time() / 1000000
+            self._zoom_animation = ZoomAnimation(
+                self._zoom, target, now, anchor, (x, y)
+            )
+            self._zoom_animating = True
+            self._ensure_motion_tick()
+        else:
+            self._apply_zoom(target, anchor, (x, y))
+            self.queue_draw()
+
     def _on_draw(self, widget, cr):
         # Draw layers in order
         for layer in self._layers:
@@ -289,6 +409,7 @@ class MapWidget(Gtk.DrawingArea):
         return False
 
     def _on_button_press(self, widget, event):
+        self._cancel_motion()
         # Let layers handle button presses first
         for layer in reversed(self._layers):
             if layer.do_button_press(self, event):
@@ -300,15 +421,31 @@ class MapWidget(Gtk.DrawingArea):
             self._drag_start_y = event.y
             self._drag_start_lat = self._center_lat
             self._drag_start_lon = self._center_lon
+            self._drag_velocity = DragVelocity()
+            self._drag_velocity.add(
+                GLib.get_monotonic_time() / 1000000, event.x, event.y
+            )
         return False
 
     def _on_button_release(self, widget, event):
         if event.button == 1:
+            if self._dragging and self._pan_inertia_enabled:
+                vx, vy = self._drag_velocity.release(
+                    GLib.get_monotonic_time() / 1000000, event.x, event.y
+                )
+                self._inertia = PanInertia(vx, vy)
+                if self._inertia.active:
+                    self._ensure_motion_tick()
+                else:
+                    self._inertia = None
             self._dragging = False
         return False
 
     def _on_motion(self, widget, event):
         if self._dragging:
+            self._drag_velocity.add(
+                GLib.get_monotonic_time() / 1000000, event.x, event.y
+            )
             dx = event.x - self._drag_start_x
             dy = event.y - self._drag_start_y
 
@@ -326,88 +463,19 @@ class MapWidget(Gtk.DrawingArea):
         return False
 
     def _on_scroll(self, widget, event):
-        # Zoom in/out centred on mouse position
-        old_zoom = self._zoom
-
+        amount = 0.0
         if event.direction == Gdk.ScrollDirection.UP:
-            self._zoom = min(self.MAX_ZOOM, self._zoom + 1)
+            amount = 1.0
         elif event.direction == Gdk.ScrollDirection.DOWN:
-            self._zoom = max(self.MIN_ZOOM, self._zoom - 1)
+            amount = -1.0
         elif event.direction == Gdk.ScrollDirection.SMOOTH:
             _, dx, dy = event.get_scroll_deltas()
-            if dy < 0:
-                self._zoom = min(self.MAX_ZOOM, self._zoom + 1)
-            elif dy > 0:
-                self._zoom = max(self.MIN_ZOOM, self._zoom - 1)
-
-        if self._zoom != old_zoom:
-            # Re-center so that the point under the mouse stays fixed
-            w = self.get_allocated_width()
-            h = self.get_allocated_height()
-
-            # Screen offset of cursor from center
-            mx = event.x - w / 2.0
-            my = event.y - h / 2.0
-
-            # Geographic point under cursor at old zoom
-            old_n = 2.0**old_zoom
-            old_cx = (self._center_lon + 180.0) / 360.0 * old_n * self.TILE_SIZE
-            old_cy = (
-                (
-                    1.0
-                    - math.log(
-                        math.tan(math.radians(self._center_lat))
-                        + 1.0 / math.cos(math.radians(self._center_lat))
-                    )
-                    / math.pi
-                )
-                / 2.0
-                * old_n
-                * self.TILE_SIZE
-            )
-            cursor_world_x = old_cx + mx
-            cursor_world_y = old_cy + my
-
-            # Convert cursor world coords to geographic
-            cursor_lon = cursor_world_x / (old_n * self.TILE_SIZE) * 360.0 - 180.0
-            cursor_lat = math.degrees(
-                math.atan(
-                    math.sinh(
-                        math.pi * (1 - 2 * cursor_world_y / (old_n * self.TILE_SIZE))
-                    )
-                )
-            )
-
-            # At new zoom, where is that geographic point in world coords?
-            new_n = 2.0**self._zoom
-            cursor_new_x = (cursor_lon + 180.0) / 360.0 * new_n * self.TILE_SIZE
-            cursor_new_y = (
-                (
-                    1.0
-                    - math.log(
-                        math.tan(math.radians(cursor_lat))
-                        + 1.0 / math.cos(math.radians(cursor_lat))
-                    )
-                    / math.pi
-                )
-                / 2.0
-                * new_n
-                * self.TILE_SIZE
-            )
-
-            # New center so that cursor point stays at same screen position
-            new_cx = cursor_new_x - mx
-            new_cy = cursor_new_y - my
-
-            self._center_lon = new_cx / (new_n * self.TILE_SIZE) * 360.0 - 180.0
-            self._center_lat = math.degrees(
-                math.atan(
-                    math.sinh(math.pi * (1 - 2 * new_cy / (new_n * self.TILE_SIZE)))
-                )
-            )
-            self._center_lat = max(-85.0, min(85.0, self._center_lat))
-
-            self.queue_draw()
+            if self._smooth_zoom:
+                amount = max(-2.0, min(2.0, -dy * 0.35))
+            elif dy:
+                amount = 1.0 if dy < 0 else -1.0
+        if amount:
+            self._request_zoom(amount, event.x, event.y)
         return True
 
     def _on_key_press(self, widget, event):  # noqa: C901
@@ -453,18 +521,25 @@ class MapWidget(Gtk.DrawingArea):
             self._pan(pan_pixels, 0)
             return True
         elif name in ("plus", "equal", "KP_Add"):
-            self._zoom = min(self.MAX_ZOOM, self._zoom + 1)
-            self.queue_draw()
+            self._request_zoom(
+                1, self.get_allocated_width() / 2, self.get_allocated_height() / 2
+            )
             return True
         elif name in ("minus", "KP_Subtract"):
-            self._zoom = max(self.MIN_ZOOM, self._zoom - 1)
-            self.queue_draw()
+            self._request_zoom(
+                -1, self.get_allocated_width() / 2, self.get_allocated_height() / 2
+            )
             return True
 
         return False
 
     def _pan(self, dx, dy):
         """Pan the map by (dx, dy) screen pixels."""
+        self._cancel_motion()
+        self._move_pixels(dx, dy)
+        self.queue_draw()
+
+    def _move_pixels(self, dx, dy):
         cx = self._lon_to_x(self._center_lon)
         cy = self._lat_to_y(self._center_lat)
 
@@ -472,4 +547,33 @@ class MapWidget(Gtk.DrawingArea):
         self._center_lat = self._y_to_lat(cy + dy)
         self._center_lat = max(-85.0, min(85.0, self._center_lat))
 
-        self.queue_draw()
+
+class MapViewport:
+    """Frozen map projection for rendering a reusable chart image with a margin."""
+
+    TILE_SIZE = MapWidget.TILE_SIZE
+    MAX_LAT = MapWidget.MAX_LAT
+    _lat_to_y = MapWidget._lat_to_y
+    _lon_to_x = MapWidget._lon_to_x
+    _y_to_lat = MapWidget._y_to_lat
+    _x_to_lon = MapWidget._x_to_lon
+    get_bbox = MapWidget.get_bbox
+    get_scale = MapWidget.get_scale
+    convert_screen_to_geographic = MapWidget.convert_screen_to_geographic
+    convert_geographic_to_screen = MapWidget.convert_geographic_to_screen
+    convert_geographic_to_screen_batch = MapWidget.convert_geographic_to_screen_batch
+
+    def __init__(self, source, margin=0, on_redraw=None):
+        self._center_lat = source._center_lat
+        self._center_lon = source._center_lon
+        self._zoom = source._zoom
+        self.width = source.get_allocated_width() + 2 * margin
+        self.height = source.get_allocated_height() + 2 * margin
+        self.queue_draw = on_redraw or source.queue_draw
+        self.render_cancelled: Callable[[], bool] = lambda: False
+
+    def get_allocated_width(self):
+        return self.width
+
+    def get_allocated_height(self):
+        return self.height

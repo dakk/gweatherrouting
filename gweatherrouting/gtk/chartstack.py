@@ -70,6 +70,7 @@ class ChartStack(
         self.pack_start(self.builder.get_object("chartcontent"), True, True, 0)
 
         self.map = MapWidget()
+        self.map.bind_display_settings(self.settings_manager)
         map_container = self.builder.get_object("map-container")
         map_container.pack_start(self.map, True, True, 0)
         self.map.set_center_and_zoom(39.0, 9.0, 6)
