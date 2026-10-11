@@ -203,7 +203,11 @@ class ChartStack(
         self.map.queue_draw()
 
     def _cancel_cursor_during_motion(self, map, cr):
-        if map._dragging or map._zoom_animating or map._inertia:
+        if (
+            map._dragging
+            or getattr(map, "_zoom_animating", False)
+            or getattr(map, "_inertia", None)
+        ):
             self._wind_cursor.cancel()
         return False
 

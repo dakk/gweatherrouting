@@ -62,6 +62,12 @@ class TestCursorEvents(unittest.TestCase):
         )
         self.stack._wind_cursor.cancel.assert_called_once()
 
+    def test_frame_motion_supports_canvas_without_animation_settings(self):
+        self.assertFalse(
+            ChartStack._cancel_cursor_during_motion(self.stack, self.canvas, None)
+        )
+        self.stack._wind_cursor.cancel.assert_not_called()
+
     def test_stationary_hover_uses_async_readout_and_converts_knots(self):
         self.stack.gribMapLayer.visible = True
         self.move()
