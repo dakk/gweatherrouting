@@ -15,6 +15,7 @@ For detail about GNU see <http://www.gnu.org/licenses/>.
 """
 
 import math
+from functools import lru_cache
 from typing import List
 
 import cairo
@@ -28,21 +29,21 @@ from gi.repository import GObject
 from gweatherrouting.common import wind_color
 from gweatherrouting.core.utils import point_in_country
 
+from .windrenderer import WindOverlayRenderer
 
-class GribMapLayer(GObject.GObject):
-    def __init__(self, grib_manager, time_control, settings_manager):
-        GObject.GObject.__init__(self)
-        self.visible = True
-        self.grib_manager = grib_manager
-        self.time_control = time_control
-        self.time_control.connect("time_change", self.on_time_change)
+
+@lru_cache(maxsize=16384)
+def wind_on_ground(lat, lon):
+    """Reuse the static land mask between neighboring wind viewports."""
+    return point_in_country(lat, lon)
+
+
+class WindPainter:
+    """Draw a frozen set of wind samples without accessing GTK or live settings."""
+
+    def __init__(self, settings_manager, on_ground=wind_on_ground):
         self.settings_manager = settings_manager
-
-    def set_visible(self, visible):
-        self.visible = visible
-
-    def on_time_change(self, t):
-        pass
+        self._on_ground = on_ground
 
     def draw_wind_barb(self, cr, x, y, wdir, wspeed):
         """Draw a wind barb in standard meteorological notation.
@@ -108,23 +109,7 @@ class GribMapLayer(GObject.GObject):
 
         cr.restore()
 
-    def do_draw(self, gpsmap, cr):
-        if not self.visible:
-            return
-
-        p1, p2 = gpsmap.get_bbox()
-
-        p1lat, p1lon = p1.get_degrees()
-        p2lat, p2lon = p2.get_degrees()
-
-        # Expand bounds by ~1 degree so edge quads still render
-        margin = 1.0
-        bounds = (
-            (min(p1lat, p2lat) - margin, min(p1lon, p2lon) - margin),
-            (max(p1lat, p2lat) + margin, max(p1lon, p2lon) + margin),
-        )
-        data = self.grib_manager.get_wind_2d(self.time_control.time, bounds)
-
+    def draw(self, gpsmap, cr, data):
         if not data or len(data) == 0:
             return
 
@@ -137,30 +122,36 @@ class GribMapLayer(GObject.GObject):
 
         # Draw wind barbs
         cr.set_line_width(1)
-        points = []
-        for x in data[::scale]:
-            for y in x[::scale]:
-                if not self.settings_manager.gribArrowOnGround:
-                    if point_in_country(y[2][0], y[2][1]):
-                        continue
-                points.append(y)
-
+        points = self._barb_points(gpsmap, data, scale)
         if points:
             lats = np.array([p[2][0] for p in points], dtype=np.float64)
             lons = np.array([p[2][1] for p in points], dtype=np.float64)
             xxs, yys = gpsmap.convert_geographic_to_screen_batch(lats, lons)
             for xx, yy, p in zip(xxs, yys, points):
+                if gpsmap.render_cancelled():
+                    return
                 self.draw_wind_barb(cr, xx, yy, p[0], p[1])
 
-    def _draw_color_fill(self, gpsmap, cr, data, scale):
-        """Draw interpolated color fill between grid points."""
-        opacity = self.settings_manager.gribArrowOpacity * 0.3
+    def _barb_points(self, gpsmap, data, scale):
+        points = []
+        for row in data[::scale]:
+            if gpsmap.render_cancelled():
+                return []
+            for point in row[::scale]:
+                if not self.settings_manager.gribArrowOnGround:
+                    if self._on_ground(point[2][0], point[2][1]):
+                        continue
+                points.append(point)
+        return points
 
+    def _grid_screen_points(self, gpsmap, data, scale):
         # Batch-convert all grid points used as quad corners
         point_map = {}
         all_lats: List = []
         all_lons: List = []
         for i in range(0, len(data), scale):
+            if gpsmap.render_cancelled():
+                return
             row = data[i]
             for j in range(0, len(row), scale):
                 point_map[(i, j)] = len(all_lats)
@@ -174,8 +165,19 @@ class GribMapLayer(GObject.GObject):
         lats = np.array(all_lats, dtype=np.float64)
         lons = np.array(all_lons, dtype=np.float64)
         screen_xs, screen_ys = gpsmap.convert_geographic_to_screen_batch(lats, lons)
+        return point_map, screen_xs, screen_ys
+
+    def _draw_color_fill(self, gpsmap, cr, data, scale):
+        """Draw interpolated color fill between grid points."""
+        opacity = self.settings_manager.gribArrowOpacity * 0.3
+        projected = self._grid_screen_points(gpsmap, data, scale)
+        if projected is None:
+            return
+        point_map, screen_xs, screen_ys = projected
 
         for i in range(0, len(data) - scale, scale):
+            if gpsmap.render_cancelled():
+                return
             for j in range(0, len(data[i]) - scale, scale):
                 try:
                     d_tl = data[i][j]
@@ -223,6 +225,51 @@ class GribMapLayer(GObject.GObject):
                 cr.line_to(x_bl, y_bl)
                 cr.close_path()
                 cr.fill()
+
+
+class GribMapLayer(GObject.GObject):
+    def __init__(self, grib_manager, time_control, settings_manager):
+        GObject.GObject.__init__(self)
+        self.visible = True
+        self.grib_manager = grib_manager
+        self.time_control = time_control
+        self.settings_manager = settings_manager
+        self._renderer = WindOverlayRenderer(WindPainter)
+        self._maps = set()
+        self.time_control.connect("time_change", self.on_time_change)
+
+    def set_visible(self, visible):
+        self.visible = visible
+        if not visible:
+            for canvas in self._maps:
+                self._renderer.forget(canvas)
+        for canvas in self._maps:
+            canvas.queue_draw()
+
+    def on_time_change(self, *args):
+        for canvas in self._maps:
+            canvas.queue_draw()
+
+    def _forget(self, canvas):
+        self._renderer.forget(canvas)
+        self._maps.discard(canvas)
+
+    def do_draw(self, gpsmap, cr):
+        if not self.visible:
+            return
+        if gpsmap not in self._maps:
+            self._maps.add(gpsmap)
+            gpsmap.connect("destroy", self._forget)
+            gpsmap.connect("unmap", lambda canvas: self._renderer.forget(canvas))
+        # All values are captured on the UI thread; workers have private GDAL
+        # handles and never consult live widgets, settings, or the routing GRIB.
+        style = (
+            self.time_control.time,
+            self.settings_manager.gribArrowOpacity,
+            self.settings_manager.gribArrowOnGround,
+        )
+        sources = tuple((grib,) for grib in self.grib_manager.gribs)
+        self._renderer.draw(gpsmap, cr, sources, style)
 
     def do_render(self, gpsmap):
         pass

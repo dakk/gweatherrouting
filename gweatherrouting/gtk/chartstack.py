@@ -32,6 +32,7 @@ from .chartstack_routing import ChartStackRouting
 from .chartstack_track import ChartStackTrack
 from .gribmanagerwindow import GribFileFilter
 from .maplayers import AISMapLayer, GeoMapLayer, GribMapLayer, ToolsMapLayer
+from .maplayers.windcursor import WindCursorSampler
 from .settings import SettingsManager
 from .widgets.mapwidget import MapWidget
 from .widgets.timetravel import TimeTravelWidget
@@ -70,6 +71,13 @@ class ChartStack(
         self.pack_start(self.builder.get_object("chartcontent"), True, True, 0)
 
         self.map = MapWidget()
+        self._wind_cursor = WindCursorSampler()
+        self.map.connect("destroy", self._wind_cursor.close)
+        self.map.connect("unmap", lambda *args: self._wind_cursor.cancel())
+        self.map.connect("leave-notify-event", lambda *args: self._wind_cursor.cancel())
+        self.map.connect("button-press-event", lambda *args: self._wind_cursor.cancel())
+        self.map.connect("scroll-event", lambda *args: self._wind_cursor.cancel())
+        self.map.connect("draw", self._cancel_cursor_during_motion)
         map_container = self.builder.get_object("map-container")
         map_container.pack_start(self.map, True, True, 0)
         self.map.set_center_and_zoom(39.0, 9.0, 6)
@@ -164,6 +172,7 @@ class ChartStack(
 
     def on_toggle_grib(self, widget):
         self.gribMapLayer.set_visible(widget.get_active())
+        self._wind_cursor.cancel()
         self.map.queue_draw()
 
     def on_toggle_connections(self, widget):
@@ -193,16 +202,44 @@ class ChartStack(
 
         self.map.queue_draw()
 
+    def _cancel_cursor_during_motion(self, map, cr):
+        if map._dragging or map._zoom_animating or map._inertia:
+            self._wind_cursor.cancel()
+        return False
+
     def on_map_mouse_move(self, map, event):
         lat, lon = map.convert_screen_to_geographic(event.x, event.y).get_degrees()
-        w = self.core.grib_manager.get_wind_at(self.time_control.time, lat, lon)
+        forecast = self.time_control.time
+        sources = tuple(self.core.grib_manager.gribs)
+        context = self.status_bar.get_context_id("Info")
+        position = "Latitude: %f, Longitude: %f" % (lat, lon)
+        view = (map._center_lat, map._center_lon, map._zoom)
 
-        sstr = ""
-        if w:
-            sstr += "Wind %.1f°, %.1f kts - " % (w[0], w[1])
-        sstr += "Latitude: %f, Longitude: %f" % (lat, lon)
+        def show(wind):
+            # Forecast/source/visibility changes also invalidate a queued readout.
+            if (
+                forecast != self.time_control.time
+                or sources != tuple(self.core.grib_manager.gribs)
+                or view != (map._center_lat, map._center_lon, map._zoom)
+                or (wind and not self.gribMapLayer.visible)
+            ):
+                return
+            text = position
+            if wind:
+                text = "Wind %.1f°, %.1f kts - " % (wind[0], wind[1] * 1.94384) + text
+            self.status_bar.pop(context)
+            self.status_bar.push(context, text)
 
-        self.status_bar.push(self.status_bar.get_context_id("Info"), sstr)
+        show(None)
+        moving = (
+            map._dragging
+            or getattr(map, "_zoom_animating", False)
+            or getattr(map, "_inertia", None)
+        )
+        if self.gribMapLayer.visible and not moving:
+            self._wind_cursor.request(sources, forecast, lat, lon, show)
+        else:
+            self._wind_cursor.cancel()
 
         if self.tools_map_layer.on_mouse_move(lat, lon, event.x, event.y):
             self.map.queue_draw()

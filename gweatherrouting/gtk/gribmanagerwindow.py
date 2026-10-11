@@ -243,7 +243,9 @@ class GribManagerWindow:
         for x in self.grib_manager.local_gribs:
             end_time = x.start_time + datetime.timedelta(hours=x.last_forecast)
             expired = end_time < now
-            color = "#666666" if expired else ""
+            # None restores the theme foreground; an empty string is parsed as
+            # an invalid GTK color on every repaint of every cell.
+            color = "#666666" if expired else None
 
             self.grib_managerStore.append(
                 [
