@@ -64,6 +64,20 @@ You can install gweatherrouting via flatpak, appimage, windows portable zip, or 
 3. Checkout the repository and run: ```pip install .```
 4. Start the software running: ```gweatherrouting```
 
+### macOS development setup
+
+On macOS, install [Homebrew](https://brew.sh/) and run the setup script from the repository root:
+
+```bash
+make setup-macos
+source .venv/bin/activate
+gweatherrouting
+```
+
+The script installs the native GTK, GDAL, and GObject Introspection dependencies with Homebrew,
+creates a local `.venv`, and installs GWeatherRouting and its Python dependencies. To install the
+Homebrew dependencies separately, run `brew bundle --file=tools/macos/Brewfile`.
+
 ## License
 
 Read the LICENSE file.

@@ -24,7 +24,7 @@ from osgeo import ogr
 
 gi.require_version("Gtk", "3.0")
 
-from gi.repository import Gdk, Gtk
+from gi.repository import Gdk, GLib, Gtk
 
 from gweatherrouting.gtk.widgets.mapwidget import MapPoint
 
@@ -297,10 +297,12 @@ class CombinedDownloadDialog(Gtk.Dialog):
         self.thread.start()
 
     def _update_progress(self, text, fraction):
-        Gdk.threads_enter()
+        GLib.idle_add(self._apply_progress, text, fraction)
+
+    def _apply_progress(self, text, fraction):
         self.label.set_text(text)
         self.pb.set_fraction(fraction)
-        Gdk.threads_leave()
+        return GLib.SOURCE_REMOVE
 
     def _download_file(self, uri, dest, label_prefix):
         response = requests.get(uri, stream=True)
@@ -350,7 +352,9 @@ class CombinedDownloadDialog(Gtk.Dialog):
             self._finish(False)
 
     def _finish(self, success):
-        Gdk.threads_enter()
+        GLib.idle_add(self._show_result, success)
+
+    def _show_result(self, success):
         if success:
             edialog = Gtk.MessageDialog(
                 self.parent, 0, Gtk.MessageType.INFO, Gtk.ButtonsType.OK, "Done"
@@ -371,7 +375,7 @@ class CombinedDownloadDialog(Gtk.Dialog):
             edialog.run()
             edialog.destroy()
             self.response(Gtk.ResponseType.CANCEL)
-        Gdk.threads_leave()
+        return GLib.SOURCE_REMOVE
 
 
 # 	GSHHS_shp: Shapefiles (polygons) derived from shorelines.

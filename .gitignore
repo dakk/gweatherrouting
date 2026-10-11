@@ -4,6 +4,7 @@ dist/*
 build/*
 *.egg-info
 venv
+.venv
 *~
 cache
 bin
